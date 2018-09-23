@@ -1,3 +1,7 @@
 /.apt_generated/
 /bin/
+/.settings/
+/.project
 /.classpath
+/.factorypath
+/.gitignore
