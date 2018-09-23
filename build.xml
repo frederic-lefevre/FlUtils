@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- WARNING: Eclipse auto-generated file.
+              Any modifications will be overwritten.
+              To include a user specific buildfile here, simply create one in the same
+              directory with the processing instruction <?eclipse.ant.import?>
+              as the first entry and export the buildfile again. --><project basedir="." default="build" name="FlUtils">
+    <property environment="env"/>
+    <property name="AnalyseCV.location" value="../AnalyseCV"/>
+    <property name="CognitiveSearch.location" value="../CognitiveSearch"/>
+    <property name="ContentPersonasInsight.location" value="../ContentPersonasInsight"/>
+    <property name="DensityFileGenerator.location" value="../DensityFileGenerator"/>
+    <property name="HMAC Calculator.location" value="../HMAC Calculator"/>
+    <property name="IVA_To_IOC_Pojo.location" value="../IVA_To_IOC_Pojo"/>
+    <property name="Ioc_Configuration.location" value="../Ioc_Configuration"/>
+    <property name="IvaDensityExtrator.location" value="../IvaDensityExtrator"/>
+    <property name="IvaToIocBridge.location" value="../IvaToIocBridge"/>
+    <property name="KatowiceProxyIOC.location" value="../KatowiceProxyIOC"/>
+    <property name="ProcessIocCsv.location" value="../ProcessIocCsv"/>
+    <property name="SkyLineApi.location" value="../SkyLineApi"/>
+    <property name="WebAppliAdminGui.location" value="../WebAppliAdminGui"/>
+    <property name="ECLIPSE_HOME" value="../../../eclipse/"/>
+    <property name="debuglevel" value="source,lines,vars"/>
+    <property name="target" value="1.8"/>
+    <property name="source" value="1.8"/>
+    <path id="FlUtils.classpath">
+        <pathelement location="bin"/>
+        <pathelement location="lib/gson-2.8.2.jar"/>
+    </path>
+    <target name="init">
+        <mkdir dir="bin"/>
+        <copy includeemptydirs="false" todir="bin">
+            <fileset dir="src">
+                <exclude name="**/*.launch"/>
+                <exclude name="**/*.java"/>
+            </fileset>
+        </copy>
+        <copy includeemptydirs="false" todir="bin">
+            <fileset dir=".apt_generated">
+                <exclude name="**/*.launch"/>
+                <exclude name="**/*.java"/>
+            </fileset>
+        </copy>
+    </target>
+    <target name="clean">
+        <delete dir="bin"/>
+    </target>
+    <target depends="clean" name="cleanall"/>
+    <target depends="build-subprojects,build-project" name="build"/>
+    <target name="build-subprojects"/>
+    <target depends="init" name="build-project">
+        <echo message="${ant.project.name}: ${ant.file}"/>
+        <javac debug="true" debuglevel="${debuglevel}" destdir="bin" includeantruntime="false" source="${source}" target="${target}">
+            <src path="src"/>
+            <src path=".apt_generated"/>
+            <classpath refid="FlUtils.classpath"/>
+        </javac>
+    </target>
+    <target description="Build all projects which reference this project. Useful to propagate changes." name="build-refprojects">
+        <ant antfile="build.xml" dir="${AnalyseCV.location}" inheritAll="false" target="clean"/>
+        <ant antfile="build.xml" dir="${AnalyseCV.location}" inheritAll="false" target="build">
+            <propertyset>
+                <propertyref name="build.compiler"/>
+            </propertyset>
+        </ant>
+        <ant antfile="build.xml" dir="${CognitiveSearch.location}" inheritAll="false" target="clean"/>
+        <ant antfile="build.xml" dir="${CognitiveSearch.location}" inheritAll="false" target="build">
+            <propertyset>
+                <propertyref name="build.compiler"/>
+            </propertyset>
+        </ant>
+        <ant antfile="build.xml" dir="${ContentPersonasInsight.location}" inheritAll="false" target="clean"/>
+        <ant antfile="build.xml" dir="${ContentPersonasInsight.location}" inheritAll="false" target="build">
+            <propertyset>
+                <propertyref name="build.compiler"/>
+            </propertyset>
+        </ant>
+        <ant antfile="build.xml" dir="${DensityFileGenerator.location}" inheritAll="false" target="clean"/>
+        <ant antfile="build.xml" dir="${DensityFileGenerator.location}" inheritAll="false" target="build">
+            <propertyset>
+                <propertyref name="build.compiler"/>
+            </propertyset>
+        </ant>
+        <ant antfile="build.xml" dir="${HMAC Calculator.location}" inheritAll="false" target="clean"/>
+        <ant antfile="build.xml" dir="${HMAC Calculator.location}" inheritAll="false" target="build">
+            <propertyset>
+                <propertyref name="build.compiler"/>
+            </propertyset>
+        </ant>
+        <ant antfile="build.xml" dir="${IVA_To_IOC_Pojo.location}" inheritAll="false" target="clean"/>
+        <ant antfile="build.xml" dir="${IVA_To_IOC_Pojo.location}" inheritAll="false" target="build">
+            <propertyset>
+                <propertyref name="build.compiler"/>
+            </propertyset>
+        </ant>
+        <ant antfile="build.xml" dir="${Ioc_Configuration.location}" inheritAll="false" target="clean"/>
+        <ant antfile="build.xml" dir="${Ioc_Configuration.location}" inheritAll="false" target="build">
+            <propertyset>
+                <propertyref name="build.compiler"/>
+            </propertyset>
+        </ant>
+        <ant antfile="build.xml" dir="${IvaDensityExtrator.location}" inheritAll="false" target="clean"/>
+        <ant antfile="build.xml" dir="${IvaDensityExtrator.location}" inheritAll="false" target="build">
+            <propertyset>
+                <propertyref name="build.compiler"/>
+            </propertyset>
+        </ant>
+        <ant antfile="build.xml" dir="${IvaToIocBridge.location}" inheritAll="false" target="clean"/>
+        <ant antfile="build.xml" dir="${IvaToIocBridge.location}" inheritAll="false" target="build">
+            <propertyset>
+                <propertyref name="build.compiler"/>
+            </propertyset>
+        </ant>
+        <ant antfile="build.xml" dir="${KatowiceProxyIOC.location}" inheritAll="false" target="clean"/>
+        <ant antfile="build.xml" dir="${KatowiceProxyIOC.location}" inheritAll="false" target="build">
+            <propertyset>
+                <propertyref name="build.compiler"/>
+            </propertyset>
+        </ant>
+        <ant antfile="build.xml" dir="${ProcessIocCsv.location}" inheritAll="false" target="clean"/>
+        <ant antfile="build.xml" dir="${ProcessIocCsv.location}" inheritAll="false" target="build">
+            <propertyset>
+                <propertyref name="build.compiler"/>
+            </propertyset>
+        </ant>
+        <ant antfile="build.xml" dir="${SkyLineApi.location}" inheritAll="false" target="clean"/>
+        <ant antfile="build.xml" dir="${SkyLineApi.location}" inheritAll="false" target="build">
+            <propertyset>
+                <propertyref name="build.compiler"/>
+            </propertyset>
+        </ant>
+        <ant antfile="build.xml" dir="${WebAppliAdminGui.location}" inheritAll="false" target="clean"/>
+        <ant antfile="build.xml" dir="${WebAppliAdminGui.location}" inheritAll="false" target="build">
+            <propertyset>
+                <propertyref name="build.compiler"/>
+            </propertyset>
+        </ant>
+    </target>
+    <target description="copy Eclipse compiler jars to ant lib directory" name="init-eclipse-compiler">
+        <copy todir="${ant.library.dir}">
+            <fileset dir="${ECLIPSE_HOME}/plugins" includes="org.eclipse.jdt.core_*.jar"/>
+        </copy>
+        <unzip dest="${ant.library.dir}">
+            <patternset includes="jdtCompilerAdapter.jar"/>
+            <fileset dir="${ECLIPSE_HOME}/plugins" includes="org.eclipse.jdt.core_*.jar"/>
+        </unzip>
+    </target>
+    <target description="compile project with Eclipse compiler" name="build-eclipse-compiler">
+        <property name="build.compiler" value="org.eclipse.jdt.core.JDTCompilerAdapter"/>
+        <antcall target="build"/>
+    </target>
+</project>
