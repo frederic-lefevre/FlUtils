@@ -1,6 +1,8 @@
 package com.ibm.lge.fl.util.file;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
 import java.nio.file.AccessDeniedException;
 import java.nio.file.FileStore;
 import java.nio.file.FileSystem;
@@ -12,16 +14,20 @@ import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.AclEntry;
+import java.nio.file.attribute.AclEntryFlag;
 import java.nio.file.attribute.AclEntryPermission;
 import java.nio.file.attribute.AclEntryType;
 import java.nio.file.attribute.AclFileAttributeView;
 import java.nio.file.attribute.BasicFileAttributeView;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.DosFileAttributeView;
+import java.nio.file.attribute.DosFileAttributes;
 import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.FileOwnerAttributeView;
 import java.nio.file.attribute.FileTime;
+import java.nio.file.attribute.GroupPrincipal;
 import java.nio.file.attribute.PosixFileAttributeView;
+import java.nio.file.attribute.PosixFileAttributes;
 import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
 import java.nio.file.attribute.UserDefinedFileAttributeView;
@@ -310,7 +316,7 @@ public class FilesUtils {
 				
 				if (fileStore.supportsFileAttributeView(BasicFileAttributeView.class)) {
 					
-					infos.append("BasicFileAttributes:\n") ;
+					infos.append(" BasicFileAttributes:\n") ;
 					basicAttributes = Files.readAttributes(path, BasicFileAttributes.class);
 					long size = basicAttributes.size() ;
 					
@@ -319,53 +325,126 @@ public class FilesUtils {
 					FileTime creationTime = basicAttributes.creationTime() ;
 					
 					if (basicAttributes.isRegularFile()) {
-						infos.append(" is a regular file\n") ;
+						infos.append("   is a regular file\n") ;
 					} else if (basicAttributes.isDirectory()) {
-						infos.append(" is a directory\n") ;
+						infos.append("   is a directory\n") ;
 					} else if (basicAttributes.isSymbolicLink()) {
-						infos.append(" is a symbolic link\n") ;
+						infos.append("   is a symbolic link\n") ;
 					} else if (basicAttributes.isOther()) {
-						infos.append(" is something else (than a regular file, directory or symbolic link\n") ;
+						infos.append("   is something else (than a regular file, directory or symbolic link\n") ;
 					} else {
-						infos.append(" must be really strange...\n") ;
+						infos.append("   must be really strange...\n") ;
 					}
 					
-					infos.append("Its size is " + size + " bytes\n") ;
-					infos.append("Last modified time is ").append(printFileTime(lastModified)).append("\n") ;
-					infos.append("Last accessed time is ").append(printFileTime(lastAccessed)).append("\n") ;
-					infos.append("Creation time is      ").append(printFileTime(creationTime)).append("\n") ;
+					infos.append("   Its size is " + size + " bytes\n") ;
+					infos.append("   Last modified time is ").append(printFileTime(lastModified)).append("\n") ;
+					infos.append("   Last accessed time is ").append(printFileTime(lastAccessed)).append("\n") ;
+					infos.append("   Creation time is      ").append(printFileTime(creationTime)).append("\n\n") ;
 					
+				} else {
+					infos.append(" BasicFileAttributes is not supported\n\n") ;
 				}
 				
 				if (fileStore.supportsFileAttributeView(FileOwnerAttributeView.class)) {
-					infos.append("FileOwnerAttributes:\n") ;
+					infos.append(" FileOwnerAttributes:\n") ;
 					FileOwnerAttributeView ownerView = Files.getFileAttributeView(path, FileOwnerAttributeView.class);
 					UserPrincipal userPrincipal = ownerView.getOwner() ;
-					infos.append("User principal name: ").append(userPrincipal.getName()) ;
-					infos.append("User principal : ").append(userPrincipal.toString()) ;
+					infos.append("   User principal : ").append(userPrincipal.toString()).append("\n\n") ;
+				} else {
+					infos.append(" FileOwnerAttributes is not supported\n\n") ;
 				}
 
 				if (fileStore.supportsFileAttributeView(AclFileAttributeView.class)) {
-					infos.append("\nAclFileAttributes:\n") ;
+					infos.append(" AclFileAttributes:\n") ;
 					AclFileAttributeView aclView = Files.getFileAttributeView(path, AclFileAttributeView.class);
 					
 					List<AclEntry> aclEntries = aclView.getAcl() ;
-					
+					infos.append("   Acl Entries:\n") ;
 					for (AclEntry aclEntry : aclEntries) {
-						infos.append("Acl entry : ").append(aclEntry.toString()) ;
+						UserPrincipal userPrincipal = aclEntry.principal() ;
+						infos.append("     User principal : ").append(userPrincipal.toString()).append("\n") ;
+						
+						AclEntryType aclEntryType = aclEntry.type() ;
+						infos.append("     Acl entry type: ").append(aclEntryType.toString()).append("\n") ;
+						
+						infos.append("     Acl entry flags:\n       ") ;
+						Set<AclEntryFlag> entryFlags = aclEntry.flags() ;
+						if ((entryFlags != null) && (! entryFlags.isEmpty())) {
+							for (AclEntryFlag entryFlag : entryFlags) {
+								infos.append(entryFlag.toString()).append(" ") ;
+							}
+							infos.append("\n") ;
+						} else {
+							infos.append("No entry flags\n") ;
+						}
+						
+						infos.append("     Acl entry permissions:\n       ") ;
+						Set<AclEntryPermission> entryPermissions = aclEntry.permissions() ;
+						if ((entryPermissions != null) && (! entryPermissions.isEmpty())) {
+							for (AclEntryPermission entryPermission : entryPermissions) {
+								infos.append(entryPermission.toString()).append(" ") ;
+							}
+							infos.append("\n\n") ;
+						} else {
+							infos.append("No entry permissions\n") ;
+						}
 					}
+				} else {
+					infos.append(" AclFileAttributes is not supported\n\n") ;
 				}
 
 				if (fileStore.supportsFileAttributeView(DosFileAttributeView.class)) {
-					infos.append("DosFileAttributes:\n") ;
+					infos.append(" DosFileAttributes:\n") ;
+					
+					DosFileAttributes dosAttributes = Files.readAttributes(path, DosFileAttributes.class);
+					infos.append("   is archive:   ").append(dosAttributes.isArchive()).append("\n") ;
+					infos.append("   is hidden:    ").append(dosAttributes.isHidden()).append("\n") ;
+					infos.append("   is read only: ").append(dosAttributes.isReadOnly()).append("\n") ;
+					infos.append("   is system:    ").append(dosAttributes.isSystem()).append("\n\n") ;
+				} else {
+					infos.append(" DosFileAttributes is not supported\n\n") ;
 				}
 
 				if (fileStore.supportsFileAttributeView(PosixFileAttributeView.class)) {
-					infos.append("PosixFileAttributes:\n") ;
+					infos.append(" PosixFileAttributes:\n") ;
+					
+					PosixFileAttributes posixAttributes = Files.readAttributes(path, PosixFileAttributes.class) ;
+					
+					GroupPrincipal groupPrincipal 		 = posixAttributes.group() ;
+					UserPrincipal userPrincipal 		 = posixAttributes.owner() ;
+					Set<PosixFilePermission> permissions = posixAttributes.permissions() ;
+					
+					infos.append("   Owner: ").append(userPrincipal.toString()).append("\n") ;
+					infos.append("   Group: ").append(groupPrincipal.toString()).append("\n") ;
+					appendPosixPermissions(infos, permissions) ;
+					infos.append("\n\n") ;
+				} else {
+					infos.append(" PosixFileAttributes is not supported\n\n") ;
 				}
 
 				if (fileStore.supportsFileAttributeView(UserDefinedFileAttributeView.class)) {
-					infos.append("UserDefinedFileAttributes:\n") ;
+					infos.append(" UserDefinedFileAttributes:\n") ;
+					
+					UserDefinedFileAttributeView userDefinedView = Files.getFileAttributeView(path, UserDefinedFileAttributeView.class);
+					
+					List<String> userDefinedAttributes = userDefinedView.list() ;
+					if ((userDefinedAttributes != null) && (! userDefinedAttributes.isEmpty())) {
+						for (String attributeName : userDefinedAttributes) {
+							infos.append("   ").append(attributeName).append(" attribute value:\n") ;
+							
+							// get attribute value
+							infos.append("   ").append(attributeName).append("\n") ;
+							ByteBuffer buf = ByteBuffer.allocate(userDefinedView.size(attributeName));
+							userDefinedView.read(attributeName, buf);
+						    buf.flip();
+						    infos.append(Charset.defaultCharset().decode(buf)) ;
+						    infos.append("\n\n") ;  
+						}
+					} else {
+						infos.append("   UserDefinedFileAttributes are supported but there is no attribute defined\n") ;
+					}
+				} else {
+					infos.append(" UserDefinedFileAttributes is not supported\n\n") ;
 				}
 				
 			} catch (Exception e) {
@@ -383,6 +462,31 @@ public class FilesUtils {
 			return unknownTime ;
 		}  else {
 			return DateTimeFormatter.ofPattern(datePattern).format(ZonedDateTime.ofInstant(fileTime.toInstant(), ZoneId.systemDefault())) ;
+		}
+	}
+	
+	private final static String READ_PERMISSION    = "r";
+	private final static String WRITE_PERMISSION   = "w"; 
+	private final static String EXECUTE_PERMISSION = "x"; 
+	private final static String NO_PERMISSION 	   = "-"; 
+	private static void appendPosixPermissions(StringBuilder buff, Set<PosixFilePermission> permissions) {
+		
+		buff.append(getOnePermission(permissions, PosixFilePermission.OWNER_READ,     READ_PERMISSION)) ;
+		buff.append(getOnePermission(permissions, PosixFilePermission.OWNER_WRITE,    WRITE_PERMISSION)) ;
+		buff.append(getOnePermission(permissions, PosixFilePermission.OWNER_EXECUTE,  EXECUTE_PERMISSION)) ;
+		buff.append(getOnePermission(permissions, PosixFilePermission.GROUP_READ,     READ_PERMISSION)) ;
+		buff.append(getOnePermission(permissions, PosixFilePermission.GROUP_WRITE,    WRITE_PERMISSION)) ;
+		buff.append(getOnePermission(permissions, PosixFilePermission.GROUP_EXECUTE,  EXECUTE_PERMISSION)) ;
+		buff.append(getOnePermission(permissions, PosixFilePermission.OTHERS_READ,    READ_PERMISSION)) ;
+		buff.append(getOnePermission(permissions, PosixFilePermission.OTHERS_WRITE,   WRITE_PERMISSION)) ;
+		buff.append(getOnePermission(permissions, PosixFilePermission.OTHERS_EXECUTE, EXECUTE_PERMISSION)) ;
+	}
+	
+	private static String getOnePermission(Set<PosixFilePermission> permissions, PosixFilePermission permission, String s) {
+		if (permissions.contains(permission)) {
+			return s ;
+		} else {
+			return  NO_PERMISSION ;
 		}
 	}
 }
