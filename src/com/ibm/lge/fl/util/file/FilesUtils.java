@@ -2,6 +2,9 @@ package com.ibm.lge.fl.util.file;
 
 import java.io.IOException;
 import java.nio.file.AccessDeniedException;
+import java.nio.file.FileStore;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
@@ -12,15 +15,25 @@ import java.nio.file.attribute.AclEntry;
 import java.nio.file.attribute.AclEntryPermission;
 import java.nio.file.attribute.AclEntryType;
 import java.nio.file.attribute.AclFileAttributeView;
+import java.nio.file.attribute.BasicFileAttributeView;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.nio.file.attribute.DosFileAttributeView;
 import java.nio.file.attribute.FileAttribute;
+import java.nio.file.attribute.FileOwnerAttributeView;
+import java.nio.file.attribute.FileTime;
+import java.nio.file.attribute.PosixFileAttributeView;
 import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
+import java.nio.file.attribute.UserDefinedFileAttributeView;
 import java.nio.file.attribute.UserPrincipal;
 import java.nio.file.attribute.UserPrincipalLookupService;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -243,6 +256,133 @@ public class FilesUtils {
 			Files.setPosixFilePermissions(path, perms);
 		} else {
 			 Files.setAttribute(path, "dos:readonly", false);
+		}
+	}
+	
+	public static void getFileStoreInformation(Path path, StringBuilder fsInfos, Logger logger) {
+		
+		try {
+			
+			FileStore fileStore = Files.getFileStore(path) ;
+			fsInfos.append("FileStore name=").append(fileStore.name()).append("\n") ;
+			fsInfos.append("FileStore type=").append(fileStore.type()).append("\n") ;
+			fsInfos.append("FileStore readOnly=").append(fileStore.isReadOnly()).append("\n") ;
+			fsInfos.append("FileStore total space=      ").append(fileStore.getTotalSpace()).append("\n") ;
+			fsInfos.append("FileStore Unallocated space=").append(fileStore.getUnallocatedSpace()).append("\n") ;
+			fsInfos.append("FileStore Usable space=     ").append(fileStore.getUsableSpace()).append("\n") ;
+			
+		} catch (Exception e) {
+			logger.log(Level.SEVERE, "Exception when appending FileStore informations for file " + path, e) ;
+		}
+	}
+	
+	public static void getFileStoreInformation(StringBuilder fsInfos, Logger logger) {
+		
+		FileSystem fs = FileSystems.getDefault() ;
+		
+		Iterable<Path> rootPaths = fs.getRootDirectories() ;
+		for (Path rootPath : rootPaths) {
+			fsInfos.append("FileSystem Root path=").append(rootPath.toString()).append("\n") ;
+			getFileStoreInformation(rootPath, fsInfos, logger) ;
+		}
+	}
+	
+ 	public static BasicFileAttributes appendFileInformations(Path path, StringBuilder infos, Logger logger) {
+		
+		BasicFileAttributes basicAttributes = null ;
+		
+		if (infos == null) {
+			infos = new StringBuilder() ;
+			if (logger.isLoggable(Level.FINE)) {
+				logger.fine("StringBuilder in poarameter of FilesUtils.appendFileInformations is null. StringBuilder created") ;
+			}
+		}
+		
+		if (path == null) {
+			infos.append(" file is null\n") ;
+		} else if  (! Files.exists(path)) {
+			infos.append(" ").append(path).append(" does not exist\n") ;
+		} else {
+			infos.append(" ").append(path).append("\n") ;
+			try {
+				
+				FileStore fileStore = Files.getFileStore(path) ;
+				
+				if (fileStore.supportsFileAttributeView(BasicFileAttributeView.class)) {
+					
+					infos.append("BasicFileAttributes:\n") ;
+					basicAttributes = Files.readAttributes(path, BasicFileAttributes.class);
+					long size = basicAttributes.size() ;
+					
+					FileTime lastModified = basicAttributes.lastModifiedTime() ;
+					FileTime lastAccessed = basicAttributes.lastAccessTime() ;
+					FileTime creationTime = basicAttributes.creationTime() ;
+					
+					if (basicAttributes.isRegularFile()) {
+						infos.append(" is a regular file\n") ;
+					} else if (basicAttributes.isDirectory()) {
+						infos.append(" is a directory\n") ;
+					} else if (basicAttributes.isSymbolicLink()) {
+						infos.append(" is a symbolic link\n") ;
+					} else if (basicAttributes.isOther()) {
+						infos.append(" is something else (than a regular file, directory or symbolic link\n") ;
+					} else {
+						infos.append(" must be really strange...\n") ;
+					}
+					
+					infos.append("Its size is " + size + " bytes\n") ;
+					infos.append("Last modified time is ").append(printFileTime(lastModified)).append("\n") ;
+					infos.append("Last accessed time is ").append(printFileTime(lastAccessed)).append("\n") ;
+					infos.append("Creation time is      ").append(printFileTime(creationTime)).append("\n") ;
+					
+				}
+				
+				if (fileStore.supportsFileAttributeView(FileOwnerAttributeView.class)) {
+					infos.append("FileOwnerAttributes:\n") ;
+					FileOwnerAttributeView ownerView = Files.getFileAttributeView(path, FileOwnerAttributeView.class);
+					UserPrincipal userPrincipal = ownerView.getOwner() ;
+					infos.append("User principal name: ").append(userPrincipal.getName()) ;
+					infos.append("User principal : ").append(userPrincipal.toString()) ;
+				}
+
+				if (fileStore.supportsFileAttributeView(AclFileAttributeView.class)) {
+					infos.append("\nAclFileAttributes:\n") ;
+					AclFileAttributeView aclView = Files.getFileAttributeView(path, AclFileAttributeView.class);
+					
+					List<AclEntry> aclEntries = aclView.getAcl() ;
+					
+					for (AclEntry aclEntry : aclEntries) {
+						infos.append("Acl entry : ").append(aclEntry.toString()) ;
+					}
+				}
+
+				if (fileStore.supportsFileAttributeView(DosFileAttributeView.class)) {
+					infos.append("DosFileAttributes:\n") ;
+				}
+
+				if (fileStore.supportsFileAttributeView(PosixFileAttributeView.class)) {
+					infos.append("PosixFileAttributes:\n") ;
+				}
+
+				if (fileStore.supportsFileAttributeView(UserDefinedFileAttributeView.class)) {
+					infos.append("UserDefinedFileAttributes:\n") ;
+				}
+				
+			} catch (Exception e) {
+				logger.log(Level.SEVERE, "Exception when appending informations for file " + path, e) ;
+			}
+		}
+		return basicAttributes ;
+	}
+	
+	private final static String datePattern = "uuuu-MM-dd HH:mm:ss.SSS VV" ;
+	private final static String unknownTime = "not known" ;
+	private static String printFileTime(FileTime fileTime) {
+		
+		if (fileTime == null) {
+			return unknownTime ;
+		}  else {
+			return DateTimeFormatter.ofPattern(datePattern).format(ZonedDateTime.ofInstant(fileTime.toInstant(), ZoneId.systemDefault())) ;
 		}
 	}
 }
