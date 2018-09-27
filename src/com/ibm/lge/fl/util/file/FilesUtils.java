@@ -36,6 +36,7 @@ import java.nio.file.attribute.UserPrincipalLookupService;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashSet;
@@ -265,11 +266,12 @@ public class FilesUtils {
 		}
 	}
 	
-	public static void getFileStoreInformation(Path path, StringBuilder fsInfos, Logger logger) {
+	public static FileStore getFileStoreInformation(Path path, StringBuilder fsInfos, Logger logger) {
 		
+		FileStore fileStore = null;
 		try {
 			
-			FileStore fileStore = Files.getFileStore(path) ;
+			fileStore = Files.getFileStore(path) ;
 			fsInfos.append("FileStore name=").append(fileStore.name()).append("\n") ;
 			fsInfos.append("FileStore type=").append(fileStore.type()).append("\n") ;
 			fsInfos.append("FileStore readOnly=").append(fileStore.isReadOnly()).append("\n") ;
@@ -280,17 +282,20 @@ public class FilesUtils {
 		} catch (Exception e) {
 			logger.log(Level.SEVERE, "Exception when appending FileStore informations for file " + path, e) ;
 		}
+		return fileStore ;
 	}
 	
-	public static void getFileStoreInformation(StringBuilder fsInfos, Logger logger) {
+	public static ArrayList<FileStore> getFileStoreInformation(StringBuilder fsInfos, Logger logger) {
 		
 		FileSystem fs = FileSystems.getDefault() ;
 		
 		Iterable<Path> rootPaths = fs.getRootDirectories() ;
+		ArrayList<FileStore> fileStores = new ArrayList<FileStore>() ;
 		for (Path rootPath : rootPaths) {
 			fsInfos.append("FileSystem Root path=").append(rootPath.toString()).append("\n") ;
-			getFileStoreInformation(rootPath, fsInfos, logger) ;
+			fileStores.add(getFileStoreInformation(rootPath, fsInfos, logger)) ;
 		}
+		return fileStores ;
 	}
 	
  	public static BasicFileAttributes appendFileInformations(Path path, StringBuilder infos, Logger logger) {
