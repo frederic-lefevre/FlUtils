@@ -502,13 +502,15 @@ public class FilesUtils {
 		try {
 			FileStore fileStore = Files.getFileStore(path) ;
 
+			Path parent = path ;
 			FileStore parentFileStore = null ;
 			do {
-				mountPoint = mountPoint.getParent() ;
-				if (mountPoint != null) {
+				parent = parent.getParent() ;
+				if (parent != null) {
 					parentFileStore = Files.getFileStore(mountPoint) ;
+					mountPoint = parent ;
 				}
-			} while ((mountPoint != null) && (fileStore.equals(parentFileStore))) ;
+			} while ((parent != null) && (fileStore.equals(parentFileStore))) ;
 			
 		} catch (Exception e) {
 			logger.log(Level.SEVERE, "Exception when searching mount point for file " + path, e) ;
