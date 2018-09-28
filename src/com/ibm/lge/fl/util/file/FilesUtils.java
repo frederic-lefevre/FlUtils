@@ -494,4 +494,26 @@ public class FilesUtils {
 			return  NO_PERMISSION ;
 		}
 	}
+	
+	public static Path getMountPoint(Path path, Logger logger) {
+		
+		Path mountPoint = path ;
+		
+		try {
+			FileStore fileStore = Files.getFileStore(path) ;
+
+			FileStore parentFileStore = null ;
+			do {
+				mountPoint = mountPoint.getParent() ;
+				if (mountPoint != null) {
+					parentFileStore = Files.getFileStore(mountPoint) ;
+				}
+			} while ((mountPoint != null) && (fileStore.equals(parentFileStore))) ;
+			
+		} catch (Exception e) {
+			logger.log(Level.SEVERE, "Exception when searching mount point for file " + path, e) ;
+		}
+		
+		return mountPoint ;
+	}
 }
