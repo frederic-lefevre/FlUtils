@@ -45,7 +45,6 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.ibm.lge.fl.util.os.OSCommandController;
 
 public class FilesUtils {
 
@@ -81,30 +80,33 @@ public class FilesUtils {
 	
 	private static void setPermission(boolean isDirectory, Path fPath, String permissions, Logger pLog) {
 		
-		if (! OSCommandController.isOSWindows()) {
-			// permission setting does not work on Windows
+		try {
 			
-			FileAttribute<Set<PosixFilePermission>> fileAttributes = null ;
-			Set<PosixFilePermission> perms = null;
-			if ((permissions != null) && (! permissions.isEmpty())) {
-				try {
-					perms = PosixFilePermissions.fromString(permissions);
-					fileAttributes = PosixFilePermissions.asFileAttribute(perms);
+			FileStore fileStore = Files.getFileStore(fPath) ;
+		
+			if (fileStore.supportsFileAttributeView(PosixFileAttributeView.class)) {
+				FileAttribute<Set<PosixFilePermission>> fileAttributes = null ;
+				Set<PosixFilePermission> perms = null;
+				if ((permissions != null) && (! permissions.isEmpty())) {
 					
-					if (Files.exists(fPath))  {
-						Files.setPosixFilePermissions(fPath, perms) ;
-					} else if (isDirectory) {
-						Files.createDirectory(fPath, fileAttributes) ;
-					} else {
-						Files.createFile(fPath, fileAttributes) ;
-					}
+						perms = PosixFilePermissions.fromString(permissions);
+						fileAttributes = PosixFilePermissions.asFileAttribute(perms);
+						
+						if (Files.exists(fPath))  {
+							Files.setPosixFilePermissions(fPath, perms) ;
+						} else if (isDirectory) {
+							Files.createDirectory(fPath, fileAttributes) ;
+						} else {
+							Files.createFile(fPath, fileAttributes) ;
+						}
+						
 					
-				} catch (IOException e) {
-					pLog.log(Level.SEVERE, "IOException when creating a policy file " + fPath + " with permission parameter " + permissions, e) ;
-				} catch (Exception e) {
-					pLog.log(Level.SEVERE, "Exception when parsing posix file permission parmeter: " + permissions, e) ;
 				}
 			}
+		}catch (IOException e) {
+			pLog.log(Level.SEVERE, "IOException when creating a policy file " + fPath + " with permission parameter " + permissions, e) ;
+		} catch (Exception e) {
+			pLog.log(Level.SEVERE, "Exception when parsing posix file permission parameter: " + permissions, e) ;
 		}
 	}
 	
@@ -231,21 +233,26 @@ public class FilesUtils {
 	
 	public static void setWritable(Path path) throws IOException {
 
-		AclFileAttributeView aclAttr = Files.getFileAttributeView(path, AclFileAttributeView.class);
-
-		UserPrincipalLookupService upls = path.getFileSystem().getUserPrincipalLookupService();
-		UserPrincipal user = upls.lookupPrincipalByName(System.getProperty("user.name"));
-
-		AclEntry.Builder builder = AclEntry.newBuilder();
-		builder.setPermissions(EnumSet.of(AclEntryPermission.READ_DATA, AclEntryPermission.EXECUTE,
-				AclEntryPermission.READ_ACL, AclEntryPermission.READ_ATTRIBUTES, AclEntryPermission.READ_NAMED_ATTRS,
-				AclEntryPermission.WRITE_ACL, AclEntryPermission.DELETE, AclEntryPermission.WRITE_DATA));
-		builder.setPrincipal(user);
-		builder.setType(AclEntryType.ALLOW);
-		aclAttr.setAcl(Collections.singletonList(builder.build()));
-		 
-		if (! OSCommandController.isOSWindows()) {
-			// posix permission setting does not work on Windows
+		FileStore fileStore = Files.getFileStore(path) ;
+		
+		if (fileStore.supportsFileAttributeView(AclFileAttributeView.class)) {
+			
+			AclFileAttributeView aclAttr = Files.getFileAttributeView(path, AclFileAttributeView.class);
+	
+			// Get the UserPrincipal of the running process
+			UserPrincipalLookupService upls = path.getFileSystem().getUserPrincipalLookupService();
+			UserPrincipal user = upls.lookupPrincipalByName(System.getProperty("user.name"));
+	
+			AclEntry.Builder builder = AclEntry.newBuilder();
+			builder.setPermissions(EnumSet.of(AclEntryPermission.READ_DATA, AclEntryPermission.EXECUTE,
+					AclEntryPermission.READ_ACL, AclEntryPermission.READ_ATTRIBUTES, AclEntryPermission.READ_NAMED_ATTRS,
+					AclEntryPermission.WRITE_ACL, AclEntryPermission.DELETE, AclEntryPermission.WRITE_DATA));
+			builder.setPrincipal(user);
+			builder.setType(AclEntryType.ALLOW);
+			aclAttr.setAcl(Collections.singletonList(builder.build()));
+		}
+		
+		if (fileStore.supportsFileAttributeView(PosixFileAttributeView.class)) {
 			
 			Set<PosixFilePermission> perms = new HashSet<PosixFilePermission>();
 			// add owners permission
