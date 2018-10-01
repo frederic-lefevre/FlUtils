@@ -235,18 +235,19 @@ public class FilesUtils {
 
 		FileStore fileStore = Files.getFileStore(path) ;
 		
+		// Get the UserPrincipal of the running process
+		UserPrincipalLookupService upls = path.getFileSystem().getUserPrincipalLookupService();
+		UserPrincipal user = upls.lookupPrincipalByName(System.getProperty("user.name"));
+
 		if (fileStore.supportsFileAttributeView(AclFileAttributeView.class)) {
 			
 			AclFileAttributeView aclAttr = Files.getFileAttributeView(path, AclFileAttributeView.class);
-	
-			// Get the UserPrincipal of the running process
-			UserPrincipalLookupService upls = path.getFileSystem().getUserPrincipalLookupService();
-			UserPrincipal user = upls.lookupPrincipalByName(System.getProperty("user.name"));
-	
+		
 			AclEntry.Builder builder = AclEntry.newBuilder();
 			builder.setPermissions(EnumSet.of(AclEntryPermission.READ_DATA, AclEntryPermission.EXECUTE,
 					AclEntryPermission.READ_ACL, AclEntryPermission.READ_ATTRIBUTES, AclEntryPermission.READ_NAMED_ATTRS,
-					AclEntryPermission.WRITE_ACL, AclEntryPermission.DELETE, AclEntryPermission.WRITE_DATA));
+					AclEntryPermission.WRITE_ACL, AclEntryPermission.DELETE, AclEntryPermission.WRITE_DATA,  AclEntryPermission.APPEND_DATA,
+					 AclEntryPermission.WRITE_OWNER,  AclEntryPermission.WRITE_ATTRIBUTES,  AclEntryPermission.WRITE_NAMED_ATTRS));
 			builder.setPrincipal(user);
 			builder.setType(AclEntryType.ALLOW);
 			aclAttr.setAcl(Collections.singletonList(builder.build()));
@@ -268,8 +269,11 @@ public class FilesUtils {
 			perms.add(PosixFilePermission.OTHERS_WRITE);
 			perms.add(PosixFilePermission.OTHERS_EXECUTE);
 			Files.setPosixFilePermissions(path, perms);
-		} else {
-			 Files.setAttribute(path, "dos:readonly", false);
+		} 
+		
+		if (fileStore.supportsFileAttributeView(FileOwnerAttributeView.class)) {
+			FileOwnerAttributeView ownerView = Files.getFileAttributeView(path, FileOwnerAttributeView.class);
+			ownerView.setOwner(user) ;
 		}
 	}
 	
