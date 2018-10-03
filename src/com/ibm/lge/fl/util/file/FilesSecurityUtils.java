@@ -16,8 +16,7 @@ import java.nio.file.attribute.PosixFilePermissions;
 import java.nio.file.attribute.UserPrincipal;
 import java.nio.file.attribute.UserPrincipalLookupService;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.EnumSet;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -101,8 +100,12 @@ public class FilesSecurityUtils {
 
 		if (fileStore.supportsFileAttributeView(AclFileAttributeView.class)) {
 			
+			AclFileAttributeView aclAttr = Files.getFileAttributeView(path, AclFileAttributeView.class);
+			
+			ArrayList<AclEntry> entries = new ArrayList<AclEntry>() ;
+			
 			// set the file writable for the user running this process
-			setWritableAcl(path, user) ;
+			entries.add(buildAclEntry(path, user)) ;
 			
 			// set the file writable for all the users defined in the ACL of sourcePath
 			if (sourcePath != null) {
@@ -110,11 +113,12 @@ public class FilesSecurityUtils {
 				if (users != null) {
 					for (UserPrincipal userPrincipal : users) {
 						if (! userPrincipal.equals(user)) {
-							setWritableAcl(path, userPrincipal) ;
+							entries.add(buildAclEntry(path, userPrincipal)) ;
 						}
 					}
 				}
 			}
+			aclAttr.setAcl(entries) ;
 			
 		}
 		
@@ -142,19 +146,15 @@ public class FilesSecurityUtils {
 		}
 	}
 	
-	private static void setWritableAcl(Path path, UserPrincipal user) throws IOException {
+	private static AclEntry buildAclEntry(Path path, UserPrincipal user) throws IOException {
 		
-		
-		AclFileAttributeView aclAttr = Files.getFileAttributeView(path, AclFileAttributeView.class);
-	
 		AclEntry.Builder builder = AclEntry.newBuilder();
-		builder.setPermissions(EnumSet.of(AclEntryPermission.READ_DATA, AclEntryPermission.EXECUTE,
-				AclEntryPermission.READ_ACL, AclEntryPermission.READ_ATTRIBUTES, AclEntryPermission.READ_NAMED_ATTRS,
-				AclEntryPermission.WRITE_ACL, AclEntryPermission.DELETE, AclEntryPermission.WRITE_DATA,  AclEntryPermission.APPEND_DATA,
-				 AclEntryPermission.WRITE_OWNER,  AclEntryPermission.WRITE_ATTRIBUTES,  AclEntryPermission.WRITE_NAMED_ATTRS));
+		Set<AclEntryPermission> allPermissions = new HashSet<AclEntryPermission>(Arrays.asList( AclEntryPermission.values())) ;	
+		builder.setPermissions(allPermissions);
 		builder.setPrincipal(user);
 		builder.setType(AclEntryType.ALLOW);
-		aclAttr.setAcl(Collections.singletonList(builder.build())) ;
+		return builder.build() ;
+		
 		
 	}
 	
