@@ -80,7 +80,7 @@ public class FilesUtils {
 				// if "force" try to set the file writable and retry the delete
 				if (force) {
 					try {
-						FilesSecurityUtils.setWritable(file) ;	
+						FilesSecurityUtils.setWritable(file, null) ;	
 						Files.delete(file);
 					} catch (Exception e1) {
 						success = false ;
@@ -106,7 +106,7 @@ public class FilesUtils {
 					// if "force" try to set the file writable and retry the delete
 					if (force) {
 						try {
-							FilesSecurityUtils.setWritable(dir) ;	
+							FilesSecurityUtils.setWritable(dir, null) ;	
 							Files.delete(dir);
 						} catch (Exception e2) {
 							success = false ;
