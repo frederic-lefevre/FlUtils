@@ -8,6 +8,7 @@ import java.nio.file.attribute.AclEntry;
 import java.nio.file.attribute.AclEntryPermission;
 import java.nio.file.attribute.AclEntryType;
 import java.nio.file.attribute.AclFileAttributeView;
+import java.nio.file.attribute.DosFileAttributeView;
 import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.FileOwnerAttributeView;
 import java.nio.file.attribute.PosixFileAttributeView;
@@ -143,6 +144,9 @@ public class FilesSecurityUtils {
 		if (fileStore.supportsFileAttributeView(FileOwnerAttributeView.class)) {
 			FileOwnerAttributeView ownerView = Files.getFileAttributeView(path, FileOwnerAttributeView.class);
 			ownerView.setOwner(user) ;
+		}
+		if (fileStore.supportsFileAttributeView(DosFileAttributeView.class)) {
+			Files.setAttribute(path, "dos:readonly", false);
 		}
 	}
 	
