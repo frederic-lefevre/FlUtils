@@ -227,10 +227,14 @@ public class FilesUtils {
 		
 		if (path == null) {
 			infos.append(" file is null\n") ;
-		} else if  (! Files.exists(path)) {
+		} else if (Files.notExists(path)) {
 			infos.append(" ").append(path).append(" does not exist\n") ;
-		} else {
-			infos.append(" ").append(path).append("\n") ;
+		} else { 
+			if (! Files.exists(path)) {
+				infos.append(" ").append(path).append(" existence is not known. Trying to get informations....\n") ;
+			} else {
+				infos.append(" ").append(path).append("\n") ;
+			}
 			try {
 				
 				FileStore fileStore = Files.getFileStore(path) ;

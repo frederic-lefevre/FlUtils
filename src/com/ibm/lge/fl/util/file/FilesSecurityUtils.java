@@ -101,7 +101,10 @@ public class FilesSecurityUtils {
 
 		if (fileStore.supportsFileAttributeView(AclFileAttributeView.class)) {
 			
+			// set the file writable for the user running this process
 			setWritableAcl(path, user) ;
+			
+			// set the file writable for all the users defined in the ACL of sourcePath
 			if (sourcePath != null) {
 				List<UserPrincipal> users = getAclPrincipals(sourcePath) ;
 				if (users != null) {
