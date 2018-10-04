@@ -1,6 +1,5 @@
 package com.ibm.lge.fl.util.file;
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.file.Files;
@@ -39,12 +38,27 @@ public class FileExaminer {
 
 	public ByteBuffer getFileZoneContent(long position, int size) {
 		
-		ByteBuffer bb = ByteBuffer.allocate(size) ;
-		int res ;
-		try {
-			res = fileChannel.read(bb, position) ;
-		} catch (IOException e) {
-			fLog.log(Level.SEVERE, "Exception reading FileChannel for " + path, e) ;
+		ByteBuffer bb ;
+		if (position >= fileSize) {
+			bb = null ;
+			fLog.warning("getFileZoneContent called with a position=" + position + " outside the file=" + path + "( file length=" + fileSize + " )") ;
+		} else {
+			bb = ByteBuffer.allocate(size + 8) ;
+			int res  = 0 ;
+			int nbBytesRead = 0 ;
+			try {
+				while ((res != -1) && (nbBytesRead < size)) {
+					res = fileChannel.read(bb, position) ;
+					if (res != -1) {
+						nbBytesRead++ ;
+					}
+				}
+			} catch (Exception e) {
+				long failOffset = position + nbBytesRead ;
+				fLog.log(Level.SEVERE, "Exception reading FileChannel for " + path + " at file offset " + failOffset, e) ;
+			}
+			 // make buffer ready for read
+			bb.flip() ;
 		}
 		return bb ;
 	}
