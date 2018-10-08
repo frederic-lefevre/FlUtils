@@ -82,15 +82,16 @@ public class ApiReturn {
 		String retStr ;
 		if (aLog.isLoggable(Level.FINE)) {
 			retStr = JsonUtils.jsonPrettyPrint(ret) ;
-			StringBuilder retStrBuild ;			
+			StringBuilder traceStrBuild ;			
 			if ((aLog.isLoggable(Level.FINER)) || (retStr.length() < TRACE_FINER_LIMIT + 2)) {
-				retStrBuild = new StringBuilder(retStr.length() + info.length() + API_RET_TRACE_TITLE.length() + 8) ;
-				retStrBuild.append(API_RET_TRACE_TITLE).append(info).append("\n").append(retStr) ;
+				traceStrBuild = new StringBuilder(retStr.length() + info.length() + API_RET_TRACE_TITLE.length() + 8) ;
+				traceStrBuild.append(API_RET_TRACE_TITLE).append(info).append("\n").append(retStr) ;
+				aLog.finer(traceStrBuild.toString());
 			} else {
-				retStrBuild = new StringBuilder(TRACE_FINER_LIMIT + info.length() + API_RET_TRACE_TITLE.length() + 8) ;
-				retStrBuild.append(API_RET_TRACE_TITLE).append(info).append("\n").append(retStr.substring(0, TRACE_FINER_LIMIT)) ;
+				traceStrBuild = new StringBuilder(TRACE_FINER_LIMIT + info.length() + API_RET_TRACE_TITLE.length() + 8) ;
+				traceStrBuild.append(API_RET_TRACE_TITLE).append(info).append("\n").append(retStr.substring(0, TRACE_FINER_LIMIT)) ;
+				aLog.fine(traceStrBuild.toString());
 			}
-			retStr = retStrBuild.toString() ;
 		} else {
 			retStr = ret.toString() ;
 		}
