@@ -73,6 +73,8 @@ public class ApiReturn {
 		apiReturnJson.add(ApiJsonPropertyName.ERROR, ApiErrorCodeBuilder.getErrorCode(errCode, msg)) ;
 	}
 	
+	private final static String API_RET_TRACE_TITLE = "Api return for " ;
+	
 	// Api return json, with logging. Include a blank at the end of info.
 	public String getApiReturnJson(String info) {
 		
@@ -80,12 +82,15 @@ public class ApiReturn {
 		String retStr ;
 		if (aLog.isLoggable(Level.FINE)) {
 			retStr = JsonUtils.jsonPrettyPrint(ret) ;
+			StringBuilder retStrBuild ;			
 			if ((aLog.isLoggable(Level.FINER)) || (retStr.length() < TRACE_FINER_LIMIT + 2)) {
-				aLog.finer("Api return for " + info) ;
-				aLog.finer(retStr) ;
-			} else {			
-				aLog.fine("Api return for " + info + "\n" + retStr.substring(0, TRACE_FINER_LIMIT)) ;
+				retStrBuild = new StringBuilder(retStr.length() + info.length() + API_RET_TRACE_TITLE.length() + 8) ;
+				retStrBuild.append(API_RET_TRACE_TITLE).append(info).append("\n").append(retStr) ;
+			} else {
+				retStrBuild = new StringBuilder(TRACE_FINER_LIMIT + info.length() + API_RET_TRACE_TITLE.length() + 8) ;
+				retStrBuild.append(API_RET_TRACE_TITLE).append(info).append("\n").append(retStr.substring(0, TRACE_FINER_LIMIT)) ;
 			}
+			retStr = retStrBuild.toString() ;
 		} else {
 			retStr = ret.toString() ;
 		}
