@@ -13,8 +13,11 @@ public class StringBuilderUtils {
 			(buff.length() > 0)) {
 			int searchStringSize = searchedString.length() ;
 			
+			if (to > buff.length() - 1) {
+				to = buff.length() - 1 ;
+			}
 			int currIdx = from ;
-			while ((currIdx < to) && (res == -1)) {
+			while ((currIdx < to + 1) && (res == -1)) {
 				
 				if  (buff.charAt(currIdx) == searchedString.charAt(0)) {
 					
@@ -22,7 +25,7 @@ public class StringBuilderUtils {
 					res = currIdx ;
 					currIdx++ ;
 					int searchedStringIdx = 1 ;
-					while ((currIdx < to) && 
+					while ((currIdx < to + 1) && 
 						   (searchedStringIdx < searchStringSize) && 
 						   (buff.charAt(currIdx) == searchedString.charAt(searchedStringIdx))) {
 						
