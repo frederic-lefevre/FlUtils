@@ -16,6 +16,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.ibm.lge.fl.util.file.FilesUtils;
 import com.ibm.lge.fl.util.os.OperatingInfo;
 
 /*
@@ -205,6 +206,7 @@ public class RunningContext {
 		applicationInfo.addProperty("initialisationDate", initDate);
 		applicationInfo.add("applicationProperties", getPropertiesAsJson()) ;
 		applicationInfo.add("operatingContext", operatingContext) ;
+		applicationInfo.add("fileSystemsInformation", FilesUtils.getFileSystemsInformation(pLog)) ;
 				
 		return applicationInfo ;
 	}

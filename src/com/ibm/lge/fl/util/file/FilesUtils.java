@@ -30,6 +30,7 @@ import java.nio.file.attribute.PosixFileAttributes;
 import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.UserDefinedFileAttributeView;
 import java.nio.file.attribute.UserPrincipal;
+import java.nio.file.spi.FileSystemProvider;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -38,6 +39,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 
 
 public class FilesUtils {
@@ -181,7 +185,7 @@ public class FilesUtils {
 	}
 	
 
-	
+	// Get informations about the filestore of a given path and put them in a StringBuilder
 	public static FileStore getFileStoreInformation(Path path, StringBuilder fsInfos, Logger logger) {
 		
 		FileStore fileStore = null;
@@ -201,6 +205,7 @@ public class FilesUtils {
 		return fileStore ;
 	}
 	
+	// Get informations about the Filestores of the default FileSystem and put them in a StringBuilder
 	public static ArrayList<FileStore> getFileStoreInformation(StringBuilder fsInfos, Logger logger) {
 		
 		FileSystem fs = FileSystems.getDefault() ;
@@ -212,6 +217,74 @@ public class FilesUtils {
 			fileStores.add(getFileStoreInformation(rootPath, fsInfos, logger)) ;
 		}
 		return fileStores ;
+	}
+	
+	// Get informations about the filestore of a given path and return them in a JsonObject
+	public static JsonObject getFileStoreInformation(Path path, Logger logger) {
+		
+		JsonObject fsInfos = new JsonObject() ;
+		try {
+			
+			FileStore fileStore = Files.getFileStore(path) ;
+			fsInfos.addProperty("name", 			fileStore.name());
+			fsInfos.addProperty("type", 			fileStore.type());
+			fsInfos.addProperty("isReadOnly", 		fileStore.isReadOnly());
+			fsInfos.addProperty("totalSpace", 		fileStore.getTotalSpace());
+			fsInfos.addProperty("unallocatedSpace", fileStore.getUnallocatedSpace());
+			fsInfos.addProperty("usablSpace", 		fileStore.getUsableSpace());
+			
+		} catch (Exception e) {
+			logger.log(Level.SEVERE, "Exception when getting FileStore informations for file " + path, e) ;
+		}
+		return fsInfos ;
+	}
+	
+	// Get informations about the FilesSystems and FileSystemProviders and return them in a JsonObject
+	public static JsonObject getFileSystemsInformation(Logger logger) {
+		
+		JsonObject fssInfos  = new JsonObject() ;
+		
+		// FileSystemProviders infos
+		JsonArray fpInfosArray = new JsonArray() ;
+		List<FileSystemProvider> fsProviders = FileSystemProvider.installedProviders() ;	
+		for (FileSystemProvider fsProvider : fsProviders) {
+			fpInfosArray.add(fsProvider.getScheme()) ;
+		}
+		fssInfos.add("fileSystemProviderSchemes", fpInfosArray);
+		
+		// default file system infos
+		FileSystem fs = FileSystems.getDefault() ;
+		
+		JsonObject defaultFsInfos = new JsonObject() ;
+		defaultFsInfos.addProperty("defaultSeparator", fs.getSeparator()) ;	
+		FileSystemProvider defaultProvider = fs.provider() ;
+		String defaultScheme ;
+		if (defaultProvider == null) {
+			defaultScheme = "no provider found for default file system" ;
+		} else {
+			defaultScheme = defaultProvider.getScheme() ;
+		}
+		defaultFsInfos.addProperty("providerScheme", defaultScheme) ;
+
+		JsonArray attViewsArray = new JsonArray() ;
+		Set<String> attViews = fs.supportedFileAttributeViews() ;
+		for (String attView : attViews) {
+			attViewsArray.add(attView) ;
+		}
+		defaultFsInfos.add("supportedFileAttributesViews", attViewsArray);
+		
+		JsonArray fsInfosArray = new JsonArray() ;
+		Iterable<Path> rootPaths = fs.getRootDirectories() ;
+		for (Path rootPath : rootPaths) {
+			JsonObject fsInfos = new JsonObject() ;
+			fsInfos.addProperty("fileSystemRootPath", rootPath.toString());
+			fsInfos.add("fileStoreInfos", getFileStoreInformation(rootPath, logger)) ;
+			fsInfosArray.add(fsInfos);
+		}
+		defaultFsInfos.add("rootDirectoriesInfos", fsInfosArray) ;
+		
+		fssInfos.add("defaultFileSystemInfos", defaultFsInfos);
+		return fssInfos ;
 	}
 	
  	public static BasicFileAttributes appendFileInformations(Path path, StringBuilder infos, Logger logger) {

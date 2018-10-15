@@ -6,16 +6,39 @@ public class StringBuilderUtils {
 		
 		int res = -1 ;
 		
-		int currIdx = from ;
-		while (currIdx < to) {
+		if ((buff != null) 				  && 
+			(searchedString != null) 	  && 
+			(from > -1) 				  && 
+			(searchedString.length() > 0) &&
+			(buff.length() > 0)) {
+			int searchStringSize = searchedString.length() ;
 			
-			if  (buff.charAt(currIdx) == searchedString.charAt(0)) {
+			int currIdx = from ;
+			while ((currIdx < to) && (res == -1)) {
 				
-			} else {
-				currIdx++ ;
+				if  (buff.charAt(currIdx) == searchedString.charAt(0)) {
+					
+					// compare the other chars
+					res = currIdx ;
+					currIdx++ ;
+					int searchedStringIdx = 1 ;
+					while ((currIdx < to) && 
+						   (searchedStringIdx < searchStringSize) && 
+						   (buff.charAt(currIdx) == searchedString.charAt(searchedStringIdx))) {
+						
+						searchedStringIdx++ ;
+						currIdx++ ;
+					}
+					
+					if (searchedStringIdx != searchStringSize) {
+						// not found
+						res = -1 ;
+					}
+				} else {
+					currIdx++ ;
+				}
 			}
 		}
-		
 		return res ;
 	}
 	
