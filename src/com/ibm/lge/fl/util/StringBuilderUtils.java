@@ -2,10 +2,11 @@ package com.ibm.lge.fl.util;
 
 public class StringBuilderUtils {
 
+	// To be used only with large string a possible negative results
+	// Execution time is 2 times the regular JRE indexOf when the string is found
 	public static int indexOf(StringBuilder buff, String searchedString, int from, int to) {
 		
 		int res = -1 ;
-		int possibleRes = -1 ;
 		
 		if ((buff != null) 				  && 
 			(searchedString != null) 	  && 
@@ -25,7 +26,6 @@ public class StringBuilderUtils {
 				if  (buff.charAt(currIdx) == firstSearchedChar) {
 					
 					// compare the other chars
-					possibleRes = currIdx ;
 					currIdx++ ;
 					int searchedStringIdx = 1 ;
 					while ((currIdx < maxIdx) && 
@@ -38,7 +38,7 @@ public class StringBuilderUtils {
 					
 					if (searchedStringIdx == searchStringSize) {
 						// found
-						res = possibleRes ;
+						res = currIdx - searchedStringIdx ;
 						break ;
 					}
 				} else {
