@@ -5,6 +5,7 @@ public class StringBuilderUtils {
 	public static int indexOf(StringBuilder buff, String searchedString, int from, int to) {
 		
 		int res = -1 ;
+		int possibleRes = -1 ;
 		
 		if ((buff != null) 				  && 
 			(searchedString != null) 	  && 
@@ -17,15 +18,17 @@ public class StringBuilderUtils {
 				to = buff.length() - 1 ;
 			}
 			int currIdx = from ;
-			while ((currIdx < to + 1) && (res == -1)) {
+			char firstSearchedChar = searchedString.charAt(0) ;
+			int maxIdx = to + 1 ;
+			while (currIdx < maxIdx) {
 				
-				if  (buff.charAt(currIdx) == searchedString.charAt(0)) {
+				if  (buff.charAt(currIdx) == firstSearchedChar) {
 					
 					// compare the other chars
-					res = currIdx ;
+					possibleRes = currIdx ;
 					currIdx++ ;
 					int searchedStringIdx = 1 ;
-					while ((currIdx < to + 1) && 
+					while ((currIdx < maxIdx) && 
 						   (searchedStringIdx < searchStringSize) && 
 						   (buff.charAt(currIdx) == searchedString.charAt(searchedStringIdx))) {
 						
@@ -33,9 +36,10 @@ public class StringBuilderUtils {
 						currIdx++ ;
 					}
 					
-					if (searchedStringIdx != searchStringSize) {
-						// not found
-						res = -1 ;
+					if (searchedStringIdx == searchStringSize) {
+						// found
+						res = possibleRes ;
+						break ;
 					}
 				} else {
 					currIdx++ ;
