@@ -15,6 +15,7 @@ public class ApiJsonPropertyName {
 	// Json property names
 	public final static String ERROR     		 	= "error" ;
 	public final static String ERR_CODE 		 	= "code" ;
+	public final static String ERR_ACTION 		 	= "action" ;
 	public final static String REASON 			 	= "failureReason" ;
 	public final static String COMPRESS_RETURN		= "compressReturn" ;
 
