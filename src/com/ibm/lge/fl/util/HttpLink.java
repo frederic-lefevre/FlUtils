@@ -94,27 +94,27 @@ public class HttpLink {
 		}
 	}
 	
-	public HttpResponseContent sendPost(String body, ArrayList<HttpHeader> headerParams) {
+	public HttpResponseContent sendPost(String body, ArrayList<HttpHeader> headerParams, boolean decompressIfCompressed) {
 		
-		return sendHttpRequest(POST, body, headerParams);
+		return sendHttpRequest(POST, body, headerParams, decompressIfCompressed);
 	}
 	
-	public HttpResponseContent sendGet(ArrayList<HttpHeader> headerParams) {
+	public HttpResponseContent sendGet(ArrayList<HttpHeader> headerParams, boolean decompressIfCompressed) {
 		
-		return sendHttpRequest(GET, null, headerParams);
+		return sendHttpRequest(GET, null, headerParams, decompressIfCompressed);
 	}
 
-	public HttpResponseContent sendDelete(ArrayList<HttpHeader> headerParams) {
+	public HttpResponseContent sendDelete(ArrayList<HttpHeader> headerParams, boolean decompressIfCompressed) {
 		
-		return sendHttpRequest(DELETE, null, headerParams);
+		return sendHttpRequest(DELETE, null, headerParams, decompressIfCompressed);
 	}
 
-	public HttpResponseContent sendPut(String body, ArrayList<HttpHeader> headerParams) {
+	public HttpResponseContent sendPut(String body, ArrayList<HttpHeader> headerParams, boolean decompressIfCompressed) {
 		
-		return sendHttpRequest(PUT, body, headerParams);
+		return sendHttpRequest(PUT, body, headerParams, decompressIfCompressed);
 	}
 
-	private HttpResponseContent sendHttpRequest(String method, String body, ArrayList<HttpHeader> headerParams) {
+	private HttpResponseContent sendHttpRequest(String method, String body, ArrayList<HttpHeader> headerParams, boolean decompressIfCompressed) {
 		
 		HttpResponseContent result = null ;
 		if (url != null) {
@@ -151,14 +151,14 @@ public class HttpLink {
 					}
 					
 					// Receive response
-					result = getHttpResponseContent(scon, method, body, headerParams) ;
+					result = getHttpResponseContent(scon, method, body, headerParams, decompressIfCompressed) ;
 					
 				} else {
 					
 					HttpURLConnection con = (HttpURLConnection)url.openConnection() ;
 					
 					// Receive response
-					result = getHttpResponseContent(con, method, body, headerParams) ;
+					result = getHttpResponseContent(con, method, body, headerParams, decompressIfCompressed) ;
 				}
 										
 				if (hLog.isLoggable(Level.FINEST)) {
@@ -175,7 +175,7 @@ public class HttpLink {
 		return result ;
 	}
 	
-	private HttpResponseContent getHttpResponseContent(HttpURLConnection con, String method, String body, ArrayList<HttpHeader> headerParams) {
+	private HttpResponseContent getHttpResponseContent(HttpURLConnection con, String method, String body, ArrayList<HttpHeader> headerParams,  boolean decompressIfCompressed) {
 		
 		HttpResponseContent result = null ;			
 		try {
@@ -210,7 +210,7 @@ public class HttpLink {
 			}
 			
 			// Receive response
-			result = new HttpResponseContent(con, charset, hLog) ;
+			result = new HttpResponseContent(con, charset, decompressIfCompressed, hLog) ;
 			
 			con.disconnect();
 		} catch (Exception e) {

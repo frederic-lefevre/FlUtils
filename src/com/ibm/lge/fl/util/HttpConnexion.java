@@ -62,7 +62,7 @@ public class HttpConnexion {
 		if (disableCertificateValidation) disableCertificateValidation(hLog) ;
 	}
 
-	public HttpResponseContent getHttp(String path, String parameter) {
+	public HttpResponseContent getHttp(String path, String parameter, boolean decompressIfCompressed) {
 		
 		HttpResponseContent result = null ;
 		
@@ -99,7 +99,7 @@ public class HttpConnexion {
 					cookieString = buildCookieString(cookies) ;
 				}
 				
-				result = getResponse(con);
+				result = getResponse(con, decompressIfCompressed);
 				
 				if (hLog.isLoggable(Level.FINEST)) {
 					hLog.finest("HTTP GET result:\n " + result.toString());
@@ -113,7 +113,7 @@ public class HttpConnexion {
 		return result ;
 	}
 	
-	public HttpResponseContent postHttp(String path, String parameter, String content) {
+	public HttpResponseContent postHttp(String path, String parameter, String content, boolean decompressIfCompressed) {
 		
 		HttpResponseContent result = null ;
 		
@@ -155,7 +155,7 @@ public class HttpConnexion {
 					cookieString = buildCookieString(cookies) ;
 				}
 
-				result = getResponse(con);
+				result = getResponse(con, decompressIfCompressed);
 
 				if (hLog.isLoggable(Level.FINEST)) {
 					hLog.finest("HTTP POST result:\n " + result.toString());
@@ -169,7 +169,7 @@ public class HttpConnexion {
 		return result ;
 	}
 	
-	public HttpResponseContent deleteHttp(String path, String parameter) {
+	public HttpResponseContent deleteHttp(String path, String parameter, boolean decompressIfCompressed) {
 		
 		HttpResponseContent result = null ;
 		
@@ -206,7 +206,7 @@ public class HttpConnexion {
 					cookieString = buildCookieString(cookies) ;
 				}
 				
-				result = getResponse(con);
+				result = getResponse(con, decompressIfCompressed);
 				
 				if (hLog.isLoggable(Level.FINEST)) {
 					hLog.finest("HTTP DELETE result:\n " + result.toString());
@@ -267,8 +267,8 @@ public class HttpConnexion {
 		return buf.toString() ;
 	}
 	
-	private HttpResponseContent getResponse(HttpURLConnection con) {
-		return new HttpResponseContent(con, charset, hLog) ;
+	private HttpResponseContent getResponse(HttpURLConnection con, boolean decompressIfCompressed) {
+		return new HttpResponseContent(con, charset, decompressIfCompressed, hLog) ;
 	}
 	
 	

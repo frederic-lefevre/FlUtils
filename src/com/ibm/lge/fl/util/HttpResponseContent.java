@@ -26,7 +26,7 @@ public class HttpResponseContent {
 	
 	private boolean responseReceived ;
 	
-	public HttpResponseContent(HttpURLConnection con, Charset cs, Logger l) {
+	public HttpResponseContent(HttpURLConnection con, Charset cs, boolean decompressIfCompressed, Logger l) {
 		
 		hLog    = l ;
 		httpCon = con ;
@@ -46,14 +46,14 @@ public class HttpResponseContent {
 			}
 			if (is != null) {
 				String contentType = con.getContentType() ;
-				boolean isCompressed = false ;
-				if (contentType.contains("application/zip")) {
-					isCompressed = true ;
+				boolean decompress = false ;
+				if (decompressIfCompressed && (contentType.contains("application/zip"))) {
+					decompress = true ;
 				}
 				if (cs == null) {
-					bytesContent = readContentAsByte(is, isCompressed) ;
+					bytesContent = readContentAsByte(is, decompress) ;
 				} else {
-					content = readContent(is, cs, isCompressed) ;
+					content = readContent(is, cs, decompress) ;
 				}
 			}
 			
