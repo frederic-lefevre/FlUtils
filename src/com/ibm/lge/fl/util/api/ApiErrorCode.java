@@ -12,6 +12,7 @@ public class ApiErrorCode {
 	public final static String REPORT_ACTION 		 	  = "report" ;
 	public final static String RETRY_AND_REPORT_ACTION 	  = "retryAndReport" ;
 	public final static String CORRECT_CALLER_CODE_ACTION = "correctCallerCode" ;
+	public final static String REFORMULATE_QUERY_ACTION   = "reformulateQuery" ;
 	
 	public ApiErrorCode(int c, String r) {
 		code   = c ;
