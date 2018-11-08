@@ -7,6 +7,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.nio.file.FileSystemNotFoundException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -268,7 +269,18 @@ public class AdvancedProperties extends Properties {
 		String pString =  getProperty(key) ;
 	
 		if ((pString != null) && (pString.length() >0)) {
-			return Paths.get(URI.create(pString)) ;
+			try {
+				return Paths.get(URI.create(pString)) ;
+			} catch (IllegalArgumentException e) {
+				log.log(Level.SEVERE, "IllegalArgumentException when creating URI " + pString + " (value of property " + key, e);
+				return null ;
+			} catch (FileSystemNotFoundException e) {
+				log.log(Level.SEVERE, "FileSystemNotFoundException when creating Path from URI " + pString + " (value of property " + key, e);
+				return null ;
+			} catch (Exception e) {
+				log.log(Level.SEVERE, "Exception when creating Path from URI " + pString + " (value of property " + key, e);
+				return null ;
+			}
 		} else {
 			return null ;
 		}
@@ -279,15 +291,16 @@ public class AdvancedProperties extends Properties {
 	}
 	
 	public String getFileContentFromURI(String key, Charset charset) {
-		
+				
 		String pString =  getProperty(key) ;
-		Path fPath ;
-		if ((pString != null) && (pString.length() >0)) {
-			 fPath = Paths.get(URI.create(pString)) ;
-		} else {
-			return "" ;
-		}
 		try {
+			Path fPath ;
+			if ((pString != null) && (pString.length() >0)) {
+				 fPath = Paths.get(URI.create(pString)) ;
+			} else {
+				return "" ;
+			}
+		
 			return new String(Files.readAllBytes(fPath), charset) ;
 		} catch (IOException e) {
 			log.log(Level.SEVERE, "IO Exception when reading file " + pString + " (value of property " + key, e);
