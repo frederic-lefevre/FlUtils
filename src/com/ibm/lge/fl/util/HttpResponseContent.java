@@ -32,6 +32,7 @@ public class HttpResponseContent {
 		httpCon = con ;
 		content = null ;
 		responseReceived = false ;
+		responseCode = -1 ;
 		
 		try {
 			responseCode     = con.getResponseCode() ;
