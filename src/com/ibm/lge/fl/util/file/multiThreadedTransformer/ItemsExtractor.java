@@ -26,6 +26,11 @@ public abstract class ItemsExtractor {
 	private final static int NB_PROCESS_THREAD_DEFAULT  = 10 ;
 	private final static int NB_SUPPLEMENTARY_THREAD	= 4 ;
 	
+	private int entriesQueueSize ;
+	private int outputQueueSize ;
+	private int eliminatedQueueSize ;
+	private int atypicQueueSize ;
+	
 	private LinkedBlockingQueue<ArrayList<String>> entries ;
 	
 	private LinkedBlockingQueue<CharSequence> outPutQ ;
@@ -76,25 +81,7 @@ public abstract class ItemsExtractor {
 					  Path	  ep,
 					  Path	  ap,
 					  Logger  l ) {
-		
-		// init queues
-		entries 		  	  = new LinkedBlockingQueue<ArrayList<String>>(ENTRIES_Q_SIZE_DEFAULT) ;
-		outPutQ 		  	  = new LinkedBlockingQueue<CharSequence>(OUTPUT_Q_SIZE_DEFAULT) ;
-		if (ep != null) {
-			eliminatedEntries = new LinkedBlockingQueue<CharSequence>(ELIMINATED_Q_SIZE_DEFAULT) ;
-		} else {
-			eliminatedEntries = null ;
-		}
-		if (ap != null) {
-			atypicEntries 	  = new LinkedBlockingQueue<CharSequence>(ATYPIC_Q_SIZE_DEFAULT) ;
-		} else {
-			atypicEntries 	  = null ;
-		}
-		
-		// Init executor service for multi threading
-		nbProcessThreads = NB_PROCESS_THREAD_DEFAULT ;
-		executorService  = Executors.newFixedThreadPool(NB_PROCESS_THREAD_DEFAULT + NB_SUPPLEMENTARY_THREAD);
-		
+				
 		inputFilePath	  		  = ip ;
 		inputCharset	  		  = ics ;
 		outputFilePath	  		  = op ;
@@ -102,10 +89,33 @@ public abstract class ItemsExtractor {
 		atypicEntriesFilePath 	  = ap ;
 		eliminatedEntriesFilePath = ep ;
 		logger			  		  = l ;
+		
+		entriesQueueSize 	= ENTRIES_Q_SIZE_DEFAULT ;
+		outputQueueSize 	= OUTPUT_Q_SIZE_DEFAULT ;
+		eliminatedQueueSize = ELIMINATED_Q_SIZE_DEFAULT ;
+		atypicQueueSize 	= ATYPIC_Q_SIZE_DEFAULT ;
+		nbProcessThreads	= NB_PROCESS_THREAD_DEFAULT ;
 	}
 	
 	public void extract(ItemProcessor itemProcessor) {
 		
+		// init queues
+		entries 		  	  = new LinkedBlockingQueue<ArrayList<String>>(entriesQueueSize) ;
+		outPutQ 		  	  = new LinkedBlockingQueue<CharSequence>(outputQueueSize) ;
+		if (eliminatedEntriesFilePath != null) {
+			eliminatedEntries = new LinkedBlockingQueue<CharSequence>(eliminatedQueueSize) ;
+		} else {
+			eliminatedEntries = null ;
+		}
+		if (atypicEntriesFilePath != null) {
+			atypicEntries 	  = new LinkedBlockingQueue<CharSequence>(atypicQueueSize) ;
+		} else {
+			atypicEntries 	  = null ;
+		}
+		
+		// Init executor service for multi threading
+		executorService  = Executors.newFixedThreadPool(nbProcessThreads + NB_SUPPLEMENTARY_THREAD);
+
 		// Launch thread that writes result file
 		ItemsWriter itemsWriter = new ItemsWriter(outPutQ, outputFilePath, outputCharset, logger) ;
 		itemsWriter.start() ;
@@ -266,6 +276,26 @@ public abstract class ItemsExtractor {
 
 	}
 	
+	public void setEntriesQueueSize(int entriesQueueSize) {
+		this.entriesQueueSize = entriesQueueSize;
+	}
+
+	public void setOutputQueueSize(int outputQueueSize) {
+		this.outputQueueSize = outputQueueSize;
+	}
+
+	public void setEliminatedQueueSize(int eliminatedQueueSize) {
+		this.eliminatedQueueSize = eliminatedQueueSize;
+	}
+
+	public void setAtypicQueueSize(int atypicQueueSize) {
+		this.atypicQueueSize = atypicQueueSize;
+	}
+
+	public void setNbProcessThreads(int nbProcessThreads) {
+		this.nbProcessThreads = nbProcessThreads;
+	}
+
 	private void terminateExecutor(ExecutorService execSvc) {
 
 		execSvc.shutdown();
