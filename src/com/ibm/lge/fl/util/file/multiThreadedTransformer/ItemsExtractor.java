@@ -138,6 +138,7 @@ public abstract class ItemsExtractor {
 		String line 	= null;
 		long nbElemRead = 0 ;
 		long nbLine 	= 0 ;
+		long nbElimi 	= 0 ;
 		long now 		= System.currentTimeMillis() ;
 		try (BufferedReader bf = Files.newBufferedReader(inputFilePath, inputCharset)) {			
 
@@ -154,6 +155,7 @@ public abstract class ItemsExtractor {
 						currentEntry = new ArrayList<String>() ;
 						currentEntry.add(line) ;
 					} else {
+						nbElimi++ ;
 						eliminatedEntries.put(line) ;
 					}
 				}
@@ -183,6 +185,7 @@ public abstract class ItemsExtractor {
 														
 						} else {
 							// not a valid record
+							nbElimi++ ;
 							eliminatedEntries.put(line) ;
 						}						
 					}
@@ -246,9 +249,18 @@ public abstract class ItemsExtractor {
 			}				
 			if (logLevel != null) {					
 
-				globalResult.addProperty("nbRecordsRead", 	   nbElemRead) ;
-				globalResult.addProperty("nbRecordsProcessed", nbElemProcessed) ;
-				globalResult.addProperty("nbRecordsWritten",   itemsWriter.getNbElementWritten()) ;
+				globalResult.addProperty("nbLinesRead", 	   		 nbLine) ;
+				globalResult.addProperty("nbLinesEliminated",  		 nbElimi) ;
+				globalResult.addProperty("nbRecordsRead", 	   		 nbElemRead) ;
+				globalResult.addProperty("nbRecordsProcessed", 		 nbElemProcessed) ;
+				globalResult.addProperty("nbRecordsWritten",   		 itemsWriter.getNbElementWritten()) ;
+				if (atypicWriter != null) {
+					globalResult.addProperty("nbAtypicRecordsWritten",   atypicWriter.getNbElementWritten()) ;
+				}
+				if (eliminatedWriter != null) {
+					globalResult.addProperty("nbEliminatedRecordsWritten",   eliminatedWriter.getNbElementWritten()) ;
+				}
+
 				
 				logger.log(logLevel, JsonUtils.jsonPrettyPrint(globalResult)) ;
 			}
