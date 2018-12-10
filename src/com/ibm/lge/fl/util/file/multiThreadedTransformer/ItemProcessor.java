@@ -8,7 +8,7 @@ public abstract class ItemProcessor {
 	protected LinkedBlockingQueue<CharSequence> atypicEntries ;
 	
 	public abstract ItemProcessor getClone() ;
-	public abstract CharSequence processItem(ArrayList<String> currentEntry) ;
+	public abstract CharSequence processItem(ArrayList<String> currentEntry, long itemNumber) ;
 
 	public void setAtypicEntries(LinkedBlockingQueue<CharSequence> ae) {
 		atypicEntries = ae ;

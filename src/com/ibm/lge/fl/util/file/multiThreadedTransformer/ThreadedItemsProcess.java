@@ -46,7 +46,7 @@ public class ThreadedItemsProcess implements Callable<JsonObject>  {
 				if (currentEntry.size() > 0) {
 					
 					// build out item
-					CharSequence outItem = itemProcessor.processItem(currentEntry) ;
+					CharSequence outItem = itemProcessor.processItem(currentEntry, nbRecordProcessed) ;
 
 					// put item in output queue
 					outPutQ.put(outItem);
