@@ -164,7 +164,9 @@ public abstract class ItemsExtractor {
 						
 						currentEntry = new ArrayList<String>() ;
 						currentEntry.add(line) ;
-					} else {
+
+					} else if (eliminatedEntries != null) {
+
 						nbElimi++ ;
 						eliminatedEntries.put(line) ;
 					}
@@ -193,7 +195,7 @@ public abstract class ItemsExtractor {
 							currentEntry = new ArrayList<String>() ;
 							currentEntry.add(line) ;
 														
-						} else {
+						} else if (eliminatedEntries != null) {
 							// not a valid record
 							nbElimi++ ;
 							eliminatedEntries.put(line) ;
