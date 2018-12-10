@@ -278,7 +278,7 @@ public abstract class ItemsExtractor {
 			}
 			
 		} catch (Exception e) {
-			logger.log(Level.SEVERE,  "Exception reading file.\n  Line nb=" + nbLine + "\n  Line=" + line, e);
+			logger.log(Level.SEVERE,  "Exception reading file.\n  Line nb=" + nbLine + "\n  Line=" + line + "\n  File=" + inputFilePath, e);
 		}
 		
 		long duration = System.currentTimeMillis() - now ;
