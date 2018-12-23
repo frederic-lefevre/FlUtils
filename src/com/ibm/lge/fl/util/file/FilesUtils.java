@@ -34,7 +34,6 @@ import java.nio.file.spi.FileSystemProvider;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
@@ -184,59 +183,40 @@ public class FilesUtils {
 		}
 	}
 	
-
-	// Get informations about the filestore of a given path and put them in a StringBuilder
-	public static FileStore getFileStoreInformation(Path path, StringBuilder fsInfos, Logger logger) {
-		
-		FileStore fileStore = null;
-		try {
-			
-			fileStore = Files.getFileStore(path) ;
-			fsInfos.append("FileStore name=").append(fileStore.name()).append("\n") ;
-			fsInfos.append("FileStore type=").append(fileStore.type()).append("\n") ;
-			fsInfos.append("FileStore readOnly=").append(fileStore.isReadOnly()).append("\n") ;
-			fsInfos.append("FileStore total space=      ").append(fileStore.getTotalSpace()).append("\n") ;
-			fsInfos.append("FileStore Unallocated space=").append(fileStore.getUnallocatedSpace()).append("\n") ;
-			fsInfos.append("FileStore Usable space=     ").append(fileStore.getUsableSpace()).append("\n") ;
-			
-		} catch (Exception e) {
-			fsInfos.append("No fileStore associated to the path " + path);
-			logger.log(Level.FINE, "Exception when getting FileStore informations for file " + path, e) ;
-		}
-		return fileStore ;
-	}
-	
-	// Get informations about the Filestores of the default FileSystem and put them in a StringBuilder
-	public static ArrayList<FileStore> getFileStoreInformation(StringBuilder fsInfos, Logger logger) {
-		
-		FileSystem fs = FileSystems.getDefault() ;
-		
-		Iterable<Path> rootPaths = fs.getRootDirectories() ;
-		ArrayList<FileStore> fileStores = new ArrayList<FileStore>() ;
-		for (Path rootPath : rootPaths) {
-			fsInfos.append("FileSystem Root path=").append(rootPath.toString()).append("\n") ;
-			fileStores.add(getFileStoreInformation(rootPath, fsInfos, logger)) ;
-		}
-		return fileStores ;
-	}
 	
 	// Get informations about the filestore of a given path and return them in a JsonObject
 	public static JsonObject getFileStoreInformation(Path path, Logger logger) {
 		
-		JsonObject fsInfos = new JsonObject() ;
+		JsonObject fsInfos ;
 		try {
 			
 			FileStore fileStore = Files.getFileStore(path) ;
-			fsInfos.addProperty("name", 			fileStore.name());
-			fsInfos.addProperty("type", 			fileStore.type());
-			fsInfos.addProperty("isReadOnly", 		fileStore.isReadOnly());
+			fsInfos = getFileStoreInformation(fileStore, logger) ;
+		} catch (Exception e) {
+			fsInfos = new JsonObject() ;
+			fsInfos.addProperty("error", 	"No fileStore associated to the path " + path);
+			logger.log(Level.FINE, "Exception when getting FileStore informations for file " + path, e) ;
+		}
+				
+		return fsInfos ;
+	}
+	
+	// Get informations about the filestore and return them in a JsonObject
+	public static JsonObject getFileStoreInformation(FileStore fileStore, Logger logger) {
+		
+		JsonObject fsInfos = new JsonObject() ;
+		
+		fsInfos.addProperty("name", 			fileStore.name());
+		fsInfos.addProperty("type", 			fileStore.type());
+		fsInfos.addProperty("isReadOnly", 		fileStore.isReadOnly());
+		try {
 			fsInfos.addProperty("totalSpace", 		fileStore.getTotalSpace());
 			fsInfos.addProperty("unallocatedSpace", fileStore.getUnallocatedSpace());
 			fsInfos.addProperty("usablSpace", 		fileStore.getUsableSpace());
 			
 		} catch (Exception e) {
-			fsInfos.addProperty("name", 			"No fileStore associated to the path " + path);
-			logger.log(Level.FINE, "Exception when getting FileStore informations for file " + path, e) ;
+			fsInfos.addProperty("error", 			"Unaccessible filestore");
+			logger.log(Level.FINE, "Exception when getting FileStore informations", e) ;
 		}
 		return fsInfos ;
 	}
@@ -276,14 +256,21 @@ public class FilesUtils {
 		defaultFsInfos.add("supportedFileAttributesViews", attViewsArray);
 		
 		JsonArray fsInfosArray = new JsonArray() ;
+		Iterable<FileStore> fileStores = fs.getFileStores() ;
+		for (FileStore fileStore : fileStores) {
+			fsInfosArray.add(getFileStoreInformation(fileStore, logger));
+		}
+		defaultFsInfos.add("FileStoresInfos", fsInfosArray) ;
+		
+		JsonArray rpInfosArray = new JsonArray() ;
 		Iterable<Path> rootPaths = fs.getRootDirectories() ;
 		for (Path rootPath : rootPaths) {
 			JsonObject fsInfos = new JsonObject() ;
 			fsInfos.addProperty("fileSystemRootPath", rootPath.toString());
 			fsInfos.add("fileStoreInfos", getFileStoreInformation(rootPath, logger)) ;
-			fsInfosArray.add(fsInfos);
+			rpInfosArray.add(fsInfos);
 		}
-		defaultFsInfos.add("rootDirectoriesInfos", fsInfosArray) ;
+		defaultFsInfos.add("rootDirectoriesInfos", rpInfosArray) ;
 		
 		fssInfos.add("defaultFileSystemInfos", defaultFsInfos);
 		return fssInfos ;
