@@ -200,7 +200,8 @@ public class FilesUtils {
 			fsInfos.append("FileStore Usable space=     ").append(fileStore.getUsableSpace()).append("\n") ;
 			
 		} catch (Exception e) {
-			logger.log(Level.SEVERE, "Exception when appending FileStore informations for file " + path, e) ;
+			fsInfos.append("No fileStore associated to the path " + path);
+			logger.log(Level.FINE, "Exception when getting FileStore informations for file " + path, e) ;
 		}
 		return fileStore ;
 	}
@@ -234,7 +235,8 @@ public class FilesUtils {
 			fsInfos.addProperty("usablSpace", 		fileStore.getUsableSpace());
 			
 		} catch (Exception e) {
-			logger.log(Level.SEVERE, "Exception when getting FileStore informations for file " + path, e) ;
+			fsInfos.addProperty("name", 			"No fileStore associated to the path " + path);
+			logger.log(Level.FINE, "Exception when getting FileStore informations for file " + path, e) ;
 		}
 		return fsInfos ;
 	}
