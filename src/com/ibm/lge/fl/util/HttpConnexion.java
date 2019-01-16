@@ -59,7 +59,7 @@ public class HttpConnexion {
 		cookies = null ;
 		charset = cs ;
 		
-		if (disableCertificateValidation) disableCertificateValidation(hLog) ;
+		if (disableCertificateValidation) disableCertificateValidation(null, hLog) ;
 	}
 
 	public HttpResponseContent getHttp(String path, String parameter, boolean decompressIfCompressed) {
@@ -220,7 +220,7 @@ public class HttpConnexion {
 		return result ;
 	}
 	
-	public static void disableCertificateValidation(Logger log) {
+	public static void disableCertificateValidation(HttpsURLConnection con, Logger log) {
 	    // Create a trust manager that does not validate certificate chains
 	    TrustManager[] trustAllCerts = new TrustManager[] { 
 	      new X509TrustManager() {
@@ -240,8 +240,13 @@ public class HttpConnexion {
 	    try {
 	      SSLContext sc = SSLContext.getInstance("SSL");
 	      sc.init(null, trustAllCerts, new SecureRandom());
-	      HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
-	      HttpsURLConnection.setDefaultHostnameVerifier(hv);
+	      if (con != null) {
+		      con.setSSLSocketFactory(sc.getSocketFactory());
+		      con.setHostnameVerifier(hv);	    	  
+	      } else {
+		      HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+		      HttpsURLConnection.setDefaultHostnameVerifier(hv);
+	      }
 	    } catch (Exception e) {
 	    	if (log != null) {
 	    		log.log(Level.SEVERE, "Exception when trying to create a trust manager that disable certificate validation", e) ;
