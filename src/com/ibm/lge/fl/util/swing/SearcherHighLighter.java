@@ -31,7 +31,7 @@ public class SearcherHighLighter {
 
 	}
 
-	public void searchAndHighlight(String toFind, boolean caseSensitive) {
+	public void searchAndHighlight(String toFind, boolean caseSensitive, boolean ignoreAccent, boolean ignoreFormatting) {
 		
         String txt = null ;
         try {
@@ -52,6 +52,11 @@ public class SearcherHighLighter {
 				text 	  = txt.toLowerCase() ;
 			}
 			
+			if (ignoreAccent) {
+				txtToFind = ignoreAccents(txtToFind) ;
+				text 	  = ignoreAccents(text) ;
+			}
+			
 			// Set highlight color
 			Color hiColor ;
 			if ((highLightColors == null) || (highLightColors.length == 0)) {
@@ -67,11 +72,12 @@ public class SearcherHighLighter {
 			DefaultHighlighter.DefaultHighlightPainter painter = new DefaultHighlighter.DefaultHighlightPainter(hiColor) ;
 			
 	        // Search for pattern
-	        int currIdx = 0;
+	        int currIdx  =  0 ;
+	        int foundIdx = -1 ;
 	        try {
 		        while (currIdx > -1) {
 		        	
-		        	int foundIdx = text.indexOf(txtToFind, currIdx) ;
+		        	foundIdx = text.indexOf(txtToFind, currIdx) ;
 		        	if (foundIdx > -1) {
 		        		currIdx = foundIdx + txtToFind.length() ;	        		
 						highLighter.addHighlight(foundIdx, currIdx, painter) ;					
@@ -83,6 +89,12 @@ public class SearcherHighLighter {
 				shLog.log(Level.WARNING, "Bad location exception when highlightning pos=" + currIdx, e);
 			}
         }   
+	}
+	
+	public void searchAndHighlight(String toFind, boolean caseSensitive) {
+		
+		searchAndHighlight(toFind, caseSensitive, false, false) ;
+   
 	}
 
 	public void removeHighlights() {
