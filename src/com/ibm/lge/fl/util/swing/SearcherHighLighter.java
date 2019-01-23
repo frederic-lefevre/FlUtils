@@ -109,4 +109,11 @@ public class SearcherHighLighter {
 		String out = Normalizer.normalize(in, Normalizer.Form.NFD);
 		return out.replaceAll("\\p{M}", ""); 
 	}
+	
+	private int indexOfIgnoreFormat(String text, String toFind) {
+		
+		int idxFound = -1 ;
+		
+		return idxFound ;
+	}
 }
