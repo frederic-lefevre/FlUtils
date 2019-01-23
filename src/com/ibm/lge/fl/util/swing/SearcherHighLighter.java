@@ -1,6 +1,7 @@
 package com.ibm.lge.fl.util.swing;
 
 import java.awt.Color;
+import java.text.Normalizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -92,4 +93,8 @@ public class SearcherHighLighter {
 		this.highLightColors = highLightColors;
 	}
 
+	private String ignoreAccents(String in) {
+		String out = Normalizer.normalize(in, Normalizer.Form.NFD);
+		return out.replaceAll("\\p{M}", ""); 
+	}
 }
