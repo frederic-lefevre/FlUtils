@@ -73,16 +73,25 @@ public class SearcherHighLighter {
 			
 	        // Search for pattern
 	        int currIdx  =  0 ;
-	        int foundIdx = -1 ;
 	        try {
 		        while (currIdx > -1) {
 		        	
-		        	foundIdx = text.indexOf(txtToFind, currIdx) ;
-		        	if (foundIdx > -1) {
-		        		currIdx = foundIdx + txtToFind.length() ;	        		
-						highLighter.addHighlight(foundIdx, currIdx, painter) ;					
+		        	if (ignoreFormatting) {
+		        		SearchResult result = indexOfIgnoreFormat(text, txtToFind, currIdx) ;
+		        		if (result.getBegin() > -1) {
+			        		currIdx = result.getEnd() ;	        		
+							highLighter.addHighlight(result.getBegin(), result.getEnd(), painter) ;					
+			        	} else {
+			        		currIdx = -1 ;
+			        	}
 		        	} else {
-		        		currIdx = -1 ;
+		        		int foundIdx = text.indexOf(txtToFind, currIdx) ;
+		        		if (foundIdx > -1) {
+			        		currIdx = foundIdx + txtToFind.length() ;	        		
+							highLighter.addHighlight(foundIdx, currIdx, painter) ;					
+			        	} else {
+			        		currIdx = -1 ;
+			        	}
 		        	}
 		        }
 	        } catch (BadLocationException e) {
@@ -110,10 +119,106 @@ public class SearcherHighLighter {
 		return out.replaceAll("\\p{M}", ""); 
 	}
 	
-	private int indexOfIgnoreFormat(String text, String toFind) {
+	private SearchResult indexOfIgnoreFormat(String text, String toFind, int from) {
 		
-		int idxFound = -1 ;
+		SearchResult result = new SearchResult() ;
+		int currIdx  		= from ;
+		boolean endOfString = ((text == null) || (text.isEmpty()) || (toFind == null) || (toFind.isEmpty())) ;
+		while ((result.getBegin() < 0) && (! endOfString)) {
+			
+			if (currIdx < text.length()) {
+				result = compareIgnoreFormat(text, toFind, currIdx) ;
+				currIdx++ ;
+			} else {
+				endOfString = true ;
+			}
+		}
+		return result ;
+	}
+	
+	private SearchResult compareIgnoreFormat(String text, String toFind, int from) {
 		
-		return idxFound ;
+		SearchResult result = new SearchResult() ;
+		boolean equal = true ;
+		boolean blank = false ;
+		int currTextIdx   = from ;
+		int currToFindIdx = 0 ;
+		int begin = -1 ;
+		while ((equal) && (currToFindIdx < toFind.length())) {
+			if (currTextIdx >= text.length()) {
+				equal = false ;
+			} else if (isFormatChar(text.charAt(currTextIdx))) {
+				currTextIdx++ ;
+				blank = true ;
+				// will cause to ignore blank after formatting char
+			} else if (text.charAt(currTextIdx) == toFind.charAt(currToFindIdx)) {			
+				if (text.charAt(currTextIdx) == ' ') {
+					blank = true ;
+				} else {
+					blank = false ;
+				}
+				if (begin < 0) {
+					begin = currTextIdx ;
+				}
+				currTextIdx++ ;
+				currToFindIdx++ ;
+			} else if (blank)  {
+				// previous char was a blank
+				// ignore the blank after a blank in text or text to find
+				if (text.charAt(currTextIdx) == ' ') {
+					currTextIdx++ ;
+				} else if (toFind.charAt(currToFindIdx) == ' ') {
+					currToFindIdx++ ;
+				} else {
+					equal = false ;
+				}
+			} else {
+				equal = false ;
+			}
+		}
+		if (equal) {
+			result.setBegin(begin);
+			result.setEnd(currTextIdx);
+		}
+		return result ;
+	}
+	
+	private boolean isFormatChar(char c) {		
+		if ((c == '\n') ||
+			(c == '\t') ||
+			(c == '\r') ||
+			(c == '\b') ||
+			(c == '\f') ) {
+			return true ;
+		} else {
+			return false ;
+		}
+	}
+	
+	private class SearchResult {
+		
+		private int begin ;
+		private int end ;
+		
+		public SearchResult() {
+			begin = -1 ;
+			end   = -1 ;
+		}
+
+		public int getBegin() {
+			return begin;
+		}
+
+		public void setBegin(int begin) {
+			this.begin = begin;
+		}
+
+		public int getEnd() {
+			return end;
+		}
+
+		public void setEnd(int end) {
+			this.end = end;
+		}
 	}
 }
