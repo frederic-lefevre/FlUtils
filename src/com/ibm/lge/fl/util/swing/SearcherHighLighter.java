@@ -1,7 +1,9 @@
 package com.ibm.lge.fl.util.swing;
 
 import java.awt.Color;
+import java.awt.Rectangle;
 import java.text.Normalizer;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -20,6 +22,8 @@ public class SearcherHighLighter {
 	private Color[] highLightColors = {Color.CYAN, Color.LIGHT_GRAY, Color.YELLOW, Color.MAGENTA} ;
 	private int currentColorIdx ;
 	
+	private ArrayList<SearchElement> currentSearches ;
+	
 	public SearcherHighLighter(JTextComponent tc, Logger l) {
 		
 		textComponent = tc ;
@@ -28,6 +32,8 @@ public class SearcherHighLighter {
 		highLighter = textComponent.getHighlighter() ;
 		
 		currentColorIdx = -1 ;
+		
+		currentSearches = new ArrayList<SearchElement>() ;
 
 	}
 
@@ -69,6 +75,9 @@ public class SearcherHighLighter {
 				hiColor = highLightColors[0] ;
 			}
 			
+			SearchElement searchElement = new SearchElement(toFind, hiColor) ;
+			currentSearches.add(searchElement) ;
+			
 			DefaultHighlighter.DefaultHighlightPainter painter = new DefaultHighlighter.DefaultHighlightPainter(hiColor) ;
 			
 	        // Search for pattern
@@ -76,23 +85,27 @@ public class SearcherHighLighter {
 	        try {
 		        while (currIdx > -1) {
 		        	
+		        	SearchResult result ;
 		        	if (ignoreFormatting) {
-		        		SearchResult result = indexOfIgnoreFormat(text, txtToFind, currIdx) ;
+		        		result = indexOfIgnoreFormat(text, txtToFind, currIdx) ;
 		        		if (result.getBegin() > -1) {
 			        		currIdx = result.getEnd() ;	        		
-							highLighter.addHighlight(result.getBegin(), result.getEnd(), painter) ;					
+							highLighter.addHighlight(result.getBegin(), result.getEnd(), painter) ;
+							searchElement.addSearchResult(result);
 			        	} else {
 			        		currIdx = -1 ;
 			        	}
 		        	} else {
-		        		int foundIdx = text.indexOf(txtToFind, currIdx) ;
+		        		int foundIdx = text.indexOf(txtToFind, currIdx) ;		        		
 		        		if (foundIdx > -1) {
 			        		currIdx = foundIdx + txtToFind.length() ;	        		
-							highLighter.addHighlight(foundIdx, currIdx, painter) ;					
+							highLighter.addHighlight(foundIdx, currIdx, painter) ;
+							result = new SearchResult(foundIdx, currIdx) ;
+							searchElement.addSearchResult(result);
 			        	} else {
 			        		currIdx = -1 ;
 			        	}
-		        	}
+		        	} 
 		        }
 	        } catch (BadLocationException e) {
 				shLog.log(Level.WARNING, "Bad location exception when highlightning pos=" + currIdx, e);
@@ -108,6 +121,7 @@ public class SearcherHighLighter {
 
 	public void removeHighlights() {
 		highLighter.removeAllHighlights() ; 
+		currentSearches = new ArrayList<SearchElement>() ;
 	}
 	
 	public void setHighLightColors(Color[] highLightColors) {
@@ -205,6 +219,11 @@ public class SearcherHighLighter {
 			end   = -1 ;
 		}
 
+		public SearchResult (int b, int e) {
+			begin = b ;
+			end   = e ;
+		}
+		
 		public int getBegin() {
 			return begin;
 		}
@@ -220,5 +239,78 @@ public class SearcherHighLighter {
 		public void setEnd(int end) {
 			this.end = end;
 		}
+		
+		public void goToResult() {
+			if (end > -1) {
+				try {
+					Rectangle viewRect = textComponent.modelToView(end);
+					textComponent.scrollRectToVisible(viewRect);
+				} catch (BadLocationException e) {
+					shLog.log(Level.WARNING, "Bad location when scrolling to search result", e);
+				}
+			}
+		}
+	}
+	
+	public class SearchElement {
+		
+		private Color  hightLightColor ;
+		private String searchedString ;
+		private ArrayList<SearchResult> searchResults ;
+		private int currentResultView ;
+		
+		public SearchElement(String ss, Color hlc) {
+			super();
+			searchedString    = ss;
+			hightLightColor   = hlc;
+			searchResults	  = new ArrayList<SearchResult>() ;
+			currentResultView = 0 ;
+		}
+
+		public Color getHightLightColor() {
+			return hightLightColor;
+		}
+
+		public String getSearchedString() {
+			return searchedString;
+		}
+		
+		public void addSearchResult(SearchResult res) {
+			searchResults.add(res) ;
+		}
+		
+		public void diplayFirstResult() {
+			if ((searchResults != null) && (searchResults.size() > 0)) {
+				searchResults.get(0).goToResult() ;
+			}
+		}
+		
+		public void displayNextResult() {
+			if ((searchResults != null) && (searchResults.size() > 0)) {
+				currentResultView = (currentResultView + 1)% searchResults.size() ;
+				searchResults.get(currentResultView).goToResult() ;
+			}
+		}
+		
+		public void displayPreviousResult() {
+			if ((searchResults != null) && (searchResults.size() > 0)) {
+				currentResultView-- ;
+				if (currentResultView == -1) {
+					currentResultView = searchResults.size() - 1 ;
+				}
+			}
+		}
+		
+		public int getNbOccurences() {
+			if (searchResults != null) {
+				return searchResults.size() ;
+			} else {
+				return 0 ;
+			}
+		}
+	}
+
+	public ArrayList<SearchElement> getCurrentSearches() {
+		return currentSearches;
 	}
 }
