@@ -19,11 +19,11 @@ public class FuzzyPeriod {
 		if ((debut != null) && (fin != null)) {
 			if (TemporalUtils.compareTemporal(debut, fin, fl) > 0) {
 				isValid = false ;
-				fl.warning("Periode de dates invalides (début après fin)") ;
+				fl.warning("Periode de dates invalides (dÃ©but aprÃ¨s fin)") ;
 			}
 		} else {
 			isValid = false ;
-			fl.warning("Periode de dates invalides (début ou fin invalides)") ;
+			fl.warning("Periode de dates invalides (dÃ©but ou fin invalides)") ;
 		}
 
 	}
