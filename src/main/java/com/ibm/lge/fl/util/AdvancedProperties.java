@@ -373,9 +373,16 @@ public class AdvancedProperties extends Properties {
 		String filePath =  getProperty(key) ;
 		if (filePath != null) {
 		
-			PropertiesStorage propsProjectStorage = new PropertiesStorage(filePath);
-			AdvancedProperties propsProject = propsProjectStorage.getAdvancedTry(log) ; 
-			return propsProject ;
+			try {
+				URI fileUri = new URI(filePath) ;
+				PropertiesStorage propsProjectStorage = new PropertiesStorage(fileUri);
+				AdvancedProperties propsProject = propsProjectStorage.getAdvancedTry(log) ; 
+				return propsProject ;
+			} catch (Exception e) {
+				System.err.println("getPropertiesFromFile: invalid filePath: " + filePath) ;
+				e.printStackTrace() ;
+				return null ;
+			}
 		
 		} else { 
 			return null ;
@@ -397,6 +404,7 @@ public class AdvancedProperties extends Properties {
                 return Level.parse(level) ;
             } catch (Exception e) {
                 System.err.println("Invalid level (" + level + ") in config file: " + e);
+                e.printStackTrace() ;
                 return defaultLevel;
             }
         }
