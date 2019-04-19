@@ -9,22 +9,19 @@ import java.util.logging.Logger;
 
 public class FileComparator {
 
-	private Path   	path1 ;
-	private Path   	path2 ;
 	private Logger 	pLog ;
 	private boolean onError ;
 	
-	public FileComparator(Path p1, Path p2,  Logger l) {
-		path1 	= p1 ;
-		path2 	= p2 ;
-		pLog  	= l ;
+	public FileComparator(Logger l) {
 		onError = false ;
+		pLog  	= l ;	
 	}
 
 	// Compare the content of 2 files
-	public boolean areTheSame() {
+	public boolean areTheSame(Path path1, Path path2) {
 
 		boolean result = true ;
+		onError = false ;
 
 		if ((path1 != null) && (path2 != null)) {
 			try {
@@ -32,18 +29,18 @@ public class FileComparator {
 					result = false;
 				} else {
 
-					try (InputStream in1 =new BufferedInputStream(Files.newInputStream(path1)) ;
-						 InputStream in2 =new BufferedInputStream(Files.newInputStream(path2)) ) {
+					try (InputStream in1 = new BufferedInputStream(Files.newInputStream(path1)) ;
+						 InputStream in2 = new BufferedInputStream(Files.newInputStream(path2)) ) {
 
 						int value1 ;
 						int value2 ;
 						do{
 							value1 = in1.read() ;
 							value2 = in2.read() ;
-							if(value1 !=value2){
+							if(value1 != value2){
 								result = false;
 							}
-						} while ((value1 >=0) && (result)) ;
+						} while ((value1 >= 0) && (result)) ;
 					} catch (Exception e) {
 						onError = true ;
 						result  = false ;
