@@ -194,6 +194,12 @@ public class RunningContext {
 		String initDate = printInitializationDate() ;
 		JsonObject operatingContext = getOperatingInfos() ;
 		
+		URL propsLocation = getPropertiesLocation() ;
+		if (propsLocation != null) {
+			applicationInfo.addProperty("propertiesLocation", propsLocation.toString());
+		} else {
+			applicationInfo.addProperty("propertiesLocation", "null location");
+		}
 		if (buildInformation != null) {
 			applicationInfo.add("buildInformation", buildInformation);
 		}
