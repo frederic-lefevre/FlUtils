@@ -264,15 +264,34 @@ public class AdvancedProperties extends Properties {
 		return path ;
 	}
 	
+	public URI getURI(String key) {
+		
+		String pString =  getProperty(key) ;
+	
+		if ((pString != null) && (pString.length() >0)) {
+			try {
+				return new URI(pString) ;
+			} catch (URISyntaxException e) {
+				log.log(Level.SEVERE, "URISyntaxException when creating URI " + pString + " (value of property " + key, e);
+				return null ;
+			} catch (Exception e) {
+				log.log(Level.SEVERE, "Exception when creating Path from URI " + pString + " (value of property " + key, e);
+				return null ;
+			}
+		} else {
+			return null ;
+		}
+	}
+	
 	public Path getPathFromURI(String key) {
 		
 		String pString =  getProperty(key) ;
 	
 		if ((pString != null) && (pString.length() >0)) {
 			try {
-				return Paths.get(URI.create(pString)) ;
-			} catch (IllegalArgumentException e) {
-				log.log(Level.SEVERE, "IllegalArgumentException when creating URI " + pString + " (value of property " + key, e);
+				return Paths.get(new URI(pString)) ;
+			} catch (URISyntaxException e) {
+				log.log(Level.SEVERE, "URISyntaxException when creating URI " + pString + " (value of property " + key, e);
 				return null ;
 			} catch (FileSystemNotFoundException e) {
 				log.log(Level.SEVERE, "FileSystemNotFoundException when creating Path from URI " + pString + " (value of property " + key, e);
@@ -296,7 +315,7 @@ public class AdvancedProperties extends Properties {
 		try {
 			Path fPath ;
 			if ((pString != null) && (pString.length() >0)) {
-				 fPath = Paths.get(URI.create(pString)) ;
+				 fPath = Paths.get(new URI(pString)) ;
 			} else {
 				return "" ;
 			}
