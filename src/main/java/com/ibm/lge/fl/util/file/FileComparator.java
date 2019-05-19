@@ -18,7 +18,9 @@ public class FileComparator {
 	}
 
 	// Compare the content of 2 files
-	public boolean areTheSame(Path path1, Path path2) {
+	// Returns true if the files have the same content
+	// Returns false if there has been an error or the content is different
+	public boolean haveSameContent(Path path1, Path path2) {
 
 		boolean result = true ;
 		onError = false ;
