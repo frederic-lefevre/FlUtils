@@ -11,10 +11,11 @@ import java.util.Enumeration;
 import com.google.gson.JsonArray;
 
 public class NetworkUtils {
-	private JsonArray IPv4 = new JsonArray() ;
-	private JsonArray IPv6 = new JsonArray() ;
-	private JsonArray networkInterfaces = new JsonArray() ;
-	private ArrayList<String> IPv4List = new ArrayList<String>();
+	
+	private JsonArray 		  IPv4 				= new JsonArray() ;
+	private JsonArray 		  IPv6 				= new JsonArray() ;
+	private JsonArray 		  networkInterfaces = new JsonArray() ;
+	private ArrayList<String> IPv4List 			= new ArrayList<String>();
 	
 	public NetworkUtils() {
 		

@@ -3,19 +3,19 @@ package com.ibm.lge.fl.util.os;
 public class Chronometre {
 
 	private boolean running ;
-	private long lastStartTime ;
-	private long previousValue ;
-	private long lastGetTime;
+	private long 	lastStartTime ;
+	private long 	previousValue ;
+	private long 	lastGetTime;
 	
 	public Chronometre() {
-		running = false ;
+		running 	  = false ;
 		previousValue = 0 ;
 	}
 
 	public void start() {
 		lastStartTime = System.currentTimeMillis() ;
-		lastGetTime = lastStartTime ;
-		running = true ;
+		lastGetTime   = lastStartTime ;
+		running 	  = true ;
 	}
 
 	public long getValue() {
