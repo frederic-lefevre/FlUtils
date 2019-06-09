@@ -2,8 +2,8 @@ package com.ibm.lge.fl.util;
 
 public class StringExtractor {
 
-	private String source ;
-	private int	   currentIndex ;
+	private final String source ;
+	private int	   		 currentIndex ;
 	
 	public StringExtractor(String s) {
 		source 		 = s ;
