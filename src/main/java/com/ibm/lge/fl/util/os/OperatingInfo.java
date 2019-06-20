@@ -73,6 +73,7 @@ public class OperatingInfo {
 		opInfoJson.add("networkInterfaces", nu.getNetworkInterfaces()) ;
 		opInfoJson.add("IPv4addresses", 	nu.getIPv4()) ;
 		opInfoJson.add("IPv6addresses", 	nu.getIPv6()) ;
+		opInfoJson.add("Otheraddresses", 	nu.getOtherAddresses()) ;
 		
 		opInfoJson.addProperty("machineName", nu.getMachineName()) ;
 

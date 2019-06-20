@@ -9,11 +9,13 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 
 public class NetworkUtils {
 	
 	private JsonArray 		  IPv4 				= new JsonArray() ;
 	private JsonArray 		  IPv6 				= new JsonArray() ;
+	private JsonArray 		  otherAddresses	= new JsonArray() ;
 	private JsonArray 		  networkInterfaces = new JsonArray() ;
 	private ArrayList<String> IPv4List 			= new ArrayList<String>();
 	
@@ -29,14 +31,24 @@ public class NetworkUtils {
 				if (current.isUp() && !current.isLoopback()	&& !current.isVirtual()) {					
 					Enumeration<InetAddress> addresses = current.getInetAddresses();
 					while (addresses.hasMoreElements()) {
+						JsonObject currAddrHost = new JsonObject() ;
 						InetAddress current_addr = addresses.nextElement();
 						if (!current_addr.isLoopbackAddress()) {
+							String hostName = current_addr.getHostName() ;
+							if (hostName == null) {
+								hostName = "" ;
+							}
+							
+							String addr = current_addr.getHostAddress() ;
+							currAddrHost.addProperty("Hostname", hostName);
+							currAddrHost.addProperty("IPaddress", addr);
 							if (current_addr instanceof Inet4Address) {
-								String addr = current_addr.getHostAddress() ;
-								IPv4.add(addr);
+								IPv4.add(currAddrHost);
 								IPv4List.add(addr) ;
 							} else if (current_addr instanceof Inet6Address) {
-								IPv6.add(current_addr.getHostAddress());
+								IPv6.add(currAddrHost);
+							} else {
+								otherAddresses.add(currAddrHost);
 							}
 						}
 					}
@@ -60,6 +72,10 @@ public class NetworkUtils {
 		return IPv4;
 	}
 	
+	public JsonArray getOtherAddresses() {
+		return otherAddresses;
+	}
+
 	public ArrayList<String> getIPv4List() {
 		return IPv4List ;
 	}
