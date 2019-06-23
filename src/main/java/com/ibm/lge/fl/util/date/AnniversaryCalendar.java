@@ -14,19 +14,29 @@ public class AnniversaryCalendar <T> {
 		anniversaires = new HashMap<MonthDay,List<T>>() ;
 	}
 
-	public void addAnniversary(T a, TemporalAccessor date) {
+	public MonthDay addAnniversary(T a, TemporalAccessor date) {
 		
-		MonthDay monthDay = MonthDay.from(date) ;
-		List<T> annivs = anniversaires.get(monthDay) ;
-		if (annivs == null) {
-			annivs = new ArrayList<T>() ;
-			anniversaires.put(monthDay, annivs) ;
+		try {
+			MonthDay monthDay = MonthDay.from(date) ;
+			List<T> annivs = anniversaires.get(monthDay) ;
+			if (annivs == null) {
+				annivs = new ArrayList<T>() ;
+				anniversaires.put(monthDay, annivs) ;
+			}
+			annivs.add(a) ;
+			return monthDay ;
+		} catch (Exception e) {
+			return null ;
 		}
-		annivs.add(a) ;
 	}
 
 	public List<T> getAnniversaries(TemporalAccessor date) {
-		return anniversaires.get(MonthDay.from(date)) ;
+		try {
+			MonthDay monthDay = MonthDay.from(date) ;
+			return anniversaires.get(monthDay) ;
+		} catch (Exception e) {
+			return null ;
+		}
 	}
 	
 	public int getNbAnniversaryDate() {
