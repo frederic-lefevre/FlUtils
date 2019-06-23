@@ -28,4 +28,8 @@ public class AnniversaryCalendar <T> {
 	public List<T> getAnniversaries(TemporalAccessor date) {
 		return anniversaires.get(MonthDay.from(date)) ;
 	}
+	
+	public int getNbAnniversaryDate() {
+		return anniversaires.size() ;
+	}
 }

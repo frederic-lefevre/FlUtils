@@ -33,6 +33,7 @@ class AnniversaryCalendarTest {
 	private static Personne titi = new Personne("2000-01-30") ;
 	private static Personne tata = new Personne("2000-01-29") ;
 	private static Personne tutu = new Personne("2005-01-30") ;
+	private static Personne bad1 = new Personne("1954") ;
 	
 	@Test
 	void test() {
@@ -85,4 +86,12 @@ class AnniversaryCalendarTest {
 		assertTrue(annivs.contains(titi)) ;
 	}
 	
+	@Test
+	void test5() {
+		
+		AnniversaryCalendar<Personne> ac = new AnniversaryCalendar<Personne>() ;
+		
+		ac.addAnniversary(bad1, bad1.getBirthDate()) ;
+		assertEquals(0, ac.getNbAnniversaryDate()) ;
+	}
 }
