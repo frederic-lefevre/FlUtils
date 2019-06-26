@@ -305,10 +305,6 @@ public class AdvancedProperties extends Properties {
 		}
 	}
 	
-	public String getFileContentFromURI(String key) {
-		return getFileContentFromURI(key, Charset.defaultCharset()) ;
-	}
-	
 	public String getFileContentFromURI(String key, Charset charset) {
 				
 		String pString =  getProperty(key) ;
