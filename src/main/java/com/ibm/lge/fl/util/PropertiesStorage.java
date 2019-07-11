@@ -91,7 +91,7 @@ public class PropertiesStorage {
 			}
 			
 			if (propUri != null) {	
-				propUrl = propUri.toURL() ;				
+				propUrl = propUri.toURL() ;	
 			} else {
 				System.out.println(buildPropErrorMsg("properties url is null", systemProperty, defaultPropertyUri)) ;
 			}
@@ -147,9 +147,7 @@ public class PropertiesStorage {
 				}
 			} else {
 				System.out.println(buildPropErrorMsg("properties path is null", systemProperty, defaultPropertyPath)) ;
-			}
-			
-
+			}			
 		} catch (Exception e) {
 			// Trace file load error
 			System.out.println(buildPropErrorMsg("Exception openning properties url", systemProperty, defaultPropertyPath)) ;
