@@ -198,10 +198,12 @@ public class RunningContext {
 		if (propsLocation != null) {
 			applicationInfo.addProperty("propertiesLocation", propsLocation.toString());
 		} else {
-			applicationInfo.addProperty("propertiesLocation", "null location");
+			applicationInfo.addProperty("propertiesLocation", "No properties file location");
 		}
 		if (buildInformation != null) {
 			applicationInfo.add("buildInformation", buildInformation);
+		} else {
+			applicationInfo.addProperty("buildInformation", "No build information") ;
 		}
 		applicationInfo.addProperty("initialisationDate", initDate);
 		applicationInfo.add("applicationProperties", getPropertiesAsJson()) ;
