@@ -19,7 +19,7 @@ public class NetworkUtils {
 	private JsonArray 		  networkInterfaces = new JsonArray() ;
 	private ArrayList<String> IPv4List 			= new ArrayList<String>();
 	
-	public NetworkUtils() {
+	public NetworkUtils(boolean withLookup) {
 		
 		Enumeration<NetworkInterface> interfaces;
 		try {
@@ -34,13 +34,15 @@ public class NetworkUtils {
 						JsonObject currAddrHost = new JsonObject() ;
 						InetAddress current_addr = addresses.nextElement();
 						if (!current_addr.isLoopbackAddress()) {
-							String hostName = current_addr.getHostName() ;
-							if (hostName == null) {
-								hostName = "" ;
+							if (withLookup) {
+								String hostName = current_addr.getHostName() ;
+								if (hostName == null) {
+									hostName = "" ;
+								}
+								currAddrHost.addProperty("Hostname", hostName);
 							}
 							
-							String addr = current_addr.getHostAddress() ;
-							currAddrHost.addProperty("Hostname", hostName);
+							String addr = current_addr.getHostAddress() ;							
 							currAddrHost.addProperty("IPaddress", addr);
 							if (current_addr instanceof Inet4Address) {
 								IPv4.add(currAddrHost);

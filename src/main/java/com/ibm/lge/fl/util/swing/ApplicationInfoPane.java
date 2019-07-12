@@ -2,9 +2,12 @@ package com.ibm.lge.fl.util.swing;
 
 import java.awt.Color;
 import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
+import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -23,6 +26,7 @@ public class ApplicationInfoPane extends JPanel {
 	
 	private JTextArea infosText ;
 	private final JScrollPane scrollInfos ;
+	private JCheckBox doIpLookUp ;
 	
 	public ApplicationInfoPane(RunningContext rc) {
 		super() ;
@@ -31,6 +35,10 @@ public class ApplicationInfoPane extends JPanel {
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS)) ;
 		setBorder(BorderFactory.createLineBorder(Color.BLACK,5,true)) ;
 		
+		doIpLookUp = new JCheckBox("Do lookup on IP addresses (may be slow)") ;
+		doIpLookUp.setSelected(false) ;
+		doIpLookUp.addActionListener(new SetLookUpListener());
+		
 		infosText = new JTextArea() ;
 		
 		// to always be on the top of the scrollPane
@@ -38,18 +46,33 @@ public class ApplicationInfoPane extends JPanel {
 		caret.setUpdatePolicy(DefaultCaret.NEVER_UPDATE);
 		
 		scrollInfos = new JScrollPane(infosText) ;	
-		setInfos() ;
-		
+
+		add(doIpLookUp) ;
 		add(scrollInfos) ;	
 	}
 	
 	public void setInfos() {
-		
-		JsonObject infosJson = runningContext.getApplicationInfo() ;		
+		setInfos(doIpLookUp.isSelected()) ;
+	}
+	
+	private void setInfos(boolean withLookUp) {
+		JsonObject infosJson = runningContext.getApplicationInfo(withLookUp) ;		
 		infosText.setText(JsonUtils.jsonPrettyPrint(infosJson)) ;
 		
 		scrollInfos.getVerticalScrollBar().setValue(0);
 		JViewport vp = scrollInfos.getViewport() ;
 		vp.setViewPosition(new Point(0,0));
+	}
+	
+	private class SetLookUpListener implements ActionListener {
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			if (doIpLookUp.isSelected()) {
+				infosText.setText("Updating...");
+				setInfos(true) ;
+			}
+		}
+		
 	}
 }

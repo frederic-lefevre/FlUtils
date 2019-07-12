@@ -14,7 +14,7 @@ public class OperatingInfo {
 		
 	}
 
-	public JsonObject getInfo() {
+	public JsonObject getInfo(boolean withIpLookup) {
 
 		StringBuilder info = new StringBuilder();
 		Map<String, String> sysEnv = System.getenv();
@@ -69,7 +69,7 @@ public class OperatingInfo {
 		opInfoJson.addProperty("defaultCharset", Charset.defaultCharset().name());
 		opInfoJson.add("availableCharset", printCharSet()) ;
 
-		NetworkUtils nu = new NetworkUtils();
+		NetworkUtils nu = new NetworkUtils(withIpLookup);
 		opInfoJson.add("networkInterfaces", nu.getNetworkInterfaces()) ;
 		opInfoJson.add("IPv4addresses", 	nu.getIPv4()) ;
 		opInfoJson.add("IPv6addresses", 	nu.getIPv6()) ;

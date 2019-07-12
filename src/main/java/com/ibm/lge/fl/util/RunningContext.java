@@ -112,7 +112,7 @@ public class RunningContext {
 
 		boolean logOperatingInfos = props.getBoolean("runningContext.operatingInfo.log", false) ;
 		if (logOperatingInfos) {
-			pLog.info(getOperatingInfos().toString()) ;
+			pLog.info(getOperatingInfos(true).toString()) ;
 		}
 
 	}
@@ -178,16 +178,16 @@ public class RunningContext {
 		return DateTimeFormatter.ofPattern(datePattern).format(ZonedDateTime.ofInstant(initializationDate, ZoneId.systemDefault()));
 	}
 	
-	public JsonObject getOperatingInfos() {
+	public JsonObject getOperatingInfos(boolean withIpLookup) {
 		OperatingInfo operatingInfo = new OperatingInfo() ;
-		return operatingInfo.getInfo() ;
+		return operatingInfo.getInfo(withIpLookup) ;
 	}
 	
-	public JsonObject getApplicationInfo() {
+	public JsonObject getApplicationInfo(boolean withIpLookup) {
 		
 		JsonObject applicationInfo = new JsonObject() ;
 		String initDate = printInitializationDate() ;
-		JsonObject operatingContext = getOperatingInfos() ;
+		JsonObject operatingContext = getOperatingInfos(withIpLookup) ;
 		
 		URL propsLocation = getPropertiesLocation() ;
 		if (propsLocation != null) {
