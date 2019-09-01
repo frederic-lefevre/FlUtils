@@ -31,6 +31,7 @@ public class TextAreaLogHandler extends Handler {
 	private final DateTimeFormatter dateTimeFormatter ;
 	private final Highlighter    	highLighter ;
 	 
+	private int lastNonHighLighedLevel ;
 	private DefaultHighlighter.DefaultHighlightPainter painter ;
 	
 	public TextAreaLogHandler(JTextArea ta) {
@@ -39,7 +40,8 @@ public class TextAreaLogHandler extends Handler {
 		dateTimeFormatter = DateTimeFormatter.ofPattern(datePattern) ;
 		highLighter 	  = textArea.getHighlighter() ;
 		
-		painter = new DefaultHighlighter.DefaultHighlightPainter(Color.PINK) ;
+		painter 				= new DefaultHighlighter.DefaultHighlightPainter(Color.PINK) ;
+		lastNonHighLighedLevel 	= Level.INFO.intValue() ;
 	}
 	
 	public void setHightColor(Color color) {
@@ -50,6 +52,10 @@ public class TextAreaLogHandler extends Handler {
 		}
 	}
 	
+	public void setLastNonHighLighedLevel(Level level) {
+		lastNonHighLighedLevel = level.intValue() ;
+	}
+	
 	@Override
 	public void publish(LogRecord record) {
 		SwingUtilities.invokeLater(new Runnable() {
@@ -58,7 +64,7 @@ public class TextAreaLogHandler extends Handler {
             public void run() {
             	
             	int startHighlight = -1 ;
-            	if ((painter != null) && (record.getLevel().intValue() > Level.INFO.intValue()))  {
+            	if ((painter != null) && (record.getLevel().intValue() > lastNonHighLighedLevel))  {
             		startHighlight = textArea.getText().length() - 1 ;
             	}
             	textArea.append(dateTimeFormatter.format(LocalDateTime.ofInstant(Instant.ofEpochMilli(record.getMillis()), ZoneId.systemDefault()))) ;
