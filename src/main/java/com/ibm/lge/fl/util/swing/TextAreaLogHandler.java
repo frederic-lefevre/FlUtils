@@ -44,7 +44,7 @@ public class TextAreaLogHandler extends Handler {
 		lastNonHighLighedLevel 	= Level.INFO.intValue() ;
 	}
 	
-	public void setHightColor(Color color) {
+	public void setHighLightColor(Color color) {
 		if (color != null) {
 			painter = new DefaultHighlighter.DefaultHighlightPainter(color) ;
 		} else {
@@ -65,7 +65,12 @@ public class TextAreaLogHandler extends Handler {
             	
             	int startHighlight = -1 ;
             	if ((painter != null) && (record.getLevel().intValue() > lastNonHighLighedLevel))  {
-            		startHighlight = textArea.getText().length() - 1 ;
+            		int textLength = textArea.getText().length() ;
+            		if (textLength > 0) {
+            			startHighlight = textLength - 1 ;
+            		} else {
+            			startHighlight = 0 ;
+            		}
             	}
             	textArea.append(dateTimeFormatter.format(LocalDateTime.ofInstant(Instant.ofEpochMilli(record.getMillis()), ZoneId.systemDefault()))) ;
             	textArea.append(Long.toString(record.getSequenceNumber())) ;
