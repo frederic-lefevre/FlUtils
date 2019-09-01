@@ -1,14 +1,19 @@
 package com.ibm.lge.fl.util.swing;
 
+import java.awt.Color;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.logging.Handler;
+import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DefaultHighlighter;
+import javax.swing.text.Highlighter;
 
 import com.ibm.lge.fl.util.ExceptionLogging;
 
@@ -21,13 +26,18 @@ public class TextAreaLogHandler  extends Handler {
 	
 	private static int MAX_PRINTED_CAUSE_LEVEL = 20 ;
 	
-	private final JTextArea textArea ;
+	private final JTextArea 		textArea ;
 	private final DateTimeFormatter dateTimeFormatter ;
+	private final Highlighter    	highLighter ;
 	 
-	public TextAreaLogHandler(JTextArea textArea) {
+	private DefaultHighlighter.DefaultHighlightPainter painter ;
+	public TextAreaLogHandler(JTextArea ta) {
 		super();
-		this.textArea = textArea;
+		textArea 		  = ta;
 		dateTimeFormatter = DateTimeFormatter.ofPattern(datePattern) ;
+		highLighter 	  = textArea.getHighlighter() ;
+		
+		painter = new DefaultHighlighter.DefaultHighlightPainter(Color.RED) ;
 	}
 	
 	@Override
@@ -37,6 +47,10 @@ public class TextAreaLogHandler  extends Handler {
             @Override
             public void run() {
             	
+            	int startHighlight = -1 ;
+            	if (record.getLevel().intValue() > Level.INFO.intValue())  {
+            		startHighlight = textArea.getText().length() - 1 ;
+            	}
             	textArea.append(dateTimeFormatter.format(LocalDateTime.ofInstant(Instant.ofEpochMilli(record.getMillis()), ZoneId.systemDefault()))) ;
             	textArea.append(Long.toString(record.getSequenceNumber())) ;
             	textArea.append(BLANK) ;
@@ -66,6 +80,15 @@ public class TextAreaLogHandler  extends Handler {
         			}
         		}
         		textArea.append(NEWLINE) ;
+        		if (startHighlight > -1) {
+        			int endHighLight = textArea.getText().length() - 1 ;
+        			try {
+						highLighter.addHighlight(startHighlight, endHighLight, painter) ;
+					} catch (BadLocationException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+        		}
             }
 		}) ;
 	}
