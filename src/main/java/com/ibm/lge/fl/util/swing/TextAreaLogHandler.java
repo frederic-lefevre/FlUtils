@@ -5,6 +5,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.logging.ErrorManager;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
@@ -17,7 +18,7 @@ import javax.swing.text.Highlighter;
 
 import com.ibm.lge.fl.util.ExceptionLogging;
 
-public class TextAreaLogHandler  extends Handler {
+public class TextAreaLogHandler extends Handler {
 
 	private final static String datePattern = "uuuu-MM-dd HH:mm:ss.SSS " ;
 	private final static String BLANK 	  = " " ;
@@ -94,8 +95,8 @@ public class TextAreaLogHandler  extends Handler {
         			try {
 						highLighter.addHighlight(startHighlight, endHighLight, painter) ;
 					} catch (BadLocationException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+						painter = null ;
+						reportError("Exception in hightlightining", e, ErrorManager.FORMAT_FAILURE) ;
 					}
         		}
             }
