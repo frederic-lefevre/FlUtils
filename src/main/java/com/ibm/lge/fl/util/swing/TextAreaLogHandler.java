@@ -31,13 +31,22 @@ public class TextAreaLogHandler  extends Handler {
 	private final Highlighter    	highLighter ;
 	 
 	private DefaultHighlighter.DefaultHighlightPainter painter ;
+	
 	public TextAreaLogHandler(JTextArea ta) {
 		super();
 		textArea 		  = ta;
 		dateTimeFormatter = DateTimeFormatter.ofPattern(datePattern) ;
 		highLighter 	  = textArea.getHighlighter() ;
 		
-		painter = new DefaultHighlighter.DefaultHighlightPainter(Color.RED) ;
+		painter = new DefaultHighlighter.DefaultHighlightPainter(Color.PINK) ;
+	}
+	
+	public void setHightColor(Color color) {
+		if (color != null) {
+			painter = new DefaultHighlighter.DefaultHighlightPainter(color) ;
+		} else {
+			painter = null ;
+		}
 	}
 	
 	@Override
@@ -48,7 +57,7 @@ public class TextAreaLogHandler  extends Handler {
             public void run() {
             	
             	int startHighlight = -1 ;
-            	if (record.getLevel().intValue() > Level.INFO.intValue())  {
+            	if ((painter != null) && (record.getLevel().intValue() > Level.INFO.intValue()))  {
             		startHighlight = textArea.getText().length() - 1 ;
             	}
             	textArea.append(dateTimeFormatter.format(LocalDateTime.ofInstant(Instant.ofEpochMilli(record.getMillis()), ZoneId.systemDefault()))) ;
