@@ -15,13 +15,14 @@ public class LogsDisplayPane  extends JPanel{
 
 	private final JScrollPane 		 scrollInfos ;
 	private final TextAreaLogHandler logTextAreaHandler ;
+	private final JTextArea 		 logArea ;
 
 	public LogsDisplayPane(Logger logger) {
 		super();
 		
 		setBorder(BorderFactory.createLineBorder(Color.BLACK,5,true)) ;
 		
-		JTextArea logArea = new JTextArea(40, 120) ;
+		logArea = new JTextArea(50, 120) ;
 		logArea.setEditable(false);
 		logArea.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
 		
@@ -40,5 +41,10 @@ public class LogsDisplayPane  extends JPanel{
 	
 	public void setLastNonHighLighedLevel(Level level) {
 		logTextAreaHandler.setLastNonHighLighedLevel(level) ;
+	}
+	
+	public void setRowsCols(int rows, int cols) {
+		logArea.setColumns(cols) ;
+		logArea.setRows(rows) ;
 	}
 }
