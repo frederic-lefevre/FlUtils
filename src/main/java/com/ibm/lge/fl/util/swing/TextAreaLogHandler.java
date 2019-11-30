@@ -34,6 +34,8 @@ public class TextAreaLogHandler extends Handler {
 	private int lastNonHighLighedLevel ;
 	private DefaultHighlighter.DefaultHighlightPainter painter ;
 	
+	private boolean hasHighLight ;
+	
 	public TextAreaLogHandler(JTextArea ta) {
 		super();
 		textArea 		  = ta;
@@ -42,6 +44,7 @@ public class TextAreaLogHandler extends Handler {
 		
 		painter 				= new DefaultHighlighter.DefaultHighlightPainter(Color.PINK) ;
 		lastNonHighLighedLevel 	= Level.INFO.intValue() ;
+		hasHighLight			= false ;
 	}
 	
 	public void setHighLightColor(Color color) {
@@ -65,6 +68,7 @@ public class TextAreaLogHandler extends Handler {
             	
             	int startHighlight = -1 ;
             	if ((painter != null) && (record.getLevel().intValue() > lastNonHighLighedLevel))  {
+            		hasHighLight = true ;
             		int textLength = textArea.getText().length() ;
             		if (textLength > 0) {
             			startHighlight = textLength - 1 ;
@@ -122,6 +126,10 @@ public class TextAreaLogHandler extends Handler {
 	@Override
 	public void close() throws SecurityException {
 
+	}
+	
+	public boolean hasHighlight() {
+		return hasHighLight ;
 	}
 
 }

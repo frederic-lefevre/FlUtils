@@ -47,4 +47,8 @@ public class LogsDisplayPane  extends JPanel{
 		logArea.setColumns(cols) ;
 		logArea.setRows(rows) ;
 	}
+	
+	public boolean hasHighlight() {
+		return logTextAreaHandler.hasHighlight() ;
+	}
 }
