@@ -5,6 +5,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.logging.ErrorManager;
 import java.util.logging.Handler;
 import java.util.logging.Level;
@@ -36,6 +37,8 @@ public class TextAreaLogHandler extends Handler {
 	
 	private boolean hasHighLight ;
 	
+	private ArrayList<LogHighLightListener> highLightListeners ;
+	
 	public TextAreaLogHandler(JTextArea ta) {
 		super();
 		textArea 		  = ta;
@@ -45,6 +48,7 @@ public class TextAreaLogHandler extends Handler {
 		painter 				= new DefaultHighlighter.DefaultHighlightPainter(Color.PINK) ;
 		lastNonHighLighedLevel 	= Level.INFO.intValue() ;
 		hasHighLight			= false ;
+		highLightListeners		= new ArrayList<LogHighLightListener>() ;
 	}
 	
 	public void setHighLightColor(Color color) {
@@ -68,7 +72,12 @@ public class TextAreaLogHandler extends Handler {
             	
             	int startHighlight = -1 ;
             	if ((painter != null) && (record.getLevel().intValue() > lastNonHighLighedLevel))  {
-            		hasHighLight = true ;
+            		if (! hasHighLight) {
+            			hasHighLight = true ;
+            			for (LogHighLightListener highLightListener : highLightListeners) {
+            				highLightListener.logsHightLighted() ;
+            			}
+            		}
             		int textLength = textArea.getText().length() ;
             		if (textLength > 0) {
             			startHighlight = textLength - 1 ;
@@ -130,6 +139,10 @@ public class TextAreaLogHandler extends Handler {
 	
 	public boolean hasHighlight() {
 		return hasHighLight ;
+	}
+	
+	public void addHighLightListener(LogHighLightListener highLightListener) {
+		highLightListeners.add(highLightListener) ;
 	}
 
 }
