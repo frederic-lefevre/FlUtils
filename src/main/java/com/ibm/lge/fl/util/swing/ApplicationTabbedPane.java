@@ -14,7 +14,7 @@ public class ApplicationTabbedPane extends JTabbedPane {
 	private ApplicationInfoPane appInfoPane ;
 	private LogsDisplayPane		logsDisplayPane ;
 	
-	private final static Color logHighLight = Color.RED ;
+	private Color logHighLightColor = Color.RED ;
 	
 	public ApplicationTabbedPane(RunningContext runningContext) {
 		super() ;
@@ -50,11 +50,14 @@ public class ApplicationTabbedPane extends JTabbedPane {
 		public void logsHightLighted() {
 			int logTabIdx = indexOfComponent(logsDisplayPane) ;
 			if (logTabIdx > -1) {
-				setBackgroundAt(logTabIdx, logHighLight) ;
+				setBackgroundAt(logTabIdx, logHighLightColor) ;
 			}
 		}
 		
 	}
-	
 
+	public void setLogHighLightColor(Color logHighLightColor) {
+		this.logHighLightColor = logHighLightColor;
+	}
+	
 }
