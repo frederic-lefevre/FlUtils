@@ -1,7 +1,6 @@
 package com.ibm.lge.fl.util.swing;
 
 import java.awt.Color;
-
 import javax.swing.JTabbedPane;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -16,7 +15,6 @@ public class ApplicationTabbedPane extends JTabbedPane {
 	private LogsDisplayPane		logsDisplayPane ;
 	
 	private final static Color logHighLight = Color.RED ;
-	private final static Color logNormal = Color.WHITE ;
 	
 	public ApplicationTabbedPane(RunningContext runningContext) {
 		super() ;
@@ -30,6 +28,9 @@ public class ApplicationTabbedPane extends JTabbedPane {
 		addTab("Logs display", logsDisplayPane) ;
 		
 		addChangeListener(new BackUpTabChangeListener());
+		
+		LogTabColorChanger logTabColorChanger = new LogTabColorChanger() ;
+		logsDisplayPane.addHighLightListener(logTabColorChanger) ;
 	}
 	
 	private class BackUpTabChangeListener implements ChangeListener {
@@ -43,14 +44,17 @@ public class ApplicationTabbedPane extends JTabbedPane {
 		}
 	}
 	
-	public void refreshStandardTabsColor() {
-		
-		int logTabIdx = indexOfTabComponent(logsDisplayPane) ;
-		if (logsDisplayPane.hasHighlight()) {			
-			setBackgroundAt(logTabIdx, logHighLight) ;
-		} else {
-			setBackgroundAt(logTabIdx, logNormal) ;
+	private class LogTabColorChanger implements LogHighLightListener {
+
+		@Override
+		public void logsHightLighted() {
+			int logTabIdx = indexOfComponent(logsDisplayPane) ;
+			if (logTabIdx > -1) {
+				setBackgroundAt(logTabIdx, logHighLight) ;
+			}
 		}
+		
 	}
+	
 
 }

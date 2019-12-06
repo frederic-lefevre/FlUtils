@@ -51,4 +51,8 @@ public class LogsDisplayPane  extends JPanel{
 	public boolean hasHighlight() {
 		return logTextAreaHandler.hasHighlight() ;
 	}
+	
+	public void addHighLightListener(LogHighLightListener highLightListener) {
+		logTextAreaHandler.addHighLightListener(highLightListener) ;
+	}
 }
