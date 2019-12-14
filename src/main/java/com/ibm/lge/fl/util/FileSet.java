@@ -7,7 +7,6 @@ import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
-import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
@@ -49,7 +48,7 @@ public class FileSet {
 	// File comparator to sort files by last modified date
 	private Comparator<Path> lastModifiedComp ;
 	
-	public FileSet(String root, Logger l) {
+	public FileSet(Path root, Logger l) {
 		super();
 		
 		// set Logger
@@ -59,7 +58,7 @@ public class FileSet {
 		recursive = true ;
 		
 		try {
-			rootPath = Paths.get(root);
+			rootPath = root ;
 			if (! Files.exists(rootPath)) {
 				fLog.warning("Directory does not exist: " + rootPath.toString()) ;
 			} else if (! Files.isReadable(rootPath) ) {
