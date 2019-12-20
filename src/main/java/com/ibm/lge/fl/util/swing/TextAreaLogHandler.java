@@ -75,7 +75,7 @@ public class TextAreaLogHandler extends Handler {
             		if (! hasHighLight) {
             			hasHighLight = true ;
             			for (LogHighLightListener highLightListener : highLightListeners) {
-            				highLightListener.logsHightLighted() ;
+            				highLightListener.logsHightLighted(true) ;
             			}
             		}
             		int textLength = textArea.getText().length() ;

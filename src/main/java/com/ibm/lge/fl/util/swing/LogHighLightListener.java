@@ -2,5 +2,5 @@ package com.ibm.lge.fl.util.swing;
 
 public interface LogHighLightListener {
 
-	void logsHightLighted() ;
+	void logsHightLighted(boolean hightLight) ;
 }

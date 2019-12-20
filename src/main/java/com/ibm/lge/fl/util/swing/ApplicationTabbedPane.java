@@ -14,7 +14,8 @@ public class ApplicationTabbedPane extends JTabbedPane {
 	private ApplicationInfoPane appInfoPane ;
 	private LogsDisplayPane		logsDisplayPane ;
 	
-	private Color logHighLightColor = Color.RED ;
+	private Color logTabHighLightColor = Color.RED ;
+	private Color logTabRegularColor ;
 	
 	public ApplicationTabbedPane(RunningContext runningContext) {
 		super() ;
@@ -26,6 +27,10 @@ public class ApplicationTabbedPane extends JTabbedPane {
 		// Tabbed Panel for logs display
 		logsDisplayPane =  new LogsDisplayPane(runningContext.getpLog()) ;
 		addTab("Logs display", logsDisplayPane) ;
+		int logTabIdx = indexOfComponent(logsDisplayPane) ;
+		if (logTabIdx > -1) {
+			logTabRegularColor = getBackgroundAt(logTabIdx) ;
+		}
 		
 		addChangeListener(new BackUpTabChangeListener());
 		
@@ -47,17 +52,21 @@ public class ApplicationTabbedPane extends JTabbedPane {
 	private class LogTabColorChanger implements LogHighLightListener {
 
 		@Override
-		public void logsHightLighted() {
+		public void logsHightLighted(boolean highLight) {
 			int logTabIdx = indexOfComponent(logsDisplayPane) ;
 			if (logTabIdx > -1) {
-				setBackgroundAt(logTabIdx, logHighLightColor) ;
+				if (highLight) {
+					setBackgroundAt(logTabIdx, logTabHighLightColor) ;
+				} else {
+					setBackgroundAt(logTabIdx, logTabRegularColor) ;
+				}
 			}
 		}
 		
 	}
 
-	public void setLogHighLightColor(Color logHighLightColor) {
-		this.logHighLightColor = logHighLightColor;
+	public void setLogTabHighLightColor(Color logHighLightColor) {
+		this.logTabHighLightColor = logHighLightColor;
 	}
 	
 }
