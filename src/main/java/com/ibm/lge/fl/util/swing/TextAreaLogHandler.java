@@ -51,6 +51,10 @@ public class TextAreaLogHandler extends Handler {
 		highLightListeners		= new ArrayList<LogHighLightListener>() ;
 	}
 	
+	public JTextArea getTextArea() {
+		return textArea;
+	}
+
 	public void setHighLightColor(Color color) {
 		if (color != null) {
 			painter = new DefaultHighlighter.DefaultHighlightPainter(color) ;
