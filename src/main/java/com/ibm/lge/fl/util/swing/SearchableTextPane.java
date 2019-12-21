@@ -86,6 +86,10 @@ public class SearchableTextPane extends JPanel  {
 		searcherHighLighter = new SearcherHighLighter(textArea, logger) ;
 	}
 
+	public JPanel getCommandPanel() {
+		return searchPanel;
+	}
+
 	private class searchListener implements ActionListener {
 
 		@Override
