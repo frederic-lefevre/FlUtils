@@ -24,6 +24,8 @@ public class SearcherHighLighter {
 	
 	private ArrayList<SearchElement> currentSearches ;
 	
+	private ArrayList<Object> currentHighLights ;
+	
 	public SearcherHighLighter(JTextComponent tc, Logger l) {
 		
 		textComponent = tc ;
@@ -31,9 +33,9 @@ public class SearcherHighLighter {
 		
 		highLighter = textComponent.getHighlighter() ;
 		
-		currentColorIdx = -1 ;
-		
-		currentSearches = new ArrayList<SearchElement>() ;
+		currentColorIdx   = -1 ;
+		currentSearches   = new ArrayList<SearchElement>() ;
+		currentHighLights = new ArrayList<Object>() ;
 
 	}
 
@@ -90,7 +92,7 @@ public class SearcherHighLighter {
 		        		result = indexOfIgnoreFormat(text, txtToFind, currIdx) ;
 		        		if (result.getBegin() > -1) {
 			        		currIdx = result.getEnd() ;	        		
-							highLighter.addHighlight(result.getBegin(), result.getEnd(), painter) ;
+			        		currentHighLights.add(highLighter.addHighlight(result.getBegin(), result.getEnd(), painter)) ;
 							searchElement.addSearchResult(result);
 			        	} else {
 			        		currIdx = -1 ;
@@ -99,7 +101,7 @@ public class SearcherHighLighter {
 		        		int foundIdx = text.indexOf(txtToFind, currIdx) ;		        		
 		        		if (foundIdx > -1) {
 			        		currIdx = foundIdx + txtToFind.length() ;	        		
-							highLighter.addHighlight(foundIdx, currIdx, painter) ;
+			        		currentHighLights.add(highLighter.addHighlight(foundIdx, currIdx, painter)) ;
 							result = new SearchResult(foundIdx, currIdx) ;
 							searchElement.addSearchResult(result);
 			        	} else {
@@ -120,8 +122,11 @@ public class SearcherHighLighter {
 	}
 
 	public void removeHighlights() {
-		highLighter.removeAllHighlights() ; 
-		currentSearches = new ArrayList<SearchElement>() ;
+		for (Object oneHighLight : currentHighLights) {
+			highLighter.removeHighlight(oneHighLight) ; 
+		}
+		currentSearches   = new ArrayList<SearchElement>() ;
+		currentHighLights = new ArrayList<Object>() ;
 	}
 	
 	public void setHighLightColors(Color[] highLightColors) {
