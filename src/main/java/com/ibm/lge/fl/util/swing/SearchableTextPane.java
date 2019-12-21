@@ -26,38 +26,41 @@ public class SearchableTextPane extends JPanel  {
 	private final JScrollPane 		 scrollInfos ;
 	private final JTextArea 		 textArea ;
 	
-	// Buttons and text field for search
+	// Component and text field for search
 	private final JTextField searchText ;
-	private final JButton    searchButton ;
-	private final JButton    resetHighLightButton ;
 	private final JCheckBox  caseSensitive ;
 	private final JCheckBox  ignoreAccent ;
 	private final JCheckBox  ignoreFormatting ;
 	private final JPanel	 searchResultPanel ;
-	private final JPanel 	 searchPanel ;
-	
-	private ArrayList<SearchElement> currentSearches ;
+	private final JPanel 	 commandPanel ;
 	
 	private final SearcherHighLighter searcherHighLighter ;
 	
 	public SearchableTextPane(JTextArea ta, Logger logger) {
 		
+		setLayout(new BoxLayout(this,  BoxLayout.X_AXIS)) ;
+		
+		// Text area panel to search from
 		textArea = ta ;
 		scrollInfos = new JScrollPane(textArea) ;
 		
 		add(scrollInfos) ;
 		
+		// Command panel
+		commandPanel = new JPanel() ;
+		commandPanel.setLayout(new BoxLayout(commandPanel,  BoxLayout.Y_AXIS));
+		
 		// Panel to search string in the log
-		searchPanel = new JPanel() ;
+		JPanel searchPanel = new JPanel() ;
 		searchPanel.setLayout(new BoxLayout(searchPanel,  BoxLayout.Y_AXIS));	
 		searchPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK,1));		
 		JPanel searchPanel1 = new JPanel() ;
 		searchPanel1.setLayout(new BoxLayout(searchPanel1,  BoxLayout.X_AXIS));		
 		searchText = new JTextField(20) ;
 		searchText.setMaximumSize(new Dimension(400, 40));
-		searchButton = new JButton("Search") ;
+		JButton searchButton = new JButton("Search") ;
 		searchButton.setBorder(BorderFactory.createEmptyBorder(10,10,10,10)) ;
-		resetHighLightButton = new JButton("Reset") ;
+		JButton resetHighLightButton = new JButton("Reset") ;
 		resetHighLightButton.setBorder(BorderFactory.createEmptyBorder(10,10,10,10)) ;
 		JPanel searchOptionPanel = new JPanel() ;
 		searchOptionPanel.setLayout(new BoxLayout(searchOptionPanel,  BoxLayout.Y_AXIS));
@@ -78,7 +81,9 @@ public class SearchableTextPane extends JPanel  {
 		searchResultPanel = new JPanel() ;
 		searchResultPanel.setLayout(new BoxLayout(searchResultPanel,  BoxLayout.Y_AXIS));	
 		searchPanel.add(searchResultPanel) ;
-		add(searchPanel) ;
+		commandPanel.add(searchPanel) ;
+		
+		add(commandPanel) ;
 		
 		searchButton.addActionListener(new searchListener()) ;
 		resetHighLightButton.addActionListener(new resetHighLightListener()) ;
@@ -87,7 +92,7 @@ public class SearchableTextPane extends JPanel  {
 	}
 
 	public JPanel getCommandPanel() {
-		return searchPanel;
+		return commandPanel;
 	}
 
 	private class searchListener implements ActionListener {
@@ -102,7 +107,7 @@ public class SearchableTextPane extends JPanel  {
 				boolean askIgnoreFormatting = ignoreFormatting.isSelected() ;
 				searcherHighLighter.searchAndHighlight(searchStr, askCaseSensitive, askIgnoreAccent, askIgnoreFormatting);
 				searchResultPanel.removeAll() ;
-				currentSearches = searcherHighLighter.getCurrentSearches() ;
+				ArrayList<SearchElement> currentSearches = searcherHighLighter.getCurrentSearches() ;
 				if ((currentSearches != null) && (currentSearches.size() > 0)) {
 					SearchElement latestSearch = currentSearches.get(currentSearches.size()-1) ;
 					latestSearch.diplayFirstResult() ;
