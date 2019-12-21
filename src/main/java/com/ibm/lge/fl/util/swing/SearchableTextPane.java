@@ -120,11 +120,11 @@ public class SearchableTextPane extends JPanel  {
 						JPanel elemPanel = new JPanel() ;
 						elemPanel.setLayout(new BoxLayout(elemPanel,  BoxLayout.X_AXIS));	
 						JLabel searchedStringLbl = new JLabel(searchElem.getSearchedString() + " ") ;
-//						JButton next = new JButton("next") ;
-						JButton next = new JButton("    ") ;
+						JButton next = new JButton("next") ;
 						occurencesButton.add(next) ;
-						next.setBackground(searchElem.getHightLightColor());
-						JLabel occurences = new JLabel(" " + searchElem.getNbOccurences() + " occurences") ;
+						JLabel occurences = new JLabel(" 1 of " + searchElem.getNbOccurences() + " occurences") ;
+						next.addActionListener(new OcccurenceButtonListener(searchElem, occurences));
+						next.setBackground(searchElem.getHightLightColor());					
 						elemPanel.add(searchedStringLbl);
 						elemPanel.add(next) ;
 						elemPanel.add(occurences);
@@ -136,6 +136,25 @@ public class SearchableTextPane extends JPanel  {
 				}
 			}
 		}
+	}
+	
+	private class OcccurenceButtonListener implements ActionListener {
+
+		private SearchElement searchElem ;
+		private JLabel 		  occurences ;
+		public OcccurenceButtonListener(SearchElement searchElem, JLabel occurences) {
+			super();
+			this.searchElem = searchElem;
+			this.occurences = occurences ;
+		}
+	
+		// Go to the next occurence
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			
+			int occurenceNum = searchElem.displayNextResult() ;
+			occurences.setText(" " + occurenceNum + " of " + searchElem.getNbOccurences() + " occurences");
+		}		
 	}
 	
 	private class resetHighLightListener implements ActionListener {

@@ -290,20 +290,24 @@ public class SearcherHighLighter {
 			}
 		}
 		
-		public void displayNextResult() {
+		// Return the number of the displayed result, starting at 1
+		public int displayNextResult() {
 			if ((searchResults != null) && (searchResults.size() > 0)) {
 				currentResultView = (currentResultView + 1)% searchResults.size() ;
 				searchResults.get(currentResultView).goToResult() ;
 			}
+			return currentResultView + 1 ;
 		}
 		
-		public void displayPreviousResult() {
+		// Return the number of the displayed result, starting at 1
+		public int displayPreviousResult() {
 			if ((searchResults != null) && (searchResults.size() > 0)) {
 				currentResultView-- ;
 				if (currentResultView == -1) {
 					currentResultView = searchResults.size() - 1 ;
 				}
 			}
+			return currentResultView + 1 ;
 		}
 		
 		public int getNbOccurences() {
