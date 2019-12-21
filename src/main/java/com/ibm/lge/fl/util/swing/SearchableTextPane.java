@@ -34,9 +34,14 @@ public class SearchableTextPane extends JPanel  {
 	private final JPanel	 searchResultPanel ;
 	private final JPanel 	 commandPanel ;
 	
+	// Buttons to navigate the search results
+	private ArrayList<JButton> occurencesButton ;
+	
 	private final SearcherHighLighter searcherHighLighter ;
 	
 	public SearchableTextPane(JTextArea ta, Logger logger) {
+		
+		occurencesButton = new ArrayList<JButton>() ;
 		
 		setLayout(new BoxLayout(this,  BoxLayout.X_AXIS)) ;
 		
@@ -117,6 +122,7 @@ public class SearchableTextPane extends JPanel  {
 						JLabel searchedStringLbl = new JLabel(searchElem.getSearchedString() + " ") ;
 //						JButton next = new JButton("next") ;
 						JButton next = new JButton("    ") ;
+						occurencesButton.add(next) ;
 						next.setBackground(searchElem.getHightLightColor());
 						JLabel occurences = new JLabel(" " + searchElem.getNbOccurences() + " occurences") ;
 						elemPanel.add(searchedStringLbl);
@@ -139,6 +145,7 @@ public class SearchableTextPane extends JPanel  {
 			searchText.setText("") ;
 			searcherHighLighter.removeHighlights() ;
 			searchResultPanel.removeAll() ;
+			occurencesButton = new ArrayList<JButton>() ;
 			validate();
 			repaint();
 		}
