@@ -306,6 +306,7 @@ public class SearcherHighLighter {
 				if (currentResultView == -1) {
 					currentResultView = searchResults.size() - 1 ;
 				}
+				searchResults.get(currentResultView).goToResult() ;
 			}
 			return currentResultView + 1 ;
 		}

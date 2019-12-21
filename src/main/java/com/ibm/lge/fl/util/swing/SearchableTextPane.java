@@ -115,12 +115,16 @@ public class SearchableTextPane extends JPanel  {
 						JPanel elemPanel = new JPanel() ;
 						elemPanel.setLayout(new BoxLayout(elemPanel,  BoxLayout.X_AXIS));	
 						JLabel searchedStringLbl = new JLabel(searchElem.getSearchedString() + " ") ;
-						JButton next = new JButton("next") ;
+						JButton next 	 = new JButton("next") ;
+						JButton previous = new JButton("previous") ;
 						JLabel occurences = new JLabel(" 1 of " + searchElem.getNbOccurences() + " occurences") ;
-						next.addActionListener(new OcccurenceButtonListener(searchElem, occurences));
-						next.setBackground(searchElem.getHightLightColor());					
+						previous.addActionListener(new OcccurenceButtonListener(searchElem, occurences, false));
+						next.addActionListener(new OcccurenceButtonListener(searchElem, occurences, true));
+						previous.setBackground(searchElem.getHightLightColor());
+						next.setBackground(searchElem.getHightLightColor());
 						elemPanel.add(searchedStringLbl);
-						elemPanel.add(next) ;
+						elemPanel.add(previous) ;
+						elemPanel.add(next) ;						
 						elemPanel.add(occurences);
 						searchResultPanel.add(elemPanel) ;
 					}
@@ -136,17 +140,24 @@ public class SearchableTextPane extends JPanel  {
 
 		private SearchElement searchElem ;
 		private JLabel 		  occurences ;
-		public OcccurenceButtonListener(SearchElement searchElem, JLabel occurences) {
+		private boolean		  forward ;
+		public OcccurenceButtonListener(SearchElement searchElem, JLabel occurences, boolean forward) {
 			super();
 			this.searchElem = searchElem;
 			this.occurences = occurences ;
+			this.forward	= forward ;
 		}
 	
 		// Go to the next occurence
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			
-			int occurenceNum = searchElem.displayNextResult() ;
+			int occurenceNum ;
+			if (forward) {
+				occurenceNum = searchElem.displayNextResult() ;
+			} else {
+				occurenceNum = searchElem.displayPreviousResult() ;
+			}
 			occurences.setText(" " + occurenceNum + " of " + searchElem.getNbOccurences() + " occurences");
 		}		
 	}
