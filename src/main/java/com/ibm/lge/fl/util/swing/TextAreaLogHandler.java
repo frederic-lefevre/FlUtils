@@ -38,6 +38,7 @@ public class TextAreaLogHandler extends Handler {
 	private boolean hasHighLight ;
 	
 	private ArrayList<LogHighLightListener> highLightListeners ;
+	private ArrayList<LogRecordArea> 		logRecordAreas ;
 	
 	public TextAreaLogHandler(JTextArea ta) {
 		super();
@@ -49,6 +50,7 @@ public class TextAreaLogHandler extends Handler {
 		lastNonHighLighedLevel 	= Level.INFO.intValue() ;
 		hasHighLight			= false ;
 		highLightListeners		= new ArrayList<LogHighLightListener>() ;
+		logRecordAreas			= new ArrayList<LogRecordArea>() ;
 	}
 	
 	public JTextArea getTextArea() {
@@ -75,6 +77,13 @@ public class TextAreaLogHandler extends Handler {
             public void run() {
             	
             	int startHighlight = -1 ;
+            	int startRecord ; 
+            	int textLength = textArea.getText().length() ;
+        		if (textLength > 0) {
+        			startRecord = textLength - 1 ;
+        		} else {
+        			startRecord = 0 ;
+        		}
             	if ((painter != null) && (record.getLevel().intValue() > lastNonHighLighedLevel))  {
             		if (! hasHighLight) {
             			hasHighLight = true ;
@@ -82,13 +91,9 @@ public class TextAreaLogHandler extends Handler {
             				highLightListener.logsHightLighted(true) ;
             			}
             		}
-            		int textLength = textArea.getText().length() ;
-            		if (textLength > 0) {
-            			startHighlight = textLength - 1 ;
-            		} else {
-            			startHighlight = 0 ;
-            		}
+            		startHighlight = startRecord ;
             	}
+            	
             	textArea.append(dateTimeFormatter.format(LocalDateTime.ofInstant(Instant.ofEpochMilli(record.getMillis()), ZoneId.systemDefault()))) ;
             	textArea.append(Long.toString(record.getSequenceNumber())) ;
             	textArea.append(BLANK) ;
@@ -118,15 +123,17 @@ public class TextAreaLogHandler extends Handler {
         			}
         		}
         		textArea.append(NEWLINE) ;
+        		
+        		int endRecord = textArea.getText().length() - 1 ;
         		if (startHighlight > -1) {
-        			int endHighLight = textArea.getText().length() - 1 ;
         			try {
-						highLighter.addHighlight(startHighlight, endHighLight, painter) ;
+						highLighter.addHighlight(startHighlight, endRecord, painter) ;
 					} catch (BadLocationException e) {
 						painter = null ;
 						reportError("Exception in hightlightining", e, ErrorManager.FORMAT_FAILURE) ;
 					}
         		}
+        		logRecordAreas.add(new LogRecordArea(record, startRecord, endRecord)) ;
             }
 		}) ;
 	}
