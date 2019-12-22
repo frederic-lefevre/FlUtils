@@ -2,6 +2,7 @@ package com.ibm.lge.fl.util.swing;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Set;
 import java.util.logging.Level;
 
 public class LogRecordAreas {
@@ -23,5 +24,7 @@ public class LogRecordAreas {
 		recordsForTheSameLevel.add(recordArea) ;		
 	}
 	
-
+	public Set<Level> getRecordLevels() {
+		return logRecordAreasByLevel.keySet() ;
+	}
 }

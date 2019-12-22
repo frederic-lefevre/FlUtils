@@ -60,6 +60,10 @@ public class TextAreaLogHandler extends Handler {
 		return textArea;
 	}
 
+	public LogRecordAreas getLogRecordAreas() {
+		return logRecordAreas;
+	}
+
 	public void setHighLightColor(Color color) {
 		if (color != null) {
 			painter = new DefaultHighlighter.DefaultHighlightPainter(color) ;

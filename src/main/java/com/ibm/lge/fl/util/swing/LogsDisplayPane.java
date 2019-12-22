@@ -5,6 +5,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 
@@ -19,7 +20,7 @@ public class LogsDisplayPane  extends JPanel {
 	public LogsDisplayPane(Logger logger) {
 		
 		super();
-		
+		setLayout(new BoxLayout(this,  BoxLayout.X_AXIS)) ;
 		setBorder(BorderFactory.createLineBorder(Color.BLACK,5,true)) ;
 		
 		logArea = new JTextArea(50, 120) ;
@@ -32,6 +33,9 @@ public class LogsDisplayPane  extends JPanel {
 		
 		searchableTextArea = new SearchableTextPane(logArea, logger) ;
 		add(searchableTextArea) ;
+		
+		LogRecordCategoriesPane logRecordCategoriesPane = new LogRecordCategoriesPane(logTextAreaHandler.getLogRecordAreas()) ;
+		searchableTextArea.getCommandPanel().add(logRecordCategoriesPane) ;
 	}
 	
 	public void setHighLightColor(Color color) {
