@@ -5,26 +5,27 @@ import java.util.HashMap;
 import java.util.Set;
 import java.util.logging.Level;
 
-public class LogRecordAreas {
-
-	private HashMap<Level,ArrayList<LogRecordArea>> logRecordAreasByLevel ;
+public class LogRecordAreas extends HashMap<Level,ArrayList<LogRecordArea>> {
 	
+	private static final long serialVersionUID = 1L;
+
 	public LogRecordAreas() {
-		logRecordAreasByLevel = new HashMap<Level,ArrayList<LogRecordArea>>() ;
+		super() ;
 	}
 
 	public void addLogRecordArea(LogRecordArea recordArea) {
 		
 		Level recordLevel = recordArea.getRecord().getLevel() ;
-		ArrayList<LogRecordArea> recordsForTheSameLevel = logRecordAreasByLevel.get(recordLevel) ;
+		ArrayList<LogRecordArea> recordsForTheSameLevel = get(recordLevel) ;
 		if (recordsForTheSameLevel == null) {
 			recordsForTheSameLevel = new ArrayList<LogRecordArea>() ;
-			logRecordAreasByLevel.put(recordLevel, recordsForTheSameLevel) ;
+			put(recordLevel, recordsForTheSameLevel) ;
 		}
 		recordsForTheSameLevel.add(recordArea) ;		
 	}
 	
 	public Set<Level> getRecordLevels() {
-		return logRecordAreasByLevel.keySet() ;
+		return keySet() ;
 	}
+	
 }
