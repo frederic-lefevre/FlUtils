@@ -26,7 +26,7 @@ public class LogsDisplayPane  extends JPanel {
 		logArea.setEditable(false);
 		logArea.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
 		
-		logTextAreaHandler = new TextAreaLogHandler(logArea) ;
+		logTextAreaHandler = new TextAreaLogHandler(logArea, logger) ;
 		logTextAreaHandler.setLevel(logger.getLevel());
 		logger.addHandler(logTextAreaHandler);
 		

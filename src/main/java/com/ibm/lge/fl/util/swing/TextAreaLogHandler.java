@@ -10,6 +10,7 @@ import java.util.logging.ErrorManager;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
+import java.util.logging.Logger;
 
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
@@ -31,6 +32,7 @@ public class TextAreaLogHandler extends Handler {
 	private final JTextArea 		textArea ;
 	private final DateTimeFormatter dateTimeFormatter ;
 	private final Highlighter    	highLighter ;
+	private final Logger			tLog ;
 	 
 	private int lastNonHighLighedLevel ;
 	private DefaultHighlighter.DefaultHighlightPainter painter ;
@@ -40,9 +42,10 @@ public class TextAreaLogHandler extends Handler {
 	private ArrayList<LogHighLightListener> highLightListeners ;
 	private LogRecordAreas 					logRecordAreas ;
 	
-	public TextAreaLogHandler(JTextArea ta) {
+	public TextAreaLogHandler(JTextArea ta, Logger l) {
 		super();
 		textArea 		  = ta;
+		tLog			  = l ;
 		dateTimeFormatter = DateTimeFormatter.ofPattern(datePattern) ;
 		highLighter 	  = textArea.getHighlighter() ;
 		
@@ -133,7 +136,7 @@ public class TextAreaLogHandler extends Handler {
 						reportError("Exception in hightlightining", e, ErrorManager.FORMAT_FAILURE) ;
 					}
         		}
-        		logRecordAreas.addLogRecordArea(new LogRecordArea(record, startRecord, endRecord)) ;
+        		logRecordAreas.addLogRecordArea(new LogRecordArea(record, startRecord, endRecord, tLog)) ;
             }
 		}) ;
 	}

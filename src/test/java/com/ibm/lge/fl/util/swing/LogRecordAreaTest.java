@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
+import java.util.logging.Logger;
 
 import org.junit.jupiter.api.Test;
 
@@ -14,13 +15,15 @@ class LogRecordAreaTest {
 		
 		LogRecord record = new LogRecord(Level.INFO, "Juste une info");
 		
-		LogRecordArea lra = new LogRecordArea(record, 10, 20) ;
+		LogRecordArea lra = new LogRecordArea(record, 10, 20, Logger.getAnonymousLogger()) ;
 		
-		int begin = lra.getStartPosition() ;
-		int end   = lra.getEndPosition() ;
+		assertEquals(lra.getEndPosition(),   20) ;
+		assertEquals(lra.getStartPosition(), 10) ;
+
+		lra.moveArea(-5);
 		
-		assertEquals(end,   20) ;
-		assertEquals(begin, 10) ;
+		assertEquals(lra.getEndPosition(),   15) ;
+		assertEquals(lra.getStartPosition(),  5) ;
 
 	}
 
