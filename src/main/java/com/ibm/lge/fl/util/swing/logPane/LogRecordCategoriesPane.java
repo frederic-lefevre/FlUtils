@@ -50,7 +50,7 @@ public class LogRecordCategoriesPane extends JPanel  {
 	
 	private JPanel oneCategoryPane(Level level) {
 		
-		ArrayList<LogRecordArea> recordAreas = logRecordAreas.get(level) ;
+		ArrayList<LogRecordArea> recordAreas = logRecordAreas.get(level).getRecords() ;
 		JPanel catPane = new JPanel() ;
 		catPane.setLayout(new BoxLayout(catPane,  BoxLayout.X_AXIS)) ;
 		
