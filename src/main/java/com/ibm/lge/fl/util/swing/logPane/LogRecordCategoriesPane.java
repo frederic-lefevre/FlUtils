@@ -3,7 +3,6 @@ package com.ibm.lge.fl.util.swing.logPane;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
 import java.util.logging.Level;
 
 import javax.swing.BorderFactory;
@@ -50,7 +49,7 @@ public class LogRecordCategoriesPane extends JPanel  {
 	
 	private JPanel oneCategoryPane(Level level) {
 		
-		ArrayList<LogRecordArea> recordAreas = logRecordAreas.get(level).getRecords() ;
+		LogRecordCategory recordForThisLevel = logRecordAreas.getLogRecordsForThisLevel(level) ;
 		JPanel catPane = new JPanel() ;
 		catPane.setLayout(new BoxLayout(catPane,  BoxLayout.X_AXIS)) ;
 		
@@ -58,7 +57,9 @@ public class LogRecordCategoriesPane extends JPanel  {
 		catPane.add(lvlLabel) ;
 		JButton next 	 = new JButton("next") ;
 		JButton previous = new JButton("previous") ;
-		JLabel occurences = new JLabel(" 1 of " + recordAreas.size() + " occurences") ;
+		JLabel occurences = new JLabel(" 1 of " + recordForThisLevel.getNumberOfRecords() + " occurences") ;
+		next.addActionListener(new OcccurenceButtonListener(recordForThisLevel, occurences, true));
+		previous.addActionListener(new OcccurenceButtonListener(recordForThisLevel, occurences, false));
 		catPane.add(previous) ;
 		catPane.add(next) ;		
 		catPane.add(occurences) ;
@@ -71,6 +72,30 @@ public class LogRecordCategoriesPane extends JPanel  {
 		public void actionPerformed(ActionEvent e) {
 			displayPane() ;
 			
+		}
+		
+	}
+	
+	private class OcccurenceButtonListener implements ActionListener {
+
+		private final LogRecordCategory logRecordCategory ;
+		private final JLabel 		    occurences ;
+		private final boolean			forward ;
+		public OcccurenceButtonListener(LogRecordCategory lrc,  JLabel occurences, boolean forward) {
+			logRecordCategory = lrc ;
+			this.occurences	  = occurences ;
+			this.forward      = forward ;
+		}
+		
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			int occurenceNum ;
+			if (forward) {
+				occurenceNum = logRecordCategory.displayNextRecord() ;
+			} else {
+				occurenceNum = logRecordCategory.displayPreviousRecord() ;
+			}
+			occurences.setText(" " + occurenceNum + " of " + logRecordCategory.getNumberOfRecords() + " occurences") ;
 		}
 		
 	}
