@@ -15,10 +15,10 @@ import java.util.logging.Logger;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 import javax.swing.text.BadLocationException;
-import javax.swing.text.DefaultHighlighter;
 import javax.swing.text.Highlighter;
 
 import com.ibm.lge.fl.util.ExceptionLogging;
+import com.ibm.lge.fl.util.swing.MultiHighLightPainter;
 
 public class TextAreaLogHandler extends Handler {
 
@@ -35,7 +35,7 @@ public class TextAreaLogHandler extends Handler {
 	private final Logger			tLog ;
 	 
 	private int lastNonHighLighedLevel ;
-	private DefaultHighlighter.DefaultHighlightPainter painter ;
+	private Highlighter.HighlightPainter painter ;
 	
 	private boolean hasHighLight ;
 	
@@ -47,9 +47,11 @@ public class TextAreaLogHandler extends Handler {
 		textArea 		  = ta;
 		tLog			  = l ;
 		dateTimeFormatter = DateTimeFormatter.ofPattern(datePattern) ;
+
 		highLighter 	  = textArea.getHighlighter() ;
 		
-		painter 				= new DefaultHighlighter.DefaultHighlightPainter(Color.PINK) ;
+		painter 				= new MultiHighLightPainter(Color.PINK) ;
+		
 		lastNonHighLighedLevel 	= Level.INFO.intValue() ;
 		hasHighLight			= false ;
 		highLightListeners		= new ArrayList<LogHighLightListener>() ;
@@ -66,7 +68,7 @@ public class TextAreaLogHandler extends Handler {
 
 	public void setHighLightColor(Color color) {
 		if (color != null) {
-			painter = new DefaultHighlighter.DefaultHighlightPainter(color) ;
+			painter = new MultiHighLightPainter(color) ;	
 		} else {
 			painter = null ;
 		}
@@ -134,7 +136,7 @@ public class TextAreaLogHandler extends Handler {
         		int endRecord = textArea.getText().length() - 1 ;
         		if (startHighlight > -1) {
         			try {
-						highLighter.addHighlight(startHighlight, endRecord, painter) ;
+        				highLighter.addHighlight(startHighlight, endRecord, painter) ;
 					} catch (BadLocationException e) {
 						painter = null ;
 						reportError("Exception in hightlightining", e, ErrorManager.FORMAT_FAILURE) ;

@@ -30,13 +30,13 @@ public class LogsDisplayPane  extends JPanel {
 		logArea.setEditable(false);
 		logArea.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
 		
-		logTextAreaHandler = new TextAreaLogHandler(logArea, logger) ;
-		logTextAreaHandler.setLevel(logger.getLevel());
-		logger.addHandler(logTextAreaHandler);
-		
 		searchableTextArea = new SearchableTextPane(logArea, logger) ;
 		add(searchableTextArea) ;
 		
+		logTextAreaHandler = new TextAreaLogHandler(logArea, logger) ;
+		logTextAreaHandler.setLevel(logger.getLevel());
+		logger.addHandler(logTextAreaHandler);
+			
 		logRecordCategoriesPane = new LogRecordCategoriesPane(logTextAreaHandler.getLogRecordAreas()) ;
 		searchableTextArea.getCommandPanel().add(logRecordCategoriesPane) ;
 	}

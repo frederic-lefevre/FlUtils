@@ -8,8 +8,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.text.BadLocationException;
-import javax.swing.text.DefaultHighlighter;
 import javax.swing.text.Highlighter;
+import javax.swing.text.Highlighter.HighlightPainter;
 import javax.swing.text.JTextComponent;
 
 public class SearcherHighLighter {
@@ -80,7 +80,7 @@ public class SearcherHighLighter {
 			SearchElement searchElement = new SearchElement(toFind, hiColor) ;
 			currentSearches.add(searchElement) ;
 			
-			DefaultHighlighter.DefaultHighlightPainter painter = new DefaultHighlighter.DefaultHighlightPainter(hiColor) ;
+			HighlightPainter matchPainter =  new MultiHighLightPainter(hiColor) ;
 			
 	        // Search for pattern
 	        int currIdx  =  0 ;
@@ -92,7 +92,7 @@ public class SearcherHighLighter {
 		        		result = indexOfIgnoreFormat(text, txtToFind, currIdx) ;
 		        		if (result.getBegin() > -1) {
 			        		currIdx = result.getEnd() ;	        		
-			        		currentHighLights.add(highLighter.addHighlight(result.getBegin(), result.getEnd(), painter)) ;
+			        		currentHighLights.add(highLighter.addHighlight(result.getBegin(), result.getEnd(), matchPainter)) ;
 							searchElement.addSearchResult(result);
 			        	} else {
 			        		currIdx = -1 ;
@@ -101,7 +101,7 @@ public class SearcherHighLighter {
 		        		int foundIdx = text.indexOf(txtToFind, currIdx) ;		        		
 		        		if (foundIdx > -1) {
 			        		currIdx = foundIdx + txtToFind.length() ;	        		
-			        		currentHighLights.add(highLighter.addHighlight(foundIdx, currIdx, painter)) ;
+			        		currentHighLights.add(highLighter.addHighlight(foundIdx, currIdx, matchPainter)) ;
 							result = new SearchResult(foundIdx, currIdx) ;
 							searchElement.addSearchResult(result);
 			        	} else {

@@ -16,6 +16,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.text.DefaultHighlighter;
 
 import com.ibm.lge.fl.util.swing.SearcherHighLighter.SearchElement;
 
@@ -42,6 +43,7 @@ public class SearchableTextPane extends JPanel  {
 		
 		// Text area panel to search from
 		textArea = ta ;
+		textArea.setHighlighter(new DefaultHighlighter());
 		scrollInfos = new JScrollPane(textArea) ;
 		
 		add(scrollInfos) ;
