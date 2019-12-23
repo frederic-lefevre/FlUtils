@@ -54,10 +54,13 @@ public class LogRecordCategory {
 	
 	private void goToResult() {
 		int end = records.get(currentResultView).getEndPosition() ;
+		int begin = records.get(currentResultView).getStartPosition() ;
 		if (end > -1) {
 			try {
 				Rectangle viewRect = textComponent.modelToView(end);
 				textComponent.scrollRectToVisible(viewRect);
+				textComponent.setCaretPosition(end);
+				textComponent.moveCaretPosition(begin);
 			} catch (BadLocationException e) {
 				lLog.log(Level.WARNING, "Bad location when scrolling to search result", e);
 			}

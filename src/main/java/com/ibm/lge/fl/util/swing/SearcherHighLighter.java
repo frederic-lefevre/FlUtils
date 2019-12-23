@@ -250,6 +250,8 @@ public class SearcherHighLighter {
 				try {
 					Rectangle viewRect = textComponent.modelToView(end);
 					textComponent.scrollRectToVisible(viewRect);
+					textComponent.setCaretPosition(end);
+					textComponent.moveCaretPosition(begin);
 				} catch (BadLocationException e) {
 					shLog.log(Level.WARNING, "Bad location when scrolling to search result", e);
 				}
