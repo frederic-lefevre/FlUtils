@@ -52,9 +52,16 @@ public class LogRecordCategoriesPane extends JPanel  {
 		
 		ArrayList<LogRecordArea> recordAreas = logRecordAreas.get(level) ;
 		JPanel catPane = new JPanel() ;
+		catPane.setLayout(new BoxLayout(catPane,  BoxLayout.X_AXIS)) ;
 		
-		JLabel lvlLabel = new JLabel(level.getName() + ": " + recordAreas.size()) ;
+		JLabel lvlLabel = new JLabel(level.getName()) ;
 		catPane.add(lvlLabel) ;
+		JButton next 	 = new JButton("next") ;
+		JButton previous = new JButton("previous") ;
+		JLabel occurences = new JLabel(" 1 of " + recordAreas.size() + " occurences") ;
+		catPane.add(previous) ;
+		catPane.add(next) ;		
+		catPane.add(occurences) ;
 		return catPane ;
 	}
 	
