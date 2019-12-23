@@ -8,6 +8,8 @@ import java.util.logging.Logger;
 
 import org.junit.jupiter.api.Test;
 
+import com.ibm.lge.fl.util.swing.logPane.LogRecordArea;
+
 class LogRecordAreaTest {
 
 	@Test

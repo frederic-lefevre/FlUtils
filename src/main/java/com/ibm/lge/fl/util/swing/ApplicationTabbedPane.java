@@ -6,6 +6,8 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import com.ibm.lge.fl.util.RunningContext;
+import com.ibm.lge.fl.util.swing.logPane.LogHighLightListener;
+import com.ibm.lge.fl.util.swing.logPane.LogsDisplayPane;
 
 public class ApplicationTabbedPane extends JTabbedPane {
 

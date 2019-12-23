@@ -1,4 +1,4 @@
-package com.ibm.lge.fl.util.swing;
+package com.ibm.lge.fl.util.swing.logPane;
 
 import java.util.ArrayList;
 import java.util.HashMap;

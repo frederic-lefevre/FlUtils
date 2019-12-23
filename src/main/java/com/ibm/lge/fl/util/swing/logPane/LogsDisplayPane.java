@@ -1,4 +1,4 @@
-package com.ibm.lge.fl.util.swing;
+package com.ibm.lge.fl.util.swing.logPane;
 
 import java.awt.Color;
 import java.util.logging.Level;
@@ -8,6 +8,8 @@ import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
+
+import com.ibm.lge.fl.util.swing.SearchableTextPane;
 
 public class LogsDisplayPane  extends JPanel {
 

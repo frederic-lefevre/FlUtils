@@ -1,4 +1,4 @@
-package com.ibm.lge.fl.util.swing;
+package com.ibm.lge.fl.util.swing.logPane;
 
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
