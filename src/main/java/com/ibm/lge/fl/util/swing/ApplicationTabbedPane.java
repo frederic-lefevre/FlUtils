@@ -47,7 +47,9 @@ public class ApplicationTabbedPane extends JTabbedPane {
 			
 			if (getSelectedComponent().equals(appInfoPane)) {
 				appInfoPane.setInfos();
-			}			
+			} else if (getSelectedComponent().equals(logsDisplayPane)) {
+				logsDisplayPane.refreshLogRecordCategories() ;
+			}
 		}
 	}
 	

@@ -18,6 +18,7 @@ public class LogsDisplayPane  extends JPanel {
 	private final TextAreaLogHandler logTextAreaHandler ;
 	private final JTextArea 		 logArea ;
 	private final SearchableTextPane searchableTextArea ;
+	private final LogRecordCategoriesPane logRecordCategoriesPane ;
 	
 	public LogsDisplayPane(Logger logger) {
 		
@@ -36,7 +37,7 @@ public class LogsDisplayPane  extends JPanel {
 		searchableTextArea = new SearchableTextPane(logArea, logger) ;
 		add(searchableTextArea) ;
 		
-		LogRecordCategoriesPane logRecordCategoriesPane = new LogRecordCategoriesPane(logTextAreaHandler.getLogRecordAreas()) ;
+		logRecordCategoriesPane = new LogRecordCategoriesPane(logTextAreaHandler.getLogRecordAreas()) ;
 		searchableTextArea.getCommandPanel().add(logRecordCategoriesPane) ;
 	}
 	
@@ -61,5 +62,7 @@ public class LogsDisplayPane  extends JPanel {
 		logTextAreaHandler.addHighLightListener(highLightListener) ;
 	}
 	
-
+	public void refreshLogRecordCategories() {
+		logRecordCategoriesPane.displayPane();
+	}
 }
