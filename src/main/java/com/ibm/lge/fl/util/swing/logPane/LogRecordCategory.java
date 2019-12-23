@@ -1,12 +1,11 @@
 package com.ibm.lge.fl.util.swing.logPane;
 
-import java.awt.Rectangle;
 import java.util.ArrayList;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.swing.text.BadLocationException;
 import javax.swing.text.JTextComponent;
+
+import com.ibm.lge.fl.util.swing.TextComponentHelpers;
 
 public class LogRecordCategory {
 
@@ -55,16 +54,7 @@ public class LogRecordCategory {
 	private void goToResult() {
 		int end = records.get(currentResultView).getEndPosition() ;
 		int begin = records.get(currentResultView).getStartPosition() ;
-		if (end > -1) {
-			try {
-				Rectangle viewRect = textComponent.modelToView(end);
-				textComponent.scrollRectToVisible(viewRect);
-				textComponent.setCaretPosition(end);
-				textComponent.moveCaretPosition(begin);
-			} catch (BadLocationException e) {
-				lLog.log(Level.WARNING, "Bad location when scrolling to search result", e);
-			}
-		}
+		TextComponentHelpers.moveTo(textComponent, begin, end, lLog) ;
 	}
 	
 	public int getNumberOfRecords() {

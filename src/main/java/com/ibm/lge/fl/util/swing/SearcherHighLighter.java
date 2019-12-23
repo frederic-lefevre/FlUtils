@@ -1,7 +1,6 @@
 package com.ibm.lge.fl.util.swing;
 
 import java.awt.Color;
-import java.awt.Rectangle;
 import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.logging.Level;
@@ -246,16 +245,7 @@ public class SearcherHighLighter {
 		}
 		
 		public void goToResult() {
-			if (end > -1) {
-				try {
-					Rectangle viewRect = textComponent.modelToView(end);
-					textComponent.scrollRectToVisible(viewRect);
-					textComponent.setCaretPosition(end);
-					textComponent.moveCaretPosition(begin);
-				} catch (BadLocationException e) {
-					shLog.log(Level.WARNING, "Bad location when scrolling to search result", e);
-				}
-			}
+			TextComponentHelpers.moveTo(textComponent, begin, end, shLog) ;
 		}
 	}
 	
