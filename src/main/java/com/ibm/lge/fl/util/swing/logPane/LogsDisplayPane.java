@@ -33,20 +33,12 @@ public class LogsDisplayPane  extends JPanel {
 		searchableTextArea = new SearchableTextPane(logArea, logger) ;
 		add(searchableTextArea) ;
 		
-		logTextAreaHandler = new TextAreaLogHandler(logArea, logger) ;
+		logTextAreaHandler = new TextAreaLogHandler(logArea, Level.INFO.intValue(), Color.PINK, logger) ;
 		logTextAreaHandler.setLevel(logger.getLevel());
 		logger.addHandler(logTextAreaHandler);
 			
 		logRecordCategoriesPane = new LogRecordCategoriesPane(logTextAreaHandler.getLogRecordAreas()) ;
 		searchableTextArea.getCommandPanel().add(logRecordCategoriesPane) ;
-	}
-	
-	public void setHighLightColor(Color color) {
-		logTextAreaHandler.setHighLightColor(color) ;
-	}
-	
-	public void setLastNonHighLighedLevel(Level level) {
-		logTextAreaHandler.setLastNonHighLighedLevel(level) ;
 	}
 	
 	public void setRowsCols(int rows, int cols) {

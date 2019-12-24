@@ -2,41 +2,72 @@ package com.ibm.lge.fl.util.swing.text;
 
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.swing.text.BadLocationException;
 import javax.swing.text.Highlighter;
 import javax.swing.text.JTextComponent;
+import javax.swing.text.Highlighter.HighlightPainter;
 
 public class TextAreaElementList {
 
-	private final JTextComponent textComponent ;
-	private final Logger		 lLog ;
-	private Highlighter highLighter ;	
-	private Color  		hightLightColor ;
+	private JTextComponent 			   textComponent ;
+	private Logger		 			   lLog ;
+	private Highlighter 			   highLighter ;
+	private HighlightPainter 		   painter ;
+	private Color  					   hightLightColor ;
 	private ArrayList<TextAreaElement> textElements ;
-	private int currentTextElement ;
+	private int 					   currentTextElement ;
+	private ArrayList<Object> 		   currentHighLights ;
+	
+	public TextAreaElementList(JTextComponent tc, Logger l) {
+		init(tc, null, l) ;
+	}
 	
 	public TextAreaElementList(JTextComponent tc, Color hlc, Logger l) {
+		init(tc, hlc, l) ;
+	}
+	
+	private void init(JTextComponent tc, Color hlc, Logger l) {
 		textComponent 	   = tc ;
 		hightLightColor    = hlc ;
 		lLog			   = l ;
 		textElements	   = new ArrayList<TextAreaElement>() ;
 		currentTextElement = 0 ;
+		highLighter 	   = textComponent.getHighlighter() ;
 		if (hightLightColor != null) {
-			highLighter = textComponent.getHighlighter() ;
+			painter			   = new MultiHighLightPainter(hightLightColor) ;
+			currentHighLights  = new ArrayList<Object>() ;
 		}
 	}
 
 	public void addTextElement(TextAreaElement res) {
 		if (res.getTextComponent().equals(textComponent)) {
 			textElements.add(res) ;
+			if (hightLightColor != null) {
+				try {
+					currentHighLights.add(highLighter.addHighlight(res.getBegin(), res.getEnd(), painter)) ;
+				} catch (BadLocationException e) {
+					lLog.log(Level.WARNING, "Bad location exception when highlightning pos=" + res.getBegin() + " y=" + res.getEnd(), e);
+				}
+			}
 		} else {
 			lLog.severe("TextAreaElement add to list with a different JTextComponent");
 		}
 	}
 	
+	public void removeHighLights() {
+		if (currentHighLights != null) {
+			for (Object oneHighLight : currentHighLights) {
+				highLighter.removeHighlight(oneHighLight) ; 
+			}
+			currentHighLights  = new ArrayList<Object>() ;
+		}
+	}
+	
 	public void addTextElement(int b, int e) {
-		textElements.add(new TextAreaElement(textComponent, b, e, lLog)) ;
+		addTextElement(new TextAreaElement(textComponent, b, e, lLog)) ;
 	}
 	
 	public Color getHightLightColor() {

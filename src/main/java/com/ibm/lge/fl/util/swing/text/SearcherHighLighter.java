@@ -6,35 +6,25 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.swing.text.BadLocationException;
-import javax.swing.text.Highlighter;
-import javax.swing.text.Highlighter.HighlightPainter;
 import javax.swing.text.JTextComponent;
 
 public class SearcherHighLighter {
 
 	private final JTextComponent textComponent ;
-	private final Highlighter    highLighter ;	
 	private final Logger 		 shLog ;
 	
 	private Color[] highLightColors = {Color.CYAN, Color.LIGHT_GRAY, Color.YELLOW, Color.MAGENTA} ;
 	private int currentColorIdx ;
 	
 	private ArrayList<SearchElement> currentSearches ;
-	
-	private ArrayList<Object> currentHighLights ;
-	
+		
 	public SearcherHighLighter(JTextComponent tc, Logger l) {
 		
 		textComponent = tc ;
 		shLog		  = l ;
 		
-		highLighter = textComponent.getHighlighter() ;
-		
 		currentColorIdx   = -1 ;
 		currentSearches   = new ArrayList<SearchElement>() ;
-		currentHighLights = new ArrayList<Object>() ;
-
 	}
 
 	public void searchAndHighlight(String toFind, boolean caseSensitive, boolean ignoreAccent, boolean ignoreFormatting) {
@@ -77,52 +67,42 @@ public class SearcherHighLighter {
 			
 			SearchElement searchElement = new SearchElement(toFind, hiColor) ;
 			currentSearches.add(searchElement) ;
-			
-			HighlightPainter matchPainter =  new MultiHighLightPainter(hiColor) ;
-			
+						
 	        // Search for pattern
 	        int currIdx  =  0 ;
-	        try {
-		        while (currIdx > -1) {
-		        	
-		        	if (ignoreFormatting) {
-		        		TextAreaElement result = indexOfIgnoreFormat(text, txtToFind, currIdx) ;
-		        		if (result.getBegin() > -1) {
-			        		currIdx = result.getEnd() ;	        		
-			        		currentHighLights.add(highLighter.addHighlight(result.getBegin(), result.getEnd(), matchPainter)) ;
-							searchElement.addTextElement(result);
-			        	} else {
-			        		currIdx = -1 ;
-			        	}
+
+	        while (currIdx > -1) {
+	        	
+	        	if (ignoreFormatting) {
+	        		TextAreaElement result = indexOfIgnoreFormat(text, txtToFind, currIdx) ;
+	        		if (result.getBegin() > -1) {
+		        		currIdx = result.getEnd() ;	        		
+						searchElement.addTextElement(result);
 		        	} else {
-		        		int foundIdx = text.indexOf(txtToFind, currIdx) ;		        		
-		        		if (foundIdx > -1) {
-			        		currIdx = foundIdx + txtToFind.length() ;	        		
-			        		currentHighLights.add(highLighter.addHighlight(foundIdx, currIdx, matchPainter)) ;
-							searchElement.addTextElement(foundIdx, currIdx);
-			        	} else {
-			        		currIdx = -1 ;
-			        	}
-		        	} 
-		        }
-	        } catch (BadLocationException e) {
-				shLog.log(Level.WARNING, "Bad location exception when highlightning pos=" + currIdx, e);
-			}
+		        		currIdx = -1 ;
+		        	}
+	        	} else {
+	        		int foundIdx = text.indexOf(txtToFind, currIdx) ;		        		
+	        		if (foundIdx > -1) {
+		        		currIdx = foundIdx + txtToFind.length() ;	        		
+						searchElement.addTextElement(foundIdx, currIdx);
+		        	} else {
+		        		currIdx = -1 ;
+		        	}
+	        	} 
+	        }
         }   
 	}
 	
-	public void searchAndHighlight(String toFind, boolean caseSensitive) {
-		
-		searchAndHighlight(toFind, caseSensitive, false, false) ;
-   
+	public void searchAndHighlight(String toFind, boolean caseSensitive) {	
+		searchAndHighlight(toFind, caseSensitive, false, false) ;   
 	}
 
 	public void removeHighlights() {
-		for (Object oneHighLight : currentHighLights) {
-			highLighter.removeHighlight(oneHighLight) ; 
+		for (SearchElement searcheElement : currentSearches) {
+			searcheElement.removeHighLights() ;
 		}
-		currentSearches   = new ArrayList<SearchElement>() ;
-		currentHighLights = new ArrayList<Object>() ;
+		currentSearches   = new ArrayList<SearchElement>() ;		
 	}
 	
 	public void setHighLightColors(Color[] highLightColors) {
@@ -209,8 +189,7 @@ public class SearcherHighLighter {
 			return false ;
 		}
 	}
-	
-	
+		
 	public class SearchElement extends TextAreaElementList{
 		
 		private String searchedString ;		
