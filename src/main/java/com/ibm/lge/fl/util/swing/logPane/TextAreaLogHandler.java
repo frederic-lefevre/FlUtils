@@ -55,7 +55,7 @@ public class TextAreaLogHandler extends Handler {
 		lastNonHighLighedLevel 	= Level.INFO.intValue() ;
 		hasHighLight			= false ;
 		highLightListeners		= new ArrayList<LogHighLightListener>() ;
-		logRecordAreas			= new LogRecordAreas(textArea, tLog) ;
+		logRecordAreas			= new LogRecordAreas() ;
 	}
 	
 	public JTextArea getTextArea() {
@@ -142,7 +142,7 @@ public class TextAreaLogHandler extends Handler {
 						reportError("Exception in hightlightining", e, ErrorManager.FORMAT_FAILURE) ;
 					}
         		}
-        		logRecordAreas.addLogRecordArea(new LogRecordArea(record, startRecord, endRecord, tLog)) ;
+        		logRecordAreas.addLogRecordArea(new LogRecordArea(textArea, record, startRecord, endRecord, tLog)) ;
             }
 		}) ;
 	}

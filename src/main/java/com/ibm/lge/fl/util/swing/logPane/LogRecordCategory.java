@@ -1,24 +1,15 @@
 package com.ibm.lge.fl.util.swing.logPane;
 
 import java.util.ArrayList;
-import java.util.logging.Logger;
-
-import javax.swing.text.JTextComponent;
-
-import com.ibm.lge.fl.util.swing.text.TextComponentHelpers;
 
 public class LogRecordCategory {
 
-	private final JTextComponent 		   textComponent ;
 	private final ArrayList<LogRecordArea> records ;
-	private final Logger 				   lLog ;
 	private int currentResultView ;
 		
-	public LogRecordCategory(JTextComponent tc, Logger l) {
+	public LogRecordCategory() {
 		records 		  = new ArrayList<LogRecordArea>() ;
 		currentResultView = 0 ;
-		textComponent 	  = tc ;
-		lLog 			  = l ;
 	}
 
 	public void addLogRecordArea(LogRecordArea recordArea) {
@@ -52,9 +43,7 @@ public class LogRecordCategory {
 	}
 	
 	private void goToResult() {
-		int end = records.get(currentResultView).getEndPosition() ;
-		int begin = records.get(currentResultView).getStartPosition() ;
-		TextComponentHelpers.moveTo(textComponent, begin, end, lLog) ;
+		records.get(currentResultView).goToResult();
 	}
 	
 	public int getNumberOfRecords() {

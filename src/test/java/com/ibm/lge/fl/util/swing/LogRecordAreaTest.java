@@ -6,6 +6,8 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
+import javax.swing.JTextArea;
+
 import org.junit.jupiter.api.Test;
 
 import com.ibm.lge.fl.util.swing.logPane.LogRecordArea;
@@ -17,15 +19,15 @@ class LogRecordAreaTest {
 		
 		LogRecord record = new LogRecord(Level.INFO, "Juste une info");
 		
-		LogRecordArea lra = new LogRecordArea(record, 10, 20, Logger.getAnonymousLogger()) ;
+		LogRecordArea lra = new LogRecordArea(new JTextArea(), record, 10, 20, Logger.getAnonymousLogger()) ;
 		
-		assertEquals(lra.getEndPosition(),   20) ;
-		assertEquals(lra.getStartPosition(), 10) ;
+		assertEquals(lra.getEnd(),   20) ;
+		assertEquals(lra.getBegin(), 10) ;
 
 		lra.moveArea(-5);
 		
-		assertEquals(lra.getEndPosition(),   15) ;
-		assertEquals(lra.getStartPosition(),  5) ;
+		assertEquals(lra.getEnd(),   15) ;
+		assertEquals(lra.getBegin(),  5) ;
 
 	}
 

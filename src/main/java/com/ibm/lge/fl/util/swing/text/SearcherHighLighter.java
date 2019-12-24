@@ -100,7 +100,7 @@ public class SearcherHighLighter {
 		        		if (foundIdx > -1) {
 			        		currIdx = foundIdx + txtToFind.length() ;	        		
 			        		currentHighLights.add(highLighter.addHighlight(foundIdx, currIdx, matchPainter)) ;
-							result = new TextAreaElement(textComponent, foundIdx, currIdx) ;
+							result = new TextAreaElement(textComponent, foundIdx, currIdx, shLog) ;
 							searchElement.addSearchResult(result);
 			        	} else {
 			        		currIdx = -1 ;
@@ -138,7 +138,7 @@ public class SearcherHighLighter {
 	
 	private TextAreaElement indexOfIgnoreFormat(String text, String toFind, int from) {
 		
-		TextAreaElement result = new TextAreaElement(textComponent) ;
+		TextAreaElement result = new TextAreaElement(textComponent, shLog) ;
 		int currIdx  		= from ;
 		boolean endOfString = ((text == null) || (text.isEmpty()) || (toFind == null) || (toFind.isEmpty())) ;
 		while ((result.getBegin() < 0) && (! endOfString)) {
@@ -192,7 +192,7 @@ public class SearcherHighLighter {
 				equal = false ;
 			}
 		}
-		TextAreaElement result = new TextAreaElement(textComponent) ;
+		TextAreaElement result = new TextAreaElement(textComponent, shLog) ;
 		if (equal) {
 			result.setBegin(begin);
 			result.setEnd(currTextIdx);
@@ -242,7 +242,7 @@ public class SearcherHighLighter {
 		
 		public void diplayFirstResult() {
 			if ((searchResults != null) && (searchResults.size() > 0)) {
-				searchResults.get(0).goToResult(shLog) ;
+				searchResults.get(0).goToResult() ;
 			}
 		}
 		
@@ -250,7 +250,7 @@ public class SearcherHighLighter {
 		public int displayNextResult() {
 			if ((searchResults != null) && (searchResults.size() > 0)) {
 				currentResultView = (currentResultView + 1)% searchResults.size() ;
-				searchResults.get(currentResultView).goToResult(shLog) ;
+				searchResults.get(currentResultView).goToResult() ;
 			}
 			return currentResultView + 1 ;
 		}
@@ -262,7 +262,7 @@ public class SearcherHighLighter {
 				if (currentResultView == -1) {
 					currentResultView = searchResults.size() - 1 ;
 				}
-				searchResults.get(currentResultView).goToResult(shLog) ;
+				searchResults.get(currentResultView).goToResult() ;
 			}
 			return currentResultView + 1 ;
 		}
