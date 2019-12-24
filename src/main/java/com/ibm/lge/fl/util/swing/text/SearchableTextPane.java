@@ -1,4 +1,4 @@
-package com.ibm.lge.fl.util.swing;
+package com.ibm.lge.fl.util.swing.text;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -18,7 +18,7 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.text.DefaultHighlighter;
 
-import com.ibm.lge.fl.util.swing.SearcherHighLighter.SearchElement;
+import com.ibm.lge.fl.util.swing.text.SearcherHighLighter.SearchElement;
 
 public class SearchableTextPane extends JPanel  {
 

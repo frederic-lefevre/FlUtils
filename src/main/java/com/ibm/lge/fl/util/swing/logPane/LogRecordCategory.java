@@ -5,7 +5,7 @@ import java.util.logging.Logger;
 
 import javax.swing.text.JTextComponent;
 
-import com.ibm.lge.fl.util.swing.TextComponentHelpers;
+import com.ibm.lge.fl.util.swing.text.TextComponentHelpers;
 
 public class LogRecordCategory {
 

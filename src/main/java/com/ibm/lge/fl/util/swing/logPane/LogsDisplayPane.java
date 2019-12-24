@@ -9,7 +9,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 
-import com.ibm.lge.fl.util.swing.SearchableTextPane;
+import com.ibm.lge.fl.util.swing.text.SearchableTextPane;
 
 public class LogsDisplayPane  extends JPanel {
 

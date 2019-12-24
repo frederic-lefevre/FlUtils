@@ -18,7 +18,7 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.Highlighter;
 
 import com.ibm.lge.fl.util.ExceptionLogging;
-import com.ibm.lge.fl.util.swing.MultiHighLightPainter;
+import com.ibm.lge.fl.util.swing.text.MultiHighLightPainter;
 
 public class TextAreaLogHandler extends Handler {
 

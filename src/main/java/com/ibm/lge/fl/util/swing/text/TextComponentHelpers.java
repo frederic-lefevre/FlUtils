@@ -1,4 +1,4 @@
-package com.ibm.lge.fl.util.swing;
+package com.ibm.lge.fl.util.swing.text;
 
 import java.awt.Rectangle;
 import java.util.logging.Level;
