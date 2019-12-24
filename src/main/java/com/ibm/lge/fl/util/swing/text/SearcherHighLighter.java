@@ -212,41 +212,6 @@ public class SearcherHighLighter {
 		}
 	}
 	
-//	private class SearchResult {
-//		
-//		private int begin ;
-//		private int end ;
-//		
-//		public SearchResult() {
-//			begin = -1 ;
-//			end   = -1 ;
-//		}
-//
-//		public SearchResult (int b, int e) {
-//			begin = b ;
-//			end   = e ;
-//		}
-//		
-//		public int getBegin() {
-//			return begin;
-//		}
-//
-//		public void setBegin(int begin) {
-//			this.begin = begin;
-//		}
-//
-//		public int getEnd() {
-//			return end;
-//		}
-//
-//		public void setEnd(int end) {
-//			this.end = end;
-//		}
-//		
-//		public void goToResult() {
-//			TextComponentHelpers.moveTo(textComponent, begin, end, shLog) ;
-//		}
-//	}
 	
 	public class SearchElement {
 		
