@@ -2,21 +2,41 @@ package com.ibm.lge.fl.util.swing.text;
 
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.logging.Logger;
+
+import javax.swing.text.Highlighter;
+import javax.swing.text.JTextComponent;
 
 public class TextAreaElementList {
 
-	private Color  hightLightColor ;
+	private final JTextComponent textComponent ;
+	private final Logger		 lLog ;
+	private Highlighter highLighter ;	
+	private Color  		hightLightColor ;
 	private ArrayList<TextAreaElement> textElements ;
 	private int currentTextElement ;
 	
-	public TextAreaElementList(Color hlc) {
+	public TextAreaElementList(JTextComponent tc, Color hlc, Logger l) {
+		textComponent 	   = tc ;
 		hightLightColor    = hlc ;
+		lLog			   = l ;
 		textElements	   = new ArrayList<TextAreaElement>() ;
 		currentTextElement = 0 ;
+		if (hightLightColor != null) {
+			highLighter = textComponent.getHighlighter() ;
+		}
 	}
 
 	public void addTextElement(TextAreaElement res) {
-		textElements.add(res) ;
+		if (res.getTextComponent().equals(textComponent)) {
+			textElements.add(res) ;
+		} else {
+			lLog.severe("TextAreaElement add to list with a different JTextComponent");
+		}
+	}
+	
+	public void addTextElement(int b, int e) {
+		textElements.add(new TextAreaElement(textComponent, b, e, lLog)) ;
 	}
 	
 	public Color getHightLightColor() {

@@ -37,6 +37,8 @@ public class TextAreaElement {
 	public void setBegin(int begin) { this.begin = begin; }
 	public void setEnd  (int end)   { this.end   = end;   }
 	
+	public JTextComponent getTextComponent() { return textComponent; }
+
 	public void moveArea(int move) {
 		
 		begin = begin + move ;

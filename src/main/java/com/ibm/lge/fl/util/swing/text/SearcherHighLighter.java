@@ -85,9 +85,8 @@ public class SearcherHighLighter {
 	        try {
 		        while (currIdx > -1) {
 		        	
-		        	TextAreaElement result ;
 		        	if (ignoreFormatting) {
-		        		result = indexOfIgnoreFormat(text, txtToFind, currIdx) ;
+		        		TextAreaElement result = indexOfIgnoreFormat(text, txtToFind, currIdx) ;
 		        		if (result.getBegin() > -1) {
 			        		currIdx = result.getEnd() ;	        		
 			        		currentHighLights.add(highLighter.addHighlight(result.getBegin(), result.getEnd(), matchPainter)) ;
@@ -100,8 +99,7 @@ public class SearcherHighLighter {
 		        		if (foundIdx > -1) {
 			        		currIdx = foundIdx + txtToFind.length() ;	        		
 			        		currentHighLights.add(highLighter.addHighlight(foundIdx, currIdx, matchPainter)) ;
-							result = new TextAreaElement(textComponent, foundIdx, currIdx, shLog) ;
-							searchElement.addTextElement(result);
+							searchElement.addTextElement(foundIdx, currIdx);
 			        	} else {
 			        		currIdx = -1 ;
 			        	}
@@ -217,7 +215,7 @@ public class SearcherHighLighter {
 		
 		private String searchedString ;		
 		public SearchElement(String ss, Color hlc) {
-			super(hlc);
+			super(textComponent, hlc, shLog);
 			searchedString    = ss;
 		}
 

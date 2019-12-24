@@ -55,7 +55,7 @@ public class TextAreaLogHandler extends Handler {
 		lastNonHighLighedLevel 	= Level.INFO.intValue() ;
 		hasHighLight			= false ;
 		highLightListeners		= new ArrayList<LogHighLightListener>() ;
-		logRecordAreas			= new LogRecordAreas() ;
+		logRecordAreas			= new LogRecordAreas(textArea, tLog) ;
 	}
 	
 	public JTextArea getTextArea() {
