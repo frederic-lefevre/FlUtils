@@ -91,7 +91,7 @@ public class SearcherHighLighter {
 		        		if (result.getBegin() > -1) {
 			        		currIdx = result.getEnd() ;	        		
 			        		currentHighLights.add(highLighter.addHighlight(result.getBegin(), result.getEnd(), matchPainter)) ;
-							searchElement.addSearchResult(result);
+							searchElement.addTextElement(result);
 			        	} else {
 			        		currIdx = -1 ;
 			        	}
@@ -101,7 +101,7 @@ public class SearcherHighLighter {
 			        		currIdx = foundIdx + txtToFind.length() ;	        		
 			        		currentHighLights.add(highLighter.addHighlight(foundIdx, currIdx, matchPainter)) ;
 							result = new TextAreaElement(textComponent, foundIdx, currIdx, shLog) ;
-							searchElement.addSearchResult(result);
+							searchElement.addTextElement(result);
 			        	} else {
 			        		currIdx = -1 ;
 			        	}
@@ -213,66 +213,16 @@ public class SearcherHighLighter {
 	}
 	
 	
-	public class SearchElement {
+	public class SearchElement extends TextAreaElementList{
 		
-		private Color  hightLightColor ;
-		private String searchedString ;
-		private ArrayList<TextAreaElement> searchResults ;
-		private int currentResultView ;
-		
+		private String searchedString ;		
 		public SearchElement(String ss, Color hlc) {
-			super();
+			super(hlc);
 			searchedString    = ss;
-			hightLightColor   = hlc;
-			searchResults	  = new ArrayList<TextAreaElement>() ;
-			currentResultView = 0 ;
-		}
-
-		public Color getHightLightColor() {
-			return hightLightColor;
 		}
 
 		public String getSearchedString() {
 			return searchedString;
-		}
-		
-		public void addSearchResult(TextAreaElement res) {
-			searchResults.add(res) ;
-		}
-		
-		public void diplayFirstResult() {
-			if ((searchResults != null) && (searchResults.size() > 0)) {
-				searchResults.get(0).goToResult() ;
-			}
-		}
-		
-		// Return the number of the displayed result, starting at 1
-		public int displayNextResult() {
-			if ((searchResults != null) && (searchResults.size() > 0)) {
-				currentResultView = (currentResultView + 1)% searchResults.size() ;
-				searchResults.get(currentResultView).goToResult() ;
-			}
-			return currentResultView + 1 ;
-		}
-		
-		// Return the number of the displayed result, starting at 1
-		public int displayPreviousResult() {
-			if ((searchResults != null) && (searchResults.size() > 0)) {
-				currentResultView-- ;
-				if (currentResultView == -1) {
-					currentResultView = searchResults.size() - 1 ;
-				}
-				searchResults.get(currentResultView).goToResult() ;
-			}
-			return currentResultView + 1 ;
-		}
-		
-		public int getNbOccurences() {
-			if (searchResults != null) {
-				return searchResults.size() ;
-			} else {
-				return 0 ;
-			}
 		}
 	}
 
