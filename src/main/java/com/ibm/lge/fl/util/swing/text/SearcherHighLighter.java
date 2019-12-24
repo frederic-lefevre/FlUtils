@@ -13,10 +13,9 @@ import javax.swing.text.JTextComponent;
 
 public class SearcherHighLighter {
 
-	private JTextComponent textComponent ;
-	private Highlighter    highLighter ;
-	
-	private Logger shLog ;
+	private final JTextComponent textComponent ;
+	private final Highlighter    highLighter ;	
+	private final Logger 		 shLog ;
 	
 	private Color[] highLightColors = {Color.CYAN, Color.LIGHT_GRAY, Color.YELLOW, Color.MAGENTA} ;
 	private int currentColorIdx ;
@@ -86,7 +85,7 @@ public class SearcherHighLighter {
 	        try {
 		        while (currIdx > -1) {
 		        	
-		        	SearchResult result ;
+		        	TextAreaElement result ;
 		        	if (ignoreFormatting) {
 		        		result = indexOfIgnoreFormat(text, txtToFind, currIdx) ;
 		        		if (result.getBegin() > -1) {
@@ -101,7 +100,7 @@ public class SearcherHighLighter {
 		        		if (foundIdx > -1) {
 			        		currIdx = foundIdx + txtToFind.length() ;	        		
 			        		currentHighLights.add(highLighter.addHighlight(foundIdx, currIdx, matchPainter)) ;
-							result = new SearchResult(foundIdx, currIdx) ;
+							result = new TextAreaElement(textComponent, foundIdx, currIdx) ;
 							searchElement.addSearchResult(result);
 			        	} else {
 			        		currIdx = -1 ;
@@ -137,9 +136,9 @@ public class SearcherHighLighter {
 		return out.replaceAll("\\p{M}", ""); 
 	}
 	
-	private SearchResult indexOfIgnoreFormat(String text, String toFind, int from) {
+	private TextAreaElement indexOfIgnoreFormat(String text, String toFind, int from) {
 		
-		SearchResult result = new SearchResult() ;
+		TextAreaElement result = new TextAreaElement(textComponent) ;
 		int currIdx  		= from ;
 		boolean endOfString = ((text == null) || (text.isEmpty()) || (toFind == null) || (toFind.isEmpty())) ;
 		while ((result.getBegin() < 0) && (! endOfString)) {
@@ -154,9 +153,8 @@ public class SearcherHighLighter {
 		return result ;
 	}
 	
-	private SearchResult compareIgnoreFormat(String text, String toFind, int from) {
+	private TextAreaElement compareIgnoreFormat(String text, String toFind, int from) {
 		
-		SearchResult result = new SearchResult() ;
 		boolean equal = true ;
 		boolean blank = false ;
 		int currTextIdx   = from ;
@@ -194,6 +192,7 @@ public class SearcherHighLighter {
 				equal = false ;
 			}
 		}
+		TextAreaElement result = new TextAreaElement(textComponent) ;
 		if (equal) {
 			result.setBegin(begin);
 			result.setEnd(currTextIdx);
@@ -213,54 +212,54 @@ public class SearcherHighLighter {
 		}
 	}
 	
-	private class SearchResult {
-		
-		private int begin ;
-		private int end ;
-		
-		public SearchResult() {
-			begin = -1 ;
-			end   = -1 ;
-		}
-
-		public SearchResult (int b, int e) {
-			begin = b ;
-			end   = e ;
-		}
-		
-		public int getBegin() {
-			return begin;
-		}
-
-		public void setBegin(int begin) {
-			this.begin = begin;
-		}
-
-		public int getEnd() {
-			return end;
-		}
-
-		public void setEnd(int end) {
-			this.end = end;
-		}
-		
-		public void goToResult() {
-			TextComponentHelpers.moveTo(textComponent, begin, end, shLog) ;
-		}
-	}
+//	private class SearchResult {
+//		
+//		private int begin ;
+//		private int end ;
+//		
+//		public SearchResult() {
+//			begin = -1 ;
+//			end   = -1 ;
+//		}
+//
+//		public SearchResult (int b, int e) {
+//			begin = b ;
+//			end   = e ;
+//		}
+//		
+//		public int getBegin() {
+//			return begin;
+//		}
+//
+//		public void setBegin(int begin) {
+//			this.begin = begin;
+//		}
+//
+//		public int getEnd() {
+//			return end;
+//		}
+//
+//		public void setEnd(int end) {
+//			this.end = end;
+//		}
+//		
+//		public void goToResult() {
+//			TextComponentHelpers.moveTo(textComponent, begin, end, shLog) ;
+//		}
+//	}
 	
 	public class SearchElement {
 		
 		private Color  hightLightColor ;
 		private String searchedString ;
-		private ArrayList<SearchResult> searchResults ;
+		private ArrayList<TextAreaElement> searchResults ;
 		private int currentResultView ;
 		
 		public SearchElement(String ss, Color hlc) {
 			super();
 			searchedString    = ss;
 			hightLightColor   = hlc;
-			searchResults	  = new ArrayList<SearchResult>() ;
+			searchResults	  = new ArrayList<TextAreaElement>() ;
 			currentResultView = 0 ;
 		}
 
@@ -272,13 +271,13 @@ public class SearcherHighLighter {
 			return searchedString;
 		}
 		
-		public void addSearchResult(SearchResult res) {
+		public void addSearchResult(TextAreaElement res) {
 			searchResults.add(res) ;
 		}
 		
 		public void diplayFirstResult() {
 			if ((searchResults != null) && (searchResults.size() > 0)) {
-				searchResults.get(0).goToResult() ;
+				searchResults.get(0).goToResult(shLog) ;
 			}
 		}
 		
@@ -286,7 +285,7 @@ public class SearcherHighLighter {
 		public int displayNextResult() {
 			if ((searchResults != null) && (searchResults.size() > 0)) {
 				currentResultView = (currentResultView + 1)% searchResults.size() ;
-				searchResults.get(currentResultView).goToResult() ;
+				searchResults.get(currentResultView).goToResult(shLog) ;
 			}
 			return currentResultView + 1 ;
 		}
@@ -298,7 +297,7 @@ public class SearcherHighLighter {
 				if (currentResultView == -1) {
 					currentResultView = searchResults.size() - 1 ;
 				}
-				searchResults.get(currentResultView).goToResult() ;
+				searchResults.get(currentResultView).goToResult(shLog) ;
 			}
 			return currentResultView + 1 ;
 		}
