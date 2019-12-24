@@ -23,14 +23,14 @@ public class TextAreaElementList {
 		return hightLightColor;
 	}
 	
-	public void diplayFirstResult() {
+	public void diplayFirstElement() {
 		if ((textElements != null) && (textElements.size() > 0)) {
 			textElements.get(0).goToResult() ;
 		}
 	}
 	
 	// Return the number of the displayed element, starting at 1
-	public int displayNextResult() {
+	public int displayNextElement() {
 		if ((textElements != null) && (textElements.size() > 0)) {
 			currentTextElement = (currentTextElement + 1)% textElements.size() ;
 			textElements.get(currentTextElement).goToResult() ;
@@ -39,7 +39,7 @@ public class TextAreaElementList {
 	}
 	
 	// Return the number of the displayed element, starting at 1
-	public int displayPreviousResult() {
+	public int displayPreviousElement() {
 		if ((textElements != null) && (textElements.size() > 0)) {
 			currentTextElement-- ;
 			if (currentTextElement == -1) {
@@ -50,7 +50,7 @@ public class TextAreaElementList {
 		return currentTextElement + 1 ;
 	}
 	
-	public int getNbOccurences() {
+	public int getNbElements() {
 		if (textElements != null) {
 			return textElements.size() ;
 		} else {

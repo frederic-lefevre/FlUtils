@@ -4,31 +4,33 @@ import java.util.HashMap;
 import java.util.Set;
 import java.util.logging.Level;
 
+import com.ibm.lge.fl.util.swing.text.TextAreaElementList;
+
 public class LogRecordAreas {
 
-	private final HashMap<Level,LogRecordCategory> logRecordAreas ;
+	private final HashMap<Level,TextAreaElementList> logRecordAreas ;
 	
 	public LogRecordAreas() {
 		super() ;
-		logRecordAreas = new HashMap<Level,LogRecordCategory>() ;
+		logRecordAreas = new HashMap<Level,TextAreaElementList>() ;
 	}
 
 	public void addLogRecordArea(LogRecordArea recordArea) {
 		
 		Level recordLevel = recordArea.getRecord().getLevel() ;
-		LogRecordCategory recordsForTheSameLevel = logRecordAreas.get(recordLevel) ;
+		TextAreaElementList recordsForTheSameLevel = logRecordAreas.get(recordLevel) ;
 		if (recordsForTheSameLevel == null) {
-			recordsForTheSameLevel = new LogRecordCategory() ;
+			recordsForTheSameLevel = new TextAreaElementList(null) ;
 			logRecordAreas.put(recordLevel, recordsForTheSameLevel) ;
 		}
-		recordsForTheSameLevel.addLogRecordArea(recordArea) ;		
+		recordsForTheSameLevel.addTextElement(recordArea) ;		
 	}
 	
 	public Set<Level> getRecordLevels() {
 		return logRecordAreas.keySet() ;
 	}
 	
-	public LogRecordCategory getLogRecordsForThisLevel(Level level) {
+	public TextAreaElementList getLogRecordsForThisLevel(Level level) {
 		return logRecordAreas.get(level) ;
 	}
 }

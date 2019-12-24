@@ -112,14 +112,14 @@ public class SearchableTextPane extends JPanel  {
 				ArrayList<SearchElement> currentSearches = searcherHighLighter.getCurrentSearches() ;
 				if ((currentSearches != null) && (currentSearches.size() > 0)) {
 					SearchElement latestSearch = currentSearches.get(currentSearches.size()-1) ;
-					latestSearch.diplayFirstResult() ;
+					latestSearch.diplayFirstElement() ;
 					for (SearchElement searchElem : currentSearches) {
 						JPanel elemPanel = new JPanel() ;
 						elemPanel.setLayout(new BoxLayout(elemPanel,  BoxLayout.X_AXIS));	
 						JLabel searchedStringLbl = new JLabel(searchElem.getSearchedString() + " ") ;
 						JButton next 	 = new JButton("next") ;
 						JButton previous = new JButton("previous") ;
-						JLabel occurences = new JLabel(" 1 of " + searchElem.getNbOccurences() + " occurences") ;
+						JLabel occurences = new JLabel(" 1 of " + searchElem.getNbElements() + " occurences") ;
 						previous.addActionListener(new OcccurenceButtonListener(searchElem, occurences, false));
 						next.addActionListener(new OcccurenceButtonListener(searchElem, occurences, true));
 						previous.setBackground(searchElem.getHightLightColor());
@@ -156,11 +156,11 @@ public class SearchableTextPane extends JPanel  {
 			
 			int occurenceNum ;
 			if (forward) {
-				occurenceNum = searchElem.displayNextResult() ;
+				occurenceNum = searchElem.displayNextElement() ;
 			} else {
-				occurenceNum = searchElem.displayPreviousResult() ;
+				occurenceNum = searchElem.displayPreviousElement() ;
 			}
-			occurences.setText(" " + occurenceNum + " of " + searchElem.getNbOccurences() + " occurences");
+			occurences.setText(" " + occurenceNum + " of " + searchElem.getNbElements() + " occurences");
 		}		
 	}
 	

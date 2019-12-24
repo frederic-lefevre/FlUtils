@@ -11,6 +11,8 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import com.ibm.lge.fl.util.swing.text.TextAreaElementList;
+
 public class LogRecordCategoriesPane extends JPanel  {
 
 	private static final long serialVersionUID = 1L;
@@ -49,7 +51,7 @@ public class LogRecordCategoriesPane extends JPanel  {
 	
 	private JPanel oneCategoryPane(Level level) {
 		
-		LogRecordCategory recordForThisLevel = logRecordAreas.getLogRecordsForThisLevel(level) ;
+		TextAreaElementList recordForThisLevel = logRecordAreas.getLogRecordsForThisLevel(level) ;
 		JPanel catPane = new JPanel() ;
 		catPane.setLayout(new BoxLayout(catPane,  BoxLayout.X_AXIS)) ;
 		
@@ -57,7 +59,7 @@ public class LogRecordCategoriesPane extends JPanel  {
 		catPane.add(lvlLabel) ;
 		JButton next 	 = new JButton("next") ;
 		JButton previous = new JButton("previous") ;
-		JLabel occurences = new JLabel(" 1 of " + recordForThisLevel.getNumberOfRecords() + " occurences") ;
+		JLabel occurences = new JLabel(" 1 of " + recordForThisLevel.getNbElements() + " occurences") ;
 		next.addActionListener(new OcccurenceButtonListener(recordForThisLevel, occurences, true));
 		previous.addActionListener(new OcccurenceButtonListener(recordForThisLevel, occurences, false));
 		catPane.add(previous) ;
@@ -78,10 +80,10 @@ public class LogRecordCategoriesPane extends JPanel  {
 	
 	private class OcccurenceButtonListener implements ActionListener {
 
-		private final LogRecordCategory logRecordCategory ;
-		private final JLabel 		    occurences ;
-		private final boolean			forward ;
-		public OcccurenceButtonListener(LogRecordCategory lrc,  JLabel occurences, boolean forward) {
+		private final TextAreaElementList logRecordCategory ;
+		private final JLabel 		      occurences ;
+		private final boolean			  forward ;
+		public OcccurenceButtonListener(TextAreaElementList lrc,  JLabel occurences, boolean forward) {
 			logRecordCategory = lrc ;
 			this.occurences	  = occurences ;
 			this.forward      = forward ;
@@ -91,11 +93,11 @@ public class LogRecordCategoriesPane extends JPanel  {
 		public void actionPerformed(ActionEvent e) {
 			int occurenceNum ;
 			if (forward) {
-				occurenceNum = logRecordCategory.displayNextRecord() ;
+				occurenceNum = logRecordCategory.displayNextElement() ;
 			} else {
-				occurenceNum = logRecordCategory.displayPreviousRecord() ;
+				occurenceNum = logRecordCategory.displayPreviousElement() ;
 			}
-			occurences.setText(" " + occurenceNum + " of " + logRecordCategory.getNumberOfRecords() + " occurences") ;
+			occurences.setText(" " + occurenceNum + " of " + logRecordCategory.getNbElements() + " occurences") ;
 		}
 		
 	}
