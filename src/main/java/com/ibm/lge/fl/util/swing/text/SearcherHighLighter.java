@@ -27,7 +27,7 @@ public class SearcherHighLighter {
 		currentSearches   = new ArrayList<TextAreaElementList>() ;
 	}
 
-	public void searchAndHighlight(String toFind, boolean caseSensitive, boolean ignoreAccent, boolean ignoreFormatting) {
+	public TextAreaElementList searchAndHighlight(String toFind, boolean caseSensitive, boolean ignoreAccent, boolean ignoreFormatting) {
 		
         String txt = null ;
         try {
@@ -91,7 +91,11 @@ public class SearcherHighLighter {
 		        	}
 	        	} 
 	        }
-        }   
+	        return searchElement ;
+        } else {
+        	return null ;
+        }
+        
 	}
 	
 	public void searchAndHighlight(String toFind, boolean caseSensitive) {	

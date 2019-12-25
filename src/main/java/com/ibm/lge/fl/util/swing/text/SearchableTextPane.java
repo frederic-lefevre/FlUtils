@@ -4,14 +4,12 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
 import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -26,12 +24,12 @@ public class SearchableTextPane extends JPanel  {
 	private final JTextArea 		 textArea ;
 	
 	// Component and text field for search
-	private final JTextField searchText ;
-	private final JCheckBox  caseSensitive ;
-	private final JCheckBox  ignoreAccent ;
-	private final JCheckBox  ignoreFormatting ;
-	private final JPanel	 searchResultPanel ;
-	private final JPanel 	 commandPanel ;
+	private final JTextField 		 searchText ;
+	private final JCheckBox  		 caseSensitive ;
+	private final JCheckBox  		 ignoreAccent ;
+	private final JCheckBox  		 ignoreFormatting ;
+	private final TextAreaNavigation searchResultPanel ;
+	private final JPanel 	 		 commandPanel ;
 	
 	private final SearcherHighLighter searcherHighLighter ;
 	
@@ -78,8 +76,7 @@ public class SearchableTextPane extends JPanel  {
 		searchOptionPanel.add(ignoreFormatting) ;
 		searchPanel1.add(searchOptionPanel) ;
 		searchPanel.add(searchPanel1);
-		searchResultPanel = new JPanel() ;
-		searchResultPanel.setLayout(new BoxLayout(searchResultPanel,  BoxLayout.Y_AXIS));	
+		searchResultPanel = new TextAreaNavigation() ;
 		searchPanel.add(searchResultPanel) ;
 		commandPanel.add(searchPanel) ;
 		
@@ -105,61 +102,16 @@ public class SearchableTextPane extends JPanel  {
 				boolean askCaseSensitive	= caseSensitive.isSelected() ;
 				boolean askIgnoreAccent 	= ignoreAccent.isSelected() ;
 				boolean askIgnoreFormatting = ignoreFormatting.isSelected() ;
-				searcherHighLighter.searchAndHighlight(searchStr, askCaseSensitive, askIgnoreAccent, askIgnoreFormatting);
-				searchResultPanel.removeAll() ;
-				ArrayList<TextAreaElementList> currentSearches = searcherHighLighter.getCurrentSearches() ;
-				if ((currentSearches != null) && (currentSearches.size() > 0)) {
-					TextAreaElementList latestSearch = currentSearches.get(currentSearches.size()-1) ;
-					latestSearch.diplayFirstElement() ;
-					for (TextAreaElementList searchElem : currentSearches) {
-						JPanel elemPanel = new JPanel() ;
-						elemPanel.setLayout(new BoxLayout(elemPanel,  BoxLayout.X_AXIS));	
-						JLabel searchedStringLbl = new JLabel(searchElem.getName() + " ") ;
-						JButton next 	 = new JButton("next") ;
-						JButton previous = new JButton("previous") ;
-						JLabel occurences = new JLabel("occurence 1 of " + searchElem.getNbElements()) ;
-						previous.addActionListener(new OcccurenceButtonListener(searchElem, occurences, false));
-						next.addActionListener(new OcccurenceButtonListener(searchElem, occurences, true));
-						previous.setBackground(searchElem.getHightLightColor());
-						next.setBackground(searchElem.getHightLightColor());
-						elemPanel.add(searchedStringLbl);
-						elemPanel.add(previous) ;
-						elemPanel.add(next) ;						
-						elemPanel.add(occurences);
-						searchResultPanel.add(elemPanel) ;
-					}
+				TextAreaElementList latestSearch = searcherHighLighter.searchAndHighlight(searchStr, askCaseSensitive, askIgnoreAccent, askIgnoreFormatting);
+				if (latestSearch != null) {
+					searchResultPanel.addNavigation(latestSearch, true);
+					
 					validate();
 					repaint();
 					requestFocus();
 				}
 			}
 		}
-	}
-	
-	private class OcccurenceButtonListener implements ActionListener {
-
-		private TextAreaElementList searchElem ;
-		private JLabel 		  		occurences ;
-		private boolean		  		forward ;
-		public OcccurenceButtonListener(TextAreaElementList searchElem, JLabel occurences, boolean forward) {
-			super();
-			this.searchElem = searchElem;
-			this.occurences = occurences ;
-			this.forward	= forward ;
-		}
-	
-		// Go to the next occurence
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			
-			int occurenceNum ;
-			if (forward) {
-				occurenceNum = searchElem.displayNextElement() ;
-			} else {
-				occurenceNum = searchElem.displayPreviousElement() ;
-			}
-			occurences.setText("occurence " + occurenceNum + " of " + searchElem.getNbElements());
-		}		
 	}
 	
 	private class resetHighLightListener implements ActionListener {
