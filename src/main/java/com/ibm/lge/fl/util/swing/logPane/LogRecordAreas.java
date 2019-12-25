@@ -50,17 +50,18 @@ public class LogRecordAreas {
 		TextAreaElementList recordsForTheSameLevel = logRecordAreas.get(recordLevel) ;
 		if (recordsForTheSameLevel == null) {
 			if ((color != null) && (recordLevel.intValue() > lastNonHighLighedLevel))  {
-				recordsForTheSameLevel = new TextAreaElementList(textComponent, recordLevel.getName(), color, lLog) ;
-	    		if (! hasHighLight) {
-	    			hasHighLight = true ;
-	    			for (LogHighLightListener highLightListener : highLightListeners) {
-	    				highLightListener.logsHightLighted(true) ;
-	    			}
-	    		}
+				recordsForTheSameLevel = new TextAreaElementList(textComponent, recordLevel.getName(), color, lLog) ;	    		
 	    	} else {
 	    		recordsForTheSameLevel = new TextAreaElementList(textComponent, recordLevel.getName(), lLog) ;
 	    	}
+			
 			logRecordAreas.put(recordLevel, recordsForTheSameLevel) ;
+		}
+		if (! hasHighLight) {
+			hasHighLight = true ;
+			for (LogHighLightListener highLightListener : highLightListeners) {
+				highLightListener.logsHightLighted(true) ;
+			}
 		}
 		recordsForTheSameLevel.addTextElement(recordArea) ;		
 	}
@@ -88,5 +89,6 @@ public class LogRecordAreas {
 		for (LogHighLightListener highLightListener : highLightListeners) {
 			highLightListener.logsHightLighted(false) ;
 		}
+		hasHighLight = false ;
 	}
 }
