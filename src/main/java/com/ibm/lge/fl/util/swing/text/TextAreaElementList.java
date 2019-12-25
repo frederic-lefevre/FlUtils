@@ -30,8 +30,8 @@ public class TextAreaElementList {
 	private Color  					   currentElementHighLightColor ;
 	private HighlightPainter 		   currentElementPainter ;
 	
-	public TextAreaElementList(JTextComponent tc, Logger l) {
-		init(tc, "", null, l) ;
+	public TextAreaElementList(JTextComponent tc, String n, Logger l) {
+		init(tc, n, null, l) ;
 	}
 	
 	public TextAreaElementList(JTextComponent tc, String n, Color hlc, Logger l) {

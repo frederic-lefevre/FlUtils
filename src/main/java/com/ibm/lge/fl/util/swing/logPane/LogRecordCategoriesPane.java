@@ -8,18 +8,17 @@ import java.util.logging.Level;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import com.ibm.lge.fl.util.swing.text.TextAreaElementList;
+import com.ibm.lge.fl.util.swing.text.TextAreaNavigation;
 
 public class LogRecordCategoriesPane extends JPanel  {
 
 	private static final long serialVersionUID = 1L;
 	
-	private final JButton showCategories ;
-	private final LogRecordAreas logRecordAreas ;
-	private final JPanel		 resultPane ;
+	private final JButton 			 showCategories ;
+	private final LogRecordAreas 	 logRecordAreas ;
+	private final TextAreaNavigation resultPane ;
 	
 	public LogRecordCategoriesPane(LogRecordAreas lra) {
 		super() ;
@@ -32,8 +31,7 @@ public class LogRecordCategoriesPane extends JPanel  {
 		ctrl.add(showCategories) ;
 		add(ctrl) ;
 		
-		resultPane = new JPanel() ;
-		resultPane.setLayout(new BoxLayout(resultPane,  BoxLayout.Y_AXIS)) ;
+		resultPane = new TextAreaNavigation() ;
 		add(resultPane) ;
 		
 		showCategories.addActionListener(new refreshListener());
@@ -42,30 +40,11 @@ public class LogRecordCategoriesPane extends JPanel  {
 	public void displayPane() {		
 		resultPane.removeAll() ;
 		for (Level level : logRecordAreas.getRecordLevels()) {
-			resultPane.add(oneCategoryPane(level)) ;
+			resultPane.addNavigation(logRecordAreas.getLogRecordsForThisLevel(level), false) ;
 		}
 		validate();
 		repaint();
 		requestFocus();
-	}
-	
-	private JPanel oneCategoryPane(Level level) {
-		
-		TextAreaElementList recordForThisLevel = logRecordAreas.getLogRecordsForThisLevel(level) ;
-		JPanel catPane = new JPanel() ;
-		catPane.setLayout(new BoxLayout(catPane,  BoxLayout.X_AXIS)) ;
-		
-		JLabel lvlLabel = new JLabel(level.getName()) ;
-		catPane.add(lvlLabel) ;
-		JButton next 	 = new JButton("next") ;
-		JButton previous = new JButton("previous") ;
-		JLabel occurences = new JLabel(recordForThisLevel.getNbElements() + " occurences") ;
-		next.addActionListener(new OcccurenceButtonListener(recordForThisLevel, occurences, true));
-		previous.addActionListener(new OcccurenceButtonListener(recordForThisLevel, occurences, false));
-		catPane.add(previous) ;
-		catPane.add(next) ;		
-		catPane.add(occurences) ;
-		return catPane ;
 	}
 	
 	private class refreshListener implements ActionListener {
@@ -78,27 +57,4 @@ public class LogRecordCategoriesPane extends JPanel  {
 		
 	}
 	
-	private class OcccurenceButtonListener implements ActionListener {
-
-		private final TextAreaElementList logRecordCategory ;
-		private final JLabel 		      occurences ;
-		private final boolean			  forward ;
-		public OcccurenceButtonListener(TextAreaElementList lrc,  JLabel occurences, boolean forward) {
-			logRecordCategory = lrc ;
-			this.occurences	  = occurences ;
-			this.forward      = forward ;
-		}
-		
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			int occurenceNum ;
-			if (forward) {
-				occurenceNum = logRecordCategory.displayNextElement() ;
-			} else {
-				occurenceNum = logRecordCategory.displayPreviousElement() ;
-			}
-			occurences.setText("occurence " + occurenceNum + " of " + logRecordCategory.getNbElements()) ;
-		}
-		
-	}
 }

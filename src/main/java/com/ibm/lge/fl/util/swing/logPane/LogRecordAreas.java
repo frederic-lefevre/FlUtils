@@ -58,7 +58,7 @@ public class LogRecordAreas {
 	    			}
 	    		}
 	    	} else {
-	    		recordsForTheSameLevel = new TextAreaElementList(textComponent, lLog) ;
+	    		recordsForTheSameLevel = new TextAreaElementList(textComponent, recordLevel.getName(), lLog) ;
 	    	}
 			logRecordAreas.put(recordLevel, recordsForTheSameLevel) ;
 		}
