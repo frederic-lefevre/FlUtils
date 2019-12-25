@@ -12,6 +12,7 @@ import javax.swing.text.Highlighter.HighlightPainter;
 
 public class TextAreaElementList {
 
+	private String 					   name ;
 	private JTextComponent 			   textComponent ;
 	private Logger		 			   lLog ;
 	private ArrayList<TextAreaElement> textElements ;
@@ -30,14 +31,15 @@ public class TextAreaElementList {
 	private HighlightPainter 		   currentElementPainter ;
 	
 	public TextAreaElementList(JTextComponent tc, Logger l) {
-		init(tc, null, l) ;
+		init(tc, "", null, l) ;
 	}
 	
-	public TextAreaElementList(JTextComponent tc, Color hlc, Logger l) {
-		init(tc, hlc, l) ;
+	public TextAreaElementList(JTextComponent tc, String n, Color hlc, Logger l) {
+		init(tc, n, hlc, l) ;
 	}
 	
-	private void init(JTextComponent tc, Color hlc, Logger l) {
+	private void init(JTextComponent tc, String n, Color hlc, Logger l) {
+		name			   = n ;
 		textComponent 	   = tc ;
 		highLightColor     = hlc ;
 		lLog			   = l ;
@@ -152,5 +154,13 @@ public class TextAreaElementList {
 		} else {
 			return 0 ;
 		}
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
 	}
 }

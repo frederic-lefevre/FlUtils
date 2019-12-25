@@ -50,7 +50,7 @@ public class LogRecordAreas {
 		TextAreaElementList recordsForTheSameLevel = logRecordAreas.get(recordLevel) ;
 		if (recordsForTheSameLevel == null) {
 			if ((color != null) && (recordLevel.intValue() > lastNonHighLighedLevel))  {
-				recordsForTheSameLevel = new TextAreaElementList(textComponent, color, lLog) ;
+				recordsForTheSameLevel = new TextAreaElementList(textComponent, recordLevel.getName(), color, lLog) ;
 	    		if (! hasHighLight) {
 	    			hasHighLight = true ;
 	    			for (LogHighLightListener highLightListener : highLightListeners) {

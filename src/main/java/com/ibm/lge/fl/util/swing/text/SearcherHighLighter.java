@@ -16,7 +16,7 @@ public class SearcherHighLighter {
 	private Color[] highLightColors = {Color.CYAN, Color.LIGHT_GRAY, Color.YELLOW, Color.MAGENTA} ;
 	private int currentColorIdx ;
 	
-	private ArrayList<SearchElement> currentSearches ;
+	private ArrayList<TextAreaElementList> currentSearches ;
 		
 	public SearcherHighLighter(JTextComponent tc, Logger l) {
 		
@@ -24,7 +24,7 @@ public class SearcherHighLighter {
 		shLog		  = l ;
 		
 		currentColorIdx   = -1 ;
-		currentSearches   = new ArrayList<SearchElement>() ;
+		currentSearches   = new ArrayList<TextAreaElementList>() ;
 	}
 
 	public void searchAndHighlight(String toFind, boolean caseSensitive, boolean ignoreAccent, boolean ignoreFormatting) {
@@ -65,7 +65,7 @@ public class SearcherHighLighter {
 				hiColor = highLightColors[0] ;
 			}
 			
-			SearchElement searchElement = new SearchElement(toFind, hiColor) ;
+			TextAreaElementList searchElement = new TextAreaElementList(textComponent, toFind, hiColor, shLog) ;
 			currentSearches.add(searchElement) ;
 						
 	        // Search for pattern
@@ -99,10 +99,10 @@ public class SearcherHighLighter {
 	}
 
 	public void removeHighlights() {
-		for (SearchElement searcheElement : currentSearches) {
+		for (TextAreaElementList searcheElement : currentSearches) {
 			searcheElement.removeHighLights() ;
 		}
-		currentSearches   = new ArrayList<SearchElement>() ;		
+		currentSearches   = new ArrayList<TextAreaElementList>() ;		
 	}
 	
 	public void setHighLightColors(Color[] highLightColors) {
@@ -189,21 +189,8 @@ public class SearcherHighLighter {
 			return false ;
 		}
 	}
-		
-	public class SearchElement extends TextAreaElementList{
-		
-		private String searchedString ;		
-		public SearchElement(String ss, Color hlc) {
-			super(textComponent, hlc, shLog);
-			searchedString    = ss;
-		}
 
-		public String getSearchedString() {
-			return searchedString;
-		}
-	}
-
-	public ArrayList<SearchElement> getCurrentSearches() {
+	public ArrayList<TextAreaElementList> getCurrentSearches() {
 		return currentSearches;
 	}
 }

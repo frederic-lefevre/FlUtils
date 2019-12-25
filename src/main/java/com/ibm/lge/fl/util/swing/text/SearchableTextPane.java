@@ -18,8 +18,6 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.text.DefaultHighlighter;
 
-import com.ibm.lge.fl.util.swing.text.SearcherHighLighter.SearchElement;
-
 public class SearchableTextPane extends JPanel  {
 
 	private static final long serialVersionUID = 1L;
@@ -109,14 +107,14 @@ public class SearchableTextPane extends JPanel  {
 				boolean askIgnoreFormatting = ignoreFormatting.isSelected() ;
 				searcherHighLighter.searchAndHighlight(searchStr, askCaseSensitive, askIgnoreAccent, askIgnoreFormatting);
 				searchResultPanel.removeAll() ;
-				ArrayList<SearchElement> currentSearches = searcherHighLighter.getCurrentSearches() ;
+				ArrayList<TextAreaElementList> currentSearches = searcherHighLighter.getCurrentSearches() ;
 				if ((currentSearches != null) && (currentSearches.size() > 0)) {
-					SearchElement latestSearch = currentSearches.get(currentSearches.size()-1) ;
+					TextAreaElementList latestSearch = currentSearches.get(currentSearches.size()-1) ;
 					latestSearch.diplayFirstElement() ;
-					for (SearchElement searchElem : currentSearches) {
+					for (TextAreaElementList searchElem : currentSearches) {
 						JPanel elemPanel = new JPanel() ;
 						elemPanel.setLayout(new BoxLayout(elemPanel,  BoxLayout.X_AXIS));	
-						JLabel searchedStringLbl = new JLabel(searchElem.getSearchedString() + " ") ;
+						JLabel searchedStringLbl = new JLabel(searchElem.getName() + " ") ;
 						JButton next 	 = new JButton("next") ;
 						JButton previous = new JButton("previous") ;
 						JLabel occurences = new JLabel("occurence 1 of " + searchElem.getNbElements()) ;
@@ -140,10 +138,10 @@ public class SearchableTextPane extends JPanel  {
 	
 	private class OcccurenceButtonListener implements ActionListener {
 
-		private SearchElement searchElem ;
-		private JLabel 		  occurences ;
-		private boolean		  forward ;
-		public OcccurenceButtonListener(SearchElement searchElem, JLabel occurences, boolean forward) {
+		private TextAreaElementList searchElem ;
+		private JLabel 		  		occurences ;
+		private boolean		  		forward ;
+		public OcccurenceButtonListener(TextAreaElementList searchElem, JLabel occurences, boolean forward) {
 			super();
 			this.searchElem = searchElem;
 			this.occurences = occurences ;
