@@ -80,4 +80,13 @@ public class LogRecordAreas {
 	public boolean hasHighlight() {
 		return hasHighLight ;
 	}
+	
+	public void removeHighLight() {
+		for (TextAreaElementList elementList : logRecordAreas.values()) {
+			elementList.removeHighLights() ;
+		}
+		for (LogHighLightListener highLightListener : highLightListeners) {
+			highLightListener.logsHightLighted(false) ;
+		}
+	}
 }

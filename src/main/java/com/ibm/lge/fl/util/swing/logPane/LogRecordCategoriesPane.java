@@ -17,6 +17,7 @@ public class LogRecordCategoriesPane extends JPanel  {
 	private static final long serialVersionUID = 1L;
 	
 	private final JButton 			 showCategories ;
+	private final JButton 			 resetHighLight ;
 	private final LogRecordAreas 	 logRecordAreas ;
 	private final TextAreaNavigation resultPane ;
 	
@@ -28,13 +29,16 @@ public class LogRecordCategoriesPane extends JPanel  {
 		setBorder(BorderFactory.createLineBorder(Color.BLACK,1));
 		JPanel ctrl = new JPanel() ;
 		showCategories = new JButton("Show categories") ;
+		resetHighLight = new JButton("Reset highlight") ;
 		ctrl.add(showCategories) ;
+		ctrl.add(resetHighLight) ;
 		add(ctrl) ;
 		
 		resultPane = new TextAreaNavigation() ;
 		add(resultPane) ;
 		
 		showCategories.addActionListener(new refreshListener());
+		resetHighLight.addActionListener(new resetListener());
 	}
 
 	public void displayPane() {		
@@ -51,10 +55,16 @@ public class LogRecordCategoriesPane extends JPanel  {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			displayPane() ;
-			
+			displayPane() ;			
+		}		
+	}
+	
+	private class resetListener implements ActionListener {
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			logRecordAreas.removeHighLight() ;			
 		}
 		
 	}
-	
 }
