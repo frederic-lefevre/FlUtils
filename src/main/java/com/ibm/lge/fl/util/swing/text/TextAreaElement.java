@@ -48,7 +48,7 @@ public class TextAreaElement {
 		}
 	}
 	
-	public void goToResult() {
+	public void goToElement() {
 		if ((begin > -1) && (end > -1)) {
 			try {
 				Rectangle viewRect = textComponent.modelToView(begin) ;
