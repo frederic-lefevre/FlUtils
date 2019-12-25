@@ -59,7 +59,7 @@ public class LogRecordCategoriesPane extends JPanel  {
 		catPane.add(lvlLabel) ;
 		JButton next 	 = new JButton("next") ;
 		JButton previous = new JButton("previous") ;
-		JLabel occurences = new JLabel(" 1 of " + recordForThisLevel.getNbElements() + " occurences") ;
+		JLabel occurences = new JLabel(recordForThisLevel.getNbElements() + " occurences") ;
 		next.addActionListener(new OcccurenceButtonListener(recordForThisLevel, occurences, true));
 		previous.addActionListener(new OcccurenceButtonListener(recordForThisLevel, occurences, false));
 		catPane.add(previous) ;
@@ -97,7 +97,7 @@ public class LogRecordCategoriesPane extends JPanel  {
 			} else {
 				occurenceNum = logRecordCategory.displayPreviousElement() ;
 			}
-			occurences.setText(" " + occurenceNum + " of " + logRecordCategory.getNbElements() + " occurences") ;
+			occurences.setText("occurence " + occurenceNum + " of " + logRecordCategory.getNbElements()) ;
 		}
 		
 	}

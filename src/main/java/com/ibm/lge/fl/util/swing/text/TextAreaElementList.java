@@ -42,7 +42,7 @@ public class TextAreaElementList {
 		highLightColor     = hlc ;
 		lLog			   = l ;
 		textElements	   = new ArrayList<TextAreaElement>() ;
-		currentTextElement = 0 ;
+		currentTextElement = -1 ;
 		highLighter 	   = textComponent.getHighlighter() ;
 		if (highLightColor != null) {
 			painter			   = new MultiHighLightPainter(highLightColor) ;
@@ -100,7 +100,11 @@ public class TextAreaElementList {
 	public int displayNextElement() {
 		removeCurrentElementHighLight() ;
 		if ((textElements != null) && (textElements.size() > 0)) {
-			currentTextElement = (currentTextElement + 1)% textElements.size() ;
+			if (currentTextElement < -1) {
+				currentTextElement = textElements.size() - 1 ;
+			} else {
+				currentTextElement = (currentTextElement + 1)% textElements.size() ;
+			}
 			textElements.get(currentTextElement).goToElement() ;
 			currentElementHighLight = addHighLightToTextElement(textElements.get(currentTextElement), currentElementPainter) ;
 		}
@@ -110,10 +114,11 @@ public class TextAreaElementList {
 	// Return the number of the displayed element, starting at 1
 	public int displayPreviousElement() {
 		removeCurrentElementHighLight() ;
-		if ((textElements != null) && (textElements.size() > 0)) {
-			currentTextElement-- ;
-			if (currentTextElement == -1) {
+		if ((textElements != null) && (textElements.size() > 0)) {		
+			if (currentTextElement < 1) {
 				currentTextElement = textElements.size() - 1 ;
+			} else {
+				currentTextElement-- ;
 			}
 			textElements.get(currentTextElement).goToElement() ;
 			currentElementHighLight = addHighLightToTextElement(textElements.get(currentTextElement), currentElementPainter) ;

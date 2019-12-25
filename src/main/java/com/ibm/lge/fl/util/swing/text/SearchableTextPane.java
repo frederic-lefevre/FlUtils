@@ -119,7 +119,7 @@ public class SearchableTextPane extends JPanel  {
 						JLabel searchedStringLbl = new JLabel(searchElem.getSearchedString() + " ") ;
 						JButton next 	 = new JButton("next") ;
 						JButton previous = new JButton("previous") ;
-						JLabel occurences = new JLabel(" 1 of " + searchElem.getNbElements() + " occurences") ;
+						JLabel occurences = new JLabel("occurence 1 of " + searchElem.getNbElements()) ;
 						previous.addActionListener(new OcccurenceButtonListener(searchElem, occurences, false));
 						next.addActionListener(new OcccurenceButtonListener(searchElem, occurences, true));
 						previous.setBackground(searchElem.getHightLightColor());
@@ -160,7 +160,7 @@ public class SearchableTextPane extends JPanel  {
 			} else {
 				occurenceNum = searchElem.displayPreviousElement() ;
 			}
-			occurences.setText(" " + occurenceNum + " of " + searchElem.getNbElements() + " occurences");
+			occurences.setText("occurence " + occurenceNum + " of " + searchElem.getNbElements());
 		}		
 	}
 	
