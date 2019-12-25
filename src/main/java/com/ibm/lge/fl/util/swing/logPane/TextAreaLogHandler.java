@@ -13,6 +13,7 @@ import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 
 import com.ibm.lge.fl.util.ExceptionLogging;
+import com.ibm.lge.fl.util.swing.text.TextAreaElement;
 
 public class TextAreaLogHandler extends Handler {
 
@@ -92,7 +93,7 @@ public class TextAreaLogHandler extends Handler {
         		textArea.append(NEWLINE) ;
         		
         		int endRecord = textArea.getText().length() - 1 ;
-        		logRecordAreas.addLogRecordArea(new LogRecordArea(textArea, record, startRecord, endRecord, tLog)) ;
+        		logRecordAreas.addLogRecordArea(new TextAreaElement(textArea, startRecord, endRecord, tLog), record.getLevel()) ;
             }
 		}) ;
 	}

@@ -9,6 +9,7 @@ import java.util.logging.Logger;
 
 import javax.swing.text.JTextComponent;
 
+import com.ibm.lge.fl.util.swing.text.TextAreaElement;
 import com.ibm.lge.fl.util.swing.text.TextAreaElementList;
 
 public class LogRecordAreas {
@@ -44,9 +45,8 @@ public class LogRecordAreas {
 		hasHighLight			= false ;
 	}
 	
-	public void addLogRecordArea(LogRecordArea recordArea) {
+	public void addLogRecordArea(TextAreaElement recordArea, Level recordLevel) {
 		
-		Level recordLevel = recordArea.getRecord().getLevel() ;
 		TextAreaElementList recordsForTheSameLevel = logRecordAreas.get(recordLevel) ;
 		if (recordsForTheSameLevel == null) {
 			if ((color != null) && (recordLevel.intValue() > lastNonHighLighedLevel))  {
