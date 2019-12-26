@@ -2,6 +2,7 @@ package com.ibm.lge.fl.util.swing.text;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -55,9 +56,12 @@ public class TextAreaNavigation extends JPanel {
 		next.setBackground(elementList.getHightLightColor());
 		previous.addActionListener(new OcccurenceButtonListener(elementList, occurences, false));
 		next.addActionListener(new OcccurenceButtonListener(elementList, occurences, true));
-		c.gridx = 0 ;
+		
 		c.gridy = rowNum ;
 		c.fill = GridBagConstraints.HORIZONTAL ;
+		c.insets = new Insets(3,3,3,3) ;
+		
+		c.gridx = 0 ;
 		add(searchedStringLbl, c) ;
 		c.gridx = 1 ;
 		add(previous, c) ;
