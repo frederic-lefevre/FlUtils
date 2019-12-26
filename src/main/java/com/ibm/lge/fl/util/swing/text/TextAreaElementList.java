@@ -27,8 +27,9 @@ public class TextAreaElementList {
 		
 	// HighLights for current element
 	private Object					   currentElementHighLight ;
-	private Color  					   currentElementHighLightColor ;
 	private HighlightPainter 		   currentElementPainter ;
+	
+	private static Color  			   currentElementHighLightColor = Color.GREEN;
 	
 	public TextAreaElementList(JTextComponent tc, String n, Logger l) {
 		init(tc, n, null, l) ;
@@ -51,10 +52,13 @@ public class TextAreaElementList {
 			currentHighLights  = new ArrayList<Object>() ;
 		}
 		currentElementHighLight = null ;
-		currentElementHighLightColor = Color.GREEN ;
 		if (currentElementHighLightColor != null) {
 			currentElementPainter = new MultiHighLightPainter(currentElementHighLightColor) ;
 		}
+	}
+
+	public static void setCurrentElementHighLightColor(Color c) {
+		currentElementHighLightColor = c;
 	}
 
 	public void addTextElement(TextAreaElement res) {
