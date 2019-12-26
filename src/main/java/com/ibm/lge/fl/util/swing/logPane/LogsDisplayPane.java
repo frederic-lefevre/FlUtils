@@ -20,7 +20,7 @@ public class LogsDisplayPane  extends JPanel {
 	private final SearchableTextPane searchableTextArea ;
 	private final LogRecordCategoriesPane logRecordCategoriesPane ;
 	
-	public LogsDisplayPane(Logger logger) {
+	public LogsDisplayPane(int level, Color color, Logger logger) {
 		
 		super();
 		setLayout(new BoxLayout(this,  BoxLayout.X_AXIS)) ;
@@ -33,7 +33,7 @@ public class LogsDisplayPane  extends JPanel {
 		searchableTextArea = new SearchableTextPane(logArea, logger) ;
 		add(searchableTextArea) ;
 		
-		logTextAreaHandler = new TextAreaLogHandler(logArea, Level.INFO.intValue(), Color.PINK, logger) ;
+		logTextAreaHandler = new TextAreaLogHandler(logArea, level, color, logger) ;
 		logTextAreaHandler.setLevel(logger.getLevel());
 		logger.addHandler(logTextAreaHandler);
 			

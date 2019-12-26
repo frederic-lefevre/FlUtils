@@ -1,6 +1,8 @@
 package com.ibm.lge.fl.util.swing;
 
 import java.awt.Color;
+import java.util.logging.Level;
+
 import javax.swing.JTabbedPane;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -27,7 +29,7 @@ public class ApplicationTabbedPane extends JTabbedPane {
 		addTab("Informations", appInfoPane) ;
 		
 		// Tabbed Panel for logs display
-		logsDisplayPane =  new LogsDisplayPane(runningContext.getpLog()) ;
+		logsDisplayPane =  new LogsDisplayPane(Level.INFO.intValue(), Color.PINK, runningContext.getpLog()) ;
 		addTab("Logs display", logsDisplayPane) ;
 		int logTabIdx = indexOfComponent(logsDisplayPane) ;
 		if (logTabIdx > -1) {
