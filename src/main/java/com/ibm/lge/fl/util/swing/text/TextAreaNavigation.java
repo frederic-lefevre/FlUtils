@@ -1,10 +1,11 @@
 package com.ibm.lge.fl.util.swing.text;
 
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
-import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -19,14 +20,14 @@ public class TextAreaNavigation extends JPanel {
 		
 		textAreaElementLists = new ArrayList<TextAreaElementList>() ;
 		
-		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS)) ;
+		setLayout(new GridBagLayout()) ;
 	}
 	
 	public TextAreaNavigation(ArrayList<TextAreaElementList> tal) {
 		
 		textAreaElementLists = tal ;
 		
-		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS)) ;
+		setLayout(new GridBagLayout()) ;
 		
 		for (TextAreaElementList elementList : textAreaElementLists) {
 			addNavigation(elementList, false) ;
@@ -34,9 +35,11 @@ public class TextAreaNavigation extends JPanel {
 	}
 
 	public void addNavigation(TextAreaElementList elementList, boolean displayFirst) {
+		GridBagConstraints c = new GridBagConstraints() ;
 		textAreaElementLists.add(elementList) ;
-		JPanel navElemPane = new JPanel() ;
-		navElemPane.setLayout(new BoxLayout(navElemPane,  BoxLayout.X_AXIS));
+
+		int rowNum = textAreaElementLists.size() - 1 ;
+		
 		JLabel searchedStringLbl = new JLabel(elementList.getName() + " ") ;
 		JButton next 	 = new JButton("next") ;
 		JButton previous = new JButton("previous") ;
@@ -52,11 +55,16 @@ public class TextAreaNavigation extends JPanel {
 		next.setBackground(elementList.getHightLightColor());
 		previous.addActionListener(new OcccurenceButtonListener(elementList, occurences, false));
 		next.addActionListener(new OcccurenceButtonListener(elementList, occurences, true));
-		navElemPane.add(searchedStringLbl) ;
-		navElemPane.add(previous) ;
-		navElemPane.add(next) ;
-		navElemPane.add(occurences) ;
-		add(navElemPane) ;
+		c.gridx = 0 ;
+		c.gridy = rowNum ;
+		c.fill = GridBagConstraints.HORIZONTAL ;
+		add(searchedStringLbl, c) ;
+		c.gridx = 1 ;
+		add(previous, c) ;
+		c.gridx = 2 ;
+		add(next, c) ;
+		c.gridx = 3 ;
+		add(occurences, c) ;
 	}
 	
 	private class OcccurenceButtonListener implements ActionListener {
