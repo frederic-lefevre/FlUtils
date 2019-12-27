@@ -52,7 +52,7 @@ public class LogRecordAreas {
 			if ((color != null) && (recordLevel.intValue() > lastNonHighLighedLevel))  {
 				recordsForTheSameLevel = new TextAreaElementList(textComponent, recordLevel.getName(), color, lLog) ;	    		
 	    	} else {
-	    		recordsForTheSameLevel = new TextAreaElementList(textComponent, recordLevel.getName(), lLog) ;
+	    		recordsForTheSameLevel = new TextAreaElementList(textComponent, recordLevel.getName(), null, lLog) ;
 	    	}
 			
 			logRecordAreas.put(recordLevel, recordsForTheSameLevel) ;

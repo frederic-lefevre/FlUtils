@@ -12,34 +12,27 @@ import javax.swing.text.Highlighter.HighlightPainter;
 
 public class TextAreaElementList {
 
-	private String 					   name ;
-	private JTextComponent 			   textComponent ;
-	private Logger		 			   lLog ;
-	private ArrayList<TextAreaElement> textElements ;
-	private int 					   currentTextElement ;
+	private final String 					   name ;
+	private final JTextComponent 			   textComponent ;
+	private final Logger		 			   lLog ;
+	private final ArrayList<TextAreaElement>   textElements ;
 	
-	private Highlighter 			   highLighter ;
+	private int 					   		   currentTextElement ;
+	
+	private final Highlighter 			   	   highLighter ;
 	
 	// HighLights for all elements
-	private HighlightPainter 		   painter ;
-	private Color  					   highLightColor ;
-	private ArrayList<Object> 		   currentHighLights ;
+	private final HighlightPainter 		   	   painter ;
+	private final Color  					   highLightColor ;
+	private ArrayList<Object> 		   		   currentHighLights ;
 		
 	// HighLights for current element
-	private Object					   currentElementHighLight ;
-	private HighlightPainter 		   currentElementPainter ;
+	private Object					   		   currentElementHighLight ;
+	private final HighlightPainter 		   	   currentElementPainter ;
 	
-	private static Color  			   currentElementHighLightColor = Color.GREEN;
-	
-	public TextAreaElementList(JTextComponent tc, String n, Logger l) {
-		init(tc, n, null, l) ;
-	}
+	private static Color currentElementHighLightColor = Color.GREEN;
 	
 	public TextAreaElementList(JTextComponent tc, String n, Color hlc, Logger l) {
-		init(tc, n, hlc, l) ;
-	}
-	
-	private void init(JTextComponent tc, String n, Color hlc, Logger l) {
 		name			   = n ;
 		textComponent 	   = tc ;
 		highLightColor     = hlc ;
@@ -50,10 +43,15 @@ public class TextAreaElementList {
 		if (highLightColor != null) {
 			painter			   = new MultiHighLightPainter(highLightColor) ;
 			currentHighLights  = new ArrayList<Object>() ;
+		} else {
+			painter 		  = null ;
+			currentHighLights = null ;
 		}
 		currentElementHighLight = null ;
 		if (currentElementHighLightColor != null) {
 			currentElementPainter = new MultiHighLightPainter(currentElementHighLightColor) ;
+		} else {
+			currentElementPainter = null ;
 		}
 	}
 
@@ -164,7 +162,4 @@ public class TextAreaElementList {
 		return name;
 	}
 
-	public void setName(String name) {
-		this.name = name;
-	}
 }
