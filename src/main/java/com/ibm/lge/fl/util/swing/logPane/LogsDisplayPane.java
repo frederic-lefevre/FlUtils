@@ -19,7 +19,8 @@ public class LogsDisplayPane  extends JTabbedPane {
 	private Color logTabSelectedColor = Color.GREEN ;
 	private Color logTabRegularColor ;
 
-	private final static int LOG_DISPLAY_NUMBER = 2 ;
+	private final static int LOG_DISPLAY_NUMBER 	= 2 ;
+	private final static int LOG_DISPLAY_MAX_LENGTH = 100000 ;
 	
 	public LogsDisplayPane(int level, Color color, Logger logger) {
 		
@@ -38,7 +39,8 @@ public class LogsDisplayPane  extends JTabbedPane {
 		selectCurrentLogDisplay() ;
 		
 		logTextAreaHandler = new TextAreaLogHandler(currentLogDisplay, new SearchLogDisplayChanger()) ;
-		logTextAreaHandler.setLevel(logger.getLevel());
+		logTextAreaHandler.setLevel(logger.getLevel()) ;
+		logTextAreaHandler.setLogDisplayMaxLength(LOG_DISPLAY_MAX_LENGTH) ;
 		logger.addHandler(logTextAreaHandler);
 	}
 	

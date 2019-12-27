@@ -24,13 +24,16 @@ public class TextAreaLogHandler extends Handler {
 	private final DateTimeFormatter dateTimeFormatter ;
 	private final LogDisplayChanger logDisplayChanger ; 
 	
-	private final static int LOG_DISPLAY_MAX_LENGTH = 10000 ;
+	private int logDisplayMaxLength ;
+	
+	private final static int DEFAULT_LOG_DISPLAY_MAX_LENGTH = 100000 ;
 	
 	public TextAreaLogHandler(LogDisplayComponent ldc, LogDisplayChanger lChanger) {
 		super();
 		logDisplayComponent = ldc;
 		logDisplayChanger   = lChanger ;
 		dateTimeFormatter   = DateTimeFormatter.ofPattern(datePattern) ;
+		logDisplayMaxLength = DEFAULT_LOG_DISPLAY_MAX_LENGTH ;
 	}
 
 	@Override
@@ -43,7 +46,7 @@ public class TextAreaLogHandler extends Handler {
             	int startRecord ; 
             	int textLength = logDisplayComponent.textLength() ;
             	
-            	if (textLength > LOG_DISPLAY_MAX_LENGTH) {
+            	if (textLength > logDisplayMaxLength) {
             		logDisplayComponent = logDisplayChanger.changeLogDisplayComponent() ;
             		textLength = logDisplayComponent.textLength() ;
             	}
@@ -96,5 +99,9 @@ public class TextAreaLogHandler extends Handler {
 
 	@Override
 	public void close() throws SecurityException {
+	}
+
+	public void setLogDisplayMaxLength(int logDisplayMaxLength) {
+		this.logDisplayMaxLength = logDisplayMaxLength;
 	}	
 }
