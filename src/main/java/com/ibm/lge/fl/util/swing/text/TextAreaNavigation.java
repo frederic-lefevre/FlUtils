@@ -45,11 +45,17 @@ public class TextAreaNavigation extends JPanel {
 		JButton next 	 = new JButton("next") ;
 		JButton previous = new JButton("previous") ;
 		String occLbl ;
-		if (displayFirst) {
-			elementList.diplayFirstElement() ;
-			occLbl = "occurence 1 of " + elementList.getNbElements() ;
+		if (elementList.getNbElements() > 0) {
+			if (displayFirst) {
+				elementList.diplayFirstElement() ;
+				occLbl = "occurence 1 of " + elementList.getNbElements() ;
+			} else {
+				occLbl = elementList.getNbElements() + " occurences" ;
+			}
 		} else {
-			occLbl = elementList.getNbElements() + " occurences" ;
+			occLbl = "no occurence" ;
+			next.setEnabled(false) ;
+			previous.setEnabled(false);
 		}
 		JLabel occurences = new JLabel(occLbl) ;
 		previous.setBackground(elementList.getHightLightColor());
