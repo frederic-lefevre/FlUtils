@@ -14,13 +14,14 @@ import com.ibm.lge.fl.util.swing.text.TextAreaElementList;
 
 public class LogRecordAreas {
 
-	private final JTextComponent textComponent ;
-	private final Logger		 lLog ;
+	private final JTextComponent 					 textComponent ;
+	private final Logger		 					 lLog ;
 	private final HashMap<Level,TextAreaElementList> logRecordAreas ;
 	
-	private int lastNonHighLighedLevel ;
-	private Color color ;
-	private ArrayList<LogHighLightListener> highLightListeners ;
+	private final int 								 lastNonHighLighedLevel ;
+	private final Color 							 color ;
+	private final ArrayList<LogHighLightListener> 	 highLightListeners ;
+	
 	private boolean hasHighLight ;
 	
 	public LogRecordAreas(JTextComponent tc,Logger l) {
