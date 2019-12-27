@@ -94,6 +94,7 @@ public class TextAreaElementList {
 	public void diplayFirstElement() {
 		removeCurrentElementHighLight() ;
 		if ((textElements != null) && (textElements.size() > 0)) {
+			currentTextElement = 0 ;
 			TextAreaElement firstElement = textElements.get(0) ;
 			firstElement.goToElement() ;
 			currentElementHighLight = addHighLightToTextElement(firstElement, currentElementPainter) ;
