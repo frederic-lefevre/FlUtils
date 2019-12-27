@@ -17,9 +17,8 @@ public class SearcherHighLighter {
 	
 	public SearcherHighLighter(JTextComponent tc, Logger l) {
 		
-		textComponent = tc ;
-		shLog		  = l ;
-		
+		textComponent 	  = tc ;
+		shLog		  	  = l ;		
 		currentColorIdx   = -1 ;
 	}
 
@@ -32,7 +31,6 @@ public class SearcherHighLighter {
             shLog.log(Level.WARNING, "Exception getting text in searchAndHightlight", e);
         }
         
-       
         if ((txt != null) && (toFind != null)) {
         	
 			String txtToFind, text ;
@@ -65,12 +63,11 @@ public class SearcherHighLighter {
 						
 	        // Search for pattern
 	        int currIdx  =  0 ;
-
 	        while (currIdx > -1) {
 	        	
 	        	if (ignoreFormatting) {
 	        		TextAreaElement result = indexOfIgnoreFormat(text, txtToFind, currIdx) ;
-	        		if (result.getBegin() > -1) {
+	        		if (result != null) {
 		        		currIdx = result.getEnd() ;	        		
 						searchElement.addTextElement(result);
 		        	} else {
@@ -89,8 +86,7 @@ public class SearcherHighLighter {
 	        return searchElement ;
         } else {
         	return null ;
-        }
-        
+        }       
 	}
 	
 	public void setHighLightColors(Color[] highLightColors) {
@@ -104,10 +100,10 @@ public class SearcherHighLighter {
 	
 	private TextAreaElement indexOfIgnoreFormat(String text, String toFind, int from) {
 		
-		TextAreaElement result = new TextAreaElement(textComponent, shLog) ;
+		TextAreaElement result = null ;
 		int currIdx  		= from ;
 		boolean endOfString = ((text == null) || (text.isEmpty()) || (toFind == null) || (toFind.isEmpty())) ;
-		while ((result.getBegin() < 0) && (! endOfString)) {
+		while ((result == null) && (! endOfString)) {
 			
 			if (currIdx < text.length()) {
 				result = compareIgnoreFormat(text, toFind, currIdx) ;
@@ -158,12 +154,11 @@ public class SearcherHighLighter {
 				equal = false ;
 			}
 		}
-		TextAreaElement result = new TextAreaElement(textComponent, shLog) ;
-		if (equal) {
-			result.setBegin(begin);
-			result.setEnd(currTextIdx);
+		if ((equal) && (begin > -1)) {
+			return new TextAreaElement(textComponent, begin, currTextIdx, shLog) ;
+		} else {
+			return null ;
 		}
-		return result ;
 	}
 	
 	private boolean isFormatChar(char c) {		

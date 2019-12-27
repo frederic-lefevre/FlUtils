@@ -11,16 +11,9 @@ public class TextAreaElement {
 
 	private final JTextComponent textComponent ;
 	private final Logger		 lLog ;
-	private int begin ;
-	private int end ;
+	private final int 			 begin ;
+	private final int 			 end ;
 	
-	public TextAreaElement(JTextComponent tc, Logger l) {
-		begin 		  = -1 ;
-		end   		  = -1 ;
-		textComponent = tc ;
-		lLog		  = l ;
-	}
-
 	public TextAreaElement(JTextComponent tc, int b, int e, Logger l) {
 		begin 		  = b ;
 		end   		  = e ;
@@ -34,20 +27,8 @@ public class TextAreaElement {
 	public int getBegin() { return begin; }
 	public int getEnd()   {	return end;   }
 
-	public void setBegin(int begin) { this.begin = begin; }
-	public void setEnd  (int end)   { this.end   = end;   }
-	
 	public JTextComponent getTextComponent() { return textComponent; }
 
-	public void moveArea(int move) {
-		
-		begin = begin + move ;
-		end   = end   + move ;		
-		if (begin < 0) {
-			lLog.severe("TextAreaElement moved to a negative position");
-		}
-	}
-	
 	public void goToElement() {
 		if ((begin > -1) && (end > -1)) {
 			try {
