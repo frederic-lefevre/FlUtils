@@ -6,18 +6,13 @@ import java.util.logging.Logger;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
-import javax.swing.JTextArea;
-
-import com.ibm.lge.fl.util.swing.text.SearchableTextPane;
 
 public class LogsDisplayPane  extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 
-	private final TextAreaLogHandler logTextAreaHandler ;
-	private final JTextArea 		 logArea ;
-	private final SearchableTextPane searchableTextArea ;
-	private final LogRecordCategoriesPane logRecordCategoriesPane ;
+	private final SearchableLogDisplay searchableLogDisplay ;	
+	private final TextAreaLogHandler   logTextAreaHandler ;
 	
 	public LogsDisplayPane(int level, Color color, Logger logger) {
 		
@@ -25,35 +20,23 @@ public class LogsDisplayPane  extends JPanel {
 		setLayout(new BoxLayout(this,  BoxLayout.X_AXIS)) ;
 		setBorder(BorderFactory.createLineBorder(Color.BLACK,5,true)) ;
 		
-		logArea = new JTextArea(50, 120) ;
-		logArea.setEditable(false);
-		logArea.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
+		searchableLogDisplay = new SearchableLogDisplay(level, color, logger) ;
+		add(searchableLogDisplay.getPanel()) ;
 		
-		searchableTextArea = new SearchableTextPane(logArea, logger) ;
-		add(searchableTextArea) ;
-		
-		logTextAreaHandler = new TextAreaLogHandler(logArea, level, color, logger) ;
+		logTextAreaHandler = new TextAreaLogHandler(searchableLogDisplay) ;
 		logTextAreaHandler.setLevel(logger.getLevel());
 		logger.addHandler(logTextAreaHandler);
-			
-		logRecordCategoriesPane = new LogRecordCategoriesPane(logTextAreaHandler.getLogRecordAreas()) ;
-		searchableTextArea.getCommandPanel().add(logRecordCategoriesPane) ;
-	}
-	
-	public void setRowsCols(int rows, int cols) {
-		logArea.setColumns(cols) ;
-		logArea.setRows(rows) ;
 	}
 	
 	public boolean hasHighlight() {
-		return logTextAreaHandler.hasHighlight() ;
+		return searchableLogDisplay.hasHighlight() ;
 	}
 	
 	public void addHighLightListener(LogHighLightListener highLightListener) {
-		logTextAreaHandler.addHighLightListener(highLightListener) ;
+		searchableLogDisplay.addHighLightListener(highLightListener) ;
 	}
 	
 	public void refreshLogRecordCategories() {
-		logRecordCategoriesPane.displayPane();
+		searchableLogDisplay.refreshLogRecordCategories();
 	}
 }

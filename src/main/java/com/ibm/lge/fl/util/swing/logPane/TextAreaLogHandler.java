@@ -1,19 +1,15 @@
 package com.ibm.lge.fl.util.swing.logPane;
 
-import java.awt.Color;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.logging.Handler;
 import java.util.logging.LogRecord;
-import java.util.logging.Logger;
 
-import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 
 import com.ibm.lge.fl.util.ExceptionLogging;
-import com.ibm.lge.fl.util.swing.text.TextAreaElement;
 
 public class TextAreaLogHandler extends Handler {
 
@@ -24,23 +20,13 @@ public class TextAreaLogHandler extends Handler {
 	
 	private static int MAX_PRINTED_CAUSE_LEVEL = 20 ;
 	
-	private final JTextArea 		textArea ;
-	private final DateTimeFormatter dateTimeFormatter ;
-	private final Logger			tLog ;
-	 
-	private LogRecordAreas 			logRecordAreas ;
+	private final LogDisplayComponent logDisplayComponent ;
+	private final DateTimeFormatter   dateTimeFormatter ;
 	
-	public TextAreaLogHandler(JTextArea ta, int lastNonHighLighedLevel, Color color, Logger l) {
+	public TextAreaLogHandler(LogDisplayComponent ldc) {
 		super();
-		textArea 		  = ta;
-		tLog			  = l ;
-		dateTimeFormatter = DateTimeFormatter.ofPattern(datePattern) ;
-
-		logRecordAreas			= new LogRecordAreas(textArea, lastNonHighLighedLevel, color, tLog) ;
-	}
-	
-	public LogRecordAreas getLogRecordAreas() {
-		return logRecordAreas;
+		logDisplayComponent = ldc;
+		dateTimeFormatter   = DateTimeFormatter.ofPattern(datePattern) ;
 	}
 
 	@Override
@@ -51,46 +37,46 @@ public class TextAreaLogHandler extends Handler {
             public void run() {
             	
             	int startRecord ; 
-            	int textLength = textArea.getText().length() ;
+            	int textLength = logDisplayComponent.textLength() ;
         		if (textLength > 0) {
         			startRecord = textLength - 1 ;
         		} else {
         			startRecord = 0 ;
         		}
             	
-            	textArea.append(dateTimeFormatter.format(LocalDateTime.ofInstant(Instant.ofEpochMilli(record.getMillis()), ZoneId.systemDefault()))) ;
-            	textArea.append(Long.toString(record.getSequenceNumber())) ;
-            	textArea.append(BLANK) ;
-            	textArea.append(record.getLoggerName()) ;
-            	textArea.append(BLANK) ;
+        		logDisplayComponent.appendToText(dateTimeFormatter.format(LocalDateTime.ofInstant(Instant.ofEpochMilli(record.getMillis()), ZoneId.systemDefault()))) ;
+        		logDisplayComponent.appendToText(Long.toString(record.getSequenceNumber())) ;
+        		logDisplayComponent.appendToText(BLANK) ;
+        		logDisplayComponent.appendToText(record.getLoggerName()) ;
+        		logDisplayComponent.appendToText(BLANK) ;
         		String srcClassName = record.getSourceClassName() ;
         		if (srcClassName != null) {
-        			textArea.append(record.getSourceClassName()) ;
-        			textArea.append(BLANK) ;
+        			logDisplayComponent.appendToText(record.getSourceClassName()) ;
+        			logDisplayComponent.appendToText(BLANK) ;
         		}
         		String methodName = record.getSourceMethodName() ;
         		if (methodName != null) {
-        			textArea.append(record.getSourceMethodName()) ;
+        			logDisplayComponent.appendToText(record.getSourceMethodName()) ;
         		}
-        		textArea.append(NEWLINE) ;
-        		textArea.append(record.getLevel().getName()) ;
-        		textArea.append(SEPARATOR) ;
-        		textArea.append(record.getMessage()) ;
-        		textArea.append(NEWLINE) ;
+        		logDisplayComponent.appendToText(NEWLINE) ;
+        		logDisplayComponent.appendToText(record.getLevel().getName()) ;
+        		logDisplayComponent.appendToText(SEPARATOR) ;
+        		logDisplayComponent.appendToText(record.getMessage()) ;
+        		logDisplayComponent.appendToText(NEWLINE) ;
         		
         		Throwable thrown = record.getThrown() ;
         		if (thrown != null) {
         			String thrownMsg = thrown.toString() ;
         			if ((thrownMsg != null) && (! thrownMsg.isEmpty())) {
-        				textArea.append(ExceptionLogging.printExceptionInfos(thrown, MAX_PRINTED_CAUSE_LEVEL)) ;
-        				textArea.append(NEWLINE) ;
+        				logDisplayComponent.appendToText(ExceptionLogging.printExceptionInfos(thrown, MAX_PRINTED_CAUSE_LEVEL)) ;
+        				logDisplayComponent.appendToText(NEWLINE) ;
         			}
         		}
-        		textArea.append(NEWLINE) ;
+        		logDisplayComponent.appendToText(NEWLINE) ;
         		
-        		int endRecord = textArea.getText().length() - 1 ;
-        		logRecordAreas.addLogRecordArea(new TextAreaElement(textArea, startRecord, endRecord, tLog), record.getLevel()) ;
-            }
+        		int endRecord = logDisplayComponent.textLength() - 1 ;
+        		logDisplayComponent.addLogRecord(record.getLevel(), startRecord, endRecord);
+        	}
 		}) ;
 	}
 
@@ -100,14 +86,5 @@ public class TextAreaLogHandler extends Handler {
 
 	@Override
 	public void close() throws SecurityException {
-	}
-	
-	public boolean hasHighlight() {
-		return logRecordAreas.hasHighlight() ;
-	}
-	
-	public void addHighLightListener(LogHighLightListener highLightListener) {
-		logRecordAreas.addHighLightListener(highLightListener);
-	}
-
+	}	
 }
