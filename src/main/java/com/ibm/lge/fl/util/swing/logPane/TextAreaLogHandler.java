@@ -20,12 +20,16 @@ public class TextAreaLogHandler extends Handler {
 	
 	private static int MAX_PRINTED_CAUSE_LEVEL = 20 ;
 	
-	private final LogDisplayComponent logDisplayComponent ;
-	private final DateTimeFormatter   dateTimeFormatter ;
+	private LogDisplayComponent 	logDisplayComponent ;
+	private final DateTimeFormatter dateTimeFormatter ;
+	private final LogDisplayChanger logDisplayChanger ; 
 	
-	public TextAreaLogHandler(LogDisplayComponent ldc) {
+	private final static int LOG_DISPLAY_MAX_LENGTH = 10000 ;
+	
+	public TextAreaLogHandler(LogDisplayComponent ldc, LogDisplayChanger lChanger) {
 		super();
 		logDisplayComponent = ldc;
+		logDisplayChanger   = lChanger ;
 		dateTimeFormatter   = DateTimeFormatter.ofPattern(datePattern) ;
 	}
 
@@ -38,6 +42,12 @@ public class TextAreaLogHandler extends Handler {
             	
             	int startRecord ; 
             	int textLength = logDisplayComponent.textLength() ;
+            	
+            	if (textLength > LOG_DISPLAY_MAX_LENGTH) {
+            		logDisplayComponent = logDisplayChanger.changeLogDisplayComponent() ;
+            		textLength = logDisplayComponent.textLength() ;
+            	}
+            	
         		if (textLength > 0) {
         			startRecord = textLength - 1 ;
         		} else {
