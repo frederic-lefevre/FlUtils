@@ -13,14 +13,15 @@ public class LogsDisplayPane  extends JTabbedPane {
 	private final ArrayList<SearchableLogDisplay> searchableLogDisplays ;
 	private final TextAreaLogHandler   logTextAreaHandler ;
 	
+	private int oldLogLastNum ;
 	private int currentLogDisplayIndex ;
 	private SearchableLogDisplay currentLogDisplay ;
 	
 	private Color logTabSelectedColor = Color.GREEN ;
 	private Color logTabRegularColor ;
 
-	private final static int LOG_DISPLAY_NUMBER 	= 2 ;
-	private final static int LOG_DISPLAY_MAX_LENGTH = 100000 ;
+	private final static int LOG_DISPLAY_NUMBER 	= 5 ;
+	private final static int LOG_DISPLAY_MAX_LENGTH = 1000 ;
 	
 	public LogsDisplayPane(int level, Color color, Logger logger) {
 		
@@ -32,6 +33,7 @@ public class LogsDisplayPane  extends JTabbedPane {
 			searchableLogDisplays.add(logDisplay) ;
 			add(logDisplay.getPanel()) ;
 		}
+		oldLogLastNum = 1 ;
 		currentLogDisplayIndex = 0 ;
 		currentLogDisplay = searchableLogDisplays.get(currentLogDisplayIndex) ;
 
@@ -62,6 +64,7 @@ public class LogsDisplayPane  extends JTabbedPane {
 		setSelectedIndex(currentLogDisplayIndex) ;
 		int logTabIdx = indexOfComponent(currentLogDisplay.getPanel()) ;
 		setBackgroundAt(logTabIdx,logTabSelectedColor) ;
+		setTitleAt(logTabIdx, "current") ;
 	}
 	
 	private class SearchLogDisplayChanger implements LogDisplayChanger {
@@ -70,6 +73,8 @@ public class LogsDisplayPane  extends JTabbedPane {
 		public LogDisplayComponent changeLogDisplayComponent() {
 			int logTabIdx = indexOfComponent(currentLogDisplay.getPanel()) ;
 			setBackgroundAt(logTabIdx,logTabRegularColor) ;
+			setTitleAt(logTabIdx, Integer.toString(oldLogLastNum)) ;
+			oldLogLastNum++ ;
 			currentLogDisplayIndex = (currentLogDisplayIndex + 1) % LOG_DISPLAY_NUMBER ;
 			currentLogDisplay = searchableLogDisplays.get(currentLogDisplayIndex) ;
 			currentLogDisplay.clear();
