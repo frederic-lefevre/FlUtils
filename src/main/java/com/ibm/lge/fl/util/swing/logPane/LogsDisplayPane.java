@@ -20,8 +20,8 @@ public class LogsDisplayPane  extends JTabbedPane {
 	private Color logTabSelectedColor = Color.GREEN ;
 	private Color logTabRegularColor ;
 
-	private final static int LOG_DISPLAY_NUMBER 	= 5 ;
-	private final static int LOG_DISPLAY_MAX_LENGTH = 1000 ;
+	private final static int LOG_DISPLAY_NUMBER 	= 3 ;
+	private final static int LOG_DISPLAY_MAX_LENGTH = 100000 ;
 	
 	public LogsDisplayPane(int level, Color color, Logger logger) {
 		
