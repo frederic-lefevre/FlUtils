@@ -39,10 +39,6 @@ public class TextAreaLogHandler extends Handler {
 		logRecordAreas			= new LogRecordAreas(textArea, lastNonHighLighedLevel, color, tLog) ;
 	}
 	
-	public JTextArea getTextArea() {
-		return textArea;
-	}
-
 	public LogRecordAreas getLogRecordAreas() {
 		return logRecordAreas;
 	}
