@@ -124,14 +124,23 @@ public class SearchableTextPane extends JPanel  {
 
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
-			searchText.setText("") ;
-			for (TextAreaElementList searcheElement : currentSearches) {
-				searcheElement.removeHighLights() ;
-			}
-			currentSearches   = new ArrayList<TextAreaElementList>() ;	
-			searchResultPanel.removeAll() ;
+			clearSearches() ;
 			validate();
 			repaint();
 		}
+	}
+
+	private void clearSearches() {
+		searchText.setText("") ;
+		for (TextAreaElementList searcheElement : currentSearches) {
+			searcheElement.removeHighLights() ;
+		}
+		currentSearches   = new ArrayList<TextAreaElementList>() ;	
+		searchResultPanel.removeAll() ;
+	}
+	
+	public void clear() {
+		textArea.setText("");
+		clearSearches() ;
 	}
 }

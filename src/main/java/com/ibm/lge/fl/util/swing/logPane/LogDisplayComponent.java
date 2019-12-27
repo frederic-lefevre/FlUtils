@@ -17,4 +17,7 @@ public interface LogDisplayComponent {
 	
 	// Get the underlying JTextComponent that contain the log text
 	public JTextComponent getTextComponent() ;
+	
+	// Clear the component (clear text, log records...)
+	public void clear() ;
 }

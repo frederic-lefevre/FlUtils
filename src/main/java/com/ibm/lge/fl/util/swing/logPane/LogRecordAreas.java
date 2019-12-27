@@ -16,7 +16,7 @@ public class LogRecordAreas {
 
 	private final JTextComponent 					 textComponent ;
 	private final Logger		 					 lLog ;
-	private final HashMap<Level,TextAreaElementList> logRecordAreas ;
+	private HashMap<Level,TextAreaElementList> 		 logRecordAreas ;
 	
 	private final int 								 lastNonHighLighedLevel ;
 	private final Color 							 color ;
@@ -91,5 +91,10 @@ public class LogRecordAreas {
 			highLightListener.logsHightLighted(false) ;
 		}
 		hasHighLight = false ;
+	}
+
+	public void clear() {
+		removeHighLight() ;
+		logRecordAreas 	= new HashMap<Level,TextAreaElementList>() ;		
 	}
 }

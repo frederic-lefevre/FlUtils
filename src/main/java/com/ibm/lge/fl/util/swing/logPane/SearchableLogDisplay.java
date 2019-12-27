@@ -16,10 +16,9 @@ public class SearchableLogDisplay implements LogDisplayComponent  {
 
 	private final JTextArea 		 	  logArea ;
 	private final SearchableTextPane 	  searchableTextArea ;
-	private final LogRecordCategoriesPane logRecordCategoriesPane ;
-	private final Logger sLog ;
-	
-	private LogRecordAreas 			logRecordAreas ;
+	private final LogRecordCategoriesPane logRecordCategoriesPane ;	
+	private final LogRecordAreas 		  logRecordAreas ;
+	private final Logger 				  sLog ;
 	
 	public SearchableLogDisplay(int lastNonHighLighedLevel, Color color, Logger l) {
 		
@@ -52,6 +51,14 @@ public class SearchableLogDisplay implements LogDisplayComponent  {
 	@Override
 	public JTextComponent getTextComponent() {
 		return logArea;
+	}
+	
+	@Override
+	public void clear() {
+		logArea.setText("") ;
+		logRecordAreas.clear() ;
+		logRecordCategoriesPane.clear() ;
+		searchableTextArea.clear() ;
 	}
 	
 	public boolean hasHighlight() {

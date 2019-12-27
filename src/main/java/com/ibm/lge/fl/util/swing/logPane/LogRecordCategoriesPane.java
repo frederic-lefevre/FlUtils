@@ -38,7 +38,7 @@ public class LogRecordCategoriesPane extends JPanel  {
 		add(resultPane) ;
 		
 		showCategories.addActionListener(new refreshListener());
-		resetHighLight.addActionListener(new resetListener());
+		resetHighLight.addActionListener(new resetHighLightListener());
 	}
 
 	public void displayPane() {		
@@ -51,6 +51,10 @@ public class LogRecordCategoriesPane extends JPanel  {
 		requestFocus();
 	}
 	
+	public void clear() {
+		resultPane.removeAll() ;
+	}
+	
 	private class refreshListener implements ActionListener {
 
 		@Override
@@ -59,12 +63,11 @@ public class LogRecordCategoriesPane extends JPanel  {
 		}		
 	}
 	
-	private class resetListener implements ActionListener {
+	private class resetHighLightListener implements ActionListener {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			logRecordAreas.removeHighLight() ;			
-		}
-		
+		}		
 	}
 }

@@ -71,6 +71,12 @@ public class TextAreaNavigation extends JPanel {
 		add(occurences, c) ;
 	}
 	
+	@Override
+	public void removeAll() {
+		super.removeAll();
+		textAreaElementLists = new ArrayList<TextAreaElementList>() ;
+	}
+	
 	private class OcccurenceButtonListener implements ActionListener {
 
 		private TextAreaElementList elementList ;
