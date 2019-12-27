@@ -2,7 +2,6 @@ package com.ibm.lge.fl.util.swing.text;
 
 import java.awt.Color;
 import java.text.Normalizer;
-import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -16,15 +15,12 @@ public class SearcherHighLighter {
 	private Color[] highLightColors = {Color.CYAN, Color.LIGHT_GRAY, Color.YELLOW, Color.MAGENTA} ;
 	private int currentColorIdx ;
 	
-	private ArrayList<TextAreaElementList> currentSearches ;
-		
 	public SearcherHighLighter(JTextComponent tc, Logger l) {
 		
 		textComponent = tc ;
 		shLog		  = l ;
 		
 		currentColorIdx   = -1 ;
-		currentSearches   = new ArrayList<TextAreaElementList>() ;
 	}
 
 	public TextAreaElementList searchAndHighlight(String toFind, boolean caseSensitive, boolean ignoreAccent, boolean ignoreFormatting) {
@@ -66,7 +62,6 @@ public class SearcherHighLighter {
 			}
 			
 			TextAreaElementList searchElement = new TextAreaElementList(textComponent, toFind, hiColor, shLog) ;
-			currentSearches.add(searchElement) ;
 						
 	        // Search for pattern
 	        int currIdx  =  0 ;
@@ -96,17 +91,6 @@ public class SearcherHighLighter {
         	return null ;
         }
         
-	}
-	
-	public void searchAndHighlight(String toFind, boolean caseSensitive) {	
-		searchAndHighlight(toFind, caseSensitive, false, false) ;   
-	}
-
-	public void removeHighlights() {
-		for (TextAreaElementList searcheElement : currentSearches) {
-			searcheElement.removeHighLights() ;
-		}
-		currentSearches   = new ArrayList<TextAreaElementList>() ;		
 	}
 	
 	public void setHighLightColors(Color[] highLightColors) {
@@ -194,7 +178,4 @@ public class SearcherHighLighter {
 		}
 	}
 
-	public ArrayList<TextAreaElementList> getCurrentSearches() {
-		return currentSearches;
-	}
 }

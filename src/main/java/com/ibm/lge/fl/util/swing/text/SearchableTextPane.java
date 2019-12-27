@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
@@ -33,7 +34,11 @@ public class SearchableTextPane extends JPanel  {
 	
 	private final SearcherHighLighter searcherHighLighter ;
 	
+	private ArrayList<TextAreaElementList> currentSearches ;
+	
 	public SearchableTextPane(JTextArea ta, Logger logger) {
+		
+		currentSearches   = new ArrayList<TextAreaElementList>() ;
 		
 		setLayout(new BoxLayout(this,  BoxLayout.X_AXIS)) ;
 		
@@ -104,6 +109,7 @@ public class SearchableTextPane extends JPanel  {
 				boolean askIgnoreFormatting = ignoreFormatting.isSelected() ;
 				TextAreaElementList latestSearch = searcherHighLighter.searchAndHighlight(searchStr, askCaseSensitive, askIgnoreAccent, askIgnoreFormatting);
 				if (latestSearch != null) {
+					currentSearches.add(latestSearch) ;
 					searchResultPanel.addNavigation(latestSearch, true);
 					
 					validate();
@@ -119,7 +125,10 @@ public class SearchableTextPane extends JPanel  {
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
 			searchText.setText("") ;
-			searcherHighLighter.removeHighlights() ;
+			for (TextAreaElementList searcheElement : currentSearches) {
+				searcheElement.removeHighLights() ;
+			}
+			currentSearches   = new ArrayList<TextAreaElementList>() ;	
 			searchResultPanel.removeAll() ;
 			validate();
 			repaint();
