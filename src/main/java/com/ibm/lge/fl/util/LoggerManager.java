@@ -21,65 +21,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-/**
- * @author Frédéric Lefèvre
- * 
- */
-
-/* Property logfile sample
- * 
-#==================================================
-#   L O G G I N G
-# Logging file (for errors, info ...)
-# if logging.logfile.name is removed there will be no file logging
-logging.directory.name=/usr/aps/log/
-logging.directory.relative.name=log/
-logging.logfile.name=app%g.log
-
-# Maximum length in bytes of a log files
-logging.logfile.length=80000000
-
-# Maximum number of log files
-logging.logfile.number=3
-
-#----------------------------------------------------------------------
-# in Memory logging
-logging.BufferLogHandler.bufferLength=50
-
-#----------------------------------------------------------------------
-# Logging levels (as defined in JDK 1.4.1 java.util.Logging.Level class
-# SEVERE, WARNING, INFO, CONFIG, FINE, FINER, FINEST)
-
-# application logging on console, in file, in memory (a custom handler will take same level as file)
-logging.file.level=INFO
-logging.console.level=FINE
-logging.BufferLogHandler.level=FINEST
-
-#----------------------------------------------------------------------
-# Character encoding, for instance UTF-8, ISO-8859-1, UTF-16, US-ASCII ...etc
-# (a custom handler will take same encoding as file)
-logging.file.encode=UTF-8
-logging.console.encode=UTF-8
-
-# root logger : other jar/application logging on console and in file
-# (optional properties)
-# If a "level" is uncommented, the corresponding logging will take place 
-logging.root.console.level=INFO
-logging.root.file.level=INFO
-logging.rootLogfile.name=rootApp%g.log
-
-#-----------------------------------------------------------------------
-# Optional properties : 
-#   replace SimpleFormatter by JSON formatter or PlainLogFormatter
-
-#logging.formatter=com.ibm.lge.fl.util.JsonLogFormatter
-#logging.formatter=com.ibm.lge.fl.util.PlainLogFormatter
-
-# Specific format of log record for SimpleFormatter (below: logging time in milliseconds)
-logging.simpleLogFormatter.format=%1$tY-%1$tm-%1$td %1$tH:%1$tM:%1$tS.%1$tL %3$S %2$s%n%4$s: %5$s%6$s%n
-#==================================================
- */
-
 public class LoggerManager {
 
     private final static String defaultLogFileDir 	 = "log" ;
@@ -343,14 +284,9 @@ public class LoggerManager {
     
     private class logFilter implements FileFilter {
 
-        /** (non-Javadoc)
-         * @see java.io.FileFilter#accept(java.io.File)
-         */
-        public boolean accept(File pathname) {
-            
+        public boolean accept(File pathname) {          
             return (! pathname.getName().endsWith("lck"));
-        }
-        
+        }        
     }
     
 	// Get a JsonObject representing the levels of a logger (and all levels of its Handlers) 	
