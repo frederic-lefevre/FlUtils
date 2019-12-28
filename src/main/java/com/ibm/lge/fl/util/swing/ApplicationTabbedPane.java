@@ -7,6 +7,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import com.ibm.lge.fl.util.AdvancedProperties;
 import com.ibm.lge.fl.util.RunningContext;
 import com.ibm.lge.fl.util.swing.logPane.LogHighLightListener;
 import com.ibm.lge.fl.util.swing.logPane.LogsDisplayPane;
@@ -24,12 +25,15 @@ public class ApplicationTabbedPane extends JTabbedPane {
 	public ApplicationTabbedPane(RunningContext runningContext) {
 		super() ;
 		
+		AdvancedProperties props = runningContext.getProps();
+		int lastNonHighLightedLevel = props.getLevel("appTabbedPane.logging.lastNonHighLighedLevel", Level.INFO).intValue() ;
+		
 		// Tabbed Panel for application information
 		appInfoPane = new ApplicationInfoPane(runningContext) ;
 		addTab("Informations", appInfoPane) ;
 		
 		// Tabbed Panel for logs display
-		logsDisplayPane =  new LogsDisplayPane(Level.INFO.intValue(), Color.PINK, runningContext.getpLog()) ;
+		logsDisplayPane =  new LogsDisplayPane(props, lastNonHighLightedLevel, Color.PINK, runningContext.getpLog()) ;
 		addTab("Logs display", logsDisplayPane) ;
 		int logTabIdx = indexOfComponent(logsDisplayPane) ;
 		if (logTabIdx > -1) {

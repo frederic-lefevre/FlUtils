@@ -6,6 +6,8 @@ import java.util.logging.Logger;
 
 import javax.swing.JTabbedPane;
 
+import com.ibm.lge.fl.util.AdvancedProperties;
+
 public class LogsDisplayPane  extends JTabbedPane {
 
 	private static final long serialVersionUID = 1L;
@@ -22,15 +24,17 @@ public class LogsDisplayPane  extends JTabbedPane {
 	private Color logTabSelectedColor = Color.GREEN ;
 	private Color logTabRegularColor ;
 
-	private final static int LOG_DISPLAY_NUMBER 	= 3 ;
-	private final static int LOG_DISPLAY_MAX_LENGTH = 100000 ;
+	private final int logDisplaySubTabNumber ;
+	private final int logDisplayMaxLength ;
 	
-	public LogsDisplayPane(int level, Color color, Logger logger) {
+	public LogsDisplayPane(AdvancedProperties props, int level, Color color, Logger logger) {
 		
 		super();
 		
+		logDisplaySubTabNumber = props.getInt("appTabbedPane.logging.subTabNumber", 3) ;
+		logDisplayMaxLength	   = props.getInt("appTabbedPane.logging.logDisplayMaxLength", 100000) ;
 		searchableLogDisplays = new ArrayList<SearchableLogDisplay>() ;
-		for (int i=0; i < LOG_DISPLAY_NUMBER; i++) {
+		for (int i=0; i < logDisplaySubTabNumber; i++) {
 			SearchableLogDisplay logDisplay = new SearchableLogDisplay(level, DEFAULT_HIGHLIGHTCOLORS, color, logger) ;
 			searchableLogDisplays.add(logDisplay) ;
 			add(logDisplay.getPanel()) ;
@@ -44,7 +48,7 @@ public class LogsDisplayPane  extends JTabbedPane {
 		
 		logTextAreaHandler = new TextAreaLogHandler(currentLogDisplay, new SearchLogDisplayChanger()) ;
 		logTextAreaHandler.setLevel(logger.getLevel()) ;
-		logTextAreaHandler.setLogDisplayMaxLength(LOG_DISPLAY_MAX_LENGTH) ;
+		logTextAreaHandler.setLogDisplayMaxLength(logDisplayMaxLength) ;
 		logger.addHandler(logTextAreaHandler);
 	}
 	
@@ -77,7 +81,7 @@ public class LogsDisplayPane  extends JTabbedPane {
 			setBackgroundAt(logTabIdx,logTabRegularColor) ;
 			setTitleAt(logTabIdx, Integer.toString(oldLogLastNum)) ;
 			oldLogLastNum++ ;
-			currentLogDisplayIndex = (currentLogDisplayIndex + 1) % LOG_DISPLAY_NUMBER ;
+			currentLogDisplayIndex = (currentLogDisplayIndex + 1) % logDisplaySubTabNumber ;
 			currentLogDisplay = searchableLogDisplays.get(currentLogDisplayIndex) ;
 			currentLogDisplay.clear();
 			selectCurrentLogDisplay() ;
