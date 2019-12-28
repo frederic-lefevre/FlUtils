@@ -11,15 +11,22 @@ public class SearcherHighLighter {
 
 	private final JTextComponent textComponent ;
 	private final Logger 		 shLog ;
+	private final Color[] highLightColors ;
 	
-	private Color[] highLightColors = {Color.CYAN, Color.LIGHT_GRAY, Color.YELLOW, Color.MAGENTA} ;
 	private int currentColorIdx ;
 	
-	public SearcherHighLighter(JTextComponent tc, Logger l) {
+	private final static Color[] DEFAULT_HIGHLIGHTCOLORS = {Color.CYAN, Color.LIGHT_GRAY, Color.YELLOW, Color.MAGENTA} ;
+		
+	public SearcherHighLighter(JTextComponent tc, Color[] hlc, Logger l) {
 		
 		textComponent 	  = tc ;
 		shLog		  	  = l ;		
-		currentColorIdx   = -1 ;
+		currentColorIdx   = -1 ;	
+		if ((hlc == null) || (hlc.length == 0)) {
+			highLightColors = DEFAULT_HIGHLIGHTCOLORS ;
+		} else {
+			highLightColors = hlc ;
+		}
 	}
 
 	public TextAreaElementList searchAndHighlight(String toFind, boolean caseSensitive, boolean ignoreAccent, boolean ignoreFormatting) {
@@ -49,9 +56,7 @@ public class SearcherHighLighter {
 			
 			// Set highlight color
 			Color hiColor ;
-			if ((highLightColors == null) || (highLightColors.length == 0)) {
-				hiColor = Color.LIGHT_GRAY ;
-			} else if (highLightColors.length > 1) {
+			if (highLightColors.length > 1) {
 				currentColorIdx = (++currentColorIdx)% highLightColors.length ;
 				hiColor = highLightColors[currentColorIdx] ;
 			} else {
@@ -89,10 +94,6 @@ public class SearcherHighLighter {
         }       
 	}
 	
-	public void setHighLightColors(Color[] highLightColors) {
-		this.highLightColors = highLightColors;
-	}
-
 	private String ignoreAccents(String in) {
 		String out = Normalizer.normalize(in, Normalizer.Form.NFD);
 		return out.replaceAll("\\p{M}", ""); 

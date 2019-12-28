@@ -17,6 +17,8 @@ public class LogsDisplayPane  extends JTabbedPane {
 	private int currentLogDisplayIndex ;
 	private SearchableLogDisplay currentLogDisplay ;
 	
+	private final static Color[] DEFAULT_HIGHLIGHTCOLORS = {Color.CYAN, Color.LIGHT_GRAY, Color.YELLOW, Color.MAGENTA} ;
+	
 	private Color logTabSelectedColor = Color.GREEN ;
 	private Color logTabRegularColor ;
 
@@ -29,7 +31,7 @@ public class LogsDisplayPane  extends JTabbedPane {
 		
 		searchableLogDisplays = new ArrayList<SearchableLogDisplay>() ;
 		for (int i=0; i < LOG_DISPLAY_NUMBER; i++) {
-			SearchableLogDisplay logDisplay = new SearchableLogDisplay(level, color, logger) ;
+			SearchableLogDisplay logDisplay = new SearchableLogDisplay(level, DEFAULT_HIGHLIGHTCOLORS, color, logger) ;
 			searchableLogDisplays.add(logDisplay) ;
 			add(logDisplay.getPanel()) ;
 		}

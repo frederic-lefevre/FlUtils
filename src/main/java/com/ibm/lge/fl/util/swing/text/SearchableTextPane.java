@@ -36,7 +36,7 @@ public class SearchableTextPane extends JPanel  {
 	
 	private ArrayList<TextAreaElementList> currentSearches ;
 	
-	public SearchableTextPane(JTextArea ta, Logger logger) {
+	public SearchableTextPane(JTextArea ta, Color[] highLightColors, Logger logger) {
 		
 		currentSearches   = new ArrayList<TextAreaElementList>() ;
 		
@@ -90,7 +90,7 @@ public class SearchableTextPane extends JPanel  {
 		searchButton.addActionListener(new searchListener()) ;
 		resetHighLightButton.addActionListener(new resetHighLightListener()) ;
 		
-		searcherHighLighter = new SearcherHighLighter(textArea, logger) ;
+		searcherHighLighter = new SearcherHighLighter(textArea, highLightColors, logger) ;
 	}
 
 	public JPanel getCommandPanel() {

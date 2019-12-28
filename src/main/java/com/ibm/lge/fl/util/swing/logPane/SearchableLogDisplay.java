@@ -20,15 +20,15 @@ public class SearchableLogDisplay implements LogDisplayComponent  {
 	private final LogRecordAreas 		  logRecordAreas ;
 	private final Logger 				  sLog ;
 	
-	public SearchableLogDisplay(int lastNonHighLighedLevel, Color color, Logger l) {
+	public SearchableLogDisplay(int lastNonHighLighedLevel, Color[] colorsForSearchResults, Color colorForHighLevel, Logger l) {
 		
 		sLog = l ;
 		logArea = new JTextArea(50, 120) ;
 		logArea.setEditable(false);
 		logArea.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
 
-		searchableTextArea 		= new SearchableTextPane(logArea, sLog) ;		
-		logRecordAreas	   		= new LogRecordAreas(logArea, lastNonHighLighedLevel, color, sLog) ;		
+		searchableTextArea 		= new SearchableTextPane(logArea, colorsForSearchResults, sLog) ;		
+		logRecordAreas	   		= new LogRecordAreas(logArea, lastNonHighLighedLevel, colorForHighLevel, sLog) ;		
 		logRecordCategoriesPane = new LogRecordCategoriesPane(logRecordAreas) ;
 		searchableTextArea.getCommandPanel().add(logRecordCategoriesPane) ;	
 	}
