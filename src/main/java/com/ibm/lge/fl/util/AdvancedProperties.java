@@ -1,5 +1,6 @@
 package com.ibm.lge.fl.util;
 
+import java.awt.Color;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -20,6 +21,8 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import com.ibm.lge.fl.util.swing.ColorHelpers;
 
 public class AdvancedProperties extends Properties {
 
@@ -423,6 +426,22 @@ public class AdvancedProperties extends Properties {
                 return defaultLevel;
             }
         }
+    }
+    
+    // The property value must be a valid color : either a String defined as a Color field (i.e BLUE, blue, red ...etc)
+    // or a string "integer" representing a RGB value (i.e "123" or "#F0F0F0") 
+    public Color getColor(String key, Color defaultColor) {
+    	String colorAsString = getProperty(key) ;
+    	if ((colorAsString == null) || (colorAsString.isEmpty())) {
+    		return defaultColor ;
+    	} else {
+    		Color color = ColorHelpers.parse(colorAsString) ;
+    		if (color == null) {
+    			System.err.println("Invalid color (" + colorAsString + ") at key " + key) ;
+    			color = defaultColor ;
+    		}
+    		return color ;
+    	}    	
     }
     
 	public ArrayList<String> getArrayOfFileContent(String key, String separator) {

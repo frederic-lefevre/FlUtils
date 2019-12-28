@@ -19,7 +19,7 @@ public class ApplicationTabbedPane extends JTabbedPane {
 	private ApplicationInfoPane appInfoPane ;
 	private LogsDisplayPane		logsDisplayPane ;
 	
-	private Color logTabHighLightColor = Color.RED ;
+	private Color logTabHighLightColor ;
 	private Color logTabRegularColor ;
 	
 	public ApplicationTabbedPane(RunningContext runningContext) {
@@ -28,12 +28,16 @@ public class ApplicationTabbedPane extends JTabbedPane {
 		AdvancedProperties props = runningContext.getProps();
 		int lastNonHighLightedLevel = props.getLevel("appTabbedPane.logging.lastNonHighLighedLevel", Level.INFO).intValue() ;
 		
+		logTabHighLightColor = props.getColor("appTabbedPane.logging.logTabHighLightColor", Color.RED) ;
+		
+		Color recordHighLightColor = props.getColor("appTabbedPane.logging.recordHighLightColor", Color.PINK) ;
+		
 		// Tabbed Panel for application information
 		appInfoPane = new ApplicationInfoPane(runningContext) ;
 		addTab("Informations", appInfoPane) ;
 		
 		// Tabbed Panel for logs display
-		logsDisplayPane =  new LogsDisplayPane(props, lastNonHighLightedLevel, Color.PINK, runningContext.getpLog()) ;
+		logsDisplayPane =  new LogsDisplayPane(props, lastNonHighLightedLevel, recordHighLightColor, runningContext.getpLog()) ;
 		addTab("Logs display", logsDisplayPane) ;
 		int logTabIdx = indexOfComponent(logsDisplayPane) ;
 		if (logTabIdx > -1) {
