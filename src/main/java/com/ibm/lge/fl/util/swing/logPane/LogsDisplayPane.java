@@ -19,7 +19,7 @@ public class LogsDisplayPane  extends JTabbedPane {
 	private int currentLogDisplayIndex ;
 	private SearchableLogDisplay currentLogDisplay ;
 	
-	private final static Color[] DEFAULT_HIGHLIGHTCOLORS = {Color.CYAN, Color.LIGHT_GRAY, Color.YELLOW, Color.MAGENTA} ;
+	private final static Color[] DEFAULT_SEARCH_HIGHLIGHTCOLORS = {Color.CYAN, Color.YELLOW, Color.MAGENTA} ;
 	
 	private final Color logTabSelectedColor ;
 	private final Color logTabRegularColor ;
@@ -35,9 +35,11 @@ public class LogsDisplayPane  extends JTabbedPane {
 		logDisplayMaxLength	   = props.getInt("appTabbedPane.logging.logDisplayMaxLength", 		  100000) ;
 		logTabSelectedColor	   = props.getColor("appTabbedPane.logging.logTabSelectedColor", Color.GREEN) ;
 		
+		Color[] searchHighLightColors = props.getColors("appTabbedPane.logging.searchHighLightColors", DEFAULT_SEARCH_HIGHLIGHTCOLORS) ;
+		
 		searchableLogDisplays = new ArrayList<SearchableLogDisplay>() ;
 		for (int i=0; i < logDisplaySubTabNumber; i++) {
-			SearchableLogDisplay logDisplay = new SearchableLogDisplay(level, DEFAULT_HIGHLIGHTCOLORS, color, logger) ;
+			SearchableLogDisplay logDisplay = new SearchableLogDisplay(level, searchHighLightColors, color, logger) ;
 			searchableLogDisplays.add(logDisplay) ;
 			add(logDisplay.getPanel()) ;
 		}

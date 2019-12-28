@@ -444,6 +444,26 @@ public class AdvancedProperties extends Properties {
     	}    	
     }
     
+    public Color[] getColors(String key, Color[] defaultColors) {
+    	String colorsAsString = getProperty(key) ;
+    	if ((colorsAsString == null) || (colorsAsString.isEmpty())) {
+    		return defaultColors ;
+    	} else {
+    		String[] colorArray = colorsAsString.split(",") ;
+    		Color[] colors = new Color[colorArray.length];
+    		for (int i=0; i < colorArray.length; i++) {
+    			Color color = ColorHelpers.parse(colorArray[i]) ;
+        		if (color == null) {
+        			System.err.println("Invalid colors (" + colorsAsString + ") at key " + key) ;
+        			return defaultColors ;
+        		} else {
+        			colors[i] = color ;
+        		}
+    		}
+    		return colors ;
+    	}    	
+    }
+    
 	public ArrayList<String> getArrayOfFileContent(String key, String separator) {
 		return getArrayOfFileContent(key, separator,  Charset.defaultCharset()) ;
 	}
