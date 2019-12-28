@@ -55,4 +55,18 @@ class ColorHelpersTests {
 		assertNotNull(c) ;
 		assertEquals(c, Color.black) ;
 	}
+	
+	@Test
+	void testEmpy() {
+
+		Color c = ColorHelpers.parse("") ;
+		assertNull(c) ;
+	}
+	
+	@Test
+	void testNull() {
+
+		Color c = ColorHelpers.parse(null) ;
+		assertNull(c) ;
+	}
 }
