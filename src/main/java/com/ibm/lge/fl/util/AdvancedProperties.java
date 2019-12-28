@@ -26,9 +26,6 @@ import com.ibm.lge.fl.util.swing.ColorHelpers;
 
 public class AdvancedProperties extends Properties {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	private static final char keySeparator = '.' ; 
 
@@ -326,8 +323,7 @@ public class AdvancedProperties extends Properties {
 		} catch (Exception e) {
 			log.log(Level.SEVERE, "Exception when reading file " + pString + " (value of property " + key, e);
 			return "" ;
-		}
-		
+		}		
 	}
 	
 	public String getFileContent(String key) {		
@@ -397,15 +393,12 @@ public class AdvancedProperties extends Properties {
 				AdvancedProperties propsProject = propsProjectStorage.getAdvancedTry(log) ; 
 				return propsProject ;
 			} catch (Exception e) {
-				System.err.println("getPropertiesFromFile: invalid filePath: " + filePathName) ;
-				e.printStackTrace() ;
+				log.log(Level.SEVERE,"getPropertiesFromFile: invalid filePath: " + filePathName, e) ;
 				return null ;
-			}
-		
+			}		
 		} else { 
 			return null ;
 		}
-
 	}
 	
 	/**
@@ -421,8 +414,7 @@ public class AdvancedProperties extends Properties {
             try {
                 return Level.parse(level) ;
             } catch (Exception e) {
-                System.err.println("Invalid level (" + level + ") in config file: " + e);
-                e.printStackTrace() ;
+            	log.log(Level.SEVERE, "Invalid level (" + level + ") in config file", e);
                 return defaultLevel;
             }
         }
@@ -437,7 +429,7 @@ public class AdvancedProperties extends Properties {
     	} else {
     		Color color = ColorHelpers.parse(colorAsString) ;
     		if (color == null) {
-    			System.err.println("Invalid color (" + colorAsString + ") at key " + key) ;
+    			log.severe("Invalid color (" + colorAsString + ") at key " + key) ;
     			color = defaultColor ;
     		}
     		return color ;
@@ -454,7 +446,7 @@ public class AdvancedProperties extends Properties {
     		for (int i=0; i < colorArray.length; i++) {
     			Color color = ColorHelpers.parse(colorArray[i]) ;
         		if (color == null) {
-        			System.err.println("Invalid colors (" + colorsAsString + ") at key " + key) ;
+        			log.severe("Invalid colors (" + colorsAsString + ") at key " + key) ;
         			return defaultColors ;
         		} else {
         			colors[i] = color ;
