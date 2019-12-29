@@ -24,17 +24,6 @@ public class LogRecordAreas {
 	
 	private boolean hasHighLight ;
 	
-	public LogRecordAreas(JTextComponent tc,Logger l) {
-		textComponent  	   = tc ;
-		lLog		   	   = l ;
-		logRecordAreas 	   = new HashMap<Level,TextAreaElementList>() ;
-		highLightListeners = new ArrayList<LogHighLightListener>() ;
-		
-		lastNonHighLighedLevel = Level.ALL.intValue() ;
-		color 				   = null ;
-		hasHighLight		   = false ;
-	}
-
 	public LogRecordAreas(JTextComponent tc, int lvl, Color c, Logger l) {
 		textComponent  	   = tc ;
 		lLog		   	   = l ;
