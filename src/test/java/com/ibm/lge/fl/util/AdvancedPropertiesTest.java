@@ -83,4 +83,62 @@ class AdvancedPropertiesTest {
 		long i = advProps.getLong("unknown", 9) ;		
 		assertEquals(9, i) ;
 	}
+	
+	@Test
+	void testDouble() {
+		
+		AdvancedProperties advProps = new AdvancedProperties() ;
+		advProps.setProperty("p1", "-10.2") ;		
+		assertEquals("-10.2", advProps.getProperty("p1")) ;
+		
+		double i = advProps.getDouble("p1", 9.5) ;		
+		assertEquals(-10.2, i) ;
+	}
+
+	@Test
+	void testDouble2() {
+		
+		AdvancedProperties advProps = new AdvancedProperties() ;
+		Logger noLog = Logger.getLogger("testNoLog") ;
+		advProps.setLog(noLog);
+		noLog.setLevel(Level.OFF);
+
+		advProps.setProperty("p1", "notAnumber") ;		
+		assertEquals("notAnumber", advProps.getProperty("p1")) ;
+		
+		double i = advProps.getDouble("p1", 1000000000.1) ;		
+		assertEquals(1000000000.1, i) ;
+	}
+	
+	@Test
+	void testDouble3() {
+		
+		AdvancedProperties advProps = new AdvancedProperties() ;
+
+		advProps.setProperty("p1", "10.7") ;		
+		assertNull(advProps.getProperty("unknown")) ;
+		
+		double i = advProps.getDouble("unknown", 9.8) ;		
+		assertEquals(9.8, i) ;
+	}
+	
+	@Test
+	void testBoolean() {
+		
+		AdvancedProperties advProps = new AdvancedProperties() ;
+		advProps.setProperty("p1", "true") ;		
+		assertEquals("true", advProps.getProperty("p1")) ;
+			
+		assertTrue(advProps.getBoolean("p1", false)) ;
+	}
+	
+//	@Test
+//	void testBoolean2() {
+//		
+//		AdvancedProperties advProps = new AdvancedProperties() ;
+//		advProps.setProperty("p1", "notBool") ;		
+//		assertEquals("notBool", advProps.getProperty("p1")) ;
+//			
+//		assertTrue(advProps.getBoolean("p1", true)) ;
+//	}
 }
