@@ -148,11 +148,14 @@ public class AdvancedProperties extends Properties {
 		
 		String pString =  getProperty(key) ;
 		boolean res ;
-		if ((pString != null) && (pString.length() >0)) {
+		if ((pString != null) && (pString.length() > 0)) {
 			if (pString.equalsIgnoreCase("true")) {
 				res = true ;
-			} else {
+			} else if (pString.equalsIgnoreCase("false")) {
 				res =false ;
+			} else {
+				log.severe("Wrong boolean value for property: " + key + " value=" + pString);
+				res = defaultValue;
 			}
 		} else {
 			res = defaultValue;

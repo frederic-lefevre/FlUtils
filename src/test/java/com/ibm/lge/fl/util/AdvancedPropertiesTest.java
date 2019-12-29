@@ -132,13 +132,39 @@ class AdvancedPropertiesTest {
 		assertTrue(advProps.getBoolean("p1", false)) ;
 	}
 	
-//	@Test
-//	void testBoolean2() {
-//		
-//		AdvancedProperties advProps = new AdvancedProperties() ;
-//		advProps.setProperty("p1", "notBool") ;		
-//		assertEquals("notBool", advProps.getProperty("p1")) ;
-//			
-//		assertTrue(advProps.getBoolean("p1", true)) ;
-//	}
+	@Test
+	void testBoolean2() {
+		
+		AdvancedProperties advProps = new AdvancedProperties() ;
+		Logger noLog = Logger.getLogger("testNoLog") ;
+		advProps.setLog(noLog);
+		noLog.setLevel(Level.OFF);
+		
+		advProps.setProperty("p1", "notBool") ;		
+		assertEquals("notBool", advProps.getProperty("p1")) ;
+			
+		assertTrue(advProps.getBoolean("p1", true)) ;
+		assertFalse(advProps.getBoolean("p1", false)) ;
+	}
+	
+	@Test
+	void testBoolean3() {
+		
+		AdvancedProperties advProps = new AdvancedProperties() ;
+		advProps.setProperty("p1", "True") ;		
+		assertEquals("True", advProps.getProperty("p1")) ;
+			
+		assertTrue(advProps.getBoolean("p1", false)) ;
+	}
+	
+	@Test
+	void testBoolean4() {
+		
+		AdvancedProperties advProps = new AdvancedProperties() ;
+		advProps.setProperty("p1", "True") ;		
+		assertEquals("True", advProps.getProperty("p1")) ;
+			
+		assertTrue(advProps.getBoolean("unknown", true)) ;
+		assertFalse(advProps.getBoolean("unknown", false)) ;
+	}
 }
