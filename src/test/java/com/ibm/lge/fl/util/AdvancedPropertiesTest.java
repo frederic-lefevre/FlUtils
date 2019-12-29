@@ -167,4 +167,48 @@ class AdvancedPropertiesTest {
 		assertTrue(advProps.getBoolean("unknown", true)) ;
 		assertFalse(advProps.getBoolean("unknown", false)) ;
 	}
+	
+	@Test
+	void testChar() {
+		
+		AdvancedProperties advProps = new AdvancedProperties() ;
+		advProps.setProperty("p1", "c") ;		
+		assertEquals("c", advProps.getProperty("p1")) ;
+			
+		char i = advProps.getChar("p1", 'r') ;		
+		assertEquals('c', i) ;
+	}
+	
+	@Test
+	void testChar2() {
+		
+		AdvancedProperties advProps = new AdvancedProperties() ;
+		advProps.setProperty("p1", "char") ;		
+		assertEquals("char", advProps.getProperty("p1")) ;
+			
+		char i = advProps.getChar("p1", 'r') ;		
+		assertEquals('c', i) ;
+	}
+	
+	@Test
+	void testChar3() {
+		
+		AdvancedProperties advProps = new AdvancedProperties() ;
+		advProps.setProperty("p1", "c") ;		
+		assertEquals("c", advProps.getProperty("p1")) ;
+			
+		char i = advProps.getChar("unknown", 'r') ;		
+		assertEquals('r', i) ;
+	}
+	
+	@Test
+	void testChar4() {
+		
+		AdvancedProperties advProps = new AdvancedProperties() ;
+		advProps.setProperty("p1", "") ;		
+		assertEquals("", advProps.getProperty("p1")) ;
+			
+		char i = advProps.getChar("p1", 'r') ;		
+		assertEquals('r', i) ;
+	}
 }
