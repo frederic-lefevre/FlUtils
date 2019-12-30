@@ -3,13 +3,25 @@ package com.ibm.lge.fl.util;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.ArrayList;
-import java.util.logging.Level;
+import java.util.logging.Filter;
+import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
 import org.junit.jupiter.api.Test;
 
 class AdvancedPropertiesTest {
 
+	private class FilterCounter implements Filter {
+
+		public int errorCount = 0 ;
+		@Override
+		public boolean isLoggable(LogRecord record) {
+			errorCount++ ;
+			return false;
+		}
+		
+	}
+	
 	@Test
 	void testKeys() {
 		
@@ -93,13 +105,15 @@ class AdvancedPropertiesTest {
 		AdvancedProperties advProps = new AdvancedProperties() ;
 		Logger noLog = Logger.getLogger("testNoLog") ;
 		advProps.setLog(noLog);
-		noLog.setLevel(Level.OFF);
+		FilterCounter filterCounter = new FilterCounter() ;
+		noLog.setFilter(filterCounter);
 
 		advProps.setProperty("p1", "notAnumber") ;		
 		assertEquals("notAnumber", advProps.getProperty("p1")) ;
 		
 		int i = advProps.getInt("p1", 9) ;		
 		assertEquals(9, i) ;
+		assertEquals(1, filterCounter.errorCount) ;
 	}
 	
 	@Test
@@ -119,13 +133,15 @@ class AdvancedPropertiesTest {
 		AdvancedProperties advProps = new AdvancedProperties() ;
 		Logger noLog = Logger.getLogger("testNoLog") ;
 		advProps.setLog(noLog);
-		noLog.setLevel(Level.OFF);
+		FilterCounter filterCounter = new FilterCounter() ;
+		noLog.setFilter(filterCounter);
 
 		advProps.setProperty("p1", "notAnumber") ;		
 		assertEquals("notAnumber", advProps.getProperty("p1")) ;
 		
 		long i = advProps.getLong("p1", 1000000000) ;		
 		assertEquals(1000000000, i) ;
+		assertEquals(1, filterCounter.errorCount) ;
 	}
 	
 	@Test
@@ -157,13 +173,15 @@ class AdvancedPropertiesTest {
 		AdvancedProperties advProps = new AdvancedProperties() ;
 		Logger noLog = Logger.getLogger("testNoLog") ;
 		advProps.setLog(noLog);
-		noLog.setLevel(Level.OFF);
+		FilterCounter filterCounter = new FilterCounter() ;
+		noLog.setFilter(filterCounter);
 
 		advProps.setProperty("p1", "notAnumber") ;		
 		assertEquals("notAnumber", advProps.getProperty("p1")) ;
 		
 		double i = advProps.getDouble("p1", 1000000000.1) ;		
 		assertEquals(1000000000.1, i) ;
+		assertEquals(1, filterCounter.errorCount) ;
 	}
 	
 	@Test
@@ -194,13 +212,15 @@ class AdvancedPropertiesTest {
 		AdvancedProperties advProps = new AdvancedProperties() ;
 		Logger noLog = Logger.getLogger("testNoLog") ;
 		advProps.setLog(noLog);
-		noLog.setLevel(Level.OFF);
+		FilterCounter filterCounter = new FilterCounter() ;
+		noLog.setFilter(filterCounter);
 		
 		advProps.setProperty("p1", "notBool") ;		
 		assertEquals("notBool", advProps.getProperty("p1")) ;
 			
 		assertTrue(advProps.getBoolean("p1", true)) ;
 		assertFalse(advProps.getBoolean("p1", false)) ;
+		assertEquals(2, filterCounter.errorCount) ;
 	}
 	
 	@Test
@@ -267,4 +287,76 @@ class AdvancedPropertiesTest {
 		char i = advProps.getChar("p1", 'r') ;		
 		assertEquals('r', i) ;
 	}
+	
+	@Test
+	void testArrayOfInts() {
+		
+		AdvancedProperties advProps = new AdvancedProperties() ;
+		advProps.setProperty("a.b.c", "5,4,3,2,1") ;
+
+		assertEquals("5,4,3,2,1", advProps.getProperty("a.b.c")) ;
+
+		int[] ints = advProps.getArrayOfInt("a.b.c", ",") ;
+		assertEquals(5, ints.length) ;
+		assertEquals(5, ints[0]) ;
+		assertEquals(4, ints[1]) ;
+		assertEquals(3, ints[2]) ;
+		assertEquals(2, ints[3]) ;
+		assertEquals(1, ints[4]) ;
+	}
+
+	@Test
+	void testArrayOfInts2() {
+		
+		AdvancedProperties advProps = new AdvancedProperties() ;
+		advProps.setProperty("a.b.c", "5") ;
+
+		assertEquals("5", advProps.getProperty("a.b.c")) ;
+
+		int[] ints = advProps.getArrayOfInt("a.b.c", ",") ;
+		assertEquals(1, ints.length) ;
+		assertEquals(5, ints[0]) ;
+	}
+
+	@Test
+	void testArrayOfInts3() {
+		
+		AdvancedProperties advProps = new AdvancedProperties() ;
+		advProps.setProperty("a.b.c", "5") ;
+
+		assertEquals("5", advProps.getProperty("a.b.c")) ;
+
+		int[] ints = advProps.getArrayOfInt("a.b.c", "") ;
+		assertEquals(1, ints.length) ;
+		assertEquals(5, ints[0]) ;
+	}
+	
+	@Test
+	void testArrayOfInts4() {
+		
+		AdvancedProperties advProps = new AdvancedProperties() ;
+		advProps.setProperty("a.b.c", "5") ;
+
+		int[] ints = advProps.getArrayOfInt("unknown", ",") ;
+		assertNull(ints) ;
+	}
+	
+	@Test
+	void testArrayOfInts5() {
+		
+		AdvancedProperties advProps = new AdvancedProperties() ;
+		advProps.setProperty("a.b.c", "5,4,NotAnumber,2,1") ;
+		Logger noLog = Logger.getLogger("testNoLog") ;
+		FilterCounter filterCounter = new FilterCounter() ;
+		noLog.setFilter(filterCounter);
+		advProps.setLog(noLog);
+
+		assertEquals("5,4,NotAnumber,2,1", advProps.getProperty("a.b.c")) ;
+
+		int[] ints = advProps.getArrayOfInt("a.b.c", ",") ;
+		assertNull(ints) ;
+		assertEquals(1, filterCounter.errorCount) ;
+	}
+	
+
 }
