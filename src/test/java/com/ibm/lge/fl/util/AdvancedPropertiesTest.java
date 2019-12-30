@@ -327,8 +327,7 @@ class AdvancedPropertiesTest {
 		assertEquals("5", advProps.getProperty("a.b.c")) ;
 
 		int[] ints = advProps.getArrayOfInt("a.b.c", "") ;
-		assertEquals(1, ints.length) ;
-		assertEquals(5, ints[0]) ;
+		assertNull(ints) ;
 	}
 	
 	@Test
@@ -358,5 +357,45 @@ class AdvancedPropertiesTest {
 		assertEquals(1, filterCounter.errorCount) ;
 	}
 	
+	@Test
+	void testArrayOfStrings() {
+		
+		AdvancedProperties advProps = new AdvancedProperties() ;
+		advProps.setProperty("a.b.c", "cinq,quatre,trois,deux,un") ;
 
+		assertEquals("cinq,quatre,trois,deux,un", advProps.getProperty("a.b.c")) ;
+
+		String[] strings = advProps.getArrayOfString("a.b.c", ",") ;
+		assertEquals(5, strings.length) ;
+		assertEquals("cinq", strings[0]) ;
+		assertEquals("quatre", strings[1]) ;
+		assertEquals("trois", strings[2]) ;
+		assertEquals("deux", strings[3]) ;
+		assertEquals("un", strings[4]) ;
+	}
+
+	@Test
+	void testArrayOfStrings2() {
+		
+		AdvancedProperties advProps = new AdvancedProperties() ;
+		advProps.setProperty("a.b.c", "trois") ;
+
+		assertEquals("trois", advProps.getProperty("a.b.c")) ;
+
+		String[] strings = advProps.getArrayOfString("a.b.c", ",") ;
+		assertEquals(1, strings.length) ;
+		assertEquals("trois", strings[0]) ;
+	}
+	
+	@Test
+	void testArrayOfStrings3() {
+		
+		AdvancedProperties advProps = new AdvancedProperties() ;
+		advProps.setProperty("a.b.c", "trois") ;
+
+		assertEquals("trois", advProps.getProperty("a.b.c")) ;
+
+		String[] strings = advProps.getArrayOfString("a.b.c", "") ;
+		assertNull(strings) ;
+	}
 }

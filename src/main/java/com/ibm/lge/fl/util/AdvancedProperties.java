@@ -177,7 +177,7 @@ public class AdvancedProperties extends Properties {
 		
 		String prop =  getProperty(key) ;
 		int[] result ;
-		if ((prop != null) && (! prop.isEmpty())) {
+		if ((prop != null) && (! prop.isEmpty()) && (separator != null) && (! separator.isEmpty())) {
 			
 			String[] intArrayStrin = prop.split(separator) ;
 			try {
@@ -196,7 +196,7 @@ public class AdvancedProperties extends Properties {
 		
 		String prop =  getProperty(key) ;
 		String[] result ;
-		if ((prop != null) && (! prop.isEmpty())) {			
+		if ((prop != null) && (! prop.isEmpty()) && (separator != null) && (! separator.isEmpty())) {			
 			result = prop.split(separator) ;
 		} else {
 			result = null ;
