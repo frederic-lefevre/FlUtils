@@ -398,4 +398,14 @@ class AdvancedPropertiesTest {
 		String[] strings = advProps.getArrayOfString("a.b.c", "") ;
 		assertNull(strings) ;
 	}
+	
+	@Test
+	void testArrayOfStrings4() {
+		
+		AdvancedProperties advProps = new AdvancedProperties() ;
+		advProps.setProperty("a.b.c", "trois") ;
+
+		String[] strings = advProps.getArrayOfString("unknown", ",") ;
+		assertNull(strings) ;
+	}
 }
