@@ -3,6 +3,7 @@ package com.ibm.lge.fl.util;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Filter;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
@@ -406,6 +407,58 @@ class AdvancedPropertiesTest {
 		advProps.setProperty("a.b.c", "trois") ;
 
 		String[] strings = advProps.getArrayOfString("unknown", ",") ;
+		assertNull(strings) ;
+	}
+	
+	@Test
+	void testListOfStrings() {
+		
+		AdvancedProperties advProps = new AdvancedProperties() ;
+		advProps.setProperty("a.b.c", "cinq,quatre,trois,deux,un") ;
+
+		assertEquals("cinq,quatre,trois,deux,un", advProps.getProperty("a.b.c")) ;
+
+		List<String> strings = advProps.getListOfString("a.b.c", ",") ;
+		assertEquals(5, strings.size()) ;
+		assertEquals("cinq", strings.get(0)) ;
+		assertEquals("quatre", strings.get(1)) ;
+		assertEquals("trois", strings.get(2)) ;
+		assertEquals("deux", strings.get(3)) ;
+		assertEquals("un", strings.get(4)) ;
+	}
+
+	@Test
+	void testListOfStrings2() {
+		
+		AdvancedProperties advProps = new AdvancedProperties() ;
+		advProps.setProperty("a.b.c", "trois") ;
+
+		assertEquals("trois", advProps.getProperty("a.b.c")) ;
+
+		List<String> strings = advProps.getListOfString("a.b.c", ",") ;
+		assertEquals(1, strings.size()) ;
+		assertEquals("trois", strings.get(0)) ;
+	}
+	
+	@Test
+	void testListOfStrings3() {
+		
+		AdvancedProperties advProps = new AdvancedProperties() ;
+		advProps.setProperty("a.b.c", "trois") ;
+
+		assertEquals("trois", advProps.getProperty("a.b.c")) ;
+
+		List<String> strings = advProps.getListOfString("a.b.c", "") ;
+		assertNull(strings) ;
+	}
+	
+	@Test
+	void testListOfStrings4() {
+		
+		AdvancedProperties advProps = new AdvancedProperties() ;
+		advProps.setProperty("a.b.c", "trois") ;
+
+		List<String> strings = advProps.getListOfString("unknown", ",") ;
 		assertNull(strings) ;
 	}
 }

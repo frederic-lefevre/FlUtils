@@ -208,7 +208,7 @@ public class AdvancedProperties extends Properties {
 		
 		String prop =  getProperty(key) ;
 		List<String> result;
-		if ((prop != null) && (! prop.isEmpty())) {			
+		if ((prop != null) && (! prop.isEmpty()) && (separator != null) && (! separator.isEmpty())) {			
 			result = Arrays.asList(prop.split(separator)) ;
 		} else {
 			result = null ;
