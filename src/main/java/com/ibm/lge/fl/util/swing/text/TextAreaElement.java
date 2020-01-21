@@ -1,6 +1,7 @@
 package com.ibm.lge.fl.util.swing.text;
 
 import java.awt.Rectangle;
+import java.awt.geom.Rectangle2D;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -32,9 +33,11 @@ public class TextAreaElement {
 	public void goToElement() {
 		if ((begin > -1) && (end > -1)) {
 			try {
-				Rectangle viewRect = textComponent.modelToView(begin) ;
-				viewRect.add(textComponent.modelToView(end)) ;
-				textComponent.scrollRectToVisible(viewRect);
+				Rectangle2D viewRect = textComponent.modelToView2D(begin) ;
+				viewRect.add(textComponent.modelToView2D(end)) ;
+				Rectangle r = new Rectangle() ;
+				r.setRect(viewRect) ;
+				textComponent.scrollRectToVisible(r);
 			} catch (BadLocationException e) {
 				lLog.log(Level.WARNING, "Bad location when scrolling to search result", e);
 			}
