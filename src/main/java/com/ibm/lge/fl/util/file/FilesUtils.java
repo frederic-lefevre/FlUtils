@@ -500,4 +500,15 @@ public class FilesUtils {
 		
 		return mountPoint ;
 	}
+	
+	public static long folderSize(Path folder, Logger logger) {
+		long size = 0;
+		try {
+			size = Files.walk(folder).filter(p -> p.toFile().isFile()).mapToLong(p -> p.toFile().length()).sum();
+		} catch (IOException e) {
+			logger.log(Level.SEVERE, "Exception when calculating folder size of " + folder, e) ;
+		}
+		return size ;		
+	}
+	
 }
