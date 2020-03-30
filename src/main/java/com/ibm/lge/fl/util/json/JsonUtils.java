@@ -92,7 +92,7 @@ public class JsonUtils {
 	}
 	
 	// Read a JsonObject from a path
-	public static JsonObject getJsonObjectFromPath(Path path,  Charset cs, Logger cLog) {
+	public static JsonObject getJsonObjectFromPath(JsonParser jsonParser, Path path,  Charset cs, Logger cLog) {
 		
 		JsonObject jsonObject = null ;
 		StringBuilder out = null ;
@@ -110,16 +110,18 @@ public class JsonUtils {
 		        if (out != null) {
 		        	if (out.length() > 0) {
 		        		String outString = out.toString() ;
-		        		cLog.finest("getJsonObjectFromInputStream: String read from input " + outString) ;
+		        		if (cLog.isLoggable(Level.FINEST)) {
+		        			cLog.finest("getJsonObjectFromInputStream: String read from input " + outString) ;
+		        		}
 		        		// parse the POST body to get a JsonObject
-		        		jsonObject = new JsonParser().parse(outString).getAsJsonObject() ;
+		        		jsonObject = jsonParser.parse(outString).getAsJsonObject() ;
 		        	} else {
 		        		// empty json object
 		        		jsonObject = new JsonObject() ;
 		        	}
 		        }
 			} else {
-				jsonObject = new JsonParser().parse(reader).getAsJsonObject() ;
+				jsonObject = jsonParser.parse(reader).getAsJsonObject() ;
 			}
 	        
 		} catch (Exception e) {
