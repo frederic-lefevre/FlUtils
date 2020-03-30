@@ -22,8 +22,7 @@ public class JsonUtils {
 	
 		String res = "" ;		
 		try {
-			JsonParser parser = new JsonParser();
-			JsonObject json = parser.parse(rawJson).getAsJsonObject();
+			JsonObject json = JsonParser.parseString(rawJson).getAsJsonObject();
 
 			res = jsonPrettyPrint(json);
 
@@ -66,14 +65,14 @@ public class JsonUtils {
 		        		String outString = out.toString() ;
 		        		cLog.finest("getJsonObjectFromInputStream: String read from input " + outString) ;
 		        		// parse the POST body to get a JsonObject
-		        		jsonObject = new JsonParser().parse(outString).getAsJsonObject() ;
+		        		jsonObject = JsonParser.parseString(outString).getAsJsonObject() ;
 		        	} else {
 		        		// empty json object
 		        		jsonObject = new JsonObject() ;
 		        	}
 		        }
 			} else {
-				jsonObject = new JsonParser().parse(reader).getAsJsonObject() ;
+				jsonObject = JsonParser.parseReader(reader).getAsJsonObject() ;
 			}
 	        
 		} catch (Exception e1) {
@@ -92,7 +91,7 @@ public class JsonUtils {
 	}
 	
 	// Read a JsonObject from a path
-	public static JsonObject getJsonObjectFromPath(JsonParser jsonParser, Path path,  Charset cs, Logger cLog) {
+	public static JsonObject getJsonObjectFromPath(Path path, Charset cs, Logger cLog) {
 		
 		JsonObject jsonObject = null ;
 		StringBuilder out = null ;
@@ -110,18 +109,17 @@ public class JsonUtils {
 		        if (out != null) {
 		        	if (out.length() > 0) {
 		        		String outString = out.toString() ;
-		        		if (cLog.isLoggable(Level.FINEST)) {
-		        			cLog.finest("getJsonObjectFromInputStream: String read from input " + outString) ;
-		        		}
+		        		cLog.finest("getJsonObjectFromInputStream: String read from input " + outString) ;
+
 		        		// parse the POST body to get a JsonObject
-		        		jsonObject = jsonParser.parse(outString).getAsJsonObject() ;
+		        		jsonObject = JsonParser.parseString(outString).getAsJsonObject() ;
 		        	} else {
 		        		// empty json object
 		        		jsonObject = new JsonObject() ;
 		        	}
 		        }
 			} else {
-				jsonObject = jsonParser.parse(reader).getAsJsonObject() ;
+				jsonObject = JsonParser.parseReader(reader).getAsJsonObject() ;
 			}
 	        
 		} catch (Exception e) {
