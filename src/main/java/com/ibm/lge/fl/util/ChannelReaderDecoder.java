@@ -18,20 +18,20 @@ import java.util.zip.InflaterInputStream;
 public class ChannelReaderDecoder {
 
 	// Logger
-	private Logger sLog ;
+	private final Logger sLog ;
 	
 	private InputStream inputStream ;
-	private Charset 	charSet ;
+	private final Charset 	charSet ;
 	
 	// file to trace the binary content of the bytes read
 	// If null, there will be no trace
-	private File		fileTrace ;
+	private final File		fileTrace ;
 
 	// Size of byte buffers that receive the bytes
-	private int bufferSize ;
+	private final int bufferSize ;
 	
 	// true is the content is compressed
-	private boolean isCompressed ;
+	private final boolean isCompressed ;
 	
 	public ChannelReaderDecoder(InputStream is, Charset cs, File f, int bs, boolean ic, Logger l) {
 		super();
