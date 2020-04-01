@@ -14,7 +14,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.zip.InflaterInputStream;
 
 public class ChannelReaderDecoder {
 
@@ -31,10 +30,7 @@ public class ChannelReaderDecoder {
 	// Size of byte buffers that receive the bytes
 	private final int bufferSize ;
 	
-	// true is the content is compressed
-	private final boolean isCompressed ;
-	
-	public ChannelReaderDecoder(InputStream is, Charset cs, File f, int bs, boolean ic, Logger l) {
+	public ChannelReaderDecoder(InputStream is, Charset cs, File f, int bs, Logger l) {
 		super();
 		sLog 		 = l;
 		if (cs == null) {
@@ -44,23 +40,12 @@ public class ChannelReaderDecoder {
 		}
 		fileTrace	 = f ;
 		bufferSize	 = bs ;
-		isCompressed = ic ;
-		if (isCompressed) {
-			InputStream in = null;
-			try {
-				in = new InflaterInputStream(is);
-			} catch (Exception e) {
-				sLog.log(Level.SEVERE, "Exception when creating inflater InputStream", e);
-			}		
-			inputStream  = in ;
-		} else {
-			inputStream  = is;
-		}
+		inputStream  = is;		
 	}
 	
 	public CharBuffer readAllChar() {
 		
-		CharBuffer cb = null;
+		CharBuffer cb = null ;
 		if (inputStream != null) {
 			
 			try {
@@ -78,7 +63,7 @@ public class ChannelReaderDecoder {
 				}
 				
 				// log bytes to a file if requested
-				if (fileTrace !=null ) {
+				if (fileTrace != null) {
 					totalBuffer.rewind() ;
 					FileOutputStream fo = new FileOutputStream(fileTrace, false) ;
 				    FileChannel wChannel = fo.getChannel();
