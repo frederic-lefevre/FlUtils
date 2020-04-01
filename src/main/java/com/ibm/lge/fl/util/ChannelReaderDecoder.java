@@ -10,6 +10,7 @@ import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.charset.Charset;
 import java.nio.charset.CodingErrorAction;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -20,7 +21,7 @@ public class ChannelReaderDecoder {
 	// Logger
 	private final Logger sLog ;
 	
-	private InputStream inputStream ;
+	private final InputStream inputStream ;
 	private final Charset 	charSet ;
 	
 	// file to trace the binary content of the bytes read
@@ -36,17 +37,22 @@ public class ChannelReaderDecoder {
 	public ChannelReaderDecoder(InputStream is, Charset cs, File f, int bs, boolean ic, Logger l) {
 		super();
 		sLog 		 = l;
-		charSet		 = cs ;
+		if (cs == null) {
+			charSet	 = StandardCharsets.UTF_8 ;
+		} else {
+			charSet	 = cs ;
+		}
 		fileTrace	 = f ;
 		bufferSize	 = bs ;
 		isCompressed = ic ;
 		if (isCompressed) {
+			InputStream in = null;
 			try {
-				inputStream = new InflaterInputStream(is);
+				in = new InflaterInputStream(is);
 			} catch (Exception e) {
 				sLog.log(Level.SEVERE, "Exception when creating inflater InputStream", e);
-				inputStream = null ;
-			}			
+			}		
+			inputStream  = in ;
 		} else {
 			inputStream  = is;
 		}
