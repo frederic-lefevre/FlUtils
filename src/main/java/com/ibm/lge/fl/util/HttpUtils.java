@@ -80,7 +80,7 @@ public class HttpUtils {
 
 	// Read http response body with decompression if necessary
 	public static CharBuffer readHttpResponse(HttpResponse<InputStream> httpResponse, Charset charSet, Logger hLog) {
-		return readHttpResponse(httpResponse, null, hLog) ;
+		return readHttpResponse(httpResponse, charSet, null, hLog) ;
 	}
 	
 	// Read http response body with decompression if necessary, and log decompressed content as bytes in a file
