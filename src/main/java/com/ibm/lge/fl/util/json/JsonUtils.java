@@ -20,16 +20,18 @@ public class JsonUtils {
 	// pretty print Json string
 	public static String jsonPrettyPrint(String rawJson, Logger uLog) {
 	
-		String res = "" ;		
-		try {
-			JsonObject json = JsonParser.parseString(rawJson).getAsJsonObject();
-
-			res = jsonPrettyPrint(json);
-
-		} catch (Exception e) {
-			uLog.log(Level.SEVERE, "Exception when pretty printing json string\n" + rawJson, e);
-			res = rawJson ;
-		} 
+		String res = "" ;
+		if ((rawJson != null) && (! rawJson.isEmpty())) {
+			try {
+				JsonObject json = JsonParser.parseString(rawJson).getAsJsonObject();
+	
+				res = jsonPrettyPrint(json);
+	
+			} catch (Exception e) {
+				uLog.log(Level.SEVERE, "Exception when pretty printing json string\n" + rawJson, e);
+				res = rawJson ;
+			}
+		}
 		return res;	
 	}
 	
