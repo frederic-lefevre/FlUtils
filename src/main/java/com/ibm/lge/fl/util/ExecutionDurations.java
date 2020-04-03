@@ -39,6 +39,7 @@ public class ExecutionDurations {
 		internalProcessName = ipn ;
 		log 				= null ;
 		durationsJson 	    = new JsonObject() ;
+		triggerLevel		= Level.OFF ;
 	}
 	
 	public void setTriggerLevel(Logger l, Level lvl) {
