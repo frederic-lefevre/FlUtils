@@ -3,6 +3,7 @@ package com.ibm.lge.fl.util.api;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.nio.charset.StandardCharsets;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.junit.jupiter.api.Test;
@@ -28,7 +29,7 @@ class ApiReturnTest {
 				
 		assertTrue(apiReturn.isOnError()) ;
 		
-		String ret = apiReturn.getApiReturnJson("Info retour") ;
+		String ret = apiReturn.getApiReturnJson("Info retour ") ;
 		JsonObject jsonRet = JsonParser.parseString(ret).getAsJsonObject() ;
 
 		assertEquals(ApiReturn.KO, jsonRet.get(ApiJsonPropertyName.OPERATION).getAsString()) ;
@@ -50,7 +51,7 @@ class ApiReturnTest {
 
 		apiReturn.setDataReturn(sampleReturn);
 		
-		String ret = apiReturn.getApiReturnJson("Info retour") ;
+		String ret = apiReturn.getApiReturnJson("Info retour ") ;
 		JsonObject jsonRet = JsonParser.parseString(ret).getAsJsonObject() ;
 		
 		assertTrue(jsonRet.has(ApiJsonPropertyName.OPERATION)) ;
@@ -63,4 +64,31 @@ class ApiReturnTest {
 		assertEquals("contenu de la prop2", dataJson.get("prop2").getAsString()) ;
 	}
 	
+	@Test
+	void testDuration() {
+		
+		String sequenceName = "test" ;
+		ExecutionDurations execDuration = new ExecutionDurations(sequenceName, logger, Level.SEVERE) ;
+		
+		ApiReturn apiReturn = new ApiReturn(execDuration, StandardCharsets.UTF_8, logger) ;
+		
+		JsonObject sampleReturn = new JsonObject() ;
+		sampleReturn.addProperty("prop1", "contenu de la prop1");
+
+		apiReturn.setDataReturn(sampleReturn);
+		
+		String ret = apiReturn.getApiReturnJson("Info retour ") ;
+		JsonObject jsonRet = JsonParser.parseString(ret).getAsJsonObject() ;
+		
+		assertTrue(jsonRet.has(ApiJsonPropertyName.ADDITIONAL_INFOS)) ;
+		
+		JsonObject aiJson = jsonRet.getAsJsonObject(ApiJsonPropertyName.ADDITIONAL_INFOS) ;
+		
+		assertTrue(aiJson.has(ApiJsonPropertyName.DURATION)) ;
+		
+		JsonObject durationJson = aiJson.getAsJsonObject(ApiJsonPropertyName.DURATION) ;
+		assertTrue(durationJson.has(ExecutionDurations.TOTAL_DURATION)) ;
+		assertTrue(durationJson.has(sequenceName + "1")) ;
+		
+	}
 }
