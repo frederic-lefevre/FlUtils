@@ -24,8 +24,8 @@ public class ApiReturn {
 	private final static int TRACE_FINER_LIMIT = 8192 ;
 
 	// Value for Json return
-	private final static String OK        		 = "OK" ;
-	private final static String KO        		 = "KO" ;
+	public final static String OK        		 = "OK" ;
+	public final static String KO        		 = "KO" ;
 
 	private JsonObject 			apiReturnJson ;
 	private Logger 				aLog ;
