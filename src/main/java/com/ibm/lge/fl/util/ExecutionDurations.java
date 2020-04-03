@@ -7,8 +7,8 @@ import com.google.gson.JsonObject;
 
 public class ExecutionDurations {
 
-	private final static String THREAD_DURATION = "threadDuration" ;
-	private final static String TOTAL_DURATION  = "totalDuration" ;
+	public final static String THREAD_DURATION = "threadDuration" ;
+	public final static String TOTAL_DURATION  = "totalDuration" ;
 	
 	private String internalProcessName;
 	private long now ;
