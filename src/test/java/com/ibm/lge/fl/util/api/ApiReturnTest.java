@@ -2,14 +2,18 @@ package com.ibm.lge.fl.util.api;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.io.ByteArrayInputStream;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.zip.InflaterInputStream;
 
 import org.junit.jupiter.api.Test;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.ibm.lge.fl.util.ChannelReaderDecoder;
 import com.ibm.lge.fl.util.ExecutionDurations;
 
 class ApiReturnTest {
@@ -90,5 +94,39 @@ class ApiReturnTest {
 		assertTrue(durationJson.has(ExecutionDurations.TOTAL_DURATION)) ;
 		assertTrue(durationJson.has(sequenceName + "1")) ;
 		
+	}
+	
+	@Test
+	void compressedReturn() {
+		
+		Charset charSetForReturn = StandardCharsets.UTF_8 ;
+		ApiReturn apiReturn = new ApiReturn(new ExecutionDurations("test"), charSetForReturn, logger) ;
+		
+		JsonObject sampleReturn = new JsonObject() ;
+		sampleReturn.addProperty("prop1", "contenu de la prop1");
+		sampleReturn.addProperty("prop2", "contenu de la prop2");
+
+		apiReturn.setDataReturn(sampleReturn);
+		
+		byte[] ret = apiReturn.getCompressedApiReturn("Info retour ") ;
+		
+		InflaterInputStream targetStream = new InflaterInputStream(new ByteArrayInputStream(ret));
+		ChannelReaderDecoder chan = new ChannelReaderDecoder(
+				targetStream,
+				charSetForReturn,
+				null, 
+				1024,				
+				logger) ;
+		
+		JsonObject jsonRet = JsonParser.parseString(chan.readAllChar().toString()).getAsJsonObject() ;
+		
+		assertTrue(jsonRet.has(ApiJsonPropertyName.OPERATION)) ;
+		assertTrue(jsonRet.has(ApiJsonPropertyName.DATA)) ;
+		
+		assertEquals(ApiReturn.OK, jsonRet.get(ApiJsonPropertyName.OPERATION).getAsString()) ;
+		
+		JsonObject dataJson = jsonRet.getAsJsonObject(ApiJsonPropertyName.DATA) ;
+		assertEquals("contenu de la prop1", dataJson.get("prop1").getAsString()) ;
+		assertEquals("contenu de la prop2", dataJson.get("prop2").getAsString()) ;
 	}
 }
