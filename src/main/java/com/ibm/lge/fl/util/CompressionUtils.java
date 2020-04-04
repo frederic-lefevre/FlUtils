@@ -7,15 +7,18 @@ import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.zip.Deflater;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
+
+import com.ibm.lge.fl.util.api.ApiErrorCodeBuilder;
 
 public class CompressionUtils {
 
 	public static byte[] compressGzip(byte[] data, Logger logger) throws IOException {
 		
 		byte[] compressed ;
-		try (ByteArrayOutputStream bos  = new ByteArrayOutputStream();
+		try (ByteArrayOutputStream bos  = new ByteArrayOutputStream(data.length);
 			 GZIPOutputStream 	   gzip = new GZIPOutputStream(bos)) {
 			gzip.write(data);
 			compressed = bos.toByteArray();
@@ -25,6 +28,33 @@ public class CompressionUtils {
 			logger.log(Level.SEVERE, "Exception during gzip decompress", e);
 		}
 		return compressed;
+	}
+	
+	public static byte[] compressDeflate(byte[] data, Logger logger) throws IOException {
+		
+		// Create a Deflater to compress the bytes
+		Deflater compresser = new Deflater();
+		compresser.setInput(data);
+		compresser.finish();
+
+		byte[] compressedArray ;
+		try (ByteArrayOutputStream bos = new ByteArrayOutputStream(data.length) ) {
+			
+			byte[] buffer = new byte[1024];           
+			while(!compresser.finished())
+			{             
+				int bytesCompressed = compresser.deflate(buffer);
+				bos.write(buffer,0,bytesCompressed);
+			}	
+			
+			//get the compressed byte array from output stream
+			compressedArray = bos.toByteArray();
+			
+		}  catch(Exception ioe) {
+			logger.log(Level.SEVERE, "Exception when compressing Api with defate", ioe);
+			compressedArray = null;
+		}
+		return compressedArray ;
 	}
 	
 	public static String decompressGzipString(byte[] compressed, Charset charset, Logger logger) {
