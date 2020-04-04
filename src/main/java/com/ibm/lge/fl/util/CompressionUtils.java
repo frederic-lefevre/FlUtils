@@ -2,8 +2,11 @@ package com.ibm.lge.fl.util;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -13,7 +16,7 @@ import java.util.zip.GZIPOutputStream;
 import java.util.zip.InflaterInputStream;
 
 public class CompressionUtils {
-
+	
 	public static byte[] compressGzip(byte[] data, Logger logger) {
 		
 		byte[] compressed ;
@@ -78,33 +81,18 @@ public class CompressionUtils {
 	
 	public static String decompressGzipString(byte[] compressed, Charset charset, Logger logger) {
 		
-		String ret ;
-		try (GZIPInputStream gis = new GZIPInputStream(new ByteArrayInputStream(compressed)) ) {
-		
-			ChannelReaderDecoder chan = new ChannelReaderDecoder(
-				gis,
-				charset,
-				null, 
-				getReceiveBufSize(compressed),				
-				logger) ;
-			ret = chan.readAllChar().toString() ;
-		} catch (Exception e) {
-			ret = null ;
-			logger.log(Level.SEVERE, "Exception during gzip decompress", e);
+		try (ByteArrayInputStream bis = new ByteArrayInputStream(compressed)) {
+			return decompressInputStream(bis, SupportedCompression.GZIP, charset, null, getReceiveBufSize(compressed), logger).toString() ;
+		} catch (IOException e) {
+			logger.log(Level.SEVERE, "Exception during GZIP string decompress", e);
+			return null ;
 		}
-		return ret;
 	}
 	
 	public static String decompressDeflateString(byte[] compressed, Charset charset, Logger logger) {
 		
-		try (InflaterInputStream targetStream = new InflaterInputStream(new ByteArrayInputStream(compressed))) {
-			ChannelReaderDecoder chan = new ChannelReaderDecoder(
-					targetStream,
-					charset,
-					null, 
-					getReceiveBufSize(compressed),				
-					logger) ;
-			return chan.readAllChar().toString() ;
+		try (ByteArrayInputStream bis = new ByteArrayInputStream(compressed)) {
+			return decompressInputStream(bis, SupportedCompression.DEFLATE, charset, null, getReceiveBufSize(compressed), logger).toString() ;
 		} catch (IOException e) {
 			logger.log(Level.SEVERE, "Exception during deflate string decompress", e);
 			return null ;
@@ -113,37 +101,81 @@ public class CompressionUtils {
 	
 	public static ByteBuffer decompressGzip(byte[] compressed, Logger logger) {
 		
-		ByteBuffer ret ;
-		try (GZIPInputStream gis = new GZIPInputStream(new ByteArrayInputStream(compressed)) ) {
-		
-			ChannelReaderDecoder chan = new ChannelReaderDecoder(
-				gis,
-				null,
-				null, 
-				getReceiveBufSize(compressed),				
-				logger) ;
-			ret = chan.readAllBytes() ;
-		} catch (Exception e) {
-			ret = null ;
-			logger.log(Level.SEVERE, "Exception during gzip decompress", e);
+		try (ByteArrayInputStream bis = new ByteArrayInputStream(compressed)) {
+			return decompressInputStream(bis, SupportedCompression.GZIP, getReceiveBufSize(compressed), logger) ;
+		} catch (IOException e) {
+			logger.log(Level.SEVERE, "Exception during GZIP decompress", e);
+			return null ;
 		}
-		return ret;
 	}
 	
 	public static ByteBuffer decompressDeflate(byte[] compressed, Logger logger) {
 		
-		try (InflaterInputStream targetStream = new InflaterInputStream(new ByteArrayInputStream(compressed))) {
-			ChannelReaderDecoder chan = new ChannelReaderDecoder(
-					targetStream,
-					null,
-					null, 
-					getReceiveBufSize(compressed),				
-					logger) ;
-			return chan.readAllBytes() ;
+		try (ByteArrayInputStream bis = new ByteArrayInputStream(compressed)) {
+			return decompressInputStream(bis, SupportedCompression.DEFLATE, getReceiveBufSize(compressed), logger) ;
 		} catch (IOException e) {
 			logger.log(Level.SEVERE, "Exception during deflate decompress", e);
 			return null ;
 		}
 	}
 
+	public enum SupportedCompression { GZIP, DEFLATE } ;
+	
+	private static InputStream getDecodedInputStream(SupportedCompression compressAlgo, InputStream compressed, Logger hLog) {
+
+		switch (compressAlgo) {
+		case GZIP:
+			try {
+				return new GZIPInputStream(compressed);
+			} catch (IOException e) {
+				hLog.log(Level.SEVERE, "IOException in GZIPInputStream creation", e);
+				return null;
+			}
+		case DEFLATE:
+			return new InflaterInputStream(compressed);
+		default:
+			hLog.severe("Unexpected compression scheme: " + compressAlgo);
+			return null;
+		}
+	}
+	
+	public static ByteBuffer decompressInputStream(InputStream compressed, SupportedCompression compressSchema, int buffSize, Logger logger) {
+		
+		try (InputStream targetStream = getDecodedInputStream(compressSchema, compressed, logger)) {
+			ChannelReaderDecoder chan = new ChannelReaderDecoder(
+					targetStream,
+					null,
+					null, 
+					buffSize,				
+					logger) ;
+			return chan.readAllBytes() ;
+		} catch (IOException e) {
+			logger.log(Level.SEVERE, "Exception during decompress " + compressSchema, e);
+			return null ;
+		}
+	}
+	
+	public static CharBuffer decompressInputStream(InputStream compressed, SupportedCompression compressSchema, Charset charSet, File fileTrace, int buffSize, Logger logger) {
+		
+		try (InputStream targetStream = getDecodedInputStream(compressSchema, compressed, logger)) {
+			ChannelReaderDecoder chan = new ChannelReaderDecoder(
+					targetStream,
+					charSet,
+					fileTrace, 
+					buffSize,				
+					logger) ;
+			return chan.readAllChar() ;
+		} catch (IOException e) {
+			logger.log(Level.SEVERE, "Exception during decompress " + compressSchema, e);
+			return null ;
+		}
+	}
+	
+	public static ByteBuffer decompressInputStream(InputStream compressed, SupportedCompression compressSchema, Logger logger) {
+		return decompressInputStream(compressed, compressSchema, RECEIVE_BUF_SIZE, logger) ;
+	}
+	
+	public static CharBuffer decompressInputStream(InputStream compressed, SupportedCompression compressSchema, Charset charSet, File fileTrace, Logger logger) {
+		return decompressInputStream(compressed, compressSchema, charSet, fileTrace, RECEIVE_BUF_SIZE, logger) ;
+	}
 }

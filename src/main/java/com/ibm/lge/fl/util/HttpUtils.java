@@ -1,9 +1,7 @@
 package com.ibm.lge.fl.util;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.UncheckedIOException;
 import java.net.http.HttpResponse;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
@@ -14,8 +12,6 @@ import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.zip.GZIPInputStream;
-import java.util.zip.InflaterInputStream;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
@@ -55,29 +51,23 @@ public class HttpUtils {
 			}			
 			return sc ;
 	}
-	
-	
-	private static InputStream getDecodedInputStream(HttpResponse<InputStream> httpResponse, Logger hLog) {
+
+	private static CompressionUtils.SupportedCompression getEncoding(HttpResponse<InputStream> httpResponse, Logger hLog) {
 		
 	    String encoding = httpResponse.headers().firstValue("Content-Encoding").orElse("") ;
-	    try {
-	        switch (encoding) {
-	            case "":
-	                return httpResponse.body();
-	            case "gzip":
-	                return new GZIPInputStream(httpResponse.body());
-	            case "deflate":
-	            	return new InflaterInputStream(httpResponse.body());
-	            default:
-	            	hLog.severe("HttpUtils.getDecodedInputStream - Unexpected Content-Encoding: \n" + readHttpResponseInfos(httpResponse)) ;
-	                throw new UnsupportedOperationException("Unexpected Content-Encoding: " + encoding);
-	        }
-	    } catch (IOException e) {
-	    	hLog.log(Level.SEVERE, "HttpUtils.getDecodedInputStream IOException", e) ;
-	        throw new UncheckedIOException(e);
-	    }
+        switch (encoding) {
+            case "":
+                return null;
+            case "gzip":
+                return CompressionUtils.SupportedCompression.GZIP;
+            case "deflate":
+            	return CompressionUtils.SupportedCompression.DEFLATE;
+            default:
+            	hLog.severe("HttpUtils.getDecodedInputStream - Unexpected Content-Encoding: \n" + readHttpResponseInfos(httpResponse)) ;
+                throw new UnsupportedOperationException("Unexpected Content-Encoding: " + encoding);
+        }
 	}
-
+	
 	// Read http response body with decompression if necessary
 	public static CharBuffer readHttpResponse(HttpResponse<InputStream> httpResponse, Charset charSet, Logger hLog) {
 		return readHttpResponse(httpResponse, charSet, null, hLog) ;
@@ -85,24 +75,37 @@ public class HttpUtils {
 	
 	// Read http response body with decompression if necessary, and log decompressed content as bytes in a file
 	public static CharBuffer readHttpResponse(HttpResponse<InputStream> httpResponse,  Charset charSet, File fileTrace, Logger hLog) {
-		ChannelReaderDecoder chan = new ChannelReaderDecoder(
-				getDecodedInputStream(httpResponse, hLog),
-				charSet,
-				fileTrace, 
-				RECEIVE_BUF_SIZE,				
-				hLog) ;
-		return chan.readAllChar() ;
+		
+		CompressionUtils.SupportedCompression compression = getEncoding(httpResponse, hLog) ;
+		if (compression == null) {
+			ChannelReaderDecoder chan = new ChannelReaderDecoder(
+					httpResponse.body(),
+					charSet,
+					fileTrace, 
+					RECEIVE_BUF_SIZE,				
+					hLog) ;
+			return chan.readAllChar() ;
+		} else {
+			return CompressionUtils.decompressInputStream(httpResponse.body(), compression, charSet, fileTrace, hLog) ;
+		}
+		
 	}
 	
 	// Read http response body with no interpretation, as bytes
 	public static ByteBuffer readHttpResponseAsBytes(HttpResponse<InputStream> httpResponse, Logger hLog) {
-		ChannelReaderDecoder chan = new ChannelReaderDecoder(
-				httpResponse.body(),
-				null,
-				null, 
-				RECEIVE_BUF_SIZE,				
-				hLog) ;
-		return chan.readAllBytes() ;
+		
+		CompressionUtils.SupportedCompression compression = getEncoding(httpResponse, hLog) ;
+		if (compression == null) {
+			ChannelReaderDecoder chan = new ChannelReaderDecoder(
+					httpResponse.body(),
+					null,
+					null, 
+					RECEIVE_BUF_SIZE,				
+					hLog) ;
+			return chan.readAllBytes() ;
+		} else {
+			return CompressionUtils.decompressInputStream(httpResponse.body(), compression, hLog) ;
+		}
 	}
 	
 	public static String readHttpResponseInfos(HttpResponse<?> httpResponse) {

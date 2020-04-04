@@ -28,8 +28,6 @@ public class ApiReturn {
 	private JsonObject 			subReturnCode ;
 	private Charset				responseCharset ;
 		
-	public enum SupportedCompression { GZIP, DEFLATE } ;
-	
 	public ApiReturn(ExecutionDurations ed, Charset rc, Logger l) {
 		
 		aLog 			 = l ;
@@ -93,7 +91,7 @@ public class ApiReturn {
 	}
 	
 	private final static String COMPRESS_ERROR_MSG =  "Error in ApiReturn when compressing string " ;
-	public byte[] getCompressedApiReturn(String info, SupportedCompression compressAlgo) {
+	public byte[] getCompressedApiReturn(String info, CompressionUtils.SupportedCompression compressAlgo) {
 		
 		// Result to return
 		byte[] compressedArray = null ;

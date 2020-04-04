@@ -106,7 +106,7 @@ class ApiReturnTest {
 
 		apiReturn.setDataReturn(sampleReturn);
 		
-		byte[] ret = apiReturn.getCompressedApiReturn("Info retour ", ApiReturn.SupportedCompression.DEFLATE) ;
+		byte[] ret = apiReturn.getCompressedApiReturn("Info retour ", CompressionUtils.SupportedCompression.DEFLATE) ;
 		
 		String decompressedRet = CompressionUtils.decompressDeflateString(ret, charSetForReturn, logger) ;
 		
@@ -134,7 +134,7 @@ class ApiReturnTest {
 
 		apiReturn.setDataReturn(sampleReturn);
 		
-		byte[] ret = apiReturn.getCompressedApiReturn("Info retour ", ApiReturn.SupportedCompression.GZIP) ;
+		byte[] ret = apiReturn.getCompressedApiReturn("Info retour ", CompressionUtils.SupportedCompression.GZIP) ;
 		
 		String decompressedRet = CompressionUtils.decompressGzipString(ret, charSetForReturn, logger) ;
 		
