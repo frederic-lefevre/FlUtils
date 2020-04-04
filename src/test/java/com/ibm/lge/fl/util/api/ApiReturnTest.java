@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.ibm.lge.fl.util.ChannelReaderDecoder;
+import com.ibm.lge.fl.util.CompressionUtils;
 import com.ibm.lge.fl.util.ExecutionDurations;
 
 class ApiReturnTest {
@@ -110,15 +111,9 @@ class ApiReturnTest {
 		
 		byte[] ret = apiReturn.getCompressedApiReturn("Info retour ") ;
 		
-		InflaterInputStream targetStream = new InflaterInputStream(new ByteArrayInputStream(ret));
-		ChannelReaderDecoder chan = new ChannelReaderDecoder(
-				targetStream,
-				charSetForReturn,
-				null, 
-				1024,				
-				logger) ;
+		String decompressedRet = CompressionUtils.decompressDeflateString(ret, charSetForReturn, logger) ;
 		
-		JsonObject jsonRet = JsonParser.parseString(chan.readAllChar().toString()).getAsJsonObject() ;
+		JsonObject jsonRet = JsonParser.parseString(decompressedRet).getAsJsonObject() ;
 		
 		assertTrue(jsonRet.has(ApiJsonPropertyName.OPERATION)) ;
 		assertTrue(jsonRet.has(ApiJsonPropertyName.DATA)) ;

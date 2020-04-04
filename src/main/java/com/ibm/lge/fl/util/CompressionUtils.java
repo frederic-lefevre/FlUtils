@@ -9,6 +9,7 @@ import java.util.logging.Logger;
 import java.util.zip.Deflater;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
+import java.util.zip.InflaterInputStream;
 
 public class CompressionUtils {
 
@@ -80,6 +81,18 @@ public class CompressionUtils {
 			logger.log(Level.SEVERE, "Exception during gzip decompress", e);
 		}
 		return ret;
+	}
+	
+	public static String decompressDeflateString(byte[] compressed, Charset charset, Logger logger) {
+		
+		InflaterInputStream targetStream = new InflaterInputStream(new ByteArrayInputStream(compressed));
+		ChannelReaderDecoder chan = new ChannelReaderDecoder(
+				targetStream,
+				charset,
+				null, 
+				1024,				
+				logger) ;
+		return chan.readAllChar().toString() ;
 	}
 	
 	public static ByteBuffer decompressGzip(byte[] compressed, Logger logger) {
