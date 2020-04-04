@@ -27,6 +27,9 @@ public class CompressionUtils {
 		return compressed;
 	}
 	
+	// Intermediate compression max buffer size (1 Mega)
+	private final static int COMPRESS_BUFFER_SIZE = 1048576 ;
+
 	public static byte[] compressDeflate(byte[] data, Logger logger) {
 		
 		// Create a Deflater to compress the bytes
@@ -37,7 +40,13 @@ public class CompressionUtils {
 		byte[] compressedArray ;
 		try (ByteArrayOutputStream bos = new ByteArrayOutputStream(data.length) ) {
 			
-			byte[] buffer = new byte[1024];           
+			int buffSize ;
+			if (data.length < COMPRESS_BUFFER_SIZE) {
+				buffSize = data.length ;
+			} else {
+				buffSize = COMPRESS_BUFFER_SIZE ;
+			}
+			byte[] buffer = new byte[buffSize];           
 			while(!compresser.finished())
 			{             
 				int bytesCompressed = compresser.deflate(buffer);

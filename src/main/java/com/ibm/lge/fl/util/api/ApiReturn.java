@@ -1,11 +1,10 @@
 package com.ibm.lge.fl.util.api;
 
-import java.io.ByteArrayOutputStream;
 import java.nio.charset.Charset;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.zip.Deflater;
 
+import com.ibm.lge.fl.util.CompressionUtils;
 import com.ibm.lge.fl.util.ExecutionDurations;
 import com.ibm.lge.fl.util.json.JsonUtils;
 
@@ -14,12 +13,6 @@ import com.google.gson.JsonObject;
 
 public class ApiReturn {
 
-	// Expected compression ratio
-	private final static int EXPECTED_COMPRESS_RATIO = 6 ;
-	
-	// Intermediate compression buffer size (1 Mega)
-	private final static int COMPRESS_BUFFER_SIZE = 1048576 ;
-			
 	// Limit trace size of api return when level is FINE
 	private final static int TRACE_FINER_LIMIT = 8192 ;
 
@@ -34,8 +27,7 @@ public class ApiReturn {
 	private JsonObject 			additionnalInfos ;
 	private JsonObject 			subReturnCode ;
 	private Charset				responseCharset ;
-	
-	
+		
 	public ApiReturn(ExecutionDurations ed, Charset rc, Logger l) {
 		
 		aLog 			 = l ;
@@ -98,6 +90,7 @@ public class ApiReturn {
 		return retStr;
 	}
 	
+	private final static String COMPRESS_ERROR_MSG =  "Error in ApiReturn when compressing string " ;
 	public byte[] getCompressedApiReturn(String info) {
 		
 		// Result to return
@@ -113,26 +106,17 @@ public class ApiReturn {
 		
 		if (!onError) {
 
-			// Create a Deflater to compress the encoded bytes
-			Deflater compresser = new Deflater();
-			compresser.setInput(stringReturnAsBytes);
-			compresser.finish();
-
-			try (ByteArrayOutputStream bos = new ByteArrayOutputStream(stringReturnAsBytes.length/EXPECTED_COMPRESS_RATIO) ) {
-				
-				byte[] buffer = new byte[COMPRESS_BUFFER_SIZE];           
-				while(!compresser.finished())
-				{             
-					int bytesCompressed = compresser.deflate(buffer);
-					bos.write(buffer,0,bytesCompressed);
-				}	
-				
-				//get the compressed byte array from output stream
-				compressedArray = bos.toByteArray();
-				
-			}  catch(Exception ioe) {
-				aLog.log(Level.SEVERE, "Exception in ApiReturn when compressing Api return", ioe);
-				setErrorReturn(ApiErrorCodeBuilder.COMPRESSION_EXCEPTION_CODE, ioe.toString()) ;
+			compressedArray = CompressionUtils.compressDeflate(stringReturnAsBytes, aLog) ;
+			
+			if (compressedArray == null) {
+				String errorMsg ;
+				if (info == null) {
+					errorMsg = COMPRESS_ERROR_MSG + "null" ;
+				} else {
+					errorMsg = COMPRESS_ERROR_MSG + first100char(info) + "..." ;
+				}
+				aLog.severe(errorMsg);
+				setErrorReturn(ApiErrorCodeBuilder.COMPRESSION_EXCEPTION_CODE, errorMsg) ;
 			}		
 		}
 		if ((aLog.isLoggable(Level.FINE)) && (!onError)) {
@@ -142,6 +126,13 @@ public class ApiReturn {
 		return compressedArray ;
 	}
 	
+	private String first100char(String s) {
+		if (s.length() > 99) {
+			return s.substring(0, 99) ;
+		} else {
+			return s ;
+		}
+	}
 	private JsonObject getApiReturnJsonObject(String info) {
 			
 		execDurations.endProcedurePoint();
