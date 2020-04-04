@@ -2,7 +2,6 @@ package com.ibm.lge.fl.util;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.logging.Level;
@@ -11,11 +10,9 @@ import java.util.zip.Deflater;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
-import com.ibm.lge.fl.util.api.ApiErrorCodeBuilder;
-
 public class CompressionUtils {
 
-	public static byte[] compressGzip(byte[] data, Logger logger) throws IOException {
+	public static byte[] compressGzip(byte[] data, Logger logger) {
 		
 		byte[] compressed ;
 		try (ByteArrayOutputStream bos  = new ByteArrayOutputStream(data.length);
@@ -30,7 +27,7 @@ public class CompressionUtils {
 		return compressed;
 	}
 	
-	public static byte[] compressDeflate(byte[] data, Logger logger) throws IOException {
+	public static byte[] compressDeflate(byte[] data, Logger logger) {
 		
 		// Create a Deflater to compress the bytes
 		Deflater compresser = new Deflater();
