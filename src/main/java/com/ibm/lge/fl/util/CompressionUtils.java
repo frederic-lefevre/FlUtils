@@ -2,6 +2,7 @@ package com.ibm.lge.fl.util;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.logging.Level;
@@ -85,14 +86,18 @@ public class CompressionUtils {
 	
 	public static String decompressDeflateString(byte[] compressed, Charset charset, Logger logger) {
 		
-		InflaterInputStream targetStream = new InflaterInputStream(new ByteArrayInputStream(compressed));
-		ChannelReaderDecoder chan = new ChannelReaderDecoder(
-				targetStream,
-				charset,
-				null, 
-				1024,				
-				logger) ;
-		return chan.readAllChar().toString() ;
+		try (InflaterInputStream targetStream = new InflaterInputStream(new ByteArrayInputStream(compressed))) {
+			ChannelReaderDecoder chan = new ChannelReaderDecoder(
+					targetStream,
+					charset,
+					null, 
+					1024,				
+					logger) ;
+			return chan.readAllChar().toString() ;
+		} catch (IOException e) {
+			logger.log(Level.SEVERE, "Exception during deflate string decompress", e);
+			return null ;
+		}
 	}
 	
 	public static ByteBuffer decompressGzip(byte[] compressed, Logger logger) {
@@ -113,4 +118,21 @@ public class CompressionUtils {
 		}
 		return ret;
 	}
+	
+	public static ByteBuffer decompressDeflate(byte[] compressed, Logger logger) {
+		
+		try (InflaterInputStream targetStream = new InflaterInputStream(new ByteArrayInputStream(compressed))) {
+			ChannelReaderDecoder chan = new ChannelReaderDecoder(
+					targetStream,
+					null,
+					null, 
+					1024,				
+					logger) ;
+			return chan.readAllBytes() ;
+		} catch (IOException e) {
+			logger.log(Level.SEVERE, "Exception during deflate decompress", e);
+			return null ;
+		}
+	}
+
 }

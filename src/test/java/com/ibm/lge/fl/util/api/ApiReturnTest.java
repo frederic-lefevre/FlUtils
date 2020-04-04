@@ -2,18 +2,15 @@ package com.ibm.lge.fl.util.api;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.io.ByteArrayInputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.zip.InflaterInputStream;
 
 import org.junit.jupiter.api.Test;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.ibm.lge.fl.util.ChannelReaderDecoder;
 import com.ibm.lge.fl.util.CompressionUtils;
 import com.ibm.lge.fl.util.ExecutionDurations;
 
