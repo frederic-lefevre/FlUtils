@@ -20,6 +20,7 @@ public class CompressionUtils {
 		try (ByteArrayOutputStream bos  = new ByteArrayOutputStream(data.length);
 			 GZIPOutputStream 	   gzip = new GZIPOutputStream(bos)) {
 			gzip.write(data);
+			gzip.close();
 			compressed = bos.toByteArray();
 		
 		} catch (Exception e) {

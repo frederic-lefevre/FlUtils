@@ -95,7 +95,7 @@ class ApiReturnTest {
 	}
 	
 	@Test
-	void compressedReturn() {
+	void compressedDeflateReturn() {
 		
 		Charset charSetForReturn = StandardCharsets.UTF_8 ;
 		ApiReturn apiReturn = new ApiReturn(new ExecutionDurations("test"), charSetForReturn, logger) ;
@@ -106,9 +106,37 @@ class ApiReturnTest {
 
 		apiReturn.setDataReturn(sampleReturn);
 		
-		byte[] ret = apiReturn.getCompressedApiReturn("Info retour ") ;
+		byte[] ret = apiReturn.getCompressedApiReturn("Info retour ", ApiReturn.SupportedCompression.DEFLATE) ;
 		
 		String decompressedRet = CompressionUtils.decompressDeflateString(ret, charSetForReturn, logger) ;
+		
+		JsonObject jsonRet = JsonParser.parseString(decompressedRet).getAsJsonObject() ;
+		
+		assertTrue(jsonRet.has(ApiJsonPropertyName.OPERATION)) ;
+		assertTrue(jsonRet.has(ApiJsonPropertyName.DATA)) ;
+		
+		assertEquals(ApiReturn.OK, jsonRet.get(ApiJsonPropertyName.OPERATION).getAsString()) ;
+		
+		JsonObject dataJson = jsonRet.getAsJsonObject(ApiJsonPropertyName.DATA) ;
+		assertEquals("contenu de la prop1", dataJson.get("prop1").getAsString()) ;
+		assertEquals("contenu de la prop2", dataJson.get("prop2").getAsString()) ;
+	}
+	
+	@Test
+	void compresseGzipReturn() {
+		
+		Charset charSetForReturn = StandardCharsets.UTF_8 ;
+		ApiReturn apiReturn = new ApiReturn(new ExecutionDurations("test"), charSetForReturn, logger) ;
+		
+		JsonObject sampleReturn = new JsonObject() ;
+		sampleReturn.addProperty("prop1", "contenu de la prop1");
+		sampleReturn.addProperty("prop2", "contenu de la prop2");
+
+		apiReturn.setDataReturn(sampleReturn);
+		
+		byte[] ret = apiReturn.getCompressedApiReturn("Info retour ", ApiReturn.SupportedCompression.GZIP) ;
+		
+		String decompressedRet = CompressionUtils.decompressGzipString(ret, charSetForReturn, logger) ;
 		
 		JsonObject jsonRet = JsonParser.parseString(decompressedRet).getAsJsonObject() ;
 		

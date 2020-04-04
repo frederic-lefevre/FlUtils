@@ -28,6 +28,8 @@ public class ApiReturn {
 	private JsonObject 			subReturnCode ;
 	private Charset				responseCharset ;
 		
+	public enum SupportedCompression { GZIP, DEFLATE } ;
+	
 	public ApiReturn(ExecutionDurations ed, Charset rc, Logger l) {
 		
 		aLog 			 = l ;
@@ -91,7 +93,7 @@ public class ApiReturn {
 	}
 	
 	private final static String COMPRESS_ERROR_MSG =  "Error in ApiReturn when compressing string " ;
-	public byte[] getCompressedApiReturn(String info) {
+	public byte[] getCompressedApiReturn(String info, SupportedCompression compressAlgo) {
 		
 		// Result to return
 		byte[] compressedArray = null ;
@@ -106,7 +108,18 @@ public class ApiReturn {
 		
 		if (!onError) {
 
-			compressedArray = CompressionUtils.compressDeflate(stringReturnAsBytes, aLog) ;
+			switch (compressAlgo) {
+			case GZIP:
+				compressedArray = CompressionUtils.compressGzip(stringReturnAsBytes, aLog) ;
+				break ;
+			case DEFLATE:
+				compressedArray = CompressionUtils.compressDeflate(stringReturnAsBytes, aLog) ;
+				break ;
+			default:
+				aLog.severe("Unexpected compression scheme: " + compressAlgo);
+				compressedArray = stringReturnAsBytes ;
+			}
+			
 			
 			if (compressedArray == null) {
 				String errorMsg ;
