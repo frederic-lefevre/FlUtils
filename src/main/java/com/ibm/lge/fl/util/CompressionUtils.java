@@ -65,6 +65,16 @@ public class CompressionUtils {
 		return compressedArray ;
 	}
 	
+	private static int RECEIVE_BUF_SIZE = 200*1024 ;
+	private static int COMPRESS_RATIO	= 6 ;
+	private static int getReceiveBufSize(byte[] compressed) {
+		long receiveBufSize = compressed.length*COMPRESS_RATIO ;
+		if (receiveBufSize > RECEIVE_BUF_SIZE) {
+			receiveBufSize = RECEIVE_BUF_SIZE ;
+		}
+		return (int) receiveBufSize ;
+	}
+	
 	public static String decompressGzipString(byte[] compressed, Charset charset, Logger logger) {
 		
 		String ret ;
@@ -74,7 +84,7 @@ public class CompressionUtils {
 				gis,
 				charset,
 				null, 
-				1024,				
+				getReceiveBufSize(compressed),				
 				logger) ;
 			ret = chan.readAllChar().toString() ;
 		} catch (Exception e) {
@@ -91,7 +101,7 @@ public class CompressionUtils {
 					targetStream,
 					charset,
 					null, 
-					1024,				
+					getReceiveBufSize(compressed),				
 					logger) ;
 			return chan.readAllChar().toString() ;
 		} catch (IOException e) {
@@ -109,7 +119,7 @@ public class CompressionUtils {
 				gis,
 				null,
 				null, 
-				1024,				
+				getReceiveBufSize(compressed),				
 				logger) ;
 			ret = chan.readAllBytes() ;
 		} catch (Exception e) {
@@ -126,7 +136,7 @@ public class CompressionUtils {
 					targetStream,
 					null,
 					null, 
-					1024,				
+					getReceiveBufSize(compressed),				
 					logger) ;
 			return chan.readAllBytes() ;
 		} catch (IOException e) {
