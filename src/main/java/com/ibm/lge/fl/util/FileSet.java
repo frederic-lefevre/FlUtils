@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.EnumSet;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -28,8 +29,8 @@ public class FileSet {
 	private boolean recursive ;
 	
 	// Filters to include and exclude files
-	private ArrayList<PathMatcher> includeMatcher ;
-	private ArrayList<PathMatcher> excludeMatcher ;
+	private List<PathMatcher> includeMatcher ;
+	private List<PathMatcher> excludeMatcher ;
 		
 	// Instance that process visited file 
 	private SimpleFileVisitor<Path> allPathVisitor ;
@@ -37,13 +38,13 @@ public class FileSet {
 	private SimpleFileVisitor<Path> filterDirectory ;
 	
 	// List of all path under the root path (do not take filter into account)
-	private ArrayList<Path> allPathList ;
+	private List<Path> allPathList ;
 	
 	// List of files in this FileSet
-	private ArrayList<Path> fileList ;
+	private List<Path> fileList ;
 	
 	// List of directories in this FileSet
-	private ArrayList<Path> directoryList ;
+	private List<Path> directoryList ;
 	
 	// File comparator to sort files by last modified date
 	private Comparator<Path> lastModifiedComp ;
@@ -148,14 +149,14 @@ public class FileSet {
 	}
 	
 	public void setIncludeFilters(String[]  iFilters) {
-		includeMatcher = new ArrayList<PathMatcher>() ;
+		includeMatcher = new ArrayList<>() ;
 		for (String pattern : iFilters) {
 			includeMatcher.add(FileSystems.getDefault().getPathMatcher("glob:" + pattern));
 		}
 	}
 
 	public void setExcludeFilters(String[] eFilters) {
-		excludeMatcher = new ArrayList<PathMatcher>() ;
+		excludeMatcher = new ArrayList<>() ;
 		for (String pattern : eFilters) {
 			excludeMatcher.add(FileSystems.getDefault().getPathMatcher("glob:" + pattern));
 		}
@@ -188,31 +189,31 @@ public class FileSet {
 		return (included && !excluded) ;
 	}
 	
-	public ArrayList<Path> getFileList() {
+	public List<Path> getFileList() {
 		
 		scan(filterFile) ;
 		return fileList ;
 	}
 	
-	public ArrayList<Path> getDirectyList() {
+	public List<Path> getDirectyList() {
 		
 		scan(filterDirectory) ;
 		return directoryList ;
 	}
 	
-	public ArrayList<Path> getAllPathList() {
+	public List<Path> getAllPathList() {
 		scan(allPathVisitor) ;
 		return allPathList;
 	}
 
-	public ArrayList<Path> getFileListOrderedByLastModified() {
+	public List<Path> getFileListOrderedByLastModified() {
 		
 		scan(filterFile) ;
 		Collections.sort(fileList, lastModifiedComp);
 		return fileList ;
 	}
 	
-	public ArrayList<Path> getFileListOrdered(Comparator<Path> comparator) {
+	public List<Path> getFileListOrdered(Comparator<Path> comparator) {
 		
 		scan(filterFile) ;
 		Collections.sort(fileList, comparator);
@@ -223,8 +224,8 @@ public class FileSet {
 	private void scan(SimpleFileVisitor<Path> sfv) {
 		
 		// reset the files and directories list
-		fileList = new ArrayList<Path>() ;
-		directoryList = new ArrayList<Path>() ;
+		fileList = new ArrayList<>() ;
+		directoryList = new ArrayList<>() ;
 		
 		EnumSet<FileVisitOption> options = EnumSet.of(FileVisitOption.FOLLOW_LINKS);
 		int maxDepth ;

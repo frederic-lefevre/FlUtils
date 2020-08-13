@@ -102,7 +102,7 @@ public class ApiErrorCodeBuilder {
 		} else {
 			// the error code is in the reserved range
 			res = false ;
-			log.severe("Trying to register error code : " + code + "\n in the reseverd range with message : " + msg);
+			log.severe("Trying to register error code : " + code + "\n in the reserved range with message : " + msg);
 		}
 		return res ;
 	}

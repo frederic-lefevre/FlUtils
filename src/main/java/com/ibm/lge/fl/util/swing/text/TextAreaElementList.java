@@ -2,6 +2,7 @@ package com.ibm.lge.fl.util.swing.text;
 
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -12,23 +13,23 @@ import javax.swing.text.Highlighter.HighlightPainter;
 
 public class TextAreaElementList {
 
-	private final String 					   name ;
-	private final JTextComponent 			   textComponent ;
-	private final Logger		 			   lLog ;
-	private final ArrayList<TextAreaElement>   textElements ;
+	private final String 				name ;
+	private final JTextComponent 		textComponent ;
+	private final Logger		 		lLog ;
+	private final List<TextAreaElement>	textElements ;
 	
-	private int 					   		   currentTextElement ;
+	private int 					   	currentTextElement ;
 	
-	private final Highlighter 			   	   highLighter ;
+	private final Highlighter 			highLighter ;
 	
 	// HighLights for all elements
-	private final HighlightPainter 		   	   painter ;
-	private final Color  					   highLightColor ;
-	private ArrayList<Object> 		   		   currentHighLights ;
+	private final HighlightPainter 		painter ;
+	private final Color  				highLightColor ;
+	private List<Object> 		   		currentHighLights ;
 		
 	// HighLights for current element
-	private Object					   		   currentElementHighLight ;
-	private final HighlightPainter 		   	   currentElementPainter ;
+	private Object					   	currentElementHighLight ;
+	private final HighlightPainter 		currentElementPainter ;
 	
 	private static Color currentElementHighLightColor = Color.GREEN;
 	
@@ -37,12 +38,12 @@ public class TextAreaElementList {
 		textComponent 	   = tc ;
 		highLightColor     = hlc ;
 		lLog			   = l ;
-		textElements	   = new ArrayList<TextAreaElement>() ;
+		textElements	   = new ArrayList<>() ;
 		currentTextElement = -1 ;
 		highLighter 	   = textComponent.getHighlighter() ;
 		if (highLightColor != null) {
 			painter			   = new MultiHighLightPainter(highLightColor) ;
-			currentHighLights  = new ArrayList<Object>() ;
+			currentHighLights  = new ArrayList<>() ;
 		} else {
 			painter 		  = null ;
 			currentHighLights = null ;

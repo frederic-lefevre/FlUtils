@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.FileHandler;
 import java.util.logging.Formatter;
@@ -437,7 +438,7 @@ public class LoggerManager {
     	} else {
     		// search for in-memory handlers
     		
-    		ArrayList<BufferLogHandler> inMemoryHandlers = getHandlersWithInMemoryLog() ;
+    		List<BufferLogHandler> inMemoryHandlers = getHandlersWithInMemoryLog() ;
     		if ((inMemoryHandlers != null) && (! inMemoryHandlers.isEmpty())) {
     			return inMemoryHandlers.get(0).getMemoryLogs() ;
     		} else {
@@ -453,7 +454,7 @@ public class LoggerManager {
     	} else {
     		// search for in-memory handlers
     		
-    		ArrayList<BufferLogHandler> inMemoryHandlers = getHandlersWithInMemoryLog() ;
+    		List<BufferLogHandler> inMemoryHandlers = getHandlersWithInMemoryLog() ;
     		if (inMemoryHandlers != null) {
     			
     			StringBuilder msg = new StringBuilder() ;
@@ -482,7 +483,7 @@ public class LoggerManager {
     	} else {
     		// search for in-memory handlers
     		
-    		ArrayList<BufferLogHandler> inMemoryHandlers = getHandlersWithInMemoryLog() ;
+    		List<BufferLogHandler> inMemoryHandlers = getHandlersWithInMemoryLog() ;
     		if (inMemoryHandlers != null) {
     			;
     			for (BufferLogHandler inMemoryHandler : inMemoryHandlers) {
@@ -500,9 +501,9 @@ public class LoggerManager {
     }
     
     // Get all handlers with in-memory logging, sorted by the size of their buffer
-    private ArrayList<BufferLogHandler> getHandlersWithInMemoryLog() {
+    private List<BufferLogHandler> getHandlersWithInMemoryLog() {
     	
-    	ArrayList<BufferLogHandler> result = new ArrayList<BufferLogHandler>() ;
+    	List<BufferLogHandler> result = new ArrayList<>() ;
     	Handler[] handlers = log.getHandlers() ;
 		if (handlers != null) {
     		for (Handler handler : handlers) {

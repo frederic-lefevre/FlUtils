@@ -50,9 +50,9 @@ public class AdvancedProperties extends Properties {
 	// The root key includes the key element separator (so it ends with a separator)
 	// The keys are sorted digits first sorted according to their numeric value 
 	// and then letters sorted case sensitive (upper letter first)
-	public ArrayList<String> getKeysElements(String rootKey) {
+	public List<String> getKeysElements(String rootKey) {
 		
-		ArrayList<String> res = new ArrayList<String>() ;
+		ArrayList<String> res = new ArrayList<>() ;
 		Set<String> keys = stringPropertyNames() ;
 		for (String ks : keys) {
 			if (ks.startsWith(rootKey)) {
@@ -459,15 +459,15 @@ public class AdvancedProperties extends Properties {
     	}    	
     }
     
-	public ArrayList<String> getArrayOfFileContent(String key, String separator) {
+	public List<String> getArrayOfFileContent(String key, String separator) {
 		return getArrayOfFileContent(key, separator,  Charset.defaultCharset()) ;
 	}
 	
-	public ArrayList<String> getArrayOfFileContent(String key, String separator, Charset charset) {
+	public List<String> getArrayOfFileContent(String key, String separator, Charset charset) {
 		
 		String prop =  getProperty(key) ;
 		String[] fPaths ;
-		ArrayList<String> result = new ArrayList<String>() ;
+		ArrayList<String> result = new ArrayList<>() ;
 		if ((prop != null) && (! prop.isEmpty())) {	
 			try {
 				fPaths = prop.split(separator) ;

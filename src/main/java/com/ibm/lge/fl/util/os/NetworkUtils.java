@@ -7,17 +7,18 @@ import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.List;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 public class NetworkUtils {
 	
-	private JsonArray 		  IPv4 				= new JsonArray() ;
-	private JsonArray 		  IPv6 				= new JsonArray() ;
-	private JsonArray 		  otherAddresses	= new JsonArray() ;
-	private JsonArray 		  networkInterfaces = new JsonArray() ;
-	private ArrayList<String> IPv4List 			= new ArrayList<String>();
+	private JsonArray 	 IPv4 			   = new JsonArray() ;
+	private JsonArray 	 IPv6 			   = new JsonArray() ;
+	private JsonArray 	 otherAddresses	   = new JsonArray() ;
+	private JsonArray 	 networkInterfaces = new JsonArray() ;
+	private List<String> IPv4List 		   = new ArrayList<String>();
 	
 	public NetworkUtils(boolean withLookup) {
 		
@@ -78,7 +79,7 @@ public class NetworkUtils {
 		return otherAddresses;
 	}
 
-	public ArrayList<String> getIPv4List() {
+	public List<String> getIPv4List() {
 		return IPv4List ;
 	}
 	

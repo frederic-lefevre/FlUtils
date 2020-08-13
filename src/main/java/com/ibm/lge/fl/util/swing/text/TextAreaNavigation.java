@@ -6,6 +6,7 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -15,16 +16,16 @@ public class TextAreaNavigation extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 
-	private ArrayList<TextAreaElementList> textAreaElementLists ;
+	private List<TextAreaElementList> textAreaElementLists ;
 	
 	public TextAreaNavigation() {
 		
-		textAreaElementLists = new ArrayList<TextAreaElementList>() ;
+		textAreaElementLists = new ArrayList<>() ;
 		
 		setLayout(new GridBagLayout()) ;
 	}
 	
-	public TextAreaNavigation(ArrayList<TextAreaElementList> tal) {
+	public TextAreaNavigation(List<TextAreaElementList> tal) {
 		
 		textAreaElementLists = tal ;
 		
@@ -80,7 +81,7 @@ public class TextAreaNavigation extends JPanel {
 	@Override
 	public void removeAll() {
 		super.removeAll();
-		textAreaElementLists = new ArrayList<TextAreaElementList>() ;
+		textAreaElementLists = new ArrayList<>() ;
 	}
 	
 	private class OcccurenceButtonListener implements ActionListener {

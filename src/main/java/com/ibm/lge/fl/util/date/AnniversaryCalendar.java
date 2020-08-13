@@ -5,13 +5,14 @@ import java.time.MonthDay ;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class AnniversaryCalendar <T> {
 
-	private HashMap<MonthDay,List<T>> anniversaires ; 	
+	private Map<MonthDay,List<T>> anniversaires ; 	
 	
 	public AnniversaryCalendar()  {
-		anniversaires = new HashMap<MonthDay,List<T>>() ;
+		anniversaires = new HashMap<>() ;
 	}
 
 	public MonthDay addAnniversary(T a, TemporalAccessor date) {

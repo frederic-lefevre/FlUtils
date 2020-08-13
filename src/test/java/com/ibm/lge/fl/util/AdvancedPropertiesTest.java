@@ -2,7 +2,6 @@ package com.ibm.lge.fl.util;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Filter;
 import java.util.logging.LogRecord;
@@ -37,7 +36,7 @@ class AdvancedPropertiesTest {
 		assertEquals("s3", advProps.getProperty("a.b.c.k3.t.v")) ;
 		assertEquals("s4", advProps.getProperty("a.b.c.k4")) ;
 		
-		ArrayList<String> keys = advProps.getKeysElements("a.b.c.") ;
+		List<String> keys = advProps.getKeysElements("a.b.c.") ;
 		assertEquals(4, keys.size()) ;
 		assertEquals("k1", keys.get(0)) ;
 		assertEquals("k2", keys.get(1)) ;
@@ -51,7 +50,7 @@ class AdvancedPropertiesTest {
 		AdvancedProperties advProps = new AdvancedProperties() ;
 		advProps.setProperty("p1", "10") ;	
 		
-		ArrayList<String> keys = advProps.getKeysElements("a.b.c.") ;
+		List<String> keys = advProps.getKeysElements("a.b.c.") ;
 		assertNotNull(keys) ;
 		assertEquals(0, keys.size()) ;
 		

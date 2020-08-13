@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -14,15 +15,15 @@ import java.util.logging.Logger;
 //
 public class AdvancedPropertiesSet {
 
-	private ArrayList<AdvancedProperties> apList ;
+	private List<AdvancedProperties> apList ;
 
 	public AdvancedPropertiesSet(FileSet fs, Logger log) {
 		super();
 		
-		apList = new ArrayList<AdvancedProperties>() ;
+		apList = new ArrayList<>() ;
 		if (fs != null) {
 			
-			ArrayList<Path> fpList = fs.getFileList() ;
+			List<Path> fpList = fs.getFileList() ;
 			
 			if (fpList != null) {
 				
@@ -40,7 +41,7 @@ public class AdvancedPropertiesSet {
 		
 	}
 
-	public ArrayList<AdvancedProperties> getApList() {
+	public List<AdvancedProperties> getApList() {
 		return apList;
 	}
 	

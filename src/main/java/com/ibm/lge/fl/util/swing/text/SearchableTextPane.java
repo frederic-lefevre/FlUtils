@@ -5,6 +5,7 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
@@ -34,11 +35,11 @@ public class SearchableTextPane extends JPanel  {
 	
 	private final SearcherHighLighter searcherHighLighter ;
 	
-	private ArrayList<TextAreaElementList> currentSearches ;
+	private List<TextAreaElementList> currentSearches ;
 	
 	public SearchableTextPane(JTextArea ta, Color[] highLightColors, Logger logger) {
 		
-		currentSearches   = new ArrayList<TextAreaElementList>() ;
+		currentSearches   = new ArrayList<>() ;
 		
 		setLayout(new BoxLayout(this,  BoxLayout.X_AXIS)) ;
 		
@@ -135,7 +136,7 @@ public class SearchableTextPane extends JPanel  {
 		for (TextAreaElementList searcheElement : currentSearches) {
 			searcheElement.removeHighLights() ;
 		}
-		currentSearches   = new ArrayList<TextAreaElementList>() ;	
+		currentSearches.clear() ;	
 		searchResultPanel.removeAll() ;
 	}
 	

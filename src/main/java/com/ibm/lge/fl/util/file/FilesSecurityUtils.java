@@ -70,9 +70,9 @@ public class FilesSecurityUtils {
 		}
 	}
 
-	private static ArrayList<UserPrincipal> getAclPrincipals(Path path) throws IOException {
+	private static List<UserPrincipal> getAclPrincipals(Path path) throws IOException {
 		
-		ArrayList<UserPrincipal> userPrincipals = new ArrayList<UserPrincipal>() ;
+		List<UserPrincipal> userPrincipals = new ArrayList<>() ;
 		FileStore fileStore = Files.getFileStore(path) ;
 		if (fileStore.supportsFileAttributeView(AclFileAttributeView.class)) {
 					
@@ -103,7 +103,7 @@ public class FilesSecurityUtils {
 			
 			AclFileAttributeView aclAttr = Files.getFileAttributeView(path, AclFileAttributeView.class);
 			
-			ArrayList<AclEntry> entries = new ArrayList<AclEntry>() ;
+			List<AclEntry> entries = new ArrayList<>() ;
 			
 			// set the file writable for the user running this process
 			entries.add(buildAclEntry(path, user)) ;

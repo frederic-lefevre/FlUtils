@@ -9,12 +9,13 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class SqlScript {
 
-	private ArrayList<String> sqlScript ;
+	private List<String> sqlScript ;
 	private Logger sLog ;
 	
 	// Line comment delimiter : after these char, everything is comment to the end of the line
@@ -30,7 +31,7 @@ public class SqlScript {
 	public SqlScript(Path sqlFile, String endStatement, Logger log) {
 		
 		sLog = log ;
-		sqlScript = new ArrayList<String>() ;
+		sqlScript = new ArrayList<>() ;
 		StringBuilder statement = new StringBuilder();
 		
 		try (BufferedReader reader = Files.newBufferedReader(sqlFile)) {
