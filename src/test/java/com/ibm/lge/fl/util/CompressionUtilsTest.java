@@ -27,7 +27,7 @@ public class CompressionUtilsTest {
 	@Test
 	void shouldCompressDecompressGzip() {
 		
-		byte[] dormeurZipped = CompressionUtils.compressGzip(DORMEUR_DU_VAL.getBytes(), logger);
+		byte[] dormeurZipped = CompressionUtils.compressGzip(DORMEUR_DU_VAL.getBytes(StandardCharsets.UTF_8), logger);
 		
 		assertNotNull(dormeurZipped);
 		assertTrue(dormeurZipped.length > 1);
@@ -40,7 +40,7 @@ public class CompressionUtilsTest {
 	@Test
 	void shouldCompressDecompressDeflate() {
 		
-		byte[] dormeurZipped = CompressionUtils.compressDeflate(DORMEUR_DU_VAL.getBytes(), logger);
+		byte[] dormeurZipped = CompressionUtils.compressDeflate(DORMEUR_DU_VAL.getBytes(StandardCharsets.UTF_8), logger);
 		
 		assertNotNull(dormeurZipped);
 		assertTrue(dormeurZipped.length > 1);
@@ -53,7 +53,7 @@ public class CompressionUtilsTest {
 	@Test
 	void shouldNotDecompressGzipAsDeflate() {
 		
-		byte[] dormeurZipped = CompressionUtils.compressGzip(DORMEUR_DU_VAL.getBytes(), logger);
+		byte[] dormeurZipped = CompressionUtils.compressGzip(DORMEUR_DU_VAL.getBytes(StandardCharsets.UTF_8), logger);
 		
 		assertNotNull(dormeurZipped);
 		assertTrue(dormeurZipped.length > 1);
@@ -66,7 +66,7 @@ public class CompressionUtilsTest {
 	@Test
 	void shouldNotDecompressDeflateAsGzip() {
 		
-		byte[] dormeurZipped = CompressionUtils.compressDeflate(DORMEUR_DU_VAL.getBytes(), logger);
+		byte[] dormeurZipped = CompressionUtils.compressDeflate(DORMEUR_DU_VAL.getBytes(StandardCharsets.UTF_8), logger);
 		
 		assertNotNull(dormeurZipped);
 		assertTrue(dormeurZipped.length > 1);
@@ -79,7 +79,7 @@ public class CompressionUtilsTest {
 	@Test
 	void shouldDecompressDeflateInputStream() {
 		
-		byte[] dormeurZipped = CompressionUtils.compressDeflate(DORMEUR_DU_VAL.getBytes(), logger);
+		byte[] dormeurZipped = CompressionUtils.compressDeflate(DORMEUR_DU_VAL.getBytes(StandardCharsets.UTF_8), logger);
 		
 		assertNotNull(dormeurZipped);
 		assertTrue(dormeurZipped.length > 1);
@@ -94,7 +94,7 @@ public class CompressionUtilsTest {
 	@Test
 	void shouldNotDecompressDeflateInputStreamAsGzip() {
 		
-		byte[] dormeurZipped = CompressionUtils.compressDeflate(DORMEUR_DU_VAL.getBytes(), logger);
+		byte[] dormeurZipped = CompressionUtils.compressDeflate(DORMEUR_DU_VAL.getBytes(StandardCharsets.UTF_8), logger);
 		
 		assertNotNull(dormeurZipped);
 		assertTrue(dormeurZipped.length > 1);
@@ -108,7 +108,7 @@ public class CompressionUtilsTest {
 	@Test
 	void shouldNotDecompressGzipInputStreamAsDeflate() {
 		
-		byte[] dormeurZipped = CompressionUtils.compressGzip(DORMEUR_DU_VAL.getBytes(), logger);
+		byte[] dormeurZipped = CompressionUtils.compressGzip(DORMEUR_DU_VAL.getBytes(StandardCharsets.UTF_8), logger);
 		
 		assertNotNull(dormeurZipped);
 		assertTrue(dormeurZipped.length > 1);
@@ -122,7 +122,7 @@ public class CompressionUtilsTest {
 	@Test
 	void shouldNotDecompressGzipInputStreamAsUnknown() {
 		
-		byte[] dormeurZipped = CompressionUtils.compressGzip(DORMEUR_DU_VAL.getBytes(), logger);
+		byte[] dormeurZipped = CompressionUtils.compressGzip(DORMEUR_DU_VAL.getBytes(StandardCharsets.UTF_8), logger);
 		
 		assertNotNull(dormeurZipped);
 		assertTrue(dormeurZipped.length > 1);

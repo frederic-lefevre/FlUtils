@@ -108,10 +108,10 @@ public class FileConcatener {
 				}
 			}
 		}
-		if (fcLog.isLoggable(Level.FINE)) {
+			
+		fcLog.fine(() -> { 
 			long d = System.currentTimeMillis() - tb ;
-			fcLog.fine("Concatenation duration for a file packet " +  + d) ;
-		}
+			return "Concatenation duration for a file packet " +  + d;}) ;
 		return success ;
 
 	}

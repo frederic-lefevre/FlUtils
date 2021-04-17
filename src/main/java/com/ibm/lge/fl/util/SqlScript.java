@@ -53,9 +53,7 @@ public class SqlScript {
 			    		// remove the end statement delimiter
 			    		String st = statement.substring(0, statement.length() - endStatement.length()).toString() ;
 			    		
-			    		if (sLog.isLoggable(Level.FINEST)) {
-			    			sLog.finest("Add statement=\n" + st);
-			    		}
+			    		sLog.finest(() -> "Add statement=\n" + st);
 			    		sqlScript.add(st) ;
 			    		
 			    		// new buffer to hold the next statement
@@ -93,9 +91,7 @@ public class SqlScript {
 				
 				for (String statement : sqlScript) {
 					
-					if (sLog.isLoggable(Level.FINEST)) {
-						sLog.finest("Execute statement=\n" + statement);
-					}
+					sLog.finest(() -> "Execute statement=\n" + statement);
 					ps = conn.createStatement();	
 					
 					if (ps != null) {

@@ -24,11 +24,11 @@ public class OScommand extends Thread {
 		
 		try {
 			Process p = r.exec(command);
-			oLog.fine("Command launched: " + command) ;
+			oLog.fine(() -> "Command launched: " + command) ;
 			
 			if (waitTermination) {
 				int ret = p.waitFor() ;
-				oLog.info("Command terminated: " + command + " Return=" + ret) ;
+				oLog.info(() -> "Command terminated: " + command + " Return=" + ret) ;
 			}
 			
 			// we assume the command is successfull (ret=0 is only a convention) 

@@ -99,9 +99,7 @@ public class FileSet {
 			@Override
 			public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
 				
-				if (fLog.isLoggable(Level.FINEST)) {
-					fLog.finest("File included: " + file) ;
-				}
+				fLog.finest(() -> "File included: " + file) ;
 				fileList.add(file) ;				
 				
 				return FileVisitResult.CONTINUE;
@@ -117,13 +115,11 @@ public class FileSet {
 				// check if the file matches
 				if (attrs.isRegularFile()) {
 					if (fileMatch(file.getFileName())) {
-						if (fLog.isLoggable(Level.FINEST)) {
-							fLog.finest("File included: " + file) ;
-						}
+						fLog.finest(() -> "File included: " + file) ;
 						fileList.add(file) ;
-					} else if (fLog.isLoggable(Level.FINEST)) {
+					} else {
 						// the file does not match the patterns
-						fLog.finest("File excluded: " + file) ;
+						fLog.finest(() -> "File excluded: " + file) ;
 					}
 				}
 				return FileVisitResult.CONTINUE;
@@ -138,9 +134,7 @@ public class FileSet {
 				
 				// check if the file is a directory
 				if (attrs.isDirectory()) {
-					if (fLog.isLoggable(Level.FINEST)) {
-						fLog.finest("Directory included: " + dir) ;
-					}
+					fLog.finest(() -> "Directory included: " + dir) ;
 					directoryList.add(dir) ;
 				}
 				return FileVisitResult.CONTINUE;
