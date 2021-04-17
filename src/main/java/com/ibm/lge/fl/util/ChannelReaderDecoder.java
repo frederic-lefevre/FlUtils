@@ -52,24 +52,26 @@ public class ChannelReaderDecoder {
 				// read all bytes in a ByteBuffer
 				ByteBuffer totalBuffer = readAllBytes() ;
 				
-				// Decode the totalBuffer, according to a charSet, into a CharBuffer
-				try {
-					cb = charSet.newDecoder()
-						.onMalformedInput(CodingErrorAction.REPORT)
-				        .onUnmappableCharacter(CodingErrorAction.REPORT)
-				        .decode(totalBuffer);
-				} catch (Exception e) {
-					sLog.log(Level.SEVERE, "decoder exception ", e);
-				}
-				
-				// log bytes to a file if requested
-				if (fileTrace != null) {
-					totalBuffer.rewind() ;
-					FileOutputStream fo = new FileOutputStream(fileTrace, false) ;
-				    FileChannel wChannel = fo.getChannel();
-				    wChannel.write(totalBuffer);
-				    wChannel.close();
-				    fo.close();
+				if (totalBuffer != null) {
+					// Decode the totalBuffer, according to a charSet, into a CharBuffer
+					try {
+						cb = charSet.newDecoder()
+							.onMalformedInput(CodingErrorAction.REPORT)
+					        .onUnmappableCharacter(CodingErrorAction.REPORT)
+					        .decode(totalBuffer);
+					} catch (Exception e) {
+						sLog.log(Level.SEVERE, "decoder exception ", e);
+					}
+					
+					// log bytes to a file if requested
+					if (fileTrace != null) {
+						totalBuffer.rewind() ;
+						FileOutputStream fo = new FileOutputStream(fileTrace, false) ;
+					    FileChannel wChannel = fo.getChannel();
+					    wChannel.write(totalBuffer);
+					    wChannel.close();
+					    fo.close();
+					}
 				}
 			} catch (Exception e1) {
 				sLog.log(Level.SEVERE, "Exception reading and decoding channel", e1);

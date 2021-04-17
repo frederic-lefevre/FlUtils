@@ -72,31 +72,22 @@ public class CompressionUtils {
 	private static int RECEIVE_BUF_SIZE = 200*1024 ;
 	private static int COMPRESS_RATIO	= 6 ;
 	private static int getReceiveBufSize(byte[] compressed) {
-		long receiveBufSize = compressed.length*COMPRESS_RATIO ;
-		if (receiveBufSize > RECEIVE_BUF_SIZE) {
-			receiveBufSize = RECEIVE_BUF_SIZE ;
+		long receiveBufSize = 0;
+		if (compressed != null) {
+			receiveBufSize = compressed.length*COMPRESS_RATIO ;
+			if (receiveBufSize > RECEIVE_BUF_SIZE) {
+				receiveBufSize = RECEIVE_BUF_SIZE ;
+			}
 		}
 		return (int) receiveBufSize ;
 	}
 	
 	public static String decompressGzipString(byte[] compressed, Charset charset, Logger logger) {
-		
-		try (ByteArrayInputStream bis = new ByteArrayInputStream(compressed)) {
-			return decompressInputStream(bis, SupportedCompression.GZIP, charset, null, getReceiveBufSize(compressed), logger).toString() ;
-		} catch (IOException e) {
-			logger.log(Level.SEVERE, "Exception during GZIP string decompress", e);
-			return null ;
-		}
+		return decompressBytesToString(compressed, SupportedCompression.GZIP, charset, null, logger);
 	}
 	
 	public static String decompressDeflateString(byte[] compressed, Charset charset, Logger logger) {
-		
-		try (ByteArrayInputStream bis = new ByteArrayInputStream(compressed)) {
-			return decompressInputStream(bis, SupportedCompression.DEFLATE, charset, null, getReceiveBufSize(compressed), logger).toString() ;
-		} catch (IOException e) {
-			logger.log(Level.SEVERE, "Exception during deflate string decompress", e);
-			return null ;
-		}
+		return decompressBytesToString(compressed, SupportedCompression.DEFLATE, charset, null, logger);
 	}
 	
 	public static ByteBuffer decompressGzip(byte[] compressed, Logger logger) {
@@ -177,5 +168,20 @@ public class CompressionUtils {
 	
 	public static CharBuffer decompressInputStream(InputStream compressed, SupportedCompression compressSchema, Charset charSet, File fileTrace, Logger logger) {
 		return decompressInputStream(compressed, compressSchema, charSet, fileTrace, RECEIVE_BUF_SIZE, logger) ;
+	}
+	
+	private static String decompressBytesToString(byte[] compressed, SupportedCompression compressSchema, Charset charSet, File fileTrace, Logger logger) {
+		try (ByteArrayInputStream bis = new ByteArrayInputStream(compressed)) {
+			CharBuffer buffer = decompressInputStream(bis, compressSchema, charSet, null, getReceiveBufSize(compressed), logger);
+			if (buffer == null) {
+				return null;
+			} else {
+				return buffer.toString() ;
+			}
+		} catch (IOException e) {
+			logger.log(Level.SEVERE, "Exception during GZIP string decompress", e);
+			return null ;
+		}
+
 	}
 }
