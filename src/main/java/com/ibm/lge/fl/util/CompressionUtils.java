@@ -114,19 +114,24 @@ public class CompressionUtils {
 	
 	private static InputStream getDecodedInputStream(SupportedCompression compressAlgo, InputStream compressed, Logger hLog) {
 
-		switch (compressAlgo) {
-		case GZIP:
-			try {
-				return new GZIPInputStream(compressed);
-			} catch (IOException e) {
-				hLog.log(Level.SEVERE, "IOException in GZIPInputStream creation", e);
+		if (compressAlgo != null) {
+			switch (compressAlgo) {
+			case GZIP:
+				try {
+					return new GZIPInputStream(compressed);
+				} catch (IOException e) {
+					hLog.log(Level.SEVERE, "IOException in GZIPInputStream creation", e);
+					return null;
+				}
+			case DEFLATE:
+				return new InflaterInputStream(compressed);
+			default:
+				hLog.severe("Unexpected compression scheme: " + compressAlgo);
 				return null;
 			}
-		case DEFLATE:
-			return new InflaterInputStream(compressed);
-		default:
-			hLog.severe("Unexpected compression scheme: " + compressAlgo);
-			return null;
+		} else {
+			hLog.severe("Null compression algorithm in getDecodedInputStream");
+			return null ;
 		}
 	}
 	
