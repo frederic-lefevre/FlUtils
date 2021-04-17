@@ -282,9 +282,7 @@ public class FilesUtils {
 		
 		if (infos == null) {
 			infos = new StringBuilder() ;
-			if (logger.isLoggable(Level.FINE)) {
-				logger.fine("StringBuilder in poarameter of FilesUtils.appendFileInformations is null. StringBuilder created") ;
-			}
+			logger.fine("StringBuilder in parameter of FilesUtils.appendFileInformations is null. StringBuilder created") ;
 		}
 		
 		if (path == null) {
