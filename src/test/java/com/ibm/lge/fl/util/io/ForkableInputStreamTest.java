@@ -64,7 +64,7 @@ public class ForkableInputStreamTest {
             forkableInputStream = new ForkableInputStream(in, bufferCapacity, logger);
         }
 
-        // Fork 5 outputstream
+        // Fork 5 outputStream
         ByteArrayOutputStream forkedOuputStream1 = new ByteArrayOutputStream();
         assertThat(forkableInputStream.addForkedOutputStream(forkedOuputStream1)).isTrue();
         ByteArrayOutputStream forkedOuputStream2 = new ByteArrayOutputStream();
