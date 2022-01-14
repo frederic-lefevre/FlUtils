@@ -93,6 +93,56 @@ public class ForkableInputStreamTest {
                 .isEqualTo(result5);
     }
 
+    @Test
+    @Tag("UnitTest")
+    void checkThatReadArrayIsSupported() throws IOException {
+
+        String source = "a string in output";
+        InputStream in = stringToInputStream(source);
+        ForkableInputStream forkableInputStream = new ForkableInputStream(in, logger);
+
+        ByteArrayOutputStream forkedOuputStream1 = new ByteArrayOutputStream();
+        assertThat(forkableInputStream.addForkedOutputStream(forkedOuputStream1)).isTrue();
+
+        byte[] tab = new byte[source.length() + 10];
+        int length = forkableInputStream.read(tab);
+
+        // Check that bytes have been written to outputStream
+        String result1 = forkedOuputStream1.toString();
+        forkableInputStream.close();
+        assertThat(result1).isEqualTo(source).hasSize(length);
+    }
+
+    @Test
+    @Tag("UnitTest")
+    void checkThatReadArrayWithOffsetIsSupported() throws IOException {
+
+        String source = "a string in output";
+        InputStream in = stringToInputStream(source);
+        
+        // ForkableInputStream can be put in a try with resources
+        try (ForkableInputStream forkableInputStream = new ForkableInputStream(in, logger);
+        	 ByteArrayOutputStream forkedOuputStream1 = new ByteArrayOutputStream()) {
+
+        	assertThat(forkableInputStream.addForkedOutputStream(forkedOuputStream1)).isTrue();
+
+        	int offset = 3;
+        	int readLength = source.length() + 5;
+        	byte[] tab = new byte[offset + readLength + 10];
+        	int length = forkableInputStream.read(tab, offset, readLength);
+
+        	// check string read from inputStream
+            String readString = new String(tab, offset, length);
+            assertThat(readString).isEqualTo(source);
+            
+        	// Check that bytes have been written to outputStream
+        	String result1 = forkedOuputStream1.toString();
+        	assertThat(result1).isEqualTo(source).hasSize(length);
+        } catch (Exception e) {
+            fail("Exception with ForkeableInputStream", e);
+        }
+    }
+    
     private InputStream stringToInputStream(String s) {
         return new ByteArrayInputStream(s.getBytes(StandardCharsets.UTF_8));
     }
