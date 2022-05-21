@@ -15,27 +15,31 @@ public class ForkableInputStream extends InputStream {
     private final int readerId;
     private final MultiReaderCircularBuffer<Integer> buffer;
     private final InputStream sourceInputStream;
+    private final InputStream originInputStream;
     private List<ForkedOutputStream> forkedOutputStreams;
     private long nbBytesRead;
 
-    public ForkableInputStream(InputStream sourceInputStream, Logger l) {
+    public ForkableInputStream(InputStream originInputStream, Logger l) {
+
+    	this.originInputStream = originInputStream;
 
         // As the implementation of read(yte[] b, int off, int len) calls read()
         // there is a high interest in enclosing the source inputStream in a BufferedInputStream
         // There is a small penalty if the source inputStream is already buffered but a great advantage if it is not
         // That is the case for FileInputStream, for instance
     	this.logger = l;
-        this.sourceInputStream = new BufferedInputStream(sourceInputStream);
+        this.sourceInputStream = new BufferedInputStream(originInputStream);
         this.buffer = new MultiReaderCircularBuffer<>();
         this.readerId = this.buffer.newReadClient();
         this.forkedOutputStreams = new ArrayList<>();
         this.nbBytesRead = 0;
     }
 
-    public ForkableInputStream(InputStream sourceInputStream, int capacity, Logger l) {
+    public ForkableInputStream(InputStream originInputStream, int capacity, Logger l) {
 
     	this.logger = l;
-        this.sourceInputStream = new BufferedInputStream(sourceInputStream);
+    	this.originInputStream = originInputStream;
+        this.sourceInputStream = new BufferedInputStream(originInputStream);
         this.buffer = new MultiReaderCircularBuffer<>(capacity);
         this.readerId = this.buffer.newReadClient();
         this.forkedOutputStreams = new ArrayList<>();
@@ -43,10 +47,11 @@ public class ForkableInputStream extends InputStream {
     }
 
     // Essentially for test
-    protected ForkableInputStream(InputStream sourceInputStream, int capacity, boolean force, Logger l) {
+    protected ForkableInputStream(InputStream originInputStream, int capacity, boolean force, Logger l) {
 
     	this.logger = l;
-        this.sourceInputStream = new BufferedInputStream(sourceInputStream);
+    	this.originInputStream = originInputStream;
+        this.sourceInputStream = new BufferedInputStream(originInputStream);
         this.buffer = new MultiReaderCircularBuffer<>(capacity, force);
         this.readerId = this.buffer.newReadClient();
         this.forkedOutputStreams = new ArrayList<>();
@@ -148,6 +153,7 @@ public class ForkableInputStream extends InputStream {
     @Override
     public void close() throws IOException {
         super.close();
+        originInputStream.close();
         closeForkedOutputStreams();
         if (logger.isLoggable(Level.FINEST)) {
             logger.finest(() -> "Number of bytes read on " + this + " : " + this.nbBytesRead);
