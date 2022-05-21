@@ -18,6 +18,7 @@ public class ForkableInputStream extends InputStream {
     private final InputStream originInputStream;
     private List<ForkedOutputStream> forkedOutputStreams;
     private long nbBytesRead;
+    private boolean isClosed = false;
 
     public ForkableInputStream(InputStream originInputStream, Logger l) {
 
@@ -152,15 +153,20 @@ public class ForkableInputStream extends InputStream {
 
     @Override
     public void close() throws IOException {
-        super.close();
-        originInputStream.close();
-        closeForkedOutputStreams();
-        if (logger.isLoggable(Level.FINEST)) {
-            logger.finest(() -> "Number of bytes read on " + this + " : " + this.nbBytesRead);
-            for (ForkedOutputStream forkedOutputStream : forkedOutputStreams) {
-            	logger.finest(() -> "Number of bytes written on " + forkedOutputStream + " : " + forkedOutputStream.getNbBytesWritten());
-            }
-        }
+
+    	if (! isClosed) {
+
+    		super.close();
+    		originInputStream.close();
+    		isClosed = true;
+    		closeForkedOutputStreams();
+    		if (logger.isLoggable(Level.FINEST)) {
+    			logger.finest(() -> "Number of bytes read on " + this + " : " + this.nbBytesRead);
+    			for (ForkedOutputStream forkedOutputStream : forkedOutputStreams) {
+    				logger.finest(() -> "Number of bytes written on " + forkedOutputStream + " : " + forkedOutputStream.getNbBytesWritten());
+    			}
+    		}
+    	}
     }
 
     // skip has to be overridden. If not, bytes skipped would be written to outputStreams
