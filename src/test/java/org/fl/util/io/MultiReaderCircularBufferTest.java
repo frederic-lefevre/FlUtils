@@ -13,7 +13,6 @@ public class MultiReaderCircularBufferTest {
 
     @ParameterizedTest
     @ValueSource(ints = {4096, 0, -1, Integer.MAX_VALUE})
-    @Tag("UnitTest")
     void regularTest(int capacity) {
 
 
@@ -74,7 +73,6 @@ public class MultiReaderCircularBufferTest {
     }
 
     @Test
-    @Tag("UnitTest")
     void invalidClientId() {
 
         MultiReaderCircularBuffer<Integer> integerBuffer = new MultiReaderCircularBuffer<>();
@@ -84,7 +82,6 @@ public class MultiReaderCircularBufferTest {
     }
 
     @Test
-    @Tag("UnitTest")
     void readClientCreationAfterFirstWrite() {
 
         MultiReaderCircularBuffer<Integer> integerBuffer = new MultiReaderCircularBuffer<>();
@@ -106,7 +103,6 @@ public class MultiReaderCircularBufferTest {
     }
 
     @Test
-    @Tag("UnitTest")
     void maximalNumberOfClient() {
 
         MultiReaderCircularBuffer<Integer> integerBuffer = new MultiReaderCircularBuffer<>();
@@ -121,7 +117,6 @@ public class MultiReaderCircularBufferTest {
     }
 
     @Test
-    @Tag("UnitTest")
     void bufferFull() {
 
         // Size of the buffer will be the minimal size

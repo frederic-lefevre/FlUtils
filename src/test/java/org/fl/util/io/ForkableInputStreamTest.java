@@ -20,7 +20,6 @@ public class ForkableInputStreamTest {
 	private static final Logger logger = Logger.getLogger(ForkableInputStreamTest.class.getName());
 	
     @Test
-    @Tag("UnitTest")
     void forkOneOutputStream() throws IOException {
 
         String source = "a string in output";
@@ -83,7 +82,6 @@ public class ForkableInputStreamTest {
 
     @ParameterizedTest
     @MethodSource("sourcesAndBufferCapacities")
-    @Tag("UnitTest")
     void forkFiveOutputStream(String source, int bufferCapacity, boolean forceCapacity, InputStream sourceInputStream, Function<InputStream, String> streamToString) {
 
         ForkableInputStream forkableInputStream ;
@@ -187,7 +185,6 @@ public class ForkableInputStreamTest {
     }
 
     @Test
-    @Tag("UnitTest")
     void checkThatReadArrayIsSupported() throws IOException {
 
         String source = "a string in output";
@@ -208,7 +205,6 @@ public class ForkableInputStreamTest {
     }
 
     @Test
-    @Tag("UnitTest")
     void checkThatReadArrayWithOffsetIsSupported() throws IOException {
 
         String source = "a string in output";
