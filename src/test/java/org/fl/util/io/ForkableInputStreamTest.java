@@ -1,6 +1,5 @@
 package org.fl.util.io;
 
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -139,7 +138,6 @@ public class ForkableInputStreamTest {
 
     @ParameterizedTest
     @MethodSource("skipTestSources")
-    @Tag("UnitTest")
     void testSkip(String source, InputStream sourceInputStream) throws IOException {
 
         final int stringLength = source.length();
