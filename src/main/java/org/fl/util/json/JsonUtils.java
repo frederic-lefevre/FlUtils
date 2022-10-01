@@ -101,6 +101,9 @@ public class JsonUtils {
 		try (BufferedReader reader = Files.newBufferedReader(path, cs)) {
 			
 			if (cLog.isLoggable(Level.FINEST)) {
+				
+				cLog.finest("About to read json file " + path);
+				
 				// Put the input in a StringBuilder to be able to log it
 				out = new StringBuilder();
 		        String line;
@@ -117,6 +120,8 @@ public class JsonUtils {
 		        		jsonObject = JsonParser.parseString(outString).getAsJsonObject() ;
 		        	} else {
 		        		// empty json object
+		        		
+		        		cLog.finest(path + " is an empty file");
 		        		jsonObject = new JsonObject() ;
 		        	}
 		        }
