@@ -98,7 +98,7 @@ public class RunningContext {
 	}
 	
 	private void initRunningContext(String name, String systemProperty, String baseDir, Handler customLogHandler) {
-		pLog = null;
+		
 		initializationDate = Instant.now() ;
 
 		// get property file
