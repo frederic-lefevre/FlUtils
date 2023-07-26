@@ -1,3 +1,27 @@
+/*
+ * MIT License
+
+Copyright (c) 2017, 2023 Frederic Lefevre
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
+
 package org.fl.util;
 
 import java.io.File;
@@ -24,12 +48,13 @@ import com.google.gson.JsonObject;
 
 public class LoggerManager {
 
-    private final static String defaultLogFileDir 	 = "log" ;
-    private final static int 	defaultLogFileLength = 8000000 ;
+	private final static String defaultLogName = "default log name";	
+    private final static String defaultLogFileDir 	 = "log";
+    private final static int 	defaultLogFileLength = 8000000;
     private final static int 	defaultLogFileNumber = 3 ;
     
     // associated Logger
-    private Logger log ;
+    private final Logger log ;
     
     // log file pattern and number
     private String logFilePattern ;
@@ -42,33 +67,26 @@ public class LoggerManager {
     
     private AdvancedProperties properties ;
     
+    private LoggerManager() {
+    	log = null;
+    }
+
+    
     /**
      * Init a logger
      * @param logName : name of the Logger
+     * @param rootDir : a root directory for logging. The logging directory in the property file will be interpreted as relative to the root directory. 
+     *        So the property logging.directory.relative.name will be used
      * @param props : a set of properties
+     * @param customHandler : a custom handler (could be a bluemix cloudant handler for instance, or whatever)
      */
-    public LoggerManager(String logName, AdvancedProperties props) {
+    private LoggerManager(String logName, String rootDir, AdvancedProperties props, Handler customHandler) {
 
-    	initLogger(logName, null, props, null) ;
-    }
-
-    // same as above but with a root directory for logging. The logging directory in the property file will
-    // be interpreted as relative to the root directory
-    // So the property logging.directory.relative.name will be used
-    public LoggerManager(String logName, String rootDir, AdvancedProperties props) {
-
-    	initLogger(logName, rootDir, props, null) ;
-    }
-    
-    // same as above but with a custom handler (could be a bluemix cloudant handler for instance, or whatever)
-    public LoggerManager(String logName, String rootDir, AdvancedProperties props, Handler customHandler) {
-
-    	initLogger(logName, rootDir, props, customHandler) ;
-    }
-    
-    private void initLogger(String logName, String rootDir, AdvancedProperties props, Handler customHandler) {
-    	
-    	properties = props ;
+    	if (props == null) {
+    		properties = new AdvancedProperties();
+    	} else {
+    		properties = props;
+    	}
     	
     	// get or create the logger (it may already exist, with all its handlers set, in the case of a J2EE container)
    		log = Logger.getLogger(logName) ;
@@ -96,8 +114,51 @@ public class LoggerManager {
 			System.out.println("Exception in handler intialisation, LoggerManager ") ;
 			e.printStackTrace();
 		}
-   		
     }
+    
+    public static Builder builder() {
+    	return new Builder();
+    }
+    
+    public static class Builder {
+    	
+    	private String logName;
+    	private String rootDir;
+    	private AdvancedProperties props;
+    	private Handler customHandler;
+    	
+    	private Builder() {
+    		logName = defaultLogName;
+    		rootDir = null;
+    		props = null;
+    		customHandler = null;
+    	}
+    	
+    	public Builder logName(String logName) {
+    		this.logName = logName;
+    		return this;
+    	}
+    	
+    	public Builder rootDir(String rootDir) {
+    		this.rootDir = rootDir;
+    		return this;
+    	}
+    	
+    	public Builder properties(AdvancedProperties props) {
+    		this.props = props;
+    		return this;
+    	}
+    	
+    	public Builder customHandler(Handler handler) {
+    		this.customHandler = handler;
+    		return this;
+    	}
+    	
+    	public LoggerManager build() {
+    		return new LoggerManager(logName, rootDir, props, customHandler);
+    	}
+    }
+    
     
     private void initHandlers(String rootDir, Handler customHandler) throws SecurityException, IOException {
     	
