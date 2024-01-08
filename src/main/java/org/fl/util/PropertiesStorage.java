@@ -1,15 +1,36 @@
+/*
+ * MIT License
+
+Copyright (c) 2017, 2024 Frederic Lefevre
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
+
 package org.fl.util;
 
 import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.StringReader;
 import java.net.URI;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -32,8 +53,6 @@ public class PropertiesStorage {
 
     // URL of storage
     private URL propUrl;
-    
-    private String propertiesAsString ;
     
  /**
      * Create a properties storage
@@ -182,14 +201,11 @@ public class PropertiesStorage {
 	    AdvancedProperties props = new AdvancedProperties();
 	    
 	    if (propUrl != null) {
-		    try {
-		        InputStream inStream = propUrl.openStream() ;
-		        props.load(inStream) ;
-		        propertiesAsString = getPropertiesFromStream(inStream) ;
-		        inStream.close() ;
+		    try (InputStreamReader reader = new InputStreamReader(propUrl.openStream(), StandardCharsets.UTF_8)) {
+		        props.load(reader);
 		    } catch (Exception e) {
 		    	if (log != null) {
-		    		log.warning("Properties not found " + propUrl.toString()) ;
+		    		log.log(Level.WARNING, "Properties not found " + propUrl, e) ;
 		    	} else {
 		    		 System.out.println("Property file loading error loading " + propUrl);
 		    		 e.printStackTrace();
@@ -247,41 +263,4 @@ public class PropertiesStorage {
 		return propUrl;
 	}
 
-	private String getPropertiesFromStream(InputStream is) throws Exception {
-		
-		StringBuilder propBuff = new StringBuilder() ;
-		if (is != null) {
-			try (BufferedReader in = new BufferedReader(new InputStreamReader(is, StandardCharsets.ISO_8859_1))) {
-				
-				String inputLine;						
-				while ((inputLine = in.readLine()) != null) {
-					
-					propBuff.append(inputLine).append("\n") ;							
-				}											
-			} catch (Exception e1) {
-				propBuff = null ;
-				throw e1;
-			}
-		}
-		return propBuff.toString() ;
-	}
-
-	public String getPropertiesAsString() {
-		return propertiesAsString;
-	}
-	
-	public AdvancedProperties changeProperties(String properties, Logger log) {
-		
-		propertiesAsString = properties ;
-		
-		 AdvancedProperties props = new AdvancedProperties();
-		 
-		 try {
-			props.load(new StringReader(properties));
-		} catch (IOException e) {
-			log.log(Level.SEVERE, "IO Exception changing properties", e);
-		}
-		 
-		 return props ;
-	}
 }
