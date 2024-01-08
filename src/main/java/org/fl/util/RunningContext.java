@@ -244,12 +244,5 @@ public class RunningContext {
 		}
 		return res ;
 	}
-	
-	public String getPropertiesAsString() {
-		return propsStorage.getPropertiesAsString() ;
-	}
-	
-	public AdvancedProperties changeProperties(String properties, Logger log) {
-		return propsStorage.changeProperties(properties, log) ;
-	}
+
 }
