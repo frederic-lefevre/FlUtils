@@ -6,7 +6,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.fl.FlUtils</groupId>
 	<artifactId>FlUtils</artifactId>
-	<version>3.0.0</version>
+	<version>3.1.0</version>
 
 	<dependencies>
 		<dependency>
@@ -17,7 +17,7 @@
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter-api</artifactId>
-			<version>5.9.0</version>
+			<version>5.10.1</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -29,13 +29,13 @@
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter-engine</artifactId>
-			<version>5.9.0</version>
+			<version>5.10.1</version>
 			<scope>test</scope>
 		</dependency>
 		 <dependency>
         	<groupId>org.assertj</groupId>
         	<artifactId>assertj-core</artifactId>
-        	<version>3.23.1</version>
+        	<version>3.24.2</version>
         	<scope>test</scope>
       	</dependency>
 	</dependencies>
