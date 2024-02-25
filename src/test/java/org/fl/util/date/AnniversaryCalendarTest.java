@@ -1,6 +1,30 @@
+/*
+ * MIT License
+
+Copyright (c) 2017, 2024 Frederic Lefevre
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
+
 package org.fl.util.date;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.LocalDate;
 import java.time.Year;
@@ -29,11 +53,11 @@ class AnniversaryCalendarTest {
 		private TemporalAccessor birthDate ;
 	}
 	
-	private static Personne toto = new Personne("2000-01-30") ;
-	private static Personne titi = new Personne("2000-01-30") ;
-	private static Personne tata = new Personne("2000-01-29") ;
-	private static Personne tutu = new Personne("2005-01-30") ;
-	private static Personne bad1 = new Personne("1954") ;
+	private static Personne toto = new Personne("2000-01-30");
+	private static Personne titi = new Personne("2000-01-30");
+	private static Personne tata = new Personne("2000-01-29");
+	private static Personne tutu = new Personne("2005-01-30");
+	private static Personne bad1 = new Personne("1954");
 	
 	@Test
 	void test() {
@@ -42,48 +66,44 @@ class AnniversaryCalendarTest {
 		
 		ac.addAnniversary(toto, toto.getBirthDate()) ;
 		
-		List<Personne> annivs = ac.getAnniversaries(toto.getBirthDate()) ;
-		assertEquals(1, annivs.size()) ;
-		assertEquals(toto, annivs.get(0)) ;
+		List<Personne> annivs = ac.getAnniversaries(toto.getBirthDate());
+		assertThat(annivs).isNotNull()
+			.singleElement()
+			.matches(pers -> pers.equals(toto));
 	}
 
 	@Test
 	void test2() {
 				
-		AnniversaryCalendar<Personne> ac = new AnniversaryCalendar<Personne>() ;
+		AnniversaryCalendar<Personne> ac = new AnniversaryCalendar<Personne>();
 		
-		List<Personne> annivs = ac.getAnniversaries(toto.getBirthDate()) ;
-		assertNull(annivs) ;
+		List<Personne> annivs = ac.getAnniversaries(toto.getBirthDate());
+		assertThat(annivs).isNull();
 	}
 	
 	@Test
 	void test3() {
 				
-		AnniversaryCalendar<Personne> ac = new AnniversaryCalendar<Personne>() ;
-		
-		ac.addAnniversary(titi, titi.getBirthDate()) ;
-		ac.addAnniversary(toto, toto.getBirthDate()) ;
-		ac.addAnniversary(tata, tata.getBirthDate()) ;
-		
-		List<Personne> annivs = ac.getAnniversaries(toto.getBirthDate()) ;
-		assertEquals(2, annivs.size()) ;
-		assertTrue(annivs.contains(toto)) ;
-		assertTrue(annivs.contains(titi)) ;
-		assertFalse(annivs.contains(tata)) ;
+		AnniversaryCalendar<Personne> ac = new AnniversaryCalendar<Personne>();
+
+		ac.addAnniversary(titi, titi.getBirthDate());
+		ac.addAnniversary(toto, toto.getBirthDate());
+		ac.addAnniversary(tata, tata.getBirthDate());
+
+		List<Personne> annivs = ac.getAnniversaries(toto.getBirthDate());
+		assertThat(annivs).hasSize(2).hasSameElementsAs(List.of(toto, titi));
 	}
 	
 	@Test
 	void test4() {
 				
-		AnniversaryCalendar<Personne> ac = new AnniversaryCalendar<Personne>() ;
+		AnniversaryCalendar<Personne> ac = new AnniversaryCalendar<Personne>();
 		
-		ac.addAnniversary(titi, titi.getBirthDate()) ;
-		ac.addAnniversary(toto, toto.getBirthDate()) ;
+		ac.addAnniversary(titi, titi.getBirthDate());
+		ac.addAnniversary(toto, toto.getBirthDate());
 		
-		List<Personne> annivs = ac.getAnniversaries(tutu.getBirthDate()) ;
-		assertEquals(2, annivs.size()) ;
-		assertTrue(annivs.contains(toto)) ;
-		assertTrue(annivs.contains(titi)) ;
+		List<Personne> annivs = ac.getAnniversaries(tutu.getBirthDate());
+		assertThat(annivs).hasSize(2).hasSameElementsAs(List.of(toto, titi));
 	}
 	
 	@Test
@@ -91,7 +111,7 @@ class AnniversaryCalendarTest {
 		
 		AnniversaryCalendar<Personne> ac = new AnniversaryCalendar<Personne>() ;
 		
-		ac.addAnniversary(bad1, bad1.getBirthDate()) ;
-		assertEquals(0, ac.getNbAnniversaryDate()) ;
+		ac.addAnniversary(bad1, bad1.getBirthDate());
+		assertThat(ac.getNbAnniversaryDate()).isZero();
 	}
 }
