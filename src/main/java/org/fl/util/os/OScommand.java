@@ -25,6 +25,8 @@ SOFTWARE.
 package org.fl.util.os;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -32,12 +34,16 @@ public class OScommand extends Thread {
 
 	private final String command;
 	private final Logger oLog;
-	private boolean processSuccessfull;
+	private final List<String> commandParameters;
+	private final List<String> commandOptions;
 	private final boolean waitTermination;
+	private boolean processSuccessfull;
 	
-	public OScommand(String cmd, boolean w, Logger l) {
+	public OScommand(String cmd, List<String> p, List<String> o, boolean w, Logger l) {
 		super();
 		command = cmd;
+		commandParameters = p;
+		commandOptions = o;
 		waitTermination = w;
 		oLog = l;
 	}
@@ -45,14 +51,22 @@ public class OScommand extends Thread {
 	public void run() {
 		
 		Runtime r = Runtime.getRuntime();
+		List<String> cmdAndParams = new ArrayList<>();
+		cmdAndParams.add(getCommand());
+		if ((commandOptions != null) && !commandOptions.isEmpty()) {
+			cmdAndParams.addAll(commandOptions);
+		}
+		if ((commandParameters != null) && !commandParameters.isEmpty()) {
+			cmdAndParams.addAll(cmdAndParams);
+		}
 		
 		try {
-			Process p = r.exec(command);
-			oLog.fine(() -> "Command launched: " + command) ;
+			Process p = r.exec(cmdAndParams.toArray(new String[0]));
+			oLog.fine(() -> "Command launched: " + cmdAndParams.toString()) ;
 			
 			if (waitTermination) {
 				int ret = p.waitFor() ;
-				oLog.info(() -> "Command terminated: " + command + " Return=" + ret) ;
+				oLog.info(() -> "Command terminated: " + cmdAndParams.toString() + " Return=" + ret) ;
 			}
 			
 			// we assume the command is successfull (ret=0 is only a convention) 
@@ -60,16 +74,16 @@ public class OScommand extends Thread {
 			
 		} catch (IOException e) {
 			processSuccessfull = false ;
-			oLog.log(Level.SEVERE, "IOException executing command " + command, e) ;
+			oLog.log(Level.SEVERE, "IOException executing command " + cmdAndParams.toString(), e) ;
 		} catch (SecurityException e) {
 			processSuccessfull = false ;
-			oLog.log(Level.SEVERE, "SecurityException executing command " + command, e) ;
+			oLog.log(Level.SEVERE, "SecurityException executing command " + cmdAndParams.toString(), e) ;
 		} catch (InterruptedException e) {
 			processSuccessfull = false ;
-			oLog.log(Level.WARNING, "InterruptedException executing command " + command, e) ;
+			oLog.log(Level.WARNING, "InterruptedException executing command " + cmdAndParams.toString(), e) ;
 		} catch (Exception e) {
 			processSuccessfull = false ;
-			oLog.log(Level.SEVERE, "Exception executing command " + command, e) ;
+			oLog.log(Level.SEVERE, "Exception executing command " + cmdAndParams.toString(), e) ;
 		}
 	}
 
