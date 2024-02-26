@@ -34,13 +34,14 @@ import java.util.logging.Logger;
 
 public class LoggerCounter extends Logger {
 
-	public static LoggerCounter getLogger(String name) {
-		return new LoggerCounter(name);
+	public static LoggerCounter getLogger() {
+		LoggerCounter newLoggerCounter = new LoggerCounter();
+		newLoggerCounter.setFilter(new FilterCounter());
+		return newLoggerCounter;
 	}
 	
-	protected LoggerCounter(String name) {
-		super(name, null);
-		setFilter(new FilterCounter());
+	private LoggerCounter() {
+		super(null, null);
 	}
 
 	private static class FilterCounter implements Filter {
@@ -73,6 +74,10 @@ public class LoggerCounter extends Logger {
 
 	public int getErrorCount() {
 		return ((FilterCounter)getFilter()).getErrorCount();
+	}
+	
+	public int getErrorCount(Level level) {
+		return ((FilterCounter)getFilter()).getErrorCount(level);
 	}
 	
 	public  void resetErrorCount() {

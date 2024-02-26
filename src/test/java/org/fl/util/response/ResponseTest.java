@@ -1,3 +1,27 @@
+/*
+ * MIT License
+
+Copyright (c) 2017, 2024 Frederic Lefevre
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
+
 package org.fl.util.response;
 
 import java.util.ArrayList;
@@ -6,9 +30,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
+import org.fl.util.LoggerCounter;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -17,6 +43,7 @@ import static org.assertj.core.api.Assertions.fail;
 public class ResponseTest {
 
 	private final static Logger logger = Logger.getLogger(ResponseTest.class.getName());
+	
     @Test
     void testNoStatusMessage() {
 
@@ -30,19 +57,27 @@ public class ResponseTest {
     @Test
     void testAddStatusMessages() {
 
-        Response<Void> mlResponse = (new Response<>(false, null, logger, (Void)null))
+    	LoggerCounter noLog = LoggerCounter.getLogger();
+    	
+        Response<Void> mlResponse = (new Response<>(false, null, noLog, (Void)null))
                 .addStatusMessages(Arrays.stream(ResponseTest.TestMessageKey.values()).map(StatusMessage::newError).collect(Collectors.toList()))
                 .addStatusMessage(StatusMessage.newWarning(ResponseTest.TestMessageKey.MALFORMED_AUTH_URL));
 
         assertThat(mlResponse).isNotNull();
         assertThat(mlResponse.isSuccess()).isFalse();
         assertThat(mlResponse.getStatusMessages()).isNotNull().hasSize(ResponseTest.TestMessageKey.values().length + 1);
+        
+        assertThat(noLog.getErrorCount()).isEqualTo(ResponseTest.TestMessageKey.values().length + 1);
+        assertThat(noLog.getErrorCount(Level.SEVERE)).isEqualTo(ResponseTest.TestMessageKey.values().length);
+        assertThat(noLog.getErrorCount(Level.WARNING)).isEqualTo(1);
     }
 
     @Test
     void testStatusMessageOrder() {
 
-        Response<Integer> mlResponse = new Response<>(false, null, logger,0);
+    	LoggerCounter noLog = LoggerCounter.getLogger();
+    	
+        Response<Integer> mlResponse = new Response<>(false, null, noLog,0);
         assertThat(mlResponse).isNotNull();
         assertThat(mlResponse.isSuccess()).isFalse();
 
@@ -76,13 +111,16 @@ public class ResponseTest {
             assertThat(testMessageKey.keyName).isEqualTo(statusMessages.get(currentIdx).getMessageKey());
             currentIdx++;
         }
+        
+        assertThat(noLog.getErrorCount()).isEqualTo(ResponseTest.TestMessageKey.values().length);
+        assertThat(noLog.getErrorCount(Level.SEVERE)).isEqualTo(ResponseTest.TestMessageKey.values().length);
     }
 
     @Test
     void basicTestForGoodResponse() {
 
         final String responseString = "the response";
-        Response<String> goodResponse = goodStringResponse(responseString);
+        Response<String> goodResponse = goodStringResponse(responseString, logger);
         assertThat(goodResponse).isNotNull();
         assertThat(goodResponse.isSuccess()).isTrue();
         assertThat(goodResponse.getStatusMessages()).isNotNull().isEmpty();
@@ -92,11 +130,16 @@ public class ResponseTest {
     @Test
     void basicTestForBadResponse() {
 
-        Response<String> badResponse = badStringResponse();
+    	LoggerCounter noLog = LoggerCounter.getLogger();
+    	StatusMessage statusMessageForBadResponse = StatusMessage.newError(ResponseTest.TestMessageKey.MALFORMED_AUTH_URL);
+        Response<String> badResponse = new Response<>(false, statusMessageForBadResponse, noLog, null);
         assertThat(badResponse).isNotNull();
         assertThat(badResponse.isSuccess()).isFalse();
         assertThat(badResponse.getStatusMessages()).isNotNull().singleElement().isEqualTo(statusMessageForBadResponse);
         assertThat(badResponse.getResponseObject()).isNull();
+        
+        assertThat(noLog.getErrorCount()).isEqualTo(1);
+        assertThat(noLog.getErrorCount(Level.SEVERE)).isEqualTo(1);
     }
 
     @Test
@@ -118,10 +161,10 @@ public class ResponseTest {
         final String firstString = "the response one";
         final String anotherString = "another string";
         StatusMessage shouldNotBeAddedStatusMessage = StatusMessage.newError(ResponseTest.TestMessageKey.AUTHENTICATION_SERVICE_EXCEPTION);
-        Response<List<String>> mlResponse = goodStringResponse(firstString)
+        Response<List<String>> mlResponse = goodStringResponse(firstString, logger)
                 .composeWithResponseIfSuccess(response -> {
                     shouldBeProcessedString.set(I_WAS_PROCESSED);
-                    return goodListOfStringResponse(response, anotherString);
+                    return goodListOfStringResponse(logger, response, anotherString);
                 })
                 .addStatusMessagesWhenInError(() -> Collections.singletonList(shouldNotBeAddedStatusMessage));
 
@@ -142,7 +185,7 @@ public class ResponseTest {
         final String firstString = "the response one";
         final String anotherString = "another string";
         StatusMessage shouldNotBeAddedStatusMessage = StatusMessage.newError(ResponseTest.TestMessageKey.AUTHENTICATION_SERVICE_EXCEPTION);
-        Response<List<String>> mlResponse = goodStringResponse(firstString)
+        Response<List<String>> mlResponse = goodStringResponse(firstString, logger)
                 .composeIfSuccess(response -> {
                     shouldBeProcessedString.set(I_WAS_PROCESSED);
                     return Arrays.asList(response, anotherString);
@@ -159,51 +202,66 @@ public class ResponseTest {
     @Test
     void fluentApiBadSecondResponse() {
 
+    	LoggerCounter noLog = LoggerCounter.getLogger();
+    	
         final String firstString = "the response one";
         StatusMessage addedStatusMessageListElement = StatusMessage.newError(ResponseTest.TestMessageKey.UNREACHABLE_AUTH_URL);
         StatusMessage shouldNotBeAddedStatusMessage = StatusMessage.newError(ResponseTest.TestMessageKey.AUTHENTICATION_SERVICE_EXCEPTION);
 
-        Response<List<String>> mlResponse = goodStringResponse(firstString)
+        StatusMessage statusMessageForBadListResponse = StatusMessage.newError(ResponseTest.TestMessageKey.WRONG_API_KEY);
+        Response<List<String>> badListOfStringResponse = new Response<>(false, statusMessageForBadListResponse, noLog, null);
+        Response<List<String>> mlResponse = goodStringResponse(firstString, logger)
                 .addStatusMessagesWhenInError(() -> Collections.singletonList(shouldNotBeAddedStatusMessage))
-                .composeWithResponseIfSuccess(response -> badListOfStringResponse())
+                .composeWithResponseIfSuccess(response -> badListOfStringResponse)
                 .addStatusMessagesWhenInError(() -> Collections.singletonList(addedStatusMessageListElement));
 
         assertThat(mlResponse).isNotNull();
         assertThat(mlResponse.isSuccess()).isFalse();
         assertThat(mlResponse.getStatusMessages()).isNotNull().hasSize(2)
                 .contains(statusMessageForBadListResponse, addedStatusMessageListElement)
-                .doesNotContain(statusMessageForBadResponse, shouldNotBeAddedStatusMessage);
+                .doesNotContain(shouldNotBeAddedStatusMessage);
         assertThat(mlResponse.getResponseObject()).isNull();
+        
+        assertThat(noLog.getErrorCount()).isEqualTo(2);
+        assertThat(noLog.getErrorCount(Level.SEVERE)).isEqualTo(2);
     }
 
     @Test
     void fluentApiBadFirstResponse() {
 
+    	LoggerCounter noLog = LoggerCounter.getLogger();
+    	
         final String WAS_NEVER_PROCESSED = "the response never processed";
         AtomicReference<String> neverProcessedString = new AtomicReference<>(WAS_NEVER_PROCESSED);
         StatusMessage addedStatusMessageListElement = StatusMessage.newError(ResponseTest.TestMessageKey.UNREACHABLE_AUTH_URL);
         StatusMessage shouldBeAddedStatusMessage = StatusMessage.newError(ResponseTest.TestMessageKey.AUTHENTICATION_SERVICE_EXCEPTION);
 
-        Response<String> mlResponse = badListOfStringResponse()
+        StatusMessage statusMessageForBadListResponse = StatusMessage.newError(ResponseTest.TestMessageKey.WRONG_API_KEY);
+        Response<List<String>> badListOfStringResponse = new Response<>(false, statusMessageForBadListResponse, noLog, null);
+        Response<String> mlResponse = badListOfStringResponse
                 .addStatusMessagesWhenInError(() -> Collections.singletonList(shouldBeAddedStatusMessage))
                 .composeWithResponseIfSuccess(response -> {
                     neverProcessedString.set("we should not pass here !");
-                    return goodStringResponse(neverProcessedString.get());
+                    return goodStringResponse(neverProcessedString.get(), logger);
                 })
                 .addStatusMessagesWhenInError(() -> Collections.singletonList(addedStatusMessageListElement));
 
         assertThat(mlResponse).isNotNull();
         assertThat(mlResponse.isSuccess()).isFalse();
         assertThat(mlResponse.getStatusMessages()).isNotNull().hasSize(3)
-                .contains(statusMessageForBadListResponse, addedStatusMessageListElement, shouldBeAddedStatusMessage)
-                .doesNotContain(statusMessageForBadResponse);
+                .contains(statusMessageForBadListResponse, addedStatusMessageListElement, shouldBeAddedStatusMessage);
         assertThat(mlResponse.getResponseObject()).isNull();
         assertThat(neverProcessedString.get()).isEqualTo(WAS_NEVER_PROCESSED);
+        
+        assertThat(noLog.getErrorCount()).isEqualTo(3);
+        assertThat(noLog.getErrorCount(Level.SEVERE)).isEqualTo(3);
     }
 
     @Test
     void fluentApiGoodResponseFinallyPutInError() {
 
+    	LoggerCounter noLog = LoggerCounter.getLogger();
+    	
         final String WAS_NEVER_PROCESSED = "the response never processed";
         final String I_WAS_PROCESSED = "The response was processed";
         AtomicReference<String> shouldBeProcessedString = new AtomicReference<>(WAS_NEVER_PROCESSED);
@@ -213,10 +271,10 @@ public class ResponseTest {
         final String notAdded = "I will not be added";
         StatusMessage shouldNotBeAddedStatusMessage = StatusMessage.newError(ResponseTest.TestMessageKey.AUTHENTICATION_SERVICE_EXCEPTION);
         StatusMessage shouldBeAddedStatusMessage = StatusMessage.newError(ResponseTest.TestMessageKey.WRONG_AUTH_URL_PATH);
-        Response<List<String>> mlResponse = goodStringResponse(firstString)
+        Response<List<String>> mlResponse = goodStringResponse(firstString, logger)
                 .composeWithResponseIfSuccess(response -> {
                     shouldBeProcessedString.set(I_WAS_PROCESSED);
-                    return goodListOfStringResponse(response, anotherString);
+                    return goodListOfStringResponse(noLog, response, anotherString);
                 })
                 .addStatusMessagesWhenInError(() -> Collections.singletonList(shouldNotBeAddedStatusMessage))
                 .putInErrorWithStatusMessage(() -> shouldBeAddedStatusMessage)
@@ -234,18 +292,23 @@ public class ResponseTest {
         // Now that should nullify object response
         Response<List<String>> mlResponse2 = mlResponse.composeWithResponseIfSuccess(listOfString -> {
             listOfString.add(notAdded);
-            return goodListOfStringResponse(listOfString.toArray(new String[0]));
+            return goodListOfStringResponse(logger, listOfString.toArray(new String[0]));
         });
 
         assertThat(mlResponse2).isNotNull();
         assertThat(mlResponse2.isSuccess()).isFalse();
         assertThat(mlResponse2.getStatusMessages()).isNotNull().singleElement().isEqualTo(shouldBeAddedStatusMessage);
         assertThat(mlResponse2.getResponseObject()).isNull();
+        
+        assertThat(noLog.getErrorCount()).isEqualTo(1);
+        assertThat(noLog.getErrorCount(Level.SEVERE)).isEqualTo(1);
     }
 
     @Test
     void fluentApiGoodResponseFinallyPutInErrorWithSeveralMessages() {
 
+    	LoggerCounter noLog = LoggerCounter.getLogger();
+    	
         final String WAS_NEVER_PROCESSED = "the response never processed";
         final String I_WAS_PROCESSED = "The response was processed";
         AtomicReference<String> shouldBeProcessedString = new AtomicReference<>(WAS_NEVER_PROCESSED);
@@ -257,10 +320,10 @@ public class ResponseTest {
         List<StatusMessage> shouldBeAddedStatusMessages = Arrays.asList(
                 StatusMessage.newError(ResponseTest.TestMessageKey.WRONG_AUTH_URL_PATH),
                 StatusMessage.newError(ResponseTest.TestMessageKey.WRONG_API_KEY));
-        Response<List<String>> mlResponse = goodStringResponse(firstString)
+        Response<List<String>> mlResponse = goodStringResponse(firstString, logger)
                 .composeWithResponseIfSuccess(response -> {
                     shouldBeProcessedString.set(I_WAS_PROCESSED);
-                    return goodListOfStringResponse(response, anotherString);
+                    return goodListOfStringResponse(noLog, response, anotherString);
                 })
                 .addStatusMessagesWhenInError(() -> Collections.singletonList(shouldNotBeAddedStatusMessage))
                 .putInErrorWithStatusMessages(() -> shouldBeAddedStatusMessages)
@@ -275,15 +338,19 @@ public class ResponseTest {
 
         assertThat(shouldBeProcessedString.get()).isEqualTo(I_WAS_PROCESSED);
 
+        assertThat(noLog.getErrorCount()).isEqualTo(2);
+        assertThat(noLog.getErrorCount(Level.SEVERE)).isEqualTo(2);
     }
 
     @Test
     void fluentApiComposeWhenInError() {
 
+    	LoggerCounter noLog = LoggerCounter.getLogger();
+    	
         String addToResponseWhenInError = "added by composeWhenInError";
         List<String> listOfString = new ArrayList<>();
 
-        Response<List<String>> goodResponse = goodListOfStringResponse()
+        Response<List<String>> goodResponse = goodListOfStringResponse(logger)
                 .composeWithResponseOnError(response -> {
                     listOfString.add(addToResponseWhenInError);
                     return response;
@@ -294,7 +361,7 @@ public class ResponseTest {
         assertThat(goodResponse.getResponseObject()).isNotNull();
         assertThat(listOfString).isEmpty();
 
-        Response<List<String>> badResponse = badListOfStringResponse()
+        Response<List<String>> badResponse = badListOfStringResponse(noLog)
                 .composeWithResponseOnError(response -> {
                     listOfString.add(addToResponseWhenInError);
                     return response;
@@ -304,24 +371,21 @@ public class ResponseTest {
         assertThat(badResponse.isSuccess()).isFalse();
         assertThat(badResponse.getResponseObject()).isNull();
         assertThat(listOfString).contains(addToResponseWhenInError);
+        
+        assertThat(noLog.getErrorCount()).isEqualTo(1);
+        assertThat(noLog.getErrorCount(Level.SEVERE)).isEqualTo(1);
     }
 
-    private Response<String> goodStringResponse(String response) {
-        return new Response<>(true, null, logger, response);
+    private Response<String> goodStringResponse(String response, Logger l) {
+        return new Response<>(true, null, l, response);
     }
 
-    private static final StatusMessage statusMessageForBadResponse = StatusMessage.newError(ResponseTest.TestMessageKey.MALFORMED_AUTH_URL);
-    private Response<String> badStringResponse() {
-        return new Response<>(false, statusMessageForBadResponse, logger, null);
+    private Response<List<String>> goodListOfStringResponse(Logger l, String... responses) {
+        return new Response<>(true, null, l, Arrays.asList(responses));
     }
 
-    private Response<List<String>> goodListOfStringResponse(String... responses) {
-        return new Response<>(true, null, logger, Arrays.asList(responses));
-    }
-
-    private static final StatusMessage statusMessageForBadListResponse = StatusMessage.newError(ResponseTest.TestMessageKey.WRONG_API_KEY);
-    private Response<List<String>> badListOfStringResponse() {
-        return new Response<>(false, statusMessageForBadListResponse, logger,null);
+    private Response<List<String>> badListOfStringResponse(Logger l) {
+        return new Response<>(false, StatusMessage.newError(ResponseTest.TestMessageKey.WRONG_API_KEY), l, null);
     }
 
 
@@ -353,7 +417,8 @@ public class ResponseTest {
             return targetClient;
         }
 
-        private static final MessagesResourcesManager messagesResourcesManager = new MessagesResourcesManager(TestMessageKey.class, "i18n/test-messages", logger);
+        private static final LoggerCounter noLog = LoggerCounter.getLogger();
+        private static final MessagesResourcesManager messagesResourcesManager = new MessagesResourcesManager(TestMessageKey.class, "i18n/test-messages", noLog);
         public MessagesResourcesManager getMessagesResourcesManager() { return messagesResourcesManager;}
     }
 }

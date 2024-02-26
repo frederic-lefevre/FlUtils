@@ -104,7 +104,7 @@ class AdvancedPropertiesTest {
 	void testInt3() {
 
 		AdvancedProperties advProps = new AdvancedProperties();
-		LoggerCounter noLog = new LoggerCounter("noLog");
+		LoggerCounter noLog = LoggerCounter.getLogger();
 		advProps.setLog(noLog);
 
 		advProps.setProperty("p1", "notAnumber");
@@ -130,7 +130,7 @@ class AdvancedPropertiesTest {
 	void testLong2() {
 
 		AdvancedProperties advProps = new AdvancedProperties();
-		LoggerCounter noLog = new LoggerCounter("noLog");
+		LoggerCounter noLog = LoggerCounter.getLogger();
 		advProps.setLog(noLog);
 
 		advProps.setProperty("p1", "notAnumber");
@@ -168,7 +168,7 @@ class AdvancedPropertiesTest {
 	void testDouble2() {
 
 		AdvancedProperties advProps = new AdvancedProperties();
-		LoggerCounter noLog = new LoggerCounter("noLog");
+		LoggerCounter noLog = LoggerCounter.getLogger();
 		advProps.setLog(noLog);
 
 		advProps.setProperty("p1", "notAnumber");
@@ -205,7 +205,7 @@ class AdvancedPropertiesTest {
 	void testBoolean2() {
 
 		AdvancedProperties advProps = new AdvancedProperties();
-		LoggerCounter noLog = new LoggerCounter("noLog");
+		LoggerCounter noLog = LoggerCounter.getLogger();
 		advProps.setLog(noLog);
 
 		advProps.setProperty("p1", "notBool");
@@ -332,7 +332,7 @@ class AdvancedPropertiesTest {
 
 		AdvancedProperties advProps = new AdvancedProperties();
 		advProps.setProperty("a.b.c", "5,4,NotAnumber,2,1");
-		LoggerCounter noLog = new LoggerCounter("noLog");
+		LoggerCounter noLog = LoggerCounter.getLogger();
 		advProps.setLog(noLog);
 
 		assertThat(advProps.getProperty("a.b.c")).isEqualTo("5,4,NotAnumber,2,1");
