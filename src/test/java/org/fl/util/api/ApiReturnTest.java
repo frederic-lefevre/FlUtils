@@ -1,6 +1,30 @@
+/*
+ * MIT License
+
+Copyright (c) 2017, 2024 Frederic Lefevre
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
+
 package org.fl.util.api;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -16,36 +40,35 @@ import com.google.gson.JsonParser;
 
 class ApiReturnTest {
 
-	private static final Logger logger = Logger.getLogger(ApiReturnTest.class.getName()) ;
+	private static final Logger logger = Logger.getLogger(ApiReturnTest.class.getName());
 	
 	@Test
 	void errorReturn() {
 		
-		ApiErrorCodeBuilder.registerApiError(1234, "Mon code de test", logger) ;
+		ApiErrorCodeBuilder.registerApiError(1234, "Mon code de test", logger);
 		
-		ApiReturn apiReturn = new ApiReturn(new ExecutionDurations("test"), StandardCharsets.UTF_8, logger) ;
+		ApiReturn apiReturn = new ApiReturn(new ExecutionDurations("test"), StandardCharsets.UTF_8, logger);
 		
-		assertFalse(apiReturn.isOnError()) ;
+		assertThat(apiReturn.isOnError()).isFalse();
 			
 		apiReturn.setErrorReturn(1234);
 				
-		assertTrue(apiReturn.isOnError()) ;
+		assertThat(apiReturn.isOnError()).isTrue();
 		
-		String ret = apiReturn.getApiReturnJson("Info retour ") ;
-		JsonObject jsonRet = JsonParser.parseString(ret).getAsJsonObject() ;
+		String ret = apiReturn.getApiReturnJson("Info retour ");
+		JsonObject jsonRet = JsonParser.parseString(ret).getAsJsonObject();
 
-		assertEquals(ApiReturn.KO, jsonRet.get(ApiJsonPropertyName.OPERATION).getAsString()) ;
+		assertThat(jsonRet.get(ApiJsonPropertyName.OPERATION).getAsString()).isEqualTo(ApiReturn.KO);
 		
-		JsonObject errorJson = jsonRet.getAsJsonObject(ApiJsonPropertyName.ERROR) ;
-		assertEquals(1234, errorJson.get(ApiJsonPropertyName.ERR_CODE).getAsInt()) ;
-		assertEquals("Mon code de test", errorJson.get(ApiJsonPropertyName.REASON).getAsString()) ;
-
+		JsonObject errorJson = jsonRet.getAsJsonObject(ApiJsonPropertyName.ERROR);
+		assertThat(errorJson.get(ApiJsonPropertyName.ERR_CODE).getAsInt()).isEqualTo(1234);
+		assertThat(errorJson.get(ApiJsonPropertyName.REASON).getAsString()).isEqualTo("Mon code de test");
 	}
 
 	@Test
 	void normalReturn() {
 		
-		ApiReturn apiReturn = new ApiReturn(new ExecutionDurations("test"), StandardCharsets.UTF_8, logger) ;
+		ApiReturn apiReturn = new ApiReturn(new ExecutionDurations("test"), StandardCharsets.UTF_8, logger);
 		
 		JsonObject sampleReturn = new JsonObject() ;
 		sampleReturn.addProperty("prop1", "contenu de la prop1");
@@ -53,44 +76,44 @@ class ApiReturnTest {
 
 		apiReturn.setDataReturn(sampleReturn);
 		
-		String ret = apiReturn.getApiReturnJson("Info retour ") ;
-		JsonObject jsonRet = JsonParser.parseString(ret).getAsJsonObject() ;
+		String ret = apiReturn.getApiReturnJson("Info retour ");
+		JsonObject jsonRet = JsonParser.parseString(ret).getAsJsonObject();
 		
-		assertTrue(jsonRet.has(ApiJsonPropertyName.OPERATION)) ;
-		assertTrue(jsonRet.has(ApiJsonPropertyName.DATA)) ;
+		assertThat(jsonRet.has(ApiJsonPropertyName.OPERATION)).isTrue();
+		assertThat(jsonRet.has(ApiJsonPropertyName.DATA)).isTrue();
 		
-		assertEquals(ApiReturn.OK, jsonRet.get(ApiJsonPropertyName.OPERATION).getAsString()) ;
+		assertThat(jsonRet.get(ApiJsonPropertyName.OPERATION).getAsString()).isEqualTo(ApiReturn.OK);
 		
-		JsonObject dataJson = jsonRet.getAsJsonObject(ApiJsonPropertyName.DATA) ;
-		assertEquals("contenu de la prop1", dataJson.get("prop1").getAsString()) ;
-		assertEquals("contenu de la prop2", dataJson.get("prop2").getAsString()) ;
+		JsonObject dataJson = jsonRet.getAsJsonObject(ApiJsonPropertyName.DATA);
+		assertThat(dataJson.get("prop1").getAsString()).isEqualTo("contenu de la prop1");
+		assertThat(dataJson.get("prop2").getAsString()).isEqualTo("contenu de la prop2");
 	}
 	
 	@Test
 	void testDuration() {
 		
 		String sequenceName = "test" ;
-		ExecutionDurations execDuration = new ExecutionDurations(sequenceName, logger, Level.SEVERE) ;
+		ExecutionDurations execDuration = new ExecutionDurations(sequenceName, logger, Level.SEVERE);
 		
-		ApiReturn apiReturn = new ApiReturn(execDuration, StandardCharsets.UTF_8, logger) ;
+		ApiReturn apiReturn = new ApiReturn(execDuration, StandardCharsets.UTF_8, logger);
 		
-		JsonObject sampleReturn = new JsonObject() ;
+		JsonObject sampleReturn = new JsonObject();
 		sampleReturn.addProperty("prop1", "contenu de la prop1");
 
 		apiReturn.setDataReturn(sampleReturn);
 		
-		String ret = apiReturn.getApiReturnJson("Info retour ") ;
-		JsonObject jsonRet = JsonParser.parseString(ret).getAsJsonObject() ;
+		String ret = apiReturn.getApiReturnJson("Info retour ");
+		JsonObject jsonRet = JsonParser.parseString(ret).getAsJsonObject();
 		
-		assertTrue(jsonRet.has(ApiJsonPropertyName.ADDITIONAL_INFOS)) ;
+		assertThat(jsonRet.has(ApiJsonPropertyName.ADDITIONAL_INFOS)).isTrue();
 		
-		JsonObject aiJson = jsonRet.getAsJsonObject(ApiJsonPropertyName.ADDITIONAL_INFOS) ;
+		JsonObject aiJson = jsonRet.getAsJsonObject(ApiJsonPropertyName.ADDITIONAL_INFOS);
 		
-		assertTrue(aiJson.has(ApiJsonPropertyName.DURATION)) ;
+		assertThat(aiJson.has(ApiJsonPropertyName.DURATION)).isTrue();
 		
-		JsonObject durationJson = aiJson.getAsJsonObject(ApiJsonPropertyName.DURATION) ;
-		assertTrue(durationJson.has(ExecutionDurations.TOTAL_DURATION)) ;
-		assertTrue(durationJson.has(sequenceName + "1")) ;
+		JsonObject durationJson = aiJson.getAsJsonObject(ApiJsonPropertyName.DURATION);
+		assertThat(durationJson.has(ExecutionDurations.TOTAL_DURATION)).isTrue();
+		assertThat(durationJson.has(sequenceName + "1")).isTrue();
 		
 	}
 	
@@ -106,47 +129,47 @@ class ApiReturnTest {
 
 		apiReturn.setDataReturn(sampleReturn);
 		
-		byte[] ret = apiReturn.getCompressedApiReturn("Info retour ", CompressionUtils.SupportedCompression.DEFLATE) ;
+		byte[] ret = apiReturn.getCompressedApiReturn("Info retour ", CompressionUtils.SupportedCompression.DEFLATE);
 		
-		String decompressedRet = CompressionUtils.decompressDeflateString(ret, charSetForReturn, logger) ;
+		String decompressedRet = CompressionUtils.decompressDeflateString(ret, charSetForReturn, logger);
 		
-		JsonObject jsonRet = JsonParser.parseString(decompressedRet).getAsJsonObject() ;
+		JsonObject jsonRet = JsonParser.parseString(decompressedRet).getAsJsonObject();
 		
-		assertTrue(jsonRet.has(ApiJsonPropertyName.OPERATION)) ;
-		assertTrue(jsonRet.has(ApiJsonPropertyName.DATA)) ;
+		assertThat(jsonRet.has(ApiJsonPropertyName.OPERATION)).isTrue();
+		assertThat(jsonRet.has(ApiJsonPropertyName.DATA)).isTrue();
 		
-		assertEquals(ApiReturn.OK, jsonRet.get(ApiJsonPropertyName.OPERATION).getAsString()) ;
+		assertThat(jsonRet.get(ApiJsonPropertyName.OPERATION).getAsString()).isEqualTo(ApiReturn.OK);
 		
-		JsonObject dataJson = jsonRet.getAsJsonObject(ApiJsonPropertyName.DATA) ;
-		assertEquals("contenu de la prop1", dataJson.get("prop1").getAsString()) ;
-		assertEquals("contenu de la prop2", dataJson.get("prop2").getAsString()) ;
+		JsonObject dataJson = jsonRet.getAsJsonObject(ApiJsonPropertyName.DATA);
+		assertThat(dataJson.get("prop1").getAsString()).isEqualTo("contenu de la prop1");
+		assertThat(dataJson.get("prop2").getAsString()).isEqualTo("contenu de la prop2");
 	}
 	
 	@Test
 	void compresseGzipReturn() {
 		
-		Charset charSetForReturn = StandardCharsets.UTF_8 ;
-		ApiReturn apiReturn = new ApiReturn(new ExecutionDurations("test"), charSetForReturn, logger) ;
+		Charset charSetForReturn = StandardCharsets.UTF_8;
+		ApiReturn apiReturn = new ApiReturn(new ExecutionDurations("test"), charSetForReturn, logger);
 		
-		JsonObject sampleReturn = new JsonObject() ;
+		JsonObject sampleReturn = new JsonObject();
 		sampleReturn.addProperty("prop1", "contenu de la prop1");
 		sampleReturn.addProperty("prop2", "contenu de la prop2");
 
 		apiReturn.setDataReturn(sampleReturn);
 		
-		byte[] ret = apiReturn.getCompressedApiReturn("Info retour ", CompressionUtils.SupportedCompression.GZIP) ;
+		byte[] ret = apiReturn.getCompressedApiReturn("Info retour ", CompressionUtils.SupportedCompression.GZIP);
 		
-		String decompressedRet = CompressionUtils.decompressGzipString(ret, charSetForReturn, logger) ;
+		String decompressedRet = CompressionUtils.decompressGzipString(ret, charSetForReturn, logger);
 		
-		JsonObject jsonRet = JsonParser.parseString(decompressedRet).getAsJsonObject() ;
+		JsonObject jsonRet = JsonParser.parseString(decompressedRet).getAsJsonObject();
 		
-		assertTrue(jsonRet.has(ApiJsonPropertyName.OPERATION)) ;
-		assertTrue(jsonRet.has(ApiJsonPropertyName.DATA)) ;
+		assertThat(jsonRet.has(ApiJsonPropertyName.OPERATION)).isTrue();
+		assertThat(jsonRet.has(ApiJsonPropertyName.DATA)).isTrue();
 		
-		assertEquals(ApiReturn.OK, jsonRet.get(ApiJsonPropertyName.OPERATION).getAsString()) ;
+		assertThat(jsonRet.get(ApiJsonPropertyName.OPERATION).getAsString()).isEqualTo(ApiReturn.OK);
 		
-		JsonObject dataJson = jsonRet.getAsJsonObject(ApiJsonPropertyName.DATA) ;
-		assertEquals("contenu de la prop1", dataJson.get("prop1").getAsString()) ;
-		assertEquals("contenu de la prop2", dataJson.get("prop2").getAsString()) ;
+		JsonObject dataJson = jsonRet.getAsJsonObject(ApiJsonPropertyName.DATA);
+		assertThat(dataJson.get("prop1").getAsString()).isEqualTo("contenu de la prop1");
+		assertThat(dataJson.get("prop2").getAsString()).isEqualTo("contenu de la prop2");
 	}
 }

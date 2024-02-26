@@ -1,7 +1,7 @@
 /*
  * MIT License
 
-Copyright (c) 2017, 2023 Frederic Lefevre
+Copyright (c) 2017, 2024 Frederic Lefevre
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,464 +24,413 @@ SOFTWARE.
 
 package org.fl.util;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatNullPointerException;
 
 import java.util.List;
-import java.util.logging.Filter;
-import java.util.logging.LogRecord;
-import java.util.logging.Logger;
 
 import org.junit.jupiter.api.Test;
 
 class AdvancedPropertiesTest {
 
-	private class FilterCounter implements Filter {
-
-		public int errorCount = 0 ;
-		@Override
-		public boolean isLoggable(LogRecord record) {
-			errorCount++ ;
-			return false;
-		}
-		
-	}
-	
 	@Test
 	void testKeys() {
-		
-		AdvancedProperties advProps = new AdvancedProperties() ;
-		advProps.setProperty("a.b.c.k2.z", "s2") ;
-		advProps.setProperty("a.b.c.k1.e", "s1") ;
-		advProps.setProperty("a.b.c.k4", "s4") ;
-		advProps.setProperty("a.b.c.k3.t.v", "s3") ;
-		
-		assertEquals("s1", advProps.getProperty("a.b.c.k1.e")) ;
-		assertEquals("s2", advProps.getProperty("a.b.c.k2.z")) ;
-		assertEquals("s3", advProps.getProperty("a.b.c.k3.t.v")) ;
-		assertEquals("s4", advProps.getProperty("a.b.c.k4")) ;
-		
-		List<String> keys = advProps.getKeysElements("a.b.c.") ;
-		assertEquals(4, keys.size()) ;
-		assertEquals("k1", keys.get(0)) ;
-		assertEquals("k2", keys.get(1)) ;
-		assertEquals("k3", keys.get(2)) ;
-		assertEquals("k4", keys.get(3)) ;
+
+		AdvancedProperties advProps = new AdvancedProperties();
+		advProps.setProperty("a.b.c.k2.z", "s2");
+		advProps.setProperty("a.b.c.k1.e", "s1");
+		advProps.setProperty("a.b.c.k4", "s4");
+		advProps.setProperty("a.b.c.k3.t.v", "s3");
+
+		assertThat(advProps.getProperty("a.b.c.k1.e")).isEqualTo("s1");
+		assertThat(advProps.getProperty("a.b.c.k2.z")).isEqualTo("s2");
+		assertThat(advProps.getProperty("a.b.c.k3.t.v")).isEqualTo("s3");
+		assertThat(advProps.getProperty("a.b.c.k4")).isEqualTo("s4");
+
+		List<String> keys = advProps.getKeysElements("a.b.c.");
+		assertThat(keys).hasSize(4).hasSameElementsAs(List.of("k1", "k2", "k3", "k4"));
 	}
 
 	@Test
 	void testKeys2() {
-		
-		AdvancedProperties advProps = new AdvancedProperties() ;
-		advProps.setProperty("p1", "10") ;	
-		
-		List<String> keys = advProps.getKeysElements("a.b.c.") ;
-		assertNotNull(keys) ;
-		assertEquals(0, keys.size()) ;
-		
-		keys = advProps.getKeysElements("a.b") ;
-		assertNotNull(keys) ;
-		assertEquals(0, keys.size()) ;
-		
-		keys = advProps.getKeysElements(".") ;
-		assertNotNull(keys) ;
-		assertEquals(0, keys.size()) ;
-		
-		keys = advProps.getKeysElements("") ;
-		assertNotNull(keys) ;
-		assertEquals(1, keys.size()) ;
-		assertEquals("p1", keys.get(0)) ;
+
+		AdvancedProperties advProps = new AdvancedProperties();
+		advProps.setProperty("p1", "10");
+
+		List<String> keys = advProps.getKeysElements("a.b.c.");
+		assertThat(keys).isNotNull().isEmpty();
+
+		keys = advProps.getKeysElements("a.b");
+		assertThat(keys).isNotNull().isEmpty();
+
+		keys = advProps.getKeysElements(".");
+		assertThat(keys).isNotNull().isEmpty();
+
+		keys = advProps.getKeysElements("");
+		assertThat(keys).isNotNull().singleElement().isEqualTo("p1");
 	}
 
 	@Test
 	void testKeys3() {
-		AdvancedProperties advProps = new AdvancedProperties() ;
-		advProps.setProperty("p1", "10") ;
-		
-		assertThrows(NullPointerException.class, () -> advProps.getKeysElements(null)) ;
+		AdvancedProperties advProps = new AdvancedProperties();
+		advProps.setProperty("p1", "10");
+
+		assertThatNullPointerException().isThrownBy(() -> advProps.getKeysElements(null));
 	}
 
-	
 	@Test
 	void testInt() {
-		
-		AdvancedProperties advProps = new AdvancedProperties() ;
-		advProps.setProperty("p1", "10") ;		
-		assertEquals("10", advProps.getProperty("p1")) ;
-		
-		int i = advProps.getInt("p1", 9) ;		
-		assertEquals(10, i) ;
+
+		AdvancedProperties advProps = new AdvancedProperties();
+		advProps.setProperty("p1", "10");
+		assertThat(advProps.getProperty("p1")).isEqualTo("10");
+
+		int i = advProps.getInt("p1", 9);
+		assertThat(i).isEqualTo(10);
 	}
 
 	@Test
 	void testInt2() {
-		
-		AdvancedProperties advProps = new AdvancedProperties() ;
-		advProps.setProperty("p1", "10") ;		
-		assertNull(advProps.getProperty("unknown")) ;
-		
-		int i = advProps.getInt("unknown", 9) ;		
-		assertEquals(9, i) ;
+
+		AdvancedProperties advProps = new AdvancedProperties();
+		advProps.setProperty("p1", "10");
+		assertThat(advProps.getProperty("unknown")).isNull();
+
+		int i = advProps.getInt("unknown", 9);
+		assertThat(i).isEqualTo(9);
 	}
-	
+
 	@Test
 	void testInt3() {
-		
-		AdvancedProperties advProps = new AdvancedProperties() ;
-		Logger noLog = Logger.getLogger("testNoLog") ;
-		advProps.setLog(noLog);
-		FilterCounter filterCounter = new FilterCounter() ;
-		noLog.setFilter(filterCounter);
 
-		advProps.setProperty("p1", "notAnumber") ;		
-		assertEquals("notAnumber", advProps.getProperty("p1")) ;
-		
-		int i = advProps.getInt("p1", 9) ;		
-		assertEquals(9, i) ;
-		assertEquals(1, filterCounter.errorCount) ;
+		AdvancedProperties advProps = new AdvancedProperties();
+		LoggerCounter noLog = LoggerCounter.getLogger();
+		advProps.setLog(noLog);
+
+		advProps.setProperty("p1", "notAnumber");
+		assertThat(advProps.getProperty("p1")).isEqualTo("notAnumber");
+
+		int i = advProps.getInt("p1", 9);
+		assertThat(i).isEqualTo(9);
+		assertThat(noLog.getErrorCount()).isEqualTo(1);
 	}
-	
+
 	@Test
 	void testLong() {
-		
-		AdvancedProperties advProps = new AdvancedProperties() ;
-		advProps.setProperty("p1", "10") ;		
-		assertEquals("10", advProps.getProperty("p1")) ;
-		
-		long i = advProps.getLong("p1", 9) ;		
-		assertEquals(10, i) ;
+
+		AdvancedProperties advProps = new AdvancedProperties();
+		advProps.setProperty("p1", "10");
+		assertThat(advProps.getProperty("p1")).isEqualTo("10");
+
+		long i = advProps.getLong("p1", 9);
+		assertThat(i).isEqualTo(10);
 	}
 
 	@Test
 	void testLong2() {
-		
-		AdvancedProperties advProps = new AdvancedProperties() ;
-		Logger noLog = Logger.getLogger("testNoLog") ;
-		advProps.setLog(noLog);
-		FilterCounter filterCounter = new FilterCounter() ;
-		noLog.setFilter(filterCounter);
 
-		advProps.setProperty("p1", "notAnumber") ;		
-		assertEquals("notAnumber", advProps.getProperty("p1")) ;
-		
-		long i = advProps.getLong("p1", 1000000000) ;		
-		assertEquals(1000000000, i) ;
-		assertEquals(1, filterCounter.errorCount) ;
+		AdvancedProperties advProps = new AdvancedProperties();
+		LoggerCounter noLog = LoggerCounter.getLogger();
+		advProps.setLog(noLog);
+
+		advProps.setProperty("p1", "notAnumber");
+		assertThat(advProps.getProperty("p1")).isEqualTo("notAnumber");
+
+		long i = advProps.getLong("p1", 1000000000);
+		assertThat(i).isEqualTo(1000000000);
+		assertThat(noLog.getErrorCount()).isEqualTo(1);
 	}
-	
+
 	@Test
 	void testLong3() {
-		
-		AdvancedProperties advProps = new AdvancedProperties() ;
 
-		advProps.setProperty("p1", "10") ;		
-		assertNull(advProps.getProperty("unknown")) ;
-		
-		long i = advProps.getLong("unknown", 9) ;		
-		assertEquals(9, i) ;
+		AdvancedProperties advProps = new AdvancedProperties();
+
+		advProps.setProperty("p1", "10");
+		assertThat(advProps.getProperty("unknown")).isNull();
+
+		long i = advProps.getLong("unknown", 9);
+		assertThat(i).isEqualTo(9);
 	}
-	
+
 	@Test
 	void testDouble() {
-		
-		AdvancedProperties advProps = new AdvancedProperties() ;
-		advProps.setProperty("p1", "-10.2") ;		
-		assertEquals("-10.2", advProps.getProperty("p1")) ;
-		
-		double i = advProps.getDouble("p1", 9.5) ;		
-		assertEquals(-10.2, i) ;
+
+		AdvancedProperties advProps = new AdvancedProperties();
+		advProps.setProperty("p1", "-10.2");
+		assertThat(advProps.getProperty("p1")).isEqualTo("-10.2");
+
+		double i = advProps.getDouble("p1", 9.5);
+		assertThat(i).isEqualTo(-10.2);
 	}
 
 	@Test
 	void testDouble2() {
-		
-		AdvancedProperties advProps = new AdvancedProperties() ;
-		Logger noLog = Logger.getLogger("testNoLog") ;
-		advProps.setLog(noLog);
-		FilterCounter filterCounter = new FilterCounter() ;
-		noLog.setFilter(filterCounter);
 
-		advProps.setProperty("p1", "notAnumber") ;		
-		assertEquals("notAnumber", advProps.getProperty("p1")) ;
-		
-		double i = advProps.getDouble("p1", 1000000000.1) ;		
-		assertEquals(1000000000.1, i) ;
-		assertEquals(1, filterCounter.errorCount) ;
+		AdvancedProperties advProps = new AdvancedProperties();
+		LoggerCounter noLog = LoggerCounter.getLogger();
+		advProps.setLog(noLog);
+
+		advProps.setProperty("p1", "notAnumber");
+		assertThat(advProps.getProperty("p1")).isEqualTo("notAnumber");
+
+		double i = advProps.getDouble("p1", 1000000000.1);
+		assertThat(i).isEqualTo(1000000000.1);
+		assertThat(noLog.getErrorCount()).isEqualTo(1);
 	}
-	
+
 	@Test
 	void testDouble3() {
-		
-		AdvancedProperties advProps = new AdvancedProperties() ;
 
-		advProps.setProperty("p1", "10.7") ;		
-		assertNull(advProps.getProperty("unknown")) ;
-		
-		double i = advProps.getDouble("unknown", 9.8) ;		
-		assertEquals(9.8, i) ;
+		AdvancedProperties advProps = new AdvancedProperties();
+
+		advProps.setProperty("p1", "10.7");
+		assertThat(advProps.getProperty("unknown")).isNull();
+
+		double i = advProps.getDouble("unknown", 9.8);
+		assertThat(i).isEqualTo(9.8);
 	}
-	
+
 	@Test
 	void testBoolean() {
-		
-		AdvancedProperties advProps = new AdvancedProperties() ;
-		advProps.setProperty("p1", "true") ;		
-		assertEquals("true", advProps.getProperty("p1")) ;
-			
-		assertTrue(advProps.getBoolean("p1", false)) ;
+
+		AdvancedProperties advProps = new AdvancedProperties();
+		advProps.setProperty("p1", "true");
+		assertThat(advProps.getProperty("p1")).isEqualTo("true");
+
+		assertThat(advProps.getBoolean("p1", false)).isTrue();
 	}
-	
+
 	@Test
 	void testBoolean2() {
-		
-		AdvancedProperties advProps = new AdvancedProperties() ;
-		Logger noLog = Logger.getLogger("testNoLog") ;
+
+		AdvancedProperties advProps = new AdvancedProperties();
+		LoggerCounter noLog = LoggerCounter.getLogger();
 		advProps.setLog(noLog);
-		FilterCounter filterCounter = new FilterCounter() ;
-		noLog.setFilter(filterCounter);
-		
-		advProps.setProperty("p1", "notBool") ;		
-		assertEquals("notBool", advProps.getProperty("p1")) ;
-			
-		assertTrue(advProps.getBoolean("p1", true)) ;
-		assertFalse(advProps.getBoolean("p1", false)) ;
-		assertEquals(2, filterCounter.errorCount) ;
+
+		advProps.setProperty("p1", "notBool");
+		assertThat(advProps.getProperty("p1")).isEqualTo("notBool");
+
+		assertThat(advProps.getBoolean("p1", true)).isTrue();
+		assertThat(advProps.getBoolean("p1", false)).isFalse();
+		assertThat(noLog.getErrorCount()).isEqualTo(2);
 	}
-	
+
 	@Test
 	void testBoolean3() {
-		
-		AdvancedProperties advProps = new AdvancedProperties() ;
-		advProps.setProperty("p1", "True") ;		
-		assertEquals("True", advProps.getProperty("p1")) ;
-			
-		assertTrue(advProps.getBoolean("p1", false)) ;
+
+		AdvancedProperties advProps = new AdvancedProperties();
+		advProps.setProperty("p1", "True");
+		assertThat(advProps.getProperty("p1")).isEqualTo("True");
+
+		assertThat(advProps.getBoolean("p1", false)).isTrue();
 	}
-	
+
 	@Test
 	void testBoolean4() {
-		
-		AdvancedProperties advProps = new AdvancedProperties() ;
-		advProps.setProperty("p1", "True") ;		
-		assertEquals("True", advProps.getProperty("p1")) ;
-			
-		assertTrue(advProps.getBoolean("unknown", true)) ;
-		assertFalse(advProps.getBoolean("unknown", false)) ;
+
+		AdvancedProperties advProps = new AdvancedProperties();
+		advProps.setProperty("p1", "True");
+		assertThat(advProps.getProperty("p1")).isEqualTo("True");
+
+		assertThat(advProps.getBoolean("unknown", true)).isTrue();
+		assertThat(advProps.getBoolean("unknown", false)).isFalse();
 	}
-	
+
 	@Test
 	void testChar() {
-		
-		AdvancedProperties advProps = new AdvancedProperties() ;
-		advProps.setProperty("p1", "c") ;		
-		assertEquals("c", advProps.getProperty("p1")) ;
-			
-		char i = advProps.getChar("p1", 'r') ;		
-		assertEquals('c', i) ;
+
+		AdvancedProperties advProps = new AdvancedProperties();
+		advProps.setProperty("p1", "c");
+		assertThat(advProps.getProperty("p1")).isEqualTo("c");
+
+		char i = advProps.getChar("p1", 'r');
+		assertThat(i).isEqualTo('c');
 	}
-	
+
 	@Test
 	void testChar2() {
-		
-		AdvancedProperties advProps = new AdvancedProperties() ;
-		advProps.setProperty("p1", "char") ;		
-		assertEquals("char", advProps.getProperty("p1")) ;
-			
-		char i = advProps.getChar("p1", 'r') ;		
-		assertEquals('c', i) ;
+
+		AdvancedProperties advProps = new AdvancedProperties();
+		advProps.setProperty("p1", "char");
+		assertThat(advProps.getProperty("p1")).isEqualTo("char");
+
+		char i = advProps.getChar("p1", 'r');
+		assertThat(i).isEqualTo('c');
 	}
-	
+
 	@Test
 	void testChar3() {
-		
-		AdvancedProperties advProps = new AdvancedProperties() ;
-		advProps.setProperty("p1", "c") ;		
-		assertEquals("c", advProps.getProperty("p1")) ;
-			
-		char i = advProps.getChar("unknown", 'r') ;		
-		assertEquals('r', i) ;
+
+		AdvancedProperties advProps = new AdvancedProperties();
+		advProps.setProperty("p1", "c");
+		assertThat(advProps.getProperty("p1")).isEqualTo("c");
+
+		char i = advProps.getChar("unknown", 'r');
+		assertThat(i).isEqualTo('r');
 	}
-	
+
 	@Test
 	void testChar4() {
-		
-		AdvancedProperties advProps = new AdvancedProperties() ;
-		advProps.setProperty("p1", "") ;		
-		assertEquals("", advProps.getProperty("p1")) ;
-			
-		char i = advProps.getChar("p1", 'r') ;		
-		assertEquals('r', i) ;
+
+		AdvancedProperties advProps = new AdvancedProperties();
+		advProps.setProperty("p1", "");
+		assertThat(advProps.getProperty("p1")).isEmpty();
+
+		char i = advProps.getChar("p1", 'r');
+		assertThat(i).isEqualTo('r');
 	}
-	
+
 	@Test
 	void testArrayOfInts() {
-		
-		AdvancedProperties advProps = new AdvancedProperties() ;
-		advProps.setProperty("a.b.c", "5,4,3,2,1") ;
 
-		assertEquals("5,4,3,2,1", advProps.getProperty("a.b.c")) ;
+		AdvancedProperties advProps = new AdvancedProperties();
+		advProps.setProperty("a.b.c", "5,4,3,2,1");
 
-		int[] ints = advProps.getArrayOfInt("a.b.c", ",") ;
-		assertEquals(5, ints.length) ;
-		assertEquals(5, ints[0]) ;
-		assertEquals(4, ints[1]) ;
-		assertEquals(3, ints[2]) ;
-		assertEquals(2, ints[3]) ;
-		assertEquals(1, ints[4]) ;
+		assertThat(advProps.getProperty("a.b.c")).isEqualTo("5,4,3,2,1");
+
+		int[] ints = advProps.getArrayOfInt("a.b.c", ",");
+		assertThat(ints).containsExactly(5,4,3,2,1);
 	}
 
 	@Test
 	void testArrayOfInts2() {
-		
-		AdvancedProperties advProps = new AdvancedProperties() ;
-		advProps.setProperty("a.b.c", "5") ;
 
-		assertEquals("5", advProps.getProperty("a.b.c")) ;
+		AdvancedProperties advProps = new AdvancedProperties();
+		advProps.setProperty("a.b.c", "5");
 
-		int[] ints = advProps.getArrayOfInt("a.b.c", ",") ;
-		assertEquals(1, ints.length) ;
-		assertEquals(5, ints[0]) ;
+		assertThat(advProps.getProperty("a.b.c")).isEqualTo("5");
+
+		int[] ints = advProps.getArrayOfInt("a.b.c", ",");
+		assertThat(ints).containsExactly(5);
 	}
 
 	@Test
 	void testArrayOfInts3() {
-		
-		AdvancedProperties advProps = new AdvancedProperties() ;
-		advProps.setProperty("a.b.c", "5") ;
 
-		assertEquals("5", advProps.getProperty("a.b.c")) ;
+		AdvancedProperties advProps = new AdvancedProperties();
+		advProps.setProperty("a.b.c", "5");
 
-		int[] ints = advProps.getArrayOfInt("a.b.c", "") ;
-		assertNull(ints) ;
+		advProps.setProperty("a.b.c", "5");
+
+		int[] ints = advProps.getArrayOfInt("a.b.c", "");
+		assertThat(ints).isNull();
 	}
-	
+
 	@Test
 	void testArrayOfInts4() {
-		
-		AdvancedProperties advProps = new AdvancedProperties() ;
-		advProps.setProperty("a.b.c", "5") ;
 
-		int[] ints = advProps.getArrayOfInt("unknown", ",") ;
-		assertNull(ints) ;
+		AdvancedProperties advProps = new AdvancedProperties();
+		advProps.setProperty("a.b.c", "5");
+
+		int[] ints = advProps.getArrayOfInt("unknown", ",");
+		assertThat(ints).isNull();
 	}
-	
+
 	@Test
 	void testArrayOfInts5() {
-		
-		AdvancedProperties advProps = new AdvancedProperties() ;
-		advProps.setProperty("a.b.c", "5,4,NotAnumber,2,1") ;
-		Logger noLog = Logger.getLogger("testNoLog") ;
-		FilterCounter filterCounter = new FilterCounter() ;
-		noLog.setFilter(filterCounter);
+
+		AdvancedProperties advProps = new AdvancedProperties();
+		advProps.setProperty("a.b.c", "5,4,NotAnumber,2,1");
+		LoggerCounter noLog = LoggerCounter.getLogger();
 		advProps.setLog(noLog);
 
-		assertEquals("5,4,NotAnumber,2,1", advProps.getProperty("a.b.c")) ;
+		assertThat(advProps.getProperty("a.b.c")).isEqualTo("5,4,NotAnumber,2,1");
 
-		int[] ints = advProps.getArrayOfInt("a.b.c", ",") ;
-		assertNull(ints) ;
-		assertEquals(1, filterCounter.errorCount) ;
+		int[] ints = advProps.getArrayOfInt("a.b.c", ",");
+		assertThat(ints).isNull();
+		assertThat(noLog.getErrorCount()).isEqualTo(1);
 	}
-	
+
 	@Test
 	void testArrayOfStrings() {
-		
-		AdvancedProperties advProps = new AdvancedProperties() ;
-		advProps.setProperty("a.b.c", "cinq,quatre,trois,deux,un") ;
 
-		assertEquals("cinq,quatre,trois,deux,un", advProps.getProperty("a.b.c")) ;
+		AdvancedProperties advProps = new AdvancedProperties();
+		advProps.setProperty("a.b.c", "cinq,quatre,trois,deux,un");
 
-		String[] strings = advProps.getArrayOfString("a.b.c", ",") ;
-		assertEquals(5, strings.length) ;
-		assertEquals("cinq", strings[0]) ;
-		assertEquals("quatre", strings[1]) ;
-		assertEquals("trois", strings[2]) ;
-		assertEquals("deux", strings[3]) ;
-		assertEquals("un", strings[4]) ;
+		assertThat(advProps.getProperty("a.b.c")).isEqualTo("cinq,quatre,trois,deux,un");
+
+		String[] strings = advProps.getArrayOfString("a.b.c", ",");
+		assertThat(strings).hasSize(5).containsExactly("cinq", "quatre", "trois", "deux", "un");
 	}
 
 	@Test
 	void testArrayOfStrings2() {
-		
-		AdvancedProperties advProps = new AdvancedProperties() ;
-		advProps.setProperty("a.b.c", "trois") ;
 
-		assertEquals("trois", advProps.getProperty("a.b.c")) ;
+		AdvancedProperties advProps = new AdvancedProperties();
+		advProps.setProperty("a.b.c", "trois");
 
-		String[] strings = advProps.getArrayOfString("a.b.c", ",") ;
-		assertEquals(1, strings.length) ;
-		assertEquals("trois", strings[0]) ;
+		assertThat(advProps.getProperty("a.b.c")).isEqualTo("trois");
+
+		String[] strings = advProps.getArrayOfString("a.b.c", ",");
+		assertThat(strings).singleElement().isEqualTo("trois");
 	}
-	
+
 	@Test
 	void testArrayOfStrings3() {
-		
-		AdvancedProperties advProps = new AdvancedProperties() ;
-		advProps.setProperty("a.b.c", "trois") ;
 
-		assertEquals("trois", advProps.getProperty("a.b.c")) ;
+		AdvancedProperties advProps = new AdvancedProperties();
+		advProps.setProperty("a.b.c", "trois");
 
-		String[] strings = advProps.getArrayOfString("a.b.c", "") ;
-		assertNull(strings) ;
+		assertThat(advProps.getProperty("a.b.c")).isEqualTo("trois");
+
+		String[] strings = advProps.getArrayOfString("a.b.c", "");
+		assertThat(strings).isNull();
 	}
-	
+
 	@Test
 	void testArrayOfStrings4() {
-		
-		AdvancedProperties advProps = new AdvancedProperties() ;
-		advProps.setProperty("a.b.c", "trois") ;
 
-		String[] strings = advProps.getArrayOfString("unknown", ",") ;
-		assertNull(strings) ;
+		AdvancedProperties advProps = new AdvancedProperties();
+		advProps.setProperty("a.b.c", "trois");
+
+		String[] strings = advProps.getArrayOfString("unknown", ",");
+		assertThat(strings).isNull();
 	}
-	
+
 	@Test
 	void testListOfStrings() {
-		
-		AdvancedProperties advProps = new AdvancedProperties() ;
-		advProps.setProperty("a.b.c", "cinq,quatre,trois,deux,un") ;
 
-		assertEquals("cinq,quatre,trois,deux,un", advProps.getProperty("a.b.c")) ;
+		AdvancedProperties advProps = new AdvancedProperties();
+		advProps.setProperty("a.b.c", "cinq,quatre,trois,deux,un");
 
-		List<String> strings = advProps.getListOfString("a.b.c", ",") ;
-		assertEquals(5, strings.size()) ;
-		assertEquals("cinq", strings.get(0)) ;
-		assertEquals("quatre", strings.get(1)) ;
-		assertEquals("trois", strings.get(2)) ;
-		assertEquals("deux", strings.get(3)) ;
-		assertEquals("un", strings.get(4)) ;
+		assertThat(advProps.getProperty("a.b.c")).isEqualTo("cinq,quatre,trois,deux,un");
+
+		List<String> strings = advProps.getListOfString("a.b.c", ",");
+		assertThat(strings).hasSize(5).containsExactly("cinq", "quatre", "trois", "deux", "un");
 	}
 
 	@Test
 	void testListOfStrings2() {
-		
-		AdvancedProperties advProps = new AdvancedProperties() ;
-		advProps.setProperty("a.b.c", "trois") ;
 
-		assertEquals("trois", advProps.getProperty("a.b.c")) ;
+		AdvancedProperties advProps = new AdvancedProperties();
+		advProps.setProperty("a.b.c", "trois");
 
-		List<String> strings = advProps.getListOfString("a.b.c", ",") ;
-		assertEquals(1, strings.size()) ;
-		assertEquals("trois", strings.get(0)) ;
+		assertThat(advProps.getProperty("a.b.c")).isEqualTo("trois");
+
+		List<String> strings = advProps.getListOfString("a.b.c", ",");
+		assertThat(strings).singleElement().isEqualTo("trois");
 	}
-	
+
 	@Test
 	void testListOfStrings3() {
-		
-		AdvancedProperties advProps = new AdvancedProperties() ;
-		advProps.setProperty("a.b.c", "trois") ;
 
-		assertEquals("trois", advProps.getProperty("a.b.c")) ;
+		AdvancedProperties advProps = new AdvancedProperties();
+		advProps.setProperty("a.b.c", "trois");
 
-		List<String> strings = advProps.getListOfString("a.b.c", "") ;
-		assertNull(strings) ;
+		assertThat(advProps.getProperty("a.b.c")).isEqualTo("trois");
+
+		List<String> strings = advProps.getListOfString("a.b.c", "");
+		assertThat(strings).isNull();
 	}
-	
+
 	@Test
 	void testListOfStrings4() {
-		
-		AdvancedProperties advProps = new AdvancedProperties() ;
-		advProps.setProperty("a.b.c", "trois") ;
 
-		List<String> strings = advProps.getListOfString("unknown", ",") ;
-		assertNull(strings) ;
+		AdvancedProperties advProps = new AdvancedProperties();
+		advProps.setProperty("a.b.c", "trois");
+
+		List<String> strings = advProps.getListOfString("unknown", ",");
+		assertThat(strings).isNull();
 	}
 }
