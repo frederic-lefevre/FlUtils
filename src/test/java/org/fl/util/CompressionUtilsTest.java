@@ -26,6 +26,7 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.CharBuffer;
 import java.nio.charset.StandardCharsets;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.fl.util.CompressionUtils.SupportedCompression;
@@ -72,25 +73,33 @@ Luit : c’est un petit val qui mousse de rayons.""";
 	@Test
 	void shouldNotDecompressGzipAsDeflate() {
 		
+		LoggerCounter noLog = LoggerCounter.getLogger();
+		
 		byte[] dormeurZipped = CompressionUtils.compressGzip(DORMEUR_DU_VAL.getBytes(StandardCharsets.UTF_8), logger);
 		
 		assertThat(dormeurZipped).isNotNull().hasSizeGreaterThan(1);
 		
-		String dormeurUnzipped = CompressionUtils.decompressDeflateString(dormeurZipped, StandardCharsets.UTF_8, logger);
+		String dormeurUnzipped = CompressionUtils.decompressDeflateString(dormeurZipped, StandardCharsets.UTF_8, noLog);
 		
 		assertThat(dormeurUnzipped).isNull();
+        assertThat(noLog.getErrorCount()).isEqualTo(1);
+        assertThat(noLog.getErrorCount(Level.SEVERE)).isEqualTo(1);
 	}
 	
 	@Test
 	void shouldNotDecompressDeflateAsGzip() {
 		
+		LoggerCounter noLog = LoggerCounter.getLogger();
+		
 		byte[] dormeurZipped = CompressionUtils.compressDeflate(DORMEUR_DU_VAL.getBytes(StandardCharsets.UTF_8), logger);
 		
 		assertThat(dormeurZipped).isNotNull().hasSizeGreaterThan(1);
 		
-		String dormeurUnzipped = CompressionUtils.decompressGzipString(dormeurZipped, StandardCharsets.UTF_8, logger);
+		String dormeurUnzipped = CompressionUtils.decompressGzipString(dormeurZipped, StandardCharsets.UTF_8, noLog);
 		
 		assertThat(dormeurUnzipped).isNull();
+        assertThat(noLog.getErrorCount()).isEqualTo(1);
+        assertThat(noLog.getErrorCount(Level.SEVERE)).isEqualTo(1);
 	}
 	
 	@Test
@@ -109,40 +118,51 @@ Luit : c’est un petit val qui mousse de rayons.""";
 	@Test
 	void shouldNotDecompressDeflateInputStreamAsGzip() {
 		
+		LoggerCounter noLog = LoggerCounter.getLogger();
+		
 		byte[] dormeurZipped = CompressionUtils.compressDeflate(DORMEUR_DU_VAL.getBytes(StandardCharsets.UTF_8), logger);
 		
 		assertThat(dormeurZipped).isNotNull().hasSizeGreaterThan(1);
 		
 		InputStream dormeurCompressedStream = new ByteArrayInputStream(dormeurZipped) ;
-		CharBuffer dormeurUnzipped = CompressionUtils.decompressInputStream(dormeurCompressedStream, SupportedCompression.GZIP, StandardCharsets.UTF_8, null, logger);
+		CharBuffer dormeurUnzipped = CompressionUtils.decompressInputStream(dormeurCompressedStream, SupportedCompression.GZIP, StandardCharsets.UTF_8, null, noLog);
 		
 		assertThatCharSequence(dormeurUnzipped).isNull();
+        assertThat(noLog.getErrorCount()).isEqualTo(1);
+        assertThat(noLog.getErrorCount(Level.SEVERE)).isEqualTo(1);
 	}
 	
 	@Test
 	void shouldNotDecompressGzipInputStreamAsDeflate() {
 		
+		LoggerCounter noLog = LoggerCounter.getLogger();
+		
 		byte[] dormeurZipped = CompressionUtils.compressGzip(DORMEUR_DU_VAL.getBytes(StandardCharsets.UTF_8), logger);
 		
 		assertThat(dormeurZipped).isNotNull().hasSizeGreaterThan(1);
 		
 		InputStream dormeurCompressedStream = new ByteArrayInputStream(dormeurZipped) ;
-		CharBuffer dormeurUnzipped = CompressionUtils.decompressInputStream(dormeurCompressedStream, SupportedCompression.DEFLATE, StandardCharsets.UTF_8, null, logger);
+		CharBuffer dormeurUnzipped = CompressionUtils.decompressInputStream(dormeurCompressedStream, SupportedCompression.DEFLATE, StandardCharsets.UTF_8, null, noLog);
 		
 		assertThatCharSequence(dormeurUnzipped).isNull();
+        assertThat(noLog.getErrorCount()).isEqualTo(1);
+        assertThat(noLog.getErrorCount(Level.SEVERE)).isEqualTo(1);
 	}
 	
 	@Test
 	void shouldNotDecompressGzipInputStreamAsUnknown() {
 		
+		LoggerCounter noLog = LoggerCounter.getLogger();
 		byte[] dormeurZipped = CompressionUtils.compressGzip(DORMEUR_DU_VAL.getBytes(StandardCharsets.UTF_8), logger);
 		
 		assertThat(dormeurZipped).isNotNull().hasSizeGreaterThan(1);
 		
 		InputStream dormeurCompressedStream = new ByteArrayInputStream(dormeurZipped) ;
-		CharBuffer dormeurUnzipped = CompressionUtils.decompressInputStream(dormeurCompressedStream, null, StandardCharsets.UTF_8, null, logger);
+		CharBuffer dormeurUnzipped = CompressionUtils.decompressInputStream(dormeurCompressedStream, null, StandardCharsets.UTF_8, null, noLog);
 		
 		assertThatCharSequence(dormeurUnzipped).isNull();
+        assertThat(noLog.getErrorCount()).isEqualTo(1);
+        assertThat(noLog.getErrorCount(Level.SEVERE)).isEqualTo(1);
 		
 	}
 }
