@@ -25,9 +25,12 @@ SOFTWARE.
 package org.fl.util;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.within;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
@@ -36,14 +39,16 @@ import org.junit.jupiter.api.Test;
 
 class RunningContextTest {
 	
+	private static final String LOGGER_NAME = "org.fl.util.test1";
+	
 	@Test
 	void testRunningContextWithRelativePath() {
 		
-		RunningContext rc = new RunningContext("org.fl.util.test1", null, "test1.properties");
+		RunningContext rc = new RunningContext(LOGGER_NAME, null, "test1.properties");
 		
 		assertThat(rc).isNotNull();
 		
-		Logger logger = Logger.getLogger("org.fl.util.test1");
+		Logger logger = Logger.getLogger(LOGGER_NAME);
 		
 		assertThat(logger).isNotNull();
 		
@@ -58,17 +63,22 @@ class RunningContextTest {
 						"class java.util.logging.FileHandler", 
 						"class java.util.logging.ConsoleHandler",
 						"class org.fl.util.BufferLogHandler"));
+		
+		assertThat(rc.getName()).isEqualTo(LOGGER_NAME);
+		
+		assertThat(rc.getInitializationDate()).isCloseTo(Instant.now(), within(2, ChronoUnit.SECONDS));
+
 	}
 
 	@Test
 	void testRunningContextWithAbsolutePath() {
 		
-		RunningContext rc = new RunningContext("org.fl.util.test1", null, 
+		RunningContext rc = new RunningContext(LOGGER_NAME, null, 
 				"C:/FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test1.properties");
 		
 		assertThat(rc).isNotNull();
 		
-		Logger logger = Logger.getLogger("org.fl.util.test1");
+		Logger logger = Logger.getLogger(LOGGER_NAME);
 		
 		assertThat(logger).isNotNull();
 		
@@ -88,12 +98,12 @@ class RunningContextTest {
 	@Test
 	void testBasicRunningContextWithURI() throws URISyntaxException {
 		
-		RunningContext rc = new RunningContext("org.fl.util.test1", null, 
+		RunningContext rc = new RunningContext(LOGGER_NAME, null, 
 				new URI("file:///C:/FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test1.properties"));
 		
 		assertThat(rc).isNotNull();
 		
-		Logger logger = Logger.getLogger("org.fl.util.test1");
+		Logger logger = Logger.getLogger(LOGGER_NAME);
 		
 		assertThat(logger).isNotNull();
 		
