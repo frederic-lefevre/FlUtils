@@ -82,14 +82,15 @@ public class LoggerManager {
      */
     private LoggerManager(String logName, String rootDir, AdvancedProperties props, Handler customHandler) {
 
+    	// get or create the logger (it may already exist, with all its handlers set, in the case of a J2EE container)
+   		log = Logger.getLogger(logName);
+   		
     	if (props == null) {
-    		properties = new AdvancedProperties();
+    		properties = new AdvancedProperties(log);
     	} else {
     		properties = props;
     	}
-    	
-    	// get or create the logger (it may already exist, with all its handlers set, in the case of a J2EE container)
-   		log = Logger.getLogger(logName) ;
+ 
     
 		try {
 			// if the logger was already existing (due to a previous deployement)
