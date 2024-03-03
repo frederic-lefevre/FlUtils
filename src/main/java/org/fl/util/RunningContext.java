@@ -68,6 +68,14 @@ public class RunningContext {
 	
 	private JsonElement buildInformation ;
 	
+	/**
+	 * @param name : normally named, using a hierarchical dot-separated namespace. 
+	 * That name will be used to configure Logger, so it should normally be based on the application package name
+	 * @param systemProperty : System property name containing the property file url
+	 * @param defaultPropertyUri : Default property file url, if the system property containing the property file uri is null
+	 *         The property file may denominated by :
+     *  		- a well formed URI (for instance "http://my.server.org/myProps.properties" or "file:///my/dir/myProps.properties")
+	 */
 	public RunningContext(String name, String systemProperty, URI defaultPropertyUri) {
 		
 		try {
@@ -82,6 +90,16 @@ public class RunningContext {
 		}	
 	}
 
+	/**
+	 * @param name : normally named, using a hierarchical dot-separated namespace. 
+	 * That name will be used to configure Logger, so it should normally be based on the application package name
+	 * @param systemProperty : System property name containing the property file url
+	 * @param defaultPropertyPathName : Default property file path, if the system property containing the property file uri is null
+	 *         The property file may denominated by :
+	 *          - an absolute path (for instance on windows "C:/mydir1/mydir2/myProps.properties"
+     *  		- a relative path ( for instance "mydir/myProps.properties"). 
+     *    		  In this case, the file is searched in the user.dir (system property) first, then with the class loader.
+	 */
 	public RunningContext(String name, String systemProperty, String defaultPropertyPathName) {
 
 		try {

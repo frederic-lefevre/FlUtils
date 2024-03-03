@@ -26,6 +26,8 @@ package org.fl.util;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
@@ -35,9 +37,9 @@ import org.junit.jupiter.api.Test;
 class RunningContextTest {
 	
 	@Test
-	void testBasicRunningContext() {
+	void testRunningContextWithRelativePath() {
 		
-		RunningContext rc = new RunningContext("test1", null, "test1.properties");
+		RunningContext rc = new RunningContext("org.fl.util.test1", null, "test1.properties");
 		
 		assertThat(rc).isNotNull();
 		
@@ -58,4 +60,53 @@ class RunningContextTest {
 						"class org.fl.util.BufferLogHandler"));
 	}
 
+	@Test
+	void testRunningContextWithAbsolutePath() {
+		
+		RunningContext rc = new RunningContext("org.fl.util.test1", null, 
+				"C:/FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test1.properties");
+		
+		assertThat(rc).isNotNull();
+		
+		Logger logger = rc.getpLog();
+		
+		assertThat(logger).isNotNull();
+		
+		assertThat(logger.getHandlers()).hasSize(3);
+		
+		List<String> handlersClassName = Arrays.stream(logger.getHandlers())
+			.map(handler -> handler.getClass().toString())
+			.toList();
+		
+		assertThat(handlersClassName).hasSameElementsAs(
+				List.of(
+						"class java.util.logging.FileHandler", 
+						"class java.util.logging.ConsoleHandler",
+						"class org.fl.util.BufferLogHandler"));
+	}
+	
+	@Test
+	void testBasicRunningContextWithURI() throws URISyntaxException {
+		
+		RunningContext rc = new RunningContext("org.fl.util.test1", null, 
+				new URI("file:///C:/FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test1.properties"));
+		
+		assertThat(rc).isNotNull();
+		
+		Logger logger = rc.getpLog();
+		
+		assertThat(logger).isNotNull();
+		
+		assertThat(logger.getHandlers()).hasSize(3);
+		
+		List<String> handlersClassName = Arrays.stream(logger.getHandlers())
+			.map(handler -> handler.getClass().toString())
+			.toList();
+		
+		assertThat(handlersClassName).hasSameElementsAs(
+				List.of(
+						"class java.util.logging.FileHandler", 
+						"class java.util.logging.ConsoleHandler",
+						"class org.fl.util.BufferLogHandler"));
+	}
 }
