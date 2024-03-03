@@ -82,8 +82,8 @@ Luit : c’est un petit val qui mousse de rayons.""";
 		String dormeurUnzipped = CompressionUtils.decompressDeflateString(dormeurZipped, StandardCharsets.UTF_8, noLog);
 		
 		assertThat(dormeurUnzipped).isNull();
-        assertThat(noLog.getErrorCount()).isEqualTo(1);
-        assertThat(noLog.getErrorCount(Level.SEVERE)).isEqualTo(1);
+        assertThat(noLog.getLogRecordCount()).isEqualTo(1);
+        assertThat(noLog.getLogRecordCount(Level.SEVERE)).isEqualTo(1);
 	}
 	
 	@Test
@@ -98,8 +98,8 @@ Luit : c’est un petit val qui mousse de rayons.""";
 		String dormeurUnzipped = CompressionUtils.decompressGzipString(dormeurZipped, StandardCharsets.UTF_8, noLog);
 		
 		assertThat(dormeurUnzipped).isNull();
-        assertThat(noLog.getErrorCount()).isEqualTo(1);
-        assertThat(noLog.getErrorCount(Level.SEVERE)).isEqualTo(1);
+        assertThat(noLog.getLogRecordCount()).isEqualTo(1);
+        assertThat(noLog.getLogRecordCount(Level.SEVERE)).isEqualTo(1);
 	}
 	
 	@Test
@@ -128,8 +128,8 @@ Luit : c’est un petit val qui mousse de rayons.""";
 		CharBuffer dormeurUnzipped = CompressionUtils.decompressInputStream(dormeurCompressedStream, SupportedCompression.GZIP, StandardCharsets.UTF_8, null, noLog);
 		
 		assertThatCharSequence(dormeurUnzipped).isNull();
-        assertThat(noLog.getErrorCount()).isEqualTo(1);
-        assertThat(noLog.getErrorCount(Level.SEVERE)).isEqualTo(1);
+        assertThat(noLog.getLogRecordCount()).isEqualTo(1);
+        assertThat(noLog.getLogRecordCount(Level.SEVERE)).isEqualTo(1);
 	}
 	
 	@Test
@@ -145,8 +145,8 @@ Luit : c’est un petit val qui mousse de rayons.""";
 		CharBuffer dormeurUnzipped = CompressionUtils.decompressInputStream(dormeurCompressedStream, SupportedCompression.DEFLATE, StandardCharsets.UTF_8, null, noLog);
 		
 		assertThatCharSequence(dormeurUnzipped).isNull();
-        assertThat(noLog.getErrorCount()).isEqualTo(1);
-        assertThat(noLog.getErrorCount(Level.SEVERE)).isEqualTo(1);
+        assertThat(noLog.getLogRecordCount()).isEqualTo(1);
+        assertThat(noLog.getLogRecordCount(Level.SEVERE)).isEqualTo(1);
 	}
 	
 	@Test
@@ -161,8 +161,8 @@ Luit : c’est un petit val qui mousse de rayons.""";
 		CharBuffer dormeurUnzipped = CompressionUtils.decompressInputStream(dormeurCompressedStream, null, StandardCharsets.UTF_8, null, noLog);
 		
 		assertThatCharSequence(dormeurUnzipped).isNull();
-        assertThat(noLog.getErrorCount()).isEqualTo(1);
-        assertThat(noLog.getErrorCount(Level.SEVERE)).isEqualTo(1);
+        assertThat(noLog.getLogRecordCount()).isEqualTo(1);
+        assertThat(noLog.getLogRecordCount(Level.SEVERE)).isEqualTo(1);
 		
 	}
 }

@@ -67,9 +67,9 @@ public class ResponseTest {
         assertThat(mlResponse.isSuccess()).isFalse();
         assertThat(mlResponse.getStatusMessages()).isNotNull().hasSize(ResponseTest.TestMessageKey.values().length + 1);
         
-        assertThat(noLog.getErrorCount()).isEqualTo(ResponseTest.TestMessageKey.values().length + 1);
-        assertThat(noLog.getErrorCount(Level.SEVERE)).isEqualTo(ResponseTest.TestMessageKey.values().length);
-        assertThat(noLog.getErrorCount(Level.WARNING)).isEqualTo(1);
+        assertThat(noLog.getLogRecordCount()).isEqualTo(ResponseTest.TestMessageKey.values().length + 1);
+        assertThat(noLog.getLogRecordCount(Level.SEVERE)).isEqualTo(ResponseTest.TestMessageKey.values().length);
+        assertThat(noLog.getLogRecordCount(Level.WARNING)).isEqualTo(1);
     }
 
     @Test
@@ -112,8 +112,8 @@ public class ResponseTest {
             currentIdx++;
         }
         
-        assertThat(noLog.getErrorCount()).isEqualTo(ResponseTest.TestMessageKey.values().length);
-        assertThat(noLog.getErrorCount(Level.SEVERE)).isEqualTo(ResponseTest.TestMessageKey.values().length);
+        assertThat(noLog.getLogRecordCount()).isEqualTo(ResponseTest.TestMessageKey.values().length);
+        assertThat(noLog.getLogRecordCount(Level.SEVERE)).isEqualTo(ResponseTest.TestMessageKey.values().length);
     }
 
     @Test
@@ -138,8 +138,8 @@ public class ResponseTest {
         assertThat(badResponse.getStatusMessages()).isNotNull().singleElement().isEqualTo(statusMessageForBadResponse);
         assertThat(badResponse.getResponseObject()).isNull();
         
-        assertThat(noLog.getErrorCount()).isEqualTo(1);
-        assertThat(noLog.getErrorCount(Level.SEVERE)).isEqualTo(1);
+        assertThat(noLog.getLogRecordCount()).isEqualTo(1);
+        assertThat(noLog.getLogRecordCount(Level.SEVERE)).isEqualTo(1);
     }
 
     @Test
@@ -222,8 +222,8 @@ public class ResponseTest {
                 .doesNotContain(shouldNotBeAddedStatusMessage);
         assertThat(mlResponse.getResponseObject()).isNull();
         
-        assertThat(noLog.getErrorCount()).isEqualTo(2);
-        assertThat(noLog.getErrorCount(Level.SEVERE)).isEqualTo(2);
+        assertThat(noLog.getLogRecordCount()).isEqualTo(2);
+        assertThat(noLog.getLogRecordCount(Level.SEVERE)).isEqualTo(2);
     }
 
     @Test
@@ -253,8 +253,8 @@ public class ResponseTest {
         assertThat(mlResponse.getResponseObject()).isNull();
         assertThat(neverProcessedString.get()).isEqualTo(WAS_NEVER_PROCESSED);
         
-        assertThat(noLog.getErrorCount()).isEqualTo(3);
-        assertThat(noLog.getErrorCount(Level.SEVERE)).isEqualTo(3);
+        assertThat(noLog.getLogRecordCount()).isEqualTo(3);
+        assertThat(noLog.getLogRecordCount(Level.SEVERE)).isEqualTo(3);
     }
 
     @Test
@@ -300,8 +300,8 @@ public class ResponseTest {
         assertThat(mlResponse2.getStatusMessages()).isNotNull().singleElement().isEqualTo(shouldBeAddedStatusMessage);
         assertThat(mlResponse2.getResponseObject()).isNull();
         
-        assertThat(noLog.getErrorCount()).isEqualTo(1);
-        assertThat(noLog.getErrorCount(Level.SEVERE)).isEqualTo(1);
+        assertThat(noLog.getLogRecordCount()).isEqualTo(1);
+        assertThat(noLog.getLogRecordCount(Level.SEVERE)).isEqualTo(1);
     }
 
     @Test
@@ -338,8 +338,8 @@ public class ResponseTest {
 
         assertThat(shouldBeProcessedString.get()).isEqualTo(I_WAS_PROCESSED);
 
-        assertThat(noLog.getErrorCount()).isEqualTo(2);
-        assertThat(noLog.getErrorCount(Level.SEVERE)).isEqualTo(2);
+        assertThat(noLog.getLogRecordCount()).isEqualTo(2);
+        assertThat(noLog.getLogRecordCount(Level.SEVERE)).isEqualTo(2);
     }
 
     @Test
@@ -372,8 +372,8 @@ public class ResponseTest {
         assertThat(badResponse.getResponseObject()).isNull();
         assertThat(listOfString).contains(addToResponseWhenInError);
         
-        assertThat(noLog.getErrorCount()).isEqualTo(1);
-        assertThat(noLog.getErrorCount(Level.SEVERE)).isEqualTo(1);
+        assertThat(noLog.getLogRecordCount()).isEqualTo(1);
+        assertThat(noLog.getLogRecordCount(Level.SEVERE)).isEqualTo(1);
     }
 
     private Response<String> goodStringResponse(String response, Logger l) {

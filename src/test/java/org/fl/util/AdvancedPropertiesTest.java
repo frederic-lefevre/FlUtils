@@ -114,8 +114,8 @@ class AdvancedPropertiesTest {
 
 		int i = advProps.getInt("p1", 9);
 		assertThat(i).isEqualTo(9);
-		assertThat(noLog.getErrorCount()).isEqualTo(1);
-		assertThat(noLog.getErrorCount(Level.SEVERE)).isEqualTo(1);
+		assertThat(noLog.getLogRecordCount()).isEqualTo(1);
+		assertThat(noLog.getLogRecordCount(Level.SEVERE)).isEqualTo(1);
 	}
 
 	@Test
@@ -140,8 +140,8 @@ class AdvancedPropertiesTest {
 
 		long i = advProps.getLong("p1", 1000000000);
 		assertThat(i).isEqualTo(1000000000);
-		assertThat(noLog.getErrorCount()).isEqualTo(1);
-		assertThat(noLog.getErrorCount(Level.SEVERE)).isEqualTo(1);
+		assertThat(noLog.getLogRecordCount()).isEqualTo(1);
+		assertThat(noLog.getLogRecordCount(Level.SEVERE)).isEqualTo(1);
 	}
 
 	@Test
@@ -178,8 +178,8 @@ class AdvancedPropertiesTest {
 
 		double i = advProps.getDouble("p1", 1000000000.1);
 		assertThat(i).isEqualTo(1000000000.1);
-		assertThat(noLog.getErrorCount()).isEqualTo(1);
-		assertThat(noLog.getErrorCount(Level.SEVERE)).isEqualTo(1);
+		assertThat(noLog.getLogRecordCount()).isEqualTo(1);
+		assertThat(noLog.getLogRecordCount(Level.SEVERE)).isEqualTo(1);
 	}
 
 	@Test
@@ -215,8 +215,8 @@ class AdvancedPropertiesTest {
 
 		assertThat(advProps.getBoolean("p1", true)).isTrue();
 		assertThat(advProps.getBoolean("p1", false)).isFalse();
-		assertThat(noLog.getErrorCount()).isEqualTo(2);
-		assertThat(noLog.getErrorCount(Level.SEVERE)).isEqualTo(2);
+		assertThat(noLog.getLogRecordCount()).isEqualTo(2);
+		assertThat(noLog.getLogRecordCount(Level.SEVERE)).isEqualTo(2);
 	}
 
 	@Test
@@ -341,8 +341,8 @@ class AdvancedPropertiesTest {
 
 		int[] ints = advProps.getArrayOfInt("a.b.c", ",");
 		assertThat(ints).isNull();
-		assertThat(noLog.getErrorCount()).isEqualTo(1);
-		assertThat(noLog.getErrorCount(Level.SEVERE)).isEqualTo(1);
+		assertThat(noLog.getLogRecordCount()).isEqualTo(1);
+		assertThat(noLog.getLogRecordCount(Level.SEVERE)).isEqualTo(1);
 	}
 
 	@Test

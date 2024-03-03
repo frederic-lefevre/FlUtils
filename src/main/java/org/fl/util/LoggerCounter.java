@@ -39,21 +39,21 @@ public class LoggerCounter extends Logger {
 		super(null, null);
 	}
 
-	public int getErrorCount() {
+	public int getLogRecordCount() {
 		return ((FilterCounter)getFilter()).getLogRecordCount();
 	}
 	
-	public int getErrorCount(Level level) {
+	public int getLogRecordCount(Level level) {
 		return ((FilterCounter)getFilter()).getLogRecordCount(level);
 	}
 	
 	// Reset counts for the current thread
-	public  void resetErrorCount() {
+	public  void resetLogRecordCount() {
 		((FilterCounter)getFilter()).resetLogRecordCounts();
 	}
 	
 	// Reset counts for all threads
-	public  void resetAllErrorCount() {
+	public  void resetAllLogRecordCount() {
 		((FilterCounter)getFilter()).resetAllLogRecordCounts();
 	}
 }
