@@ -30,6 +30,7 @@ import java.util.Optional;
 import java.util.logging.Filter;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
+import java.util.logging.Logger;
 
 public class FilterCounter implements Filter {
 
@@ -78,5 +79,19 @@ public class FilterCounter implements Filter {
 		} else {
 			return Optional.ofNullable(logRecordCountByLevels.get(level)).orElse(0);
 		}		
+	}
+	
+	public static FilterCounter setFilterCounter(Logger logger) {
+		
+		FilterCounter filterCounter = null;
+		Filter filter = logger.getFilter();
+		if (filter == null) {
+			filterCounter = new FilterCounter();
+			logger.setFilter(filterCounter);
+		} else if (filter instanceof FilterCounter){
+			filterCounter = (FilterCounter)filter;
+			filterCounter.resetLogRecordCounts();		
+		}
+		return filterCounter;
 	}
 }
