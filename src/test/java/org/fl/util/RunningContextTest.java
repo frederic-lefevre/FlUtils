@@ -43,7 +43,7 @@ class RunningContextTest {
 		
 		assertThat(rc).isNotNull();
 		
-		Logger logger = rc.getpLog();
+		Logger logger = Logger.getLogger("org.fl.util.test1");
 		
 		assertThat(logger).isNotNull();
 		
@@ -68,7 +68,7 @@ class RunningContextTest {
 		
 		assertThat(rc).isNotNull();
 		
-		Logger logger = rc.getpLog();
+		Logger logger = Logger.getLogger("org.fl.util.test1");
 		
 		assertThat(logger).isNotNull();
 		
@@ -93,7 +93,7 @@ class RunningContextTest {
 		
 		assertThat(rc).isNotNull();
 		
-		Logger logger = rc.getpLog();
+		Logger logger = Logger.getLogger("org.fl.util.test1");
 		
 		assertThat(logger).isNotNull();
 		
