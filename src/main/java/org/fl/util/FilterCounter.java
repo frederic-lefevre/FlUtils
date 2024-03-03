@@ -49,10 +49,18 @@ public class FilterCounter implements Filter {
 		return false;
 	}
 	
-	public void resetLogRecordCounts() {
+	public void resetAllLogRecordCounts() {
 		logRecordCounts.clear();
 	}
 
+	public void resetLogRecordCounts() {
+		
+		Map<Level, Integer> logRecordCountByLevels = logRecordCounts.get(Thread.currentThread());
+		if (logRecordCountByLevels != null) {
+			logRecordCountByLevels.clear();
+		}
+	}
+	
 	public int getLogRecordCount() {
 		
 		Map<Level, Integer> logRecordCountByLevels = logRecordCounts.get(Thread.currentThread());
