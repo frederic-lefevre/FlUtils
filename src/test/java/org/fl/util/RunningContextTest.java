@@ -26,6 +26,10 @@ package org.fl.util;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.logging.Logger;
+
 import org.junit.jupiter.api.Test;
 
 class RunningContextTest {
@@ -36,6 +40,22 @@ class RunningContextTest {
 		RunningContext rc = new RunningContext("test1", null, "test1.properties");
 		
 		assertThat(rc).isNotNull();
+		
+		Logger logger = rc.getpLog();
+		
+		assertThat(logger).isNotNull();
+		
+		assertThat(logger.getHandlers()).hasSize(3);
+		
+		List<String> handlersClassName = Arrays.stream(logger.getHandlers())
+			.map(handler -> handler.getClass().toString())
+			.toList();
+		
+		assertThat(handlersClassName).hasSameElementsAs(
+				List.of(
+						"class java.util.logging.FileHandler", 
+						"class java.util.logging.ConsoleHandler",
+						"class org.fl.util.BufferLogHandler"));
 	}
 
 }
