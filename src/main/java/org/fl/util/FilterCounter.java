@@ -24,30 +24,37 @@ SOFTWARE.
 
 package org.fl.util;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.logging.Filter;
 import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.logging.LogRecord;
 
-public class LoggerCounter extends Logger {
+public class FilterCounter implements Filter {
 
-	public static LoggerCounter getLogger() {
-		LoggerCounter newLoggerCounter = new LoggerCounter();
-		newLoggerCounter.setFilter(new FilterCounter());
-		return newLoggerCounter;
+	private int errorCount = 0;
+	
+	private Map<Level, Integer> errorCounts = new HashMap<>();
+
+	@Override
+	public boolean isLoggable(LogRecord record) {
+		errorCount++;
+		Level level = record.getLevel();
+		errorCounts.put(level, getErrorCount(level) + 1);
+		return false;
 	}
 	
-	private LoggerCounter() {
-		super(null, null);
+	public void resetErrorCount() {
+		errorCount = 0;
+		errorCounts.clear();
 	}
 
 	public int getErrorCount() {
-		return ((FilterCounter)getFilter()).getErrorCount();
+		return errorCount;
 	}
 	
 	public int getErrorCount(Level level) {
-		return ((FilterCounter)getFilter()).getErrorCount(level);
-	}
-	
-	public  void resetErrorCount() {
-		((FilterCounter)getFilter()).resetErrorCount();
+		return Optional.ofNullable(errorCounts.get(level)).orElse(0);
 	}
 }
