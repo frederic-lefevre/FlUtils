@@ -33,42 +33,42 @@ import java.util.logging.LogRecord;
 
 public class FilterCounter implements Filter {
 
-	private Map<Thread, Map<Level, Integer>> errorCounts = new HashMap<>();
+	private Map<Thread, Map<Level, Integer>> logRecordCounts = new HashMap<>();
 	
 	@Override
 	public boolean isLoggable(LogRecord record) {
 
 		Level level = record.getLevel();
 		
-		Map<Level, Integer> errorCountByLevels = errorCounts.get(Thread.currentThread());
-		if (errorCountByLevels == null) {
-			errorCountByLevels = new HashMap<>();
-			errorCounts.put(Thread.currentThread(), errorCountByLevels);
+		Map<Level, Integer> logRecordCountByLevels = logRecordCounts.get(Thread.currentThread());
+		if (logRecordCountByLevels == null) {
+			logRecordCountByLevels = new HashMap<>();
+			logRecordCounts.put(Thread.currentThread(), logRecordCountByLevels);
 		}
-		errorCountByLevels.put(level, getErrorCount(level) + 1);
+		logRecordCountByLevels.put(level, getLogRecordCount(level) + 1);
 		return false;
 	}
 	
-	public void resetErrorCount() {
-		errorCounts.clear();
+	public void resetLogRecordCounts() {
+		logRecordCounts.clear();
 	}
 
-	public int getErrorCount() {
+	public int getLogRecordCount() {
 		
-		Map<Level, Integer> errorCountByLevels = errorCounts.get(Thread.currentThread());
-		if (errorCountByLevels == null) {
+		Map<Level, Integer> logRecordCountByLevels = logRecordCounts.get(Thread.currentThread());
+		if (logRecordCountByLevels == null) {
 			return 0;
 		} else {
-			return errorCountByLevels.values().stream().mapToInt(Integer::intValue).sum();
+			return logRecordCountByLevels.values().stream().mapToInt(Integer::intValue).sum();
 		}
 	}
 	
-	public int getErrorCount(Level level) {
-		Map<Level, Integer> errorCountByLevels = errorCounts.get(Thread.currentThread());
-		if (errorCountByLevels == null) {
+	public int getLogRecordCount(Level level) {
+		Map<Level, Integer> logRecordCountByLevels = logRecordCounts.get(Thread.currentThread());
+		if (logRecordCountByLevels == null) {
 			return 0;
 		} else {
-			return Optional.ofNullable(errorCountByLevels.get(level)).orElse(0);
+			return Optional.ofNullable(logRecordCountByLevels.get(level)).orElse(0);
 		}		
 	}
 }

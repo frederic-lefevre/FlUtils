@@ -40,14 +40,14 @@ public class LoggerCounter extends Logger {
 	}
 
 	public int getErrorCount() {
-		return ((FilterCounter)getFilter()).getErrorCount();
+		return ((FilterCounter)getFilter()).getLogRecordCount();
 	}
 	
 	public int getErrorCount(Level level) {
-		return ((FilterCounter)getFilter()).getErrorCount(level);
+		return ((FilterCounter)getFilter()).getLogRecordCount(level);
 	}
 	
 	public  void resetErrorCount() {
-		((FilterCounter)getFilter()).resetErrorCount();
+		((FilterCounter)getFilter()).resetLogRecordCounts();
 	}
 }
