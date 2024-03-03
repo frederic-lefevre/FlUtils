@@ -35,6 +35,7 @@ import org.fl.util.CompressionUtils;
 import org.fl.util.ExecutionDurations;
 import org.fl.util.FilterCounter;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.google.gson.JsonObject;
@@ -43,10 +44,16 @@ import com.google.gson.JsonParser;
 class ApiReturnTest {
 
 	private static final Logger logger = Logger.getLogger(ApiReturnTest.class.getName());
+	private static final FilterCounter filterCounter = new FilterCounter();
 	
 	@BeforeAll
 	static void silentLog() {
-		logger.setFilter(new FilterCounter());
+		logger.setFilter(filterCounter);
+	}
+	
+	@BeforeEach
+	void resetLogRecordCounter() {
+		filterCounter.resetLogRecordCounts();
 	}
 	
 	@Test
@@ -70,6 +77,9 @@ class ApiReturnTest {
 		JsonObject errorJson = jsonRet.getAsJsonObject(ApiJsonPropertyName.ERROR);
 		assertThat(errorJson.get(ApiJsonPropertyName.ERR_CODE).getAsInt()).isEqualTo(1234);
 		assertThat(errorJson.get(ApiJsonPropertyName.REASON).getAsString()).isEqualTo("Mon code de test");
+		
+		assertThat(filterCounter.getLogRecordCount()).isEqualTo(1);
+		assertThat(filterCounter.getLogRecordCount(Level.INFO)).isEqualTo(1);
 	}
 
 	@Test
@@ -94,6 +104,9 @@ class ApiReturnTest {
 		JsonObject dataJson = jsonRet.getAsJsonObject(ApiJsonPropertyName.DATA);
 		assertThat(dataJson.get("prop1").getAsString()).isEqualTo("contenu de la prop1");
 		assertThat(dataJson.get("prop2").getAsString()).isEqualTo("contenu de la prop2");
+		
+		assertThat(filterCounter.getLogRecordCount()).isEqualTo(1);
+		assertThat(filterCounter.getLogRecordCount(Level.INFO)).isEqualTo(1);
 	}
 	
 	@Test
@@ -121,6 +134,9 @@ class ApiReturnTest {
 		JsonObject durationJson = aiJson.getAsJsonObject(ApiJsonPropertyName.DURATION);
 		assertThat(durationJson.has(ExecutionDurations.TOTAL_DURATION)).isTrue();
 		assertThat(durationJson.has(sequenceName + "1")).isTrue();
+		
+		assertThat(filterCounter.getLogRecordCount()).isEqualTo(1);
+		assertThat(filterCounter.getLogRecordCount(Level.INFO)).isEqualTo(1);
 		
 	}
 	
@@ -150,6 +166,9 @@ class ApiReturnTest {
 		JsonObject dataJson = jsonRet.getAsJsonObject(ApiJsonPropertyName.DATA);
 		assertThat(dataJson.get("prop1").getAsString()).isEqualTo("contenu de la prop1");
 		assertThat(dataJson.get("prop2").getAsString()).isEqualTo("contenu de la prop2");
+		
+		assertThat(filterCounter.getLogRecordCount()).isEqualTo(1);
+		assertThat(filterCounter.getLogRecordCount(Level.INFO)).isEqualTo(1);
 	}
 	
 	@Test
@@ -178,5 +197,8 @@ class ApiReturnTest {
 		JsonObject dataJson = jsonRet.getAsJsonObject(ApiJsonPropertyName.DATA);
 		assertThat(dataJson.get("prop1").getAsString()).isEqualTo("contenu de la prop1");
 		assertThat(dataJson.get("prop2").getAsString()).isEqualTo("contenu de la prop2");
+		
+		assertThat(filterCounter.getLogRecordCount()).isEqualTo(1);
+		assertThat(filterCounter.getLogRecordCount(Level.INFO)).isEqualTo(1);
 	}
 }
