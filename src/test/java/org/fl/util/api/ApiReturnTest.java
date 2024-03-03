@@ -33,6 +33,8 @@ import java.util.logging.Logger;
 
 import org.fl.util.CompressionUtils;
 import org.fl.util.ExecutionDurations;
+import org.fl.util.FilterCounter;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import com.google.gson.JsonObject;
@@ -41,6 +43,11 @@ import com.google.gson.JsonParser;
 class ApiReturnTest {
 
 	private static final Logger logger = Logger.getLogger(ApiReturnTest.class.getName());
+	
+	@BeforeAll
+	static void silentLog() {
+		logger.setFilter(new FilterCounter());
+	}
 	
 	@Test
 	void errorReturn() {

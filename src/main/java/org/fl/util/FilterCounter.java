@@ -33,28 +33,42 @@ import java.util.logging.LogRecord;
 
 public class FilterCounter implements Filter {
 
-	private int errorCount = 0;
+	private Map<Thread, Map<Level, Integer>> errorCounts = new HashMap<>();
 	
-	private Map<Level, Integer> errorCounts = new HashMap<>();
-
 	@Override
 	public boolean isLoggable(LogRecord record) {
-		errorCount++;
+
 		Level level = record.getLevel();
-		errorCounts.put(level, getErrorCount(level) + 1);
+		
+		Map<Level, Integer> errorCountByLevels = errorCounts.get(Thread.currentThread());
+		if (errorCountByLevels == null) {
+			errorCountByLevels = new HashMap<>();
+			errorCounts.put(Thread.currentThread(), errorCountByLevels);
+		}
+		errorCountByLevels.put(level, getErrorCount(level) + 1);
 		return false;
 	}
 	
 	public void resetErrorCount() {
-		errorCount = 0;
 		errorCounts.clear();
 	}
 
 	public int getErrorCount() {
-		return errorCount;
+		
+		Map<Level, Integer> errorCountByLevels = errorCounts.get(Thread.currentThread());
+		if (errorCountByLevels == null) {
+			return 0;
+		} else {
+			return errorCountByLevels.values().stream().mapToInt(Integer::intValue).sum();
+		}
 	}
 	
 	public int getErrorCount(Level level) {
-		return Optional.ofNullable(errorCounts.get(level)).orElse(0);
+		Map<Level, Integer> errorCountByLevels = errorCounts.get(Thread.currentThread());
+		if (errorCountByLevels == null) {
+			return 0;
+		} else {
+			return Optional.ofNullable(errorCountByLevels.get(level)).orElse(0);
+		}		
 	}
 }
