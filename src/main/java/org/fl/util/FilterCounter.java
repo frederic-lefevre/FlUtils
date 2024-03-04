@@ -24,6 +24,8 @@ SOFTWARE.
 
 package org.fl.util;
 
+import java.lang.StackWalker.Option;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -34,37 +36,69 @@ import java.util.logging.Logger;
 
 public class FilterCounter implements Filter {
 
-	private Map<Thread, Map<Level, Integer>> logRecordCounts = new HashMap<>();
-	
-	@Override
-	public boolean isLoggable(LogRecord record) {
-
-		Level level = record.getLevel();
+	public static class LogRecordCounter {
 		
-		Map<Level, Integer> logRecordCountByLevels = logRecordCounts.get(Thread.currentThread());
-		if (logRecordCountByLevels == null) {
-			logRecordCountByLevels = new HashMap<>();
-			logRecordCounts.put(Thread.currentThread(), logRecordCountByLevels);
+		private final String name;
+		private final FilterCounter filterCounter;
+		private final Logger logger;
+		
+		public LogRecordCounter(String name, FilterCounter filterCounter, Logger logger) {
+			super();
+			this.name = name;
+			this.filterCounter = filterCounter;
+			this.logger = logger;
 		}
-		logRecordCountByLevels.put(level, getLogRecordCount(level) + 1);
-		return false;
+
+		public int getLogRecordCount() {
+			return filterCounter.getLogRecordCount(name);
+		}
+
+		public int getLogRecordCount(Level level) {
+			return filterCounter.getLogRecordCount(name, level);
+		}
+		
+		public boolean isLoggable(Level level) {
+			return logger.isLoggable(level);
+		}
 	}
 	
-	public void resetAllLogRecordCounts() {
+	// Keys are fully qualified method names
+	private Map<String, Map<Level, Integer>> logRecordCounts = new HashMap<>();
+	
+	@Override
+	public synchronized boolean isLoggable(LogRecord record) {
+
+		Level level = record.getLevel();
+
+		Arrays.stream(Thread.currentThread().getStackTrace())
+				.map(stackTraceElement -> stackTraceElement.getClassName() + "." + stackTraceElement.getMethodName())
+				.forEach(name -> {
+					Map<Level, Integer> logRecordCountByLevels = logRecordCounts.get(name);
+					if (logRecordCountByLevels != null) {
+						logRecordCountByLevels.put(level,
+								Optional.ofNullable(logRecordCountByLevels.get(level)).orElse(0) + 1);
+					}
+				});
+		return false;
+	}
+
+	public synchronized void resetAllLogRecordCounts() {
 		logRecordCounts.clear();
 	}
 
-	public void resetLogRecordCounts() {
+	public synchronized void addLogRecordCounters(String name) {
 		
-		Map<Level, Integer> logRecordCountByLevels = logRecordCounts.get(Thread.currentThread());
+		Map<Level, Integer> logRecordCountByLevels = logRecordCounts.get(name);
 		if (logRecordCountByLevels != null) {
 			logRecordCountByLevels.clear();
+		} else {
+			logRecordCounts.put(name, new HashMap<>());
 		}
 	}
 	
-	public int getLogRecordCount() {
+	public int getLogRecordCount(String name) {
 		
-		Map<Level, Integer> logRecordCountByLevels = logRecordCounts.get(Thread.currentThread());
+		Map<Level, Integer> logRecordCountByLevels = logRecordCounts.get(name);
 		if (logRecordCountByLevels == null) {
 			return 0;
 		} else {
@@ -72,8 +106,8 @@ public class FilterCounter implements Filter {
 		}
 	}
 	
-	public int getLogRecordCount(Level level) {
-		Map<Level, Integer> logRecordCountByLevels = logRecordCounts.get(Thread.currentThread());
+	public int getLogRecordCount(String name, Level level) {
+		Map<Level, Integer> logRecordCountByLevels = logRecordCounts.get(name);
 		if (logRecordCountByLevels == null) {
 			return 0;
 		} else {
@@ -81,17 +115,35 @@ public class FilterCounter implements Filter {
 		}		
 	}
 	
-	public static FilterCounter setFilterCounter(Logger logger) {
+	protected static synchronized FilterCounter setFilterCounter(String name, Logger logger) {
 		
 		FilterCounter filterCounter = null;
 		Filter filter = logger.getFilter();
 		if (filter == null) {
+			
 			filterCounter = new FilterCounter();
+			filterCounter.addLogRecordCounters(name);
 			logger.setFilter(filterCounter);
 		} else if (filter instanceof FilterCounter){
 			filterCounter = (FilterCounter)filter;
-			filterCounter.resetLogRecordCounts();		
+			filterCounter.addLogRecordCounters(name);
 		}
 		return filterCounter;
+	}
+
+	public static synchronized LogRecordCounter getLogRecordCounter(Logger logger) {
+		
+		String name = getCallerFullyQualifiedMethodName();
+		
+		return new LogRecordCounter(name, setFilterCounter(name, logger), logger);
+	}
+	
+	private static String getCallerFullyQualifiedMethodName() {
+		return StackWalker.getInstance(Option.RETAIN_CLASS_REFERENCE)
+				.walk(stream -> getCallerFullyQualifiedMethodName(stream.skip(2).findFirst().get()));
+	}
+
+	private static String getCallerFullyQualifiedMethodName(StackWalker.StackFrame stackFrame) {
+		return stackFrame.getDeclaringClass().getCanonicalName() + "." + stackFrame.getMethodName();
 	}
 }

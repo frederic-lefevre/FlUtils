@@ -20,7 +20,8 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-*/package org.fl.util;
+*/
+package org.fl.util;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -153,6 +154,7 @@ Luit : c’est un petit val qui mousse de rayons.""";
 	void shouldNotDecompressGzipInputStreamAsUnknown() {
 		
 		LoggerCounter noLog = LoggerCounter.getLogger();
+		
 		byte[] dormeurZipped = CompressionUtils.compressGzip(DORMEUR_DU_VAL.getBytes(StandardCharsets.UTF_8), logger);
 		
 		assertThat(dormeurZipped).isNotNull().hasSizeGreaterThan(1);

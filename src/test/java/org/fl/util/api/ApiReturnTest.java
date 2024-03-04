@@ -29,39 +29,25 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.fl.util.CompressionUtils;
 import org.fl.util.ExecutionDurations;
-import org.fl.util.FilterCounter;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
+import org.fl.util.LoggerCounter;
 import org.junit.jupiter.api.Test;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 class ApiReturnTest {
-
-	private static final Logger logger = Logger.getLogger(ApiReturnTest.class.getName());
-	private static final FilterCounter filterCounter = new FilterCounter();
-	
-	@BeforeAll
-	static void silentLog() {
-		logger.setFilter(filterCounter);
-	}
-	
-	@BeforeEach
-	void resetLogRecordCounter() {
-		filterCounter.resetLogRecordCounts();
-	}
 	
 	@Test
 	void errorReturn() {
 		
-		ApiErrorCodeBuilder.registerApiError(1234, "Mon code de test", logger);
+		LoggerCounter noLog = LoggerCounter.getLogger();
 		
-		ApiReturn apiReturn = new ApiReturn(new ExecutionDurations("test"), StandardCharsets.UTF_8, logger);
+		ApiErrorCodeBuilder.registerApiError(1234, "Mon code de test", noLog);
+		
+		ApiReturn apiReturn = new ApiReturn(new ExecutionDurations("test"), StandardCharsets.UTF_8, noLog);
 		
 		assertThat(apiReturn.isOnError()).isFalse();
 			
@@ -78,14 +64,16 @@ class ApiReturnTest {
 		assertThat(errorJson.get(ApiJsonPropertyName.ERR_CODE).getAsInt()).isEqualTo(1234);
 		assertThat(errorJson.get(ApiJsonPropertyName.REASON).getAsString()).isEqualTo("Mon code de test");
 		
-		assertThat(filterCounter.getLogRecordCount()).isEqualTo(1);
-		assertThat(filterCounter.getLogRecordCount(Level.INFO)).isEqualTo(1);
+		assertThat(noLog.getLogRecordCount()).isEqualTo(1);
+		assertThat(noLog.getLogRecordCount(Level.INFO)).isEqualTo(1);
 	}
 
 	@Test
 	void normalReturn() {
 		
-		ApiReturn apiReturn = new ApiReturn(new ExecutionDurations("test"), StandardCharsets.UTF_8, logger);
+		LoggerCounter noLog = LoggerCounter.getLogger();
+		
+		ApiReturn apiReturn = new ApiReturn(new ExecutionDurations("test"), StandardCharsets.UTF_8, noLog);
 		
 		JsonObject sampleReturn = new JsonObject() ;
 		sampleReturn.addProperty("prop1", "contenu de la prop1");
@@ -105,17 +93,19 @@ class ApiReturnTest {
 		assertThat(dataJson.get("prop1").getAsString()).isEqualTo("contenu de la prop1");
 		assertThat(dataJson.get("prop2").getAsString()).isEqualTo("contenu de la prop2");
 		
-		assertThat(filterCounter.getLogRecordCount()).isEqualTo(1);
-		assertThat(filterCounter.getLogRecordCount(Level.INFO)).isEqualTo(1);
+		assertThat(noLog.getLogRecordCount()).isEqualTo(1);
+		assertThat(noLog.getLogRecordCount(Level.INFO)).isEqualTo(1);
 	}
 	
 	@Test
 	void testDuration() {
 		
-		String sequenceName = "test" ;
-		ExecutionDurations execDuration = new ExecutionDurations(sequenceName, logger, Level.SEVERE);
+		LoggerCounter noLog = LoggerCounter.getLogger();
 		
-		ApiReturn apiReturn = new ApiReturn(execDuration, StandardCharsets.UTF_8, logger);
+		String sequenceName = "test" ;
+		ExecutionDurations execDuration = new ExecutionDurations(sequenceName, noLog, Level.SEVERE);
+		
+		ApiReturn apiReturn = new ApiReturn(execDuration, StandardCharsets.UTF_8, noLog);
 		
 		JsonObject sampleReturn = new JsonObject();
 		sampleReturn.addProperty("prop1", "contenu de la prop1");
@@ -135,16 +125,18 @@ class ApiReturnTest {
 		assertThat(durationJson.has(ExecutionDurations.TOTAL_DURATION)).isTrue();
 		assertThat(durationJson.has(sequenceName + "1")).isTrue();
 		
-		assertThat(filterCounter.getLogRecordCount()).isEqualTo(1);
-		assertThat(filterCounter.getLogRecordCount(Level.INFO)).isEqualTo(1);
+		assertThat(noLog.getLogRecordCount()).isEqualTo(1);
+		assertThat(noLog.getLogRecordCount(Level.INFO)).isEqualTo(1);
 		
 	}
 	
 	@Test
 	void compressedDeflateReturn() {
 		
+		LoggerCounter noLog = LoggerCounter.getLogger();
+		
 		Charset charSetForReturn = StandardCharsets.UTF_8 ;
-		ApiReturn apiReturn = new ApiReturn(new ExecutionDurations("test"), charSetForReturn, logger) ;
+		ApiReturn apiReturn = new ApiReturn(new ExecutionDurations("test"), charSetForReturn, noLog) ;
 		
 		JsonObject sampleReturn = new JsonObject() ;
 		sampleReturn.addProperty("prop1", "contenu de la prop1");
@@ -154,7 +146,7 @@ class ApiReturnTest {
 		
 		byte[] ret = apiReturn.getCompressedApiReturn("Info retour ", CompressionUtils.SupportedCompression.DEFLATE);
 		
-		String decompressedRet = CompressionUtils.decompressDeflateString(ret, charSetForReturn, logger);
+		String decompressedRet = CompressionUtils.decompressDeflateString(ret, charSetForReturn, noLog);
 		
 		JsonObject jsonRet = JsonParser.parseString(decompressedRet).getAsJsonObject();
 		
@@ -167,15 +159,17 @@ class ApiReturnTest {
 		assertThat(dataJson.get("prop1").getAsString()).isEqualTo("contenu de la prop1");
 		assertThat(dataJson.get("prop2").getAsString()).isEqualTo("contenu de la prop2");
 		
-		assertThat(filterCounter.getLogRecordCount()).isEqualTo(1);
-		assertThat(filterCounter.getLogRecordCount(Level.INFO)).isEqualTo(1);
+		assertThat(noLog.getLogRecordCount()).isEqualTo(1);
+		assertThat(noLog.getLogRecordCount(Level.INFO)).isEqualTo(1);
 	}
 	
 	@Test
 	void compresseGzipReturn() {
 		
+		LoggerCounter noLog = LoggerCounter.getLogger();
+		
 		Charset charSetForReturn = StandardCharsets.UTF_8;
-		ApiReturn apiReturn = new ApiReturn(new ExecutionDurations("test"), charSetForReturn, logger);
+		ApiReturn apiReturn = new ApiReturn(new ExecutionDurations("test"), charSetForReturn, noLog);
 		
 		JsonObject sampleReturn = new JsonObject();
 		sampleReturn.addProperty("prop1", "contenu de la prop1");
@@ -185,7 +179,7 @@ class ApiReturnTest {
 		
 		byte[] ret = apiReturn.getCompressedApiReturn("Info retour ", CompressionUtils.SupportedCompression.GZIP);
 		
-		String decompressedRet = CompressionUtils.decompressGzipString(ret, charSetForReturn, logger);
+		String decompressedRet = CompressionUtils.decompressGzipString(ret, charSetForReturn, noLog);
 		
 		JsonObject jsonRet = JsonParser.parseString(decompressedRet).getAsJsonObject();
 		
@@ -198,7 +192,7 @@ class ApiReturnTest {
 		assertThat(dataJson.get("prop1").getAsString()).isEqualTo("contenu de la prop1");
 		assertThat(dataJson.get("prop2").getAsString()).isEqualTo("contenu de la prop2");
 		
-		assertThat(filterCounter.getLogRecordCount()).isEqualTo(1);
-		assertThat(filterCounter.getLogRecordCount(Level.INFO)).isEqualTo(1);
+		assertThat(noLog.getLogRecordCount()).isEqualTo(1);
+		assertThat(noLog.getLogRecordCount(Level.INFO)).isEqualTo(1);
 	}
 }

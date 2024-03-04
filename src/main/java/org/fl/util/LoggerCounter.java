@@ -24,36 +24,52 @@ SOFTWARE.
 
 package org.fl.util;
 
+import java.lang.StackWalker.Option;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class LoggerCounter extends Logger {
 
+	// fully qualified method name
+	private final String name;
+	
 	public static LoggerCounter getLogger() {
-		LoggerCounter newLoggerCounter = new LoggerCounter();
-		newLoggerCounter.setFilter(new FilterCounter());
+		String name = getCallerFullyQualifiedMethodName();
+		LoggerCounter newLoggerCounter = new LoggerCounter(name);
+		FilterCounter.setFilterCounter(name, newLoggerCounter);
 		return newLoggerCounter;
 	}
 	
-	private LoggerCounter() {
+	private LoggerCounter(String name) {
 		super(null, null);
+		this.name = name;
 	}
 
 	public int getLogRecordCount() {
-		return ((FilterCounter)getFilter()).getLogRecordCount();
+		return ((FilterCounter)getFilter()).getLogRecordCount(name);
 	}
 	
 	public int getLogRecordCount(Level level) {
-		return ((FilterCounter)getFilter()).getLogRecordCount(level);
+		return ((FilterCounter)getFilter()).getLogRecordCount(name, level);
 	}
 	
 	// Reset counts for the current thread
 	public  void resetLogRecordCount() {
-		((FilterCounter)getFilter()).resetLogRecordCounts();
+		((FilterCounter)getFilter()).addLogRecordCounters(name);
 	}
 	
 	// Reset counts for all threads
 	public  void resetAllLogRecordCount() {
 		((FilterCounter)getFilter()).resetAllLogRecordCounts();
+	}
+	
+	private static String getCallerFullyQualifiedMethodName() {
+	   return StackWalker
+	      .getInstance(Option.RETAIN_CLASS_REFERENCE)
+	      .walk(stream -> getCallerFullyQualifiedMethodName(stream.skip(2).findFirst().get()));
+	}
+	
+	private static String getCallerFullyQualifiedMethodName(StackWalker.StackFrame stackFrame) {
+		return stackFrame.getDeclaringClass().getCanonicalName() + "." + stackFrame.getMethodName();
 	}
 }

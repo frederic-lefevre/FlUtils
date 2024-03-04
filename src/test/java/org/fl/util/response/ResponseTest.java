@@ -131,6 +131,7 @@ public class ResponseTest {
     void basicTestForBadResponse() {
 
     	LoggerCounter noLog = LoggerCounter.getLogger();
+
     	StatusMessage statusMessageForBadResponse = StatusMessage.newError(ResponseTest.TestMessageKey.MALFORMED_AUTH_URL);
         Response<String> badResponse = new Response<>(false, statusMessageForBadResponse, noLog, null);
         assertThat(badResponse).isNotNull();
