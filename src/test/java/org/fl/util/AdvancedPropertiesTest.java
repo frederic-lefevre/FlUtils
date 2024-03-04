@@ -28,15 +28,18 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNullPointerException;
 
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.junit.jupiter.api.Test;
 
 class AdvancedPropertiesTest {
 
+	private static final Logger logger = Logger.getLogger(AdvancedPropertiesTest.class.getName());
 	@Test
 	void testKeys() {
 
-		AdvancedProperties advProps = new AdvancedProperties();
+		AdvancedProperties advProps = new AdvancedProperties(logger);
 		advProps.setProperty("a.b.c.k2.z", "s2");
 		advProps.setProperty("a.b.c.k1.e", "s1");
 		advProps.setProperty("a.b.c.k4", "s4");
@@ -54,7 +57,7 @@ class AdvancedPropertiesTest {
 	@Test
 	void testKeys2() {
 
-		AdvancedProperties advProps = new AdvancedProperties();
+		AdvancedProperties advProps = new AdvancedProperties(logger);
 		advProps.setProperty("p1", "10");
 
 		List<String> keys = advProps.getKeysElements("a.b.c.");
@@ -72,7 +75,7 @@ class AdvancedPropertiesTest {
 
 	@Test
 	void testKeys3() {
-		AdvancedProperties advProps = new AdvancedProperties();
+		AdvancedProperties advProps = new AdvancedProperties(logger);
 		advProps.setProperty("p1", "10");
 
 		assertThatNullPointerException().isThrownBy(() -> advProps.getKeysElements(null));
@@ -81,7 +84,7 @@ class AdvancedPropertiesTest {
 	@Test
 	void testInt() {
 
-		AdvancedProperties advProps = new AdvancedProperties();
+		AdvancedProperties advProps = new AdvancedProperties(logger);
 		advProps.setProperty("p1", "10");
 		assertThat(advProps.getProperty("p1")).isEqualTo("10");
 
@@ -92,7 +95,7 @@ class AdvancedPropertiesTest {
 	@Test
 	void testInt2() {
 
-		AdvancedProperties advProps = new AdvancedProperties();
+		AdvancedProperties advProps = new AdvancedProperties(logger);
 		advProps.setProperty("p1", "10");
 		assertThat(advProps.getProperty("unknown")).isNull();
 
@@ -103,22 +106,22 @@ class AdvancedPropertiesTest {
 	@Test
 	void testInt3() {
 
-		AdvancedProperties advProps = new AdvancedProperties();
 		LoggerCounter noLog = LoggerCounter.getLogger();
-		advProps.setLog(noLog);
+		AdvancedProperties advProps = new AdvancedProperties(noLog);
 
 		advProps.setProperty("p1", "notAnumber");
 		assertThat(advProps.getProperty("p1")).isEqualTo("notAnumber");
 
 		int i = advProps.getInt("p1", 9);
 		assertThat(i).isEqualTo(9);
-		assertThat(noLog.getErrorCount()).isEqualTo(1);
+		assertThat(noLog.getLogRecordCount()).isEqualTo(1);
+		assertThat(noLog.getLogRecordCount(Level.SEVERE)).isEqualTo(1);
 	}
 
 	@Test
 	void testLong() {
 
-		AdvancedProperties advProps = new AdvancedProperties();
+		AdvancedProperties advProps = new AdvancedProperties(logger);
 		advProps.setProperty("p1", "10");
 		assertThat(advProps.getProperty("p1")).isEqualTo("10");
 
@@ -129,22 +132,22 @@ class AdvancedPropertiesTest {
 	@Test
 	void testLong2() {
 
-		AdvancedProperties advProps = new AdvancedProperties();
 		LoggerCounter noLog = LoggerCounter.getLogger();
-		advProps.setLog(noLog);
+		AdvancedProperties advProps = new AdvancedProperties(noLog);
 
 		advProps.setProperty("p1", "notAnumber");
 		assertThat(advProps.getProperty("p1")).isEqualTo("notAnumber");
 
 		long i = advProps.getLong("p1", 1000000000);
 		assertThat(i).isEqualTo(1000000000);
-		assertThat(noLog.getErrorCount()).isEqualTo(1);
+		assertThat(noLog.getLogRecordCount()).isEqualTo(1);
+		assertThat(noLog.getLogRecordCount(Level.SEVERE)).isEqualTo(1);
 	}
 
 	@Test
 	void testLong3() {
 
-		AdvancedProperties advProps = new AdvancedProperties();
+		AdvancedProperties advProps = new AdvancedProperties(logger);
 
 		advProps.setProperty("p1", "10");
 		assertThat(advProps.getProperty("unknown")).isNull();
@@ -156,7 +159,7 @@ class AdvancedPropertiesTest {
 	@Test
 	void testDouble() {
 
-		AdvancedProperties advProps = new AdvancedProperties();
+		AdvancedProperties advProps = new AdvancedProperties(logger);
 		advProps.setProperty("p1", "-10.2");
 		assertThat(advProps.getProperty("p1")).isEqualTo("-10.2");
 
@@ -167,22 +170,22 @@ class AdvancedPropertiesTest {
 	@Test
 	void testDouble2() {
 
-		AdvancedProperties advProps = new AdvancedProperties();
 		LoggerCounter noLog = LoggerCounter.getLogger();
-		advProps.setLog(noLog);
+		AdvancedProperties advProps = new AdvancedProperties(noLog);
 
 		advProps.setProperty("p1", "notAnumber");
 		assertThat(advProps.getProperty("p1")).isEqualTo("notAnumber");
 
 		double i = advProps.getDouble("p1", 1000000000.1);
 		assertThat(i).isEqualTo(1000000000.1);
-		assertThat(noLog.getErrorCount()).isEqualTo(1);
+		assertThat(noLog.getLogRecordCount()).isEqualTo(1);
+		assertThat(noLog.getLogRecordCount(Level.SEVERE)).isEqualTo(1);
 	}
 
 	@Test
 	void testDouble3() {
 
-		AdvancedProperties advProps = new AdvancedProperties();
+		AdvancedProperties advProps = new AdvancedProperties(logger);
 
 		advProps.setProperty("p1", "10.7");
 		assertThat(advProps.getProperty("unknown")).isNull();
@@ -194,7 +197,7 @@ class AdvancedPropertiesTest {
 	@Test
 	void testBoolean() {
 
-		AdvancedProperties advProps = new AdvancedProperties();
+		AdvancedProperties advProps = new AdvancedProperties(logger);
 		advProps.setProperty("p1", "true");
 		assertThat(advProps.getProperty("p1")).isEqualTo("true");
 
@@ -204,22 +207,22 @@ class AdvancedPropertiesTest {
 	@Test
 	void testBoolean2() {
 
-		AdvancedProperties advProps = new AdvancedProperties();
 		LoggerCounter noLog = LoggerCounter.getLogger();
-		advProps.setLog(noLog);
+		AdvancedProperties advProps = new AdvancedProperties(noLog);
 
 		advProps.setProperty("p1", "notBool");
 		assertThat(advProps.getProperty("p1")).isEqualTo("notBool");
 
 		assertThat(advProps.getBoolean("p1", true)).isTrue();
 		assertThat(advProps.getBoolean("p1", false)).isFalse();
-		assertThat(noLog.getErrorCount()).isEqualTo(2);
+		assertThat(noLog.getLogRecordCount()).isEqualTo(2);
+		assertThat(noLog.getLogRecordCount(Level.SEVERE)).isEqualTo(2);
 	}
 
 	@Test
 	void testBoolean3() {
 
-		AdvancedProperties advProps = new AdvancedProperties();
+		AdvancedProperties advProps = new AdvancedProperties(logger);
 		advProps.setProperty("p1", "True");
 		assertThat(advProps.getProperty("p1")).isEqualTo("True");
 
@@ -229,7 +232,7 @@ class AdvancedPropertiesTest {
 	@Test
 	void testBoolean4() {
 
-		AdvancedProperties advProps = new AdvancedProperties();
+		AdvancedProperties advProps = new AdvancedProperties(logger);
 		advProps.setProperty("p1", "True");
 		assertThat(advProps.getProperty("p1")).isEqualTo("True");
 
@@ -240,7 +243,7 @@ class AdvancedPropertiesTest {
 	@Test
 	void testChar() {
 
-		AdvancedProperties advProps = new AdvancedProperties();
+		AdvancedProperties advProps = new AdvancedProperties(logger);
 		advProps.setProperty("p1", "c");
 		assertThat(advProps.getProperty("p1")).isEqualTo("c");
 
@@ -251,7 +254,7 @@ class AdvancedPropertiesTest {
 	@Test
 	void testChar2() {
 
-		AdvancedProperties advProps = new AdvancedProperties();
+		AdvancedProperties advProps = new AdvancedProperties(logger);
 		advProps.setProperty("p1", "char");
 		assertThat(advProps.getProperty("p1")).isEqualTo("char");
 
@@ -262,7 +265,7 @@ class AdvancedPropertiesTest {
 	@Test
 	void testChar3() {
 
-		AdvancedProperties advProps = new AdvancedProperties();
+		AdvancedProperties advProps = new AdvancedProperties(logger);
 		advProps.setProperty("p1", "c");
 		assertThat(advProps.getProperty("p1")).isEqualTo("c");
 
@@ -273,7 +276,7 @@ class AdvancedPropertiesTest {
 	@Test
 	void testChar4() {
 
-		AdvancedProperties advProps = new AdvancedProperties();
+		AdvancedProperties advProps = new AdvancedProperties(logger);
 		advProps.setProperty("p1", "");
 		assertThat(advProps.getProperty("p1")).isEmpty();
 
@@ -284,7 +287,7 @@ class AdvancedPropertiesTest {
 	@Test
 	void testArrayOfInts() {
 
-		AdvancedProperties advProps = new AdvancedProperties();
+		AdvancedProperties advProps = new AdvancedProperties(logger);
 		advProps.setProperty("a.b.c", "5,4,3,2,1");
 
 		assertThat(advProps.getProperty("a.b.c")).isEqualTo("5,4,3,2,1");
@@ -296,7 +299,7 @@ class AdvancedPropertiesTest {
 	@Test
 	void testArrayOfInts2() {
 
-		AdvancedProperties advProps = new AdvancedProperties();
+		AdvancedProperties advProps = new AdvancedProperties(logger);
 		advProps.setProperty("a.b.c", "5");
 
 		assertThat(advProps.getProperty("a.b.c")).isEqualTo("5");
@@ -308,7 +311,7 @@ class AdvancedPropertiesTest {
 	@Test
 	void testArrayOfInts3() {
 
-		AdvancedProperties advProps = new AdvancedProperties();
+		AdvancedProperties advProps = new AdvancedProperties(logger);
 		advProps.setProperty("a.b.c", "5");
 
 		advProps.setProperty("a.b.c", "5");
@@ -320,7 +323,7 @@ class AdvancedPropertiesTest {
 	@Test
 	void testArrayOfInts4() {
 
-		AdvancedProperties advProps = new AdvancedProperties();
+		AdvancedProperties advProps = new AdvancedProperties(logger);
 		advProps.setProperty("a.b.c", "5");
 
 		int[] ints = advProps.getArrayOfInt("unknown", ",");
@@ -330,22 +333,22 @@ class AdvancedPropertiesTest {
 	@Test
 	void testArrayOfInts5() {
 
-		AdvancedProperties advProps = new AdvancedProperties();
-		advProps.setProperty("a.b.c", "5,4,NotAnumber,2,1");
 		LoggerCounter noLog = LoggerCounter.getLogger();
-		advProps.setLog(noLog);
+		AdvancedProperties advProps = new AdvancedProperties(noLog);
+		advProps.setProperty("a.b.c", "5,4,NotAnumber,2,1");
 
 		assertThat(advProps.getProperty("a.b.c")).isEqualTo("5,4,NotAnumber,2,1");
 
 		int[] ints = advProps.getArrayOfInt("a.b.c", ",");
 		assertThat(ints).isNull();
-		assertThat(noLog.getErrorCount()).isEqualTo(1);
+		assertThat(noLog.getLogRecordCount()).isEqualTo(1);
+		assertThat(noLog.getLogRecordCount(Level.SEVERE)).isEqualTo(1);
 	}
 
 	@Test
 	void testArrayOfStrings() {
 
-		AdvancedProperties advProps = new AdvancedProperties();
+		AdvancedProperties advProps = new AdvancedProperties(logger);
 		advProps.setProperty("a.b.c", "cinq,quatre,trois,deux,un");
 
 		assertThat(advProps.getProperty("a.b.c")).isEqualTo("cinq,quatre,trois,deux,un");
@@ -357,7 +360,7 @@ class AdvancedPropertiesTest {
 	@Test
 	void testArrayOfStrings2() {
 
-		AdvancedProperties advProps = new AdvancedProperties();
+		AdvancedProperties advProps = new AdvancedProperties(logger);
 		advProps.setProperty("a.b.c", "trois");
 
 		assertThat(advProps.getProperty("a.b.c")).isEqualTo("trois");
@@ -369,7 +372,7 @@ class AdvancedPropertiesTest {
 	@Test
 	void testArrayOfStrings3() {
 
-		AdvancedProperties advProps = new AdvancedProperties();
+		AdvancedProperties advProps = new AdvancedProperties(logger);
 		advProps.setProperty("a.b.c", "trois");
 
 		assertThat(advProps.getProperty("a.b.c")).isEqualTo("trois");
@@ -381,7 +384,7 @@ class AdvancedPropertiesTest {
 	@Test
 	void testArrayOfStrings4() {
 
-		AdvancedProperties advProps = new AdvancedProperties();
+		AdvancedProperties advProps = new AdvancedProperties(logger);
 		advProps.setProperty("a.b.c", "trois");
 
 		String[] strings = advProps.getArrayOfString("unknown", ",");
@@ -391,7 +394,7 @@ class AdvancedPropertiesTest {
 	@Test
 	void testListOfStrings() {
 
-		AdvancedProperties advProps = new AdvancedProperties();
+		AdvancedProperties advProps = new AdvancedProperties(logger);
 		advProps.setProperty("a.b.c", "cinq,quatre,trois,deux,un");
 
 		assertThat(advProps.getProperty("a.b.c")).isEqualTo("cinq,quatre,trois,deux,un");
@@ -403,7 +406,7 @@ class AdvancedPropertiesTest {
 	@Test
 	void testListOfStrings2() {
 
-		AdvancedProperties advProps = new AdvancedProperties();
+		AdvancedProperties advProps = new AdvancedProperties(logger);
 		advProps.setProperty("a.b.c", "trois");
 
 		assertThat(advProps.getProperty("a.b.c")).isEqualTo("trois");
@@ -415,7 +418,7 @@ class AdvancedPropertiesTest {
 	@Test
 	void testListOfStrings3() {
 
-		AdvancedProperties advProps = new AdvancedProperties();
+		AdvancedProperties advProps = new AdvancedProperties(logger);
 		advProps.setProperty("a.b.c", "trois");
 
 		assertThat(advProps.getProperty("a.b.c")).isEqualTo("trois");
@@ -427,7 +430,7 @@ class AdvancedPropertiesTest {
 	@Test
 	void testListOfStrings4() {
 
-		AdvancedProperties advProps = new AdvancedProperties();
+		AdvancedProperties advProps = new AdvancedProperties(logger);
 		advProps.setProperty("a.b.c", "trois");
 
 		List<String> strings = advProps.getListOfString("unknown", ",");

@@ -186,19 +186,11 @@ public class PropertiesStorage {
 	   errorMsg.append( "user.dir: ").append(System.getProperty("user.dir")).append("\n") ;
 	   return errorMsg.toString() ;
    }
-   
-	/**
-	 * Get a AdvancedProperties object from the storage
-	 * @return the AdvancedProperties object
-	 */
-	public AdvancedProperties getAdvanced() {
-		return getAdvancedTry(null) ;
-	}
 	
-	public AdvancedProperties getAdvancedTry(Logger log) {
+	public AdvancedProperties getAdvanced(Logger log) {
 		
 	    // load property from the property file		
-	    AdvancedProperties props = new AdvancedProperties();
+	    AdvancedProperties props = new AdvancedProperties(log);
 	    
 	    if (propUrl != null) {
 		    try (InputStreamReader reader = new InputStreamReader(propUrl.openStream(), StandardCharsets.UTF_8)) {

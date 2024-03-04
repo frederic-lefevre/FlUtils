@@ -24,63 +24,52 @@ SOFTWARE.
 
 package org.fl.util;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.logging.Filter;
+import java.lang.StackWalker.Option;
 import java.util.logging.Level;
-import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
 public class LoggerCounter extends Logger {
 
+	// fully qualified method name
+	private final String name;
+	
 	public static LoggerCounter getLogger() {
-		LoggerCounter newLoggerCounter = new LoggerCounter();
-		newLoggerCounter.setFilter(new FilterCounter());
+		String name = getCallerFullyQualifiedMethodName();
+		LoggerCounter newLoggerCounter = new LoggerCounter(name);
+		FilterCounter.setFilterCounter(name, newLoggerCounter);
 		return newLoggerCounter;
 	}
 	
-	private LoggerCounter() {
+	private LoggerCounter(String name) {
 		super(null, null);
+		this.name = name;
 	}
 
-	private static class FilterCounter implements Filter {
-
-		private int errorCount = 0;
-		
-		private Map<Level, Integer> errorCounts = new HashMap<>();
-
-		@Override
-		public boolean isLoggable(LogRecord record) {
-			errorCount++;
-			Level level = record.getLevel();
-			errorCounts.put(level, getErrorCount(level) + 1);
-			return false;
-		}
-		
-		public void resetErrorCount() {
-			errorCount = 0;
-			errorCounts.clear();
-		}
-
-		public int getErrorCount() {
-			return errorCount;
-		}
-		
-		public int getErrorCount(Level level) {
-			return Optional.ofNullable(errorCounts.get(level)).orElse(0);
-		}
-	}
-
-	public int getErrorCount() {
-		return ((FilterCounter)getFilter()).getErrorCount();
+	public int getLogRecordCount() {
+		return ((FilterCounter)getFilter()).getLogRecordCount(name);
 	}
 	
-	public int getErrorCount(Level level) {
-		return ((FilterCounter)getFilter()).getErrorCount(level);
+	public int getLogRecordCount(Level level) {
+		return ((FilterCounter)getFilter()).getLogRecordCount(name, level);
 	}
 	
-	public  void resetErrorCount() {
-		((FilterCounter)getFilter()).resetErrorCount();
+	// Reset counts for the current thread
+	public  void resetLogRecordCount() {
+		((FilterCounter)getFilter()).addLogRecordCounters(name);
+	}
+	
+	// Reset counts for all threads
+	public  void resetAllLogRecordCount() {
+		((FilterCounter)getFilter()).resetAllLogRecordCounts();
+	}
+	
+	private static String getCallerFullyQualifiedMethodName() {
+	   return StackWalker
+	      .getInstance(Option.RETAIN_CLASS_REFERENCE)
+	      .walk(stream -> getCallerFullyQualifiedMethodName(stream.skip(2).findFirst().get()));
+	}
+	
+	private static String getCallerFullyQualifiedMethodName(StackWalker.StackFrame stackFrame) {
+		return stackFrame.getDeclaringClass().getCanonicalName() + "." + stackFrame.getMethodName();
 	}
 }

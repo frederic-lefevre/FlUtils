@@ -1,7 +1,7 @@
 /*
  * MIT License
 
-Copyright (c) 2017, 2023 Frederic Lefevre
+Copyright (c) 2017, 2024 Frederic Lefevre
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -51,7 +51,7 @@ public class LogsDisplayPane  extends JTabbedPane {
 	private final int logDisplaySubTabNumber ;
 	private final int logDisplayMaxLength ;
 	
-	public LogsDisplayPane(AdvancedProperties props, int level, Color color, Logger logger) {
+	public LogsDisplayPane(AdvancedProperties props, int level, Color color, String loggerNameSpace) {
 		
 		super();
 		
@@ -61,6 +61,7 @@ public class LogsDisplayPane  extends JTabbedPane {
 		
 		Color[] searchHighLightColors = props.getColors("appTabbedPane.logging.searchHighLightColors", DEFAULT_SEARCH_HIGHLIGHTCOLORS) ;
 		
+		Logger logger = Logger.getLogger(loggerNameSpace);
 		searchableLogDisplays = new ArrayList<SearchableLogDisplay>() ;
 		for (int i=0; i < logDisplaySubTabNumber; i++) {
 			SearchableLogDisplay logDisplay = new SearchableLogDisplay(level, searchHighLightColors, color, logger) ;

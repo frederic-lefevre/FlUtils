@@ -1,7 +1,7 @@
 /*
  * MIT License
 
-Copyright (c) 2017, 2023 Frederic Lefevre
+Copyright (c) 2017, 2024 Frederic Lefevre
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -82,14 +82,15 @@ public class LoggerManager {
      */
     private LoggerManager(String logName, String rootDir, AdvancedProperties props, Handler customHandler) {
 
+    	// get or create the logger (it may already exist, with all its handlers set, in the case of a J2EE container)
+   		log = Logger.getLogger(logName);
+   		
     	if (props == null) {
-    		properties = new AdvancedProperties();
+    		properties = new AdvancedProperties(log);
     	} else {
     		properties = props;
     	}
-    	
-    	// get or create the logger (it may already exist, with all its handlers set, in the case of a J2EE container)
-   		log = Logger.getLogger(logName) ;
+ 
     
 		try {
 			// if the logger was already existing (due to a previous deployement)
@@ -284,14 +285,6 @@ public class LoggerManager {
             }
         }
         return highestLevel ;
-    }
-
-    /**
-     * Get the Logger
-     * @return Returns the logger.
-     */
-    public Logger getLog() {
-        return log;
     }
     
     // Add a custom handler to the logger

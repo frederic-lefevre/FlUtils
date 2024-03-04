@@ -1,7 +1,7 @@
 /*
  * MIT License
 
-Copyright (c) 2017, 2023 Frederic Lefevre
+Copyright (c) 2017, 2024 Frederic Lefevre
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -55,21 +55,16 @@ public class AdvancedProperties extends Properties {
 	private static final long serialVersionUID = 1L;
 	private static final char keySeparator = '.' ; 
 
-	private Logger log  ;
+	private final Logger log  ;
 	
-	public AdvancedProperties() {
+	public AdvancedProperties(Logger log) {
 		super() ;
-		log = Logger.getLogger("Default advanced property logger") ;
-	}
-
-	public AdvancedProperties(Properties properties) {
-		super(properties);
-		log = Logger.getLogger("Default advanced property logger") ;
+		this.log = log;
 	}
 
 	public AdvancedProperties(Properties properties, Logger l) {
 		super(properties);
-		log = l ;
+		this.log = l ;
 	}
 	
 	// Get all key elements following a root key
@@ -419,7 +414,7 @@ public class AdvancedProperties extends Properties {
 			try {
 				Path filePath = Paths.get(filePathName) ;
 				PropertiesStorage propsProjectStorage = new PropertiesStorage(filePath);
-				AdvancedProperties propsProject = propsProjectStorage.getAdvancedTry(log) ; 
+				AdvancedProperties propsProject = propsProjectStorage.getAdvanced(log) ; 
 				return propsProject ;
 			} catch (Exception e) {
 				log.log(Level.SEVERE,"getPropertiesFromFile: invalid filePath: " + filePathName, e) ;
@@ -512,10 +507,6 @@ public class AdvancedProperties extends Properties {
 		}
 		
 		return result ;
-	}
-	
-	public void setLog(Logger log) {
-		this.log = log;
 	}
 	
 	// Get all the properties as a string
