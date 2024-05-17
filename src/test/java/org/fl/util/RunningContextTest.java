@@ -68,6 +68,7 @@ class RunningContextTest {
 		
 		assertThat(rc.getInitializationDate()).isCloseTo(Instant.now(), within(2, ChronoUnit.SECONDS));
 
+		assertThat(rc.getBuildInformation()).isNotNull().isNotEmpty().contains("version");
 	}
 
 	@Test

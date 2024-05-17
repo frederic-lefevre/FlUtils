@@ -40,6 +40,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.fl.util.file.FilesUtils;
+import org.fl.util.json.JsonUtils;
 import org.fl.util.os.OperatingInfo;
 
 import com.google.gson.Gson;
@@ -120,6 +121,10 @@ public class RunningContext {
 	
 	public String getName() {
 		return name;
+	}
+	
+	public String getBuildInformation() {
+		return JsonUtils.jsonPrettyPrint(buildInformation.getAsJsonObject());
 	}
 	
 	private void initRunningContext(String name, String systemProperty, String baseDir, Handler customLogHandler) {
