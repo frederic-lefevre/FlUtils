@@ -57,7 +57,7 @@ public class OScommand extends Thread {
 			cmdAndParams.addAll(commandOptions);
 		}
 		if ((commandParameters != null) && !commandParameters.isEmpty()) {
-			cmdAndParams.addAll(cmdAndParams);
+			cmdAndParams.addAll(commandParameters);
 		}
 		
 		try {
