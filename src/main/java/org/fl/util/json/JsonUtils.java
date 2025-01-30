@@ -1,3 +1,27 @@
+/*
+ * MIT License
+
+Copyright (c) 2017, 2025 Frederic Lefevre
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
+
 package org.fl.util.json;
 
 import java.io.BufferedReader;
@@ -9,6 +33,9 @@ import java.nio.file.Path;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
@@ -17,22 +44,22 @@ import com.google.gson.JsonParser;
 
 public class JsonUtils {
 
-	// pretty print Json string
-	public static String jsonPrettyPrint(String rawJson, Logger uLog) {
+	private static final ObjectMapper mapper = JsonMapper.builder().enable(SerializationFeature.INDENT_OUTPUT).build();
 	
-		String res = "" ;
+	// pretty print Json string
+	public static String jsonStringPrettyPrint(String rawJson, Logger logger) {
+	
 		if ((rawJson != null) && (! rawJson.isEmpty())) {
 			try {
-				JsonObject json = JsonParser.parseString(rawJson).getAsJsonObject();
-	
-				res = jsonPrettyPrint(json);
-	
+				return mapper.writeValueAsString(mapper.readValue(rawJson, Object.class));	
 			} catch (Exception e) {
-				uLog.log(Level.SEVERE, "Exception when pretty printing json string\n" + rawJson, e);
-				res = rawJson ;
+				logger.log(Level.SEVERE, "Exception when pretty printing json string\n" + rawJson, e);
+				return rawJson ;
 			}
+		} else {
+			return rawJson;
 		}
-		return res;	
+
 	}
 	
 	// pretty print Json object
