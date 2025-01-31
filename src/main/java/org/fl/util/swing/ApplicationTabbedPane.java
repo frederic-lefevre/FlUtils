@@ -1,7 +1,7 @@
 /*
  * MIT License
 
-Copyright (c) 2017, 2024 Frederic Lefevre
+Copyright (c) 2017, 2025 Frederic Lefevre
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -26,6 +26,7 @@ package org.fl.util.swing;
 
 import java.awt.Color;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.JTabbedPane;
 import javax.swing.event.ChangeEvent;
@@ -37,8 +38,12 @@ import org.fl.util.RunningContext;
 import org.fl.util.swing.logPane.LogHighLightListener;
 import org.fl.util.swing.logPane.LogsDisplayPane;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+
 public class ApplicationTabbedPane extends JTabbedPane {
 
+	private static final Logger logger = Logger.getLogger(ApplicationTabbedPane.class.getName());
+			
 	private static final long serialVersionUID = 1L;
 
 	private ApplicationInfoPane appInfoPane ;
@@ -81,7 +86,11 @@ public class ApplicationTabbedPane extends JTabbedPane {
 		public void stateChanged(ChangeEvent arg0) {
 			
 			if (getSelectedComponent().equals(appInfoPane)) {
-				appInfoPane.setInfos();
+				try {
+					appInfoPane.setInfos();
+				} catch (JsonProcessingException e) {
+					logger.log(Level.SEVERE, "Exception setting Application info pane", e);
+				}
 			} else if (getSelectedComponent().equals(logsDisplayPane)) {
 				logsDisplayPane.refreshLogRecordCategories() ;
 			}

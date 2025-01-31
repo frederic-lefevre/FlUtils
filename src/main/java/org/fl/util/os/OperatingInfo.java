@@ -1,12 +1,37 @@
+/*
+ * MIT License
+
+Copyright (c) 2017, 2025 Frederic Lefevre
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
+
 package org.fl.util.os;
 
 import java.nio.charset.Charset;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Set;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class OperatingInfo {
 	
@@ -14,7 +39,7 @@ public class OperatingInfo {
 		
 	}
 
-	public JsonObject getInfo(boolean withIpLookup) {
+	public JsonNode getInfo(boolean withIpLookup) {
 
 		StringBuilder info = new StringBuilder();
 		Map<String, String> sysEnv = System.getenv();
@@ -37,83 +62,67 @@ public class OperatingInfo {
 		long totalMem = rt.totalMemory();
 		int nbAvailProc = rt.availableProcessors();
 
-		JsonObject opInfoJson = new JsonObject() ;
-		
-		JsonArray rtInfos = new JsonArray() ;
-		info.append("Free Memory usable for objects=").append(freeMem).append(" bytes") ;
+		ObjectNode opInfoJson = JsonNodeFactory.instance.objectNode();
+
+		ArrayNode rtInfos = JsonNodeFactory.instance.arrayNode();
+		info.append("Free Memory usable for objects=").append(freeMem).append(" bytes");
 		rtInfos.add(info.toString());
-		info.setLength(0) ;
-		info.append("Maximum Memory available for the JVM=").append(maxMem).append(" bytes") ;
+		info.setLength(0);
+		info.append("Maximum Memory available for the JVM=").append(maxMem).append(" bytes");
 		rtInfos.add(info.toString());
-		info.setLength(0) ;
-		info.append("Total Memory usable for objects=").append(totalMem).append(" bytes") ;
+		info.setLength(0);
+		info.append("Total Memory usable for objects=").append(totalMem).append(" bytes");
 		rtInfos.add(info.toString());
-		info.setLength(0) ;
+		info.setLength(0);
 		info.append("Number of processors=").append(nbAvailProc);
 		rtInfos.add(info.toString());
-		info.setLength(0) ;		
-		opInfoJson.add("runtimeInformation",  rtInfos) ;
-		
-		opInfoJson.add("systemProperties", printProp(sysProp)) ;
-		opInfoJson.add("systemEnvironment", printSysenv(sysEnv)) ;
-		
-		JsonArray nlInfos = new JsonArray() ;
+		info.setLength(0);
+		opInfoJson.set("runtimeInformation", rtInfos);
+
+		opInfoJson.set("systemProperties", printProp(sysProp));
+		opInfoJson.set("systemEnvironment", printSysenv(sysEnv));
+
+		ArrayNode nlInfos = JsonNodeFactory.instance.arrayNode();
 		info.append("Newline unicode code point sequence:").append(newLineCodePoint);
 		nlInfos.add(info.toString());
-		info.setLength(0) ;
+		info.setLength(0);
 		info.append("Newline as byte sequence:").append(newLineBytesString);
 		nlInfos.add(info.toString());
-		info.setLength(0) ;
-		opInfoJson.add("newLine", nlInfos) ;
-		
-		opInfoJson.addProperty("defaultCharset", Charset.defaultCharset().name());
-		opInfoJson.add("availableCharset", printCharSet()) ;
+		info.setLength(0);
+		opInfoJson.set("newLine", nlInfos);
+
+		opInfoJson.put("defaultCharset", Charset.defaultCharset().name());
+		opInfoJson.set("availableCharset", printCharSet());
 
 		NetworkUtils nu = new NetworkUtils(withIpLookup);
-		opInfoJson.add("networkInterfaces", nu.getNetworkInterfaces()) ;
-		opInfoJson.add("IPv4addresses", 	nu.getIPv4()) ;
-		opInfoJson.add("IPv6addresses", 	nu.getIPv6()) ;
-		opInfoJson.add("Otheraddresses", 	nu.getOtherAddresses()) ;
-		
-		opInfoJson.addProperty("machineName", nu.getMachineName()) ;
+		opInfoJson.set("networkInterfaces", nu.getNetworkInterfaces());
+		opInfoJson.set("IPv4addresses", nu.getIPv4());
+		opInfoJson.set("IPv6addresses", nu.getIPv6());
+		opInfoJson.set("Otheraddresses", nu.getOtherAddresses());
 
-		return opInfoJson ;
+		opInfoJson.put("machineName", nu.getMachineName());
+
+		return opInfoJson;
 	}
 
-	private JsonArray printProp(Properties prop) {
-		
-		 Set<String> keys = prop.stringPropertyNames() ;
-		 JsonArray res = new JsonArray() ;
-		
-		for (String k : keys)   {
-			JsonObject jProp = new JsonObject() ;
-			jProp.addProperty(k, prop.getProperty(k));
-			res.add(jProp);
-		}
-		return res ;
+	private ObjectNode printProp(Properties prop) {
+
+		ObjectNode res = JsonNodeFactory.instance.objectNode();
+		prop.stringPropertyNames().forEach(key -> res.put(key, prop.getProperty(key)));
+		return res;
 	}
 	
-	private JsonArray printSysenv(Map <String,String> sysenv) {
+	private ObjectNode printSysenv(Map <String,String> sysenv) {
 	
-		 Set<String> keys = sysenv.keySet() ;
-		 JsonArray res = new JsonArray() ;
-			
-		for (String k : keys)   {
-			JsonObject jProp = new JsonObject() ;
-			jProp.addProperty(k, sysenv.get(k));
-			res.add(jProp);
-		}
-		return res ;
+		ObjectNode res = JsonNodeFactory.instance.objectNode();
+		sysenv.keySet().forEach(key -> res.put(key, sysenv.get(key)));
+		return res;
 	}
 	
-	private JsonArray printCharSet() {
+	private ObjectNode printCharSet() {
 		
-		Set<String> charSetNames = Charset.availableCharsets().keySet() ;
-		JsonArray  res = new JsonArray() ;
-		
-		for (String csn : charSetNames) {
-			res.add(csn) ;
-		}
-		return res ;
+		ObjectNode charSetJson = JsonNodeFactory.instance.objectNode();
+		Charset.availableCharsets().entrySet().forEach(entry -> charSetJson.put(entry.getKey(), entry.getValue().name()));
+		return charSetJson;
 	}
 }

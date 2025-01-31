@@ -1,3 +1,27 @@
+/*
+ * MIT License
+
+Copyright (c) 2017, 2025 Frederic Lefevre
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
+
 package org.fl.util.file;
 
 import java.io.IOException;
@@ -39,9 +63,10 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class FilesUtils {
 
@@ -184,61 +209,54 @@ public class FilesUtils {
 	}
 	
 	
-	// Get informations about the filestore of a given path and return them in a JsonObject
-	public static JsonObject getFileStoreInformation(Path path, Logger logger) {
-		
-		JsonObject fsInfos ;
+	// Get informations about the filestore of a given path and return them in a
+	// JsonObject
+	public static JsonNode getFileStoreInformation(Path path, Logger logger) {
+
 		try {
-			
-			FileStore fileStore = Files.getFileStore(path) ;
-			fsInfos = getFileStoreInformation(fileStore, logger) ;
+			return getFileStoreInformation(Files.getFileStore(path), logger);
 		} catch (Exception e) {
-			fsInfos = new JsonObject() ;
-			fsInfos.addProperty("error", 	"No fileStore associated to the path " + path);
-			logger.log(Level.FINE, "Exception when getting FileStore informations for file " + path, e) ;
+			logger.log(Level.FINE, "Exception when getting FileStore informations for file " + path, e);
+			return JsonNodeFactory.instance.objectNode().put("error", "No fileStore associated to the path " + path);
 		}
-				
-		return fsInfos ;
 	}
-	
-	// Get informations about the filestore and return them in a JsonObject
-	public static JsonObject getFileStoreInformation(FileStore fileStore, Logger logger) {
-		
-		JsonObject fsInfos = new JsonObject() ;
-		
-		fsInfos.addProperty("name", 			fileStore.name());
-		fsInfos.addProperty("type", 			fileStore.type());
-		fsInfos.addProperty("isReadOnly", 		fileStore.isReadOnly());
+
+	// Get informations about the filestore and return them in a JsonNode
+	public static JsonNode getFileStoreInformation(FileStore fileStore, Logger logger) {
+
+		ObjectNode fsInfos = JsonNodeFactory.instance.objectNode();
+
+		fsInfos.put("name", fileStore.name());
+		fsInfos.put("type", fileStore.type());
+		fsInfos.put("isReadOnly", fileStore.isReadOnly());
 		try {
-			fsInfos.addProperty("totalSpace", 		fileStore.getTotalSpace());
-			fsInfos.addProperty("unallocatedSpace", fileStore.getUnallocatedSpace());
-			fsInfos.addProperty("usablSpace", 		fileStore.getUsableSpace());
-			
+			fsInfos.put("totalSpace", fileStore.getTotalSpace());
+			fsInfos.put("unallocatedSpace", fileStore.getUnallocatedSpace());
+			fsInfos.put("usablSpace", fileStore.getUsableSpace());
+
 		} catch (Exception e) {
-			fsInfos.addProperty("error", 			"Unaccessible filestore");
-			logger.log(Level.FINE, "Exception when getting FileStore informations", e) ;
+			fsInfos.put("error", "Unaccessible filestore");
+			logger.log(Level.FINE, "Exception when getting FileStore informations", e);
 		}
-		return fsInfos ;
+		return fsInfos;
 	}
 	
 	// Get informations about the FilesSystems and FileSystemProviders and return them in a JsonObject
-	public static JsonObject getFileSystemsInformation(Logger logger) {
+	public static JsonNode getFileSystemsInformation(Logger logger) {
 		
-		JsonObject fssInfos  = new JsonObject() ;
+		ObjectNode fssInfos = JsonNodeFactory.instance.objectNode();
 		
 		// FileSystemProviders infos
-		JsonArray fpInfosArray = new JsonArray() ;
-		List<FileSystemProvider> fsProviders = FileSystemProvider.installedProviders() ;	
-		for (FileSystemProvider fsProvider : fsProviders) {
-			fpInfosArray.add(fsProvider.getScheme()) ;
-		}
-		fssInfos.add("fileSystemProviderSchemes", fpInfosArray);
+		ArrayNode fpInfosArray = JsonNodeFactory.instance.arrayNode();
+		FileSystemProvider.installedProviders().forEach(fsProvider -> fpInfosArray.add(fsProvider.getScheme()));
+		
+		fssInfos.set("fileSystemProviderSchemes", fpInfosArray);
 		
 		// default file system infos
 		FileSystem fs = FileSystems.getDefault() ;
 		
-		JsonObject defaultFsInfos = new JsonObject() ;
-		defaultFsInfos.addProperty("defaultSeparator", fs.getSeparator()) ;	
+		ObjectNode defaultFsInfos = JsonNodeFactory.instance.objectNode();
+		defaultFsInfos.put("defaultSeparator", fs.getSeparator()) ;	
 		FileSystemProvider defaultProvider = fs.provider() ;
 		String defaultScheme ;
 		if (defaultProvider == null) {
@@ -246,33 +264,33 @@ public class FilesUtils {
 		} else {
 			defaultScheme = defaultProvider.getScheme() ;
 		}
-		defaultFsInfos.addProperty("providerScheme", defaultScheme) ;
+		defaultFsInfos.put("providerScheme", defaultScheme) ;
 
-		JsonArray attViewsArray = new JsonArray() ;
+		ArrayNode attViewsArray = JsonNodeFactory.instance.arrayNode();
 		Set<String> attViews = fs.supportedFileAttributeViews() ;
 		for (String attView : attViews) {
 			attViewsArray.add(attView) ;
 		}
-		defaultFsInfos.add("supportedFileAttributesViews", attViewsArray);
+		defaultFsInfos.set("supportedFileAttributesViews", attViewsArray);
 		
-		JsonArray fsInfosArray = new JsonArray() ;
+		ArrayNode fsInfosArray = JsonNodeFactory.instance.arrayNode();
 		Iterable<FileStore> fileStores = fs.getFileStores() ;
 		for (FileStore fileStore : fileStores) {
 			fsInfosArray.add(getFileStoreInformation(fileStore, logger));
 		}
-		defaultFsInfos.add("FileStoresInfos", fsInfosArray) ;
+		defaultFsInfos.set("FileStoresInfos", fsInfosArray) ;
 		
-		JsonArray rpInfosArray = new JsonArray() ;
+		ArrayNode rpInfosArray = JsonNodeFactory.instance.arrayNode();
 		Iterable<Path> rootPaths = fs.getRootDirectories() ;
 		for (Path rootPath : rootPaths) {
-			JsonObject fsInfos = new JsonObject() ;
-			fsInfos.addProperty("fileSystemRootPath", rootPath.toString());
-			fsInfos.add("fileStoreInfos", getFileStoreInformation(rootPath, logger)) ;
+			ObjectNode fsInfos = JsonNodeFactory.instance.objectNode();
+			fsInfos.put("fileSystemRootPath", rootPath.toString());
+			fsInfos.set("fileStoreInfos", getFileStoreInformation(rootPath, logger)) ;
 			rpInfosArray.add(fsInfos);
 		}
-		defaultFsInfos.add("rootDirectoriesInfos", rpInfosArray) ;
+		defaultFsInfos.set("rootDirectoriesInfos", rpInfosArray) ;
 		
-		fssInfos.add("defaultFileSystemInfos", defaultFsInfos);
+		fssInfos.set("defaultFileSystemInfos", defaultFsInfos);
 		return fssInfos ;
 	}
 	

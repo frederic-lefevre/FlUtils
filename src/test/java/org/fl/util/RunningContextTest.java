@@ -1,7 +1,7 @@
 /*
  * MIT License
 
-Copyright (c) 2017, 2024 Frederic Lefevre
+Copyright (c) 2017, 2025 Frederic Lefevre
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,8 +24,7 @@ SOFTWARE.
 
 package org.fl.util;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.within;
+import static org.assertj.core.api.Assertions.*;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -37,12 +36,14 @@ import java.util.logging.Logger;
 
 import org.junit.jupiter.api.Test;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+
 class RunningContextTest {
 	
 	private static final String LOGGER_NAME = "org.fl.util.test1";
 	
 	@Test
-	void testRunningContextWithRelativePath() {
+	void testRunningContextWithRelativePath() throws JsonProcessingException {
 		
 		RunningContext rc = new RunningContext(LOGGER_NAME, null, "test1.properties");
 		

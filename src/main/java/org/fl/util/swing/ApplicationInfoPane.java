@@ -1,9 +1,35 @@
+/*
+ * MIT License
+
+Copyright (c) 2017, 2025 Frederic Lefevre
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
+
 package org.fl.util.swing;
 
 import java.awt.Color;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -17,10 +43,13 @@ import javax.swing.text.DefaultCaret;
 import org.fl.util.RunningContext;
 import org.fl.util.json.JsonUtils;
 
-import com.google.gson.JsonObject;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 
 public class ApplicationInfoPane extends JPanel {
 
+	private static final Logger logger = Logger.getLogger(ApplicationInfoPane.class.getName());
+			
 	private static final long serialVersionUID = 1L;
 
 	private RunningContext runningContext ;
@@ -52,12 +81,12 @@ public class ApplicationInfoPane extends JPanel {
 		add(scrollInfos) ;	
 	}
 	
-	public void setInfos() {
+	public void setInfos() throws JsonProcessingException {
 		setInfos(doIpLookUp.isSelected()) ;
 	}
 	
-	private void setInfos(boolean withLookUp) {
-		JsonObject infosJson = runningContext.getApplicationInfo(withLookUp) ;		
+	private void setInfos(boolean withLookUp) throws JsonProcessingException {
+		JsonNode infosJson = runningContext.getApplicationInfo(withLookUp) ;		
 		infosText.setText(JsonUtils.jsonPrettyPrint(infosJson)) ;
 		
 		scrollInfos.getVerticalScrollBar().setValue(0);
@@ -71,7 +100,11 @@ public class ApplicationInfoPane extends JPanel {
 		public void actionPerformed(ActionEvent e) {
 			if (doIpLookUp.isSelected()) {
 				infosText.setText("Updating...");
-				setInfos(true) ;
+				try {
+					setInfos(true) ;
+				} catch (JsonProcessingException e1) {
+					logger.log(Level.SEVERE, "Exception setting Application pane infos", e);
+				}
 			}
 		}
 		
