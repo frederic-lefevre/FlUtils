@@ -1,3 +1,27 @@
+/*
+ * MIT License
+
+Copyright (c) 2017, 2025 Frederic Lefevre
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
+
 package org.fl.util.api;
 
 import java.nio.charset.Charset;
@@ -8,61 +32,63 @@ import org.fl.util.CompressionUtils;
 import org.fl.util.ExecutionDurations;
 import org.fl.util.json.JsonUtils;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class ApiReturn {
 
 	// Limit trace size of api return when level is FINE
-	private final static int TRACE_FINER_LIMIT = 8192 ;
+	private final static int TRACE_FINER_LIMIT = 8192;
 
 	// Value for Json return
-	public final static String OK        		 = "OK" ;
-	public final static String KO        		 = "KO" ;
+	public final static String OK = "OK";
+	public final static String KO = "KO";
 
-	private JsonObject 			apiReturnJson ;
-	private Logger 				aLog ;
-	private boolean 			onError ;
-	private ExecutionDurations 	execDurations ;
-	private JsonObject 			additionnalInfos ;
-	private JsonObject 			subReturnCode ;
-	private Charset				responseCharset ;
-		
+	private ObjectNode apiReturnJson;
+	private final Logger aLog;
+	private boolean onError;
+	private final ExecutionDurations execDurations;
+	private ObjectNode additionnalInfos;
+	private ObjectNode subReturnCode;
+	private Charset responseCharset;
+
 	public ApiReturn(ExecutionDurations ed, Charset rc, Logger l) {
-		
-		aLog 			 = l ;
-		onError 		 = false ;
-		apiReturnJson 	 = null ;
-		execDurations	 = ed ;
-		subReturnCode	 = null ;
-		additionnalInfos = new JsonObject() ;
-		responseCharset	 = rc ;
+
+		aLog = l;
+		onError = false;
+		apiReturnJson = null;
+		execDurations = ed;
+		subReturnCode = null;
+		additionnalInfos = JsonNodeFactory.instance.objectNode();
+		responseCharset = rc;
 	}
-	
-	public void setDataReturn(JsonElement dataReturn) {
-		
-		apiReturnJson = new JsonObject() ;
-		apiReturnJson.addProperty(ApiJsonPropertyName.OPERATION, OK);
-		onError = false ;
+
+	public void setDataReturn(JsonNode dataReturn) {
+
+		apiReturnJson = JsonNodeFactory.instance.objectNode();
+		apiReturnJson.put(ApiJsonPropertyName.OPERATION, OK);
+		onError = false;
 		if (dataReturn != null) {
-			apiReturnJson.add(ApiJsonPropertyName.DATA, dataReturn) ;
+			apiReturnJson.set(ApiJsonPropertyName.DATA, dataReturn);
 		}
 	}
 	
 	public void setErrorReturn(int errCode) {
 		
-		apiReturnJson= new JsonObject() ;
+		apiReturnJson= JsonNodeFactory.instance.objectNode();
 		onError = true ;
-		apiReturnJson.addProperty(ApiJsonPropertyName.OPERATION, KO);
-		apiReturnJson.add(ApiJsonPropertyName.ERROR, ApiErrorCodeBuilder.getErrorCode(errCode, null)) ;
+		apiReturnJson.put(ApiJsonPropertyName.OPERATION, KO);
+		apiReturnJson.set(ApiJsonPropertyName.ERROR, ApiErrorCodeBuilder.getErrorCode(errCode, null)) ;
 	}
 	
 	public void setErrorReturn(int errCode, String msg) {
 		
-		apiReturnJson= new JsonObject() ;
+		apiReturnJson= JsonNodeFactory.instance.objectNode();
 		onError = true ;
-		apiReturnJson.addProperty(ApiJsonPropertyName.OPERATION, KO);
-		apiReturnJson.add(ApiJsonPropertyName.ERROR, ApiErrorCodeBuilder.getErrorCode(errCode, msg)) ;
+		apiReturnJson.put(ApiJsonPropertyName.OPERATION, KO);
+		apiReturnJson.set(ApiJsonPropertyName.ERROR, ApiErrorCodeBuilder.getErrorCode(errCode, msg)) ;
 	}
 	
 	private final static String API_RET_TRACE_TITLE = "Api return for " ;
@@ -70,10 +96,15 @@ public class ApiReturn {
 	// Api return json, with logging. Include a blank at the end of info.
 	public String getApiReturnJson(String info) {
 		
-		JsonObject ret = getApiReturnJsonObject(info) ;
+		JsonNode ret = getApiReturnJsonObject(info) ;
 		String retStr ;
 		if (aLog.isLoggable(Level.FINE)) {
-			retStr = JsonUtils.jsonPrettyPrint(ret) ;
+			try {
+				retStr = JsonUtils.jsonPrettyPrint(ret) ;
+			} catch (JsonProcessingException e) {
+				aLog.log(Level.SEVERE, "Exception pretty printing API return", e);
+				retStr = ret.toString();
+			}
 			StringBuilder traceStrBuild ;			
 			if ((aLog.isLoggable(Level.FINER)) || (retStr.length() < TRACE_FINER_LIMIT + 2)) {
 				traceStrBuild = new StringBuilder(retStr.length() + info.length() + API_RET_TRACE_TITLE.length() + 8) ;
@@ -144,17 +175,17 @@ public class ApiReturn {
 			return s ;
 		}
 	}
-	private JsonObject getApiReturnJsonObject(String info) {
+	private JsonNode getApiReturnJsonObject(String info) {
 			
 		execDurations.endProcedurePoint();
 		if ((apiReturnJson != null) && (info != null)) {
 			if (aLog.isLoggable(execDurations.getTriggerLevel())) {
-				additionnalInfos.add(ApiJsonPropertyName.DURATION, execDurations.getJsonExecutionDuration()) ;
-				apiReturnJson.add(ApiJsonPropertyName.ADDITIONAL_INFOS, additionnalInfos) ;
+				additionnalInfos.set(ApiJsonPropertyName.DURATION, execDurations.getJsonExecutionDuration()) ;
+				apiReturnJson.set(ApiJsonPropertyName.ADDITIONAL_INFOS, additionnalInfos) ;
 				aLog.info(info + execDurations.getTotalDuration());
 			}
 			if (subReturnCode != null) {
-				apiReturnJson.add(ApiJsonPropertyName.SUB_RETURN_CODE, subReturnCode);
+				apiReturnJson.set(ApiJsonPropertyName.SUB_RETURN_CODE, subReturnCode);
 			}
 		} else {
 			setErrorReturn(ApiErrorCodeBuilder.EMPTY_RETURN_ERROR_CODE) ;
@@ -166,7 +197,7 @@ public class ApiReturn {
 		return onError;
 	}
 
-	public JsonObject getAdditionnalInfos() {
+	public JsonNode getAdditionnalInfos() {
 		return additionnalInfos;
 	}
 	
@@ -175,8 +206,8 @@ public class ApiReturn {
 		onError = source.isOnError() ;
 		apiReturnJson = source.apiReturnJson ;
 	}
-
-	public void setSubReturnCode(JsonObject subReturnCode) {
+ 
+	public void setSubReturnCode(ObjectNode subReturnCode) {
 		this.subReturnCode = subReturnCode;
 	}
 

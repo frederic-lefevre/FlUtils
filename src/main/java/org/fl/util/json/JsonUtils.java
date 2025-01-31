@@ -33,11 +33,12 @@ import java.nio.file.Path;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.json.JsonMapper;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -45,6 +46,10 @@ import com.google.gson.JsonParser;
 public class JsonUtils {
 
 	private static final ObjectMapper mapper = JsonMapper.builder().enable(SerializationFeature.INDENT_OUTPUT).build();
+	
+	public static ObjectMapper getObjectMapper() {
+		return mapper;
+	}
 	
 	// pretty print Json string
 	public static String jsonStringPrettyPrint(String rawJson, Logger logger) {
@@ -63,17 +68,13 @@ public class JsonUtils {
 	}
 	
 	// pretty print Json object
-	public static String jsonPrettyPrint(JsonObject jsonObject) {
+	public static String jsonPrettyPrint(JsonNode jsonNode) throws JsonProcessingException {
 	
-		GsonBuilder gsonBuilder = new GsonBuilder() ;
-		gsonBuilder.disableHtmlEscaping() ;
-		Gson gson = gsonBuilder.setPrettyPrinting().create();
-
-		return gson.toJson(jsonObject);	
+		return mapper.writeValueAsString(jsonNode);
 	}
 	
-	// Read a JsonObject from an input stream
-	// If the stream is empty , an empty JsonObject is returned (can be checked with size() method)
+	// Read a JsonNode from an input stream
+	// If the stream is empty , an empty JsonNode is returned (can be checked with size() method)
 	// If there is a processing error, null is returned
 	public static JsonObject getJsonObjectFromInputStream(InputStream is,  Charset cs, Logger cLog) {
 		
