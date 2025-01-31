@@ -38,10 +38,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.json.JsonMapper;
-
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 
 public class JsonUtils {
 
@@ -76,104 +73,96 @@ public class JsonUtils {
 	// Read a JsonNode from an input stream
 	// If the stream is empty , an empty JsonNode is returned (can be checked with size() method)
 	// If there is a processing error, null is returned
-	public static JsonObject getJsonObjectFromInputStream(InputStream is,  Charset cs, Logger cLog) {
-		
-		JsonObject jsonObject = null ;
-		StringBuilder out = null ;
+	public static JsonNode getJsonObjectFromInputStream(InputStream is, Charset cs, Logger cLog) {
+
+		StringBuilder out = null;
 		try (BufferedReader reader = new BufferedReader(new InputStreamReader(is, cs))) {
-		
+
 			if (cLog.isLoggable(Level.FINEST)) {
 				// Put the input in a StringBuilder to be able to log it
-				 out = new StringBuilder();
-		        String line;
-		        while ((line = reader.readLine()) != null) {
-		            out.append(line);
-		        }
-		        
-		        if (out != null) {
-		        	if (out.length() > 0) {
-		        		String outString = out.toString() ;
-		        		cLog.finest("getJsonObjectFromInputStream: String read from input " + outString) ;
-		        		// parse the POST body to get a JsonObject
-		        		jsonObject = JsonParser.parseString(outString).getAsJsonObject() ;
-		        	} else {
-		        		// empty json object
-		        		jsonObject = new JsonObject() ;
-		        	}
-		        }
+				out = new StringBuilder();
+				String line;
+				while ((line = reader.readLine()) != null) {
+					out.append(line);
+				}
+
+				if (out.length() > 0) {
+					String outString = out.toString();
+					cLog.finest("getJsonObjectFromInputStream: String read from input " + outString);
+					// parse the POST body to get a JsonObject
+					return mapper.readTree(outString);
+				} else {
+					// empty json object
+					return JsonNodeFactory.instance.objectNode();
+				}
+
 			} else {
-				jsonObject = JsonParser.parseReader(reader).getAsJsonObject() ;
+				return mapper.readTree(reader);
 			}
-	        
+
 		} catch (Exception e1) {
-			jsonObject = null ;
-			cLog.log(Level.SEVERE, "Exception reading json input stream", e1) ;
+			cLog.log(Level.SEVERE, "Exception reading json input stream", e1);
 			if (cLog.isLoggable(Level.FINEST)) {
 				if (out != null) {
-					cLog.finest("getJsonObjectFromInputStream: String read from input " + out.toString()) ;
+					cLog.finest("getJsonObjectFromInputStream: String read from input " + out.toString());
 				} else {
 					cLog.finest("getJsonObjectFromInputStream: StringBuilder for storing input is null");
 				}
 			}
+			return null;
 		}
-		return jsonObject ;
-		
 	}
 	
 	// Read a JsonObject from a path
-	public static JsonObject getJsonObjectFromPath(Path path, Charset cs, Logger cLog) {
-		
-		JsonObject jsonObject = null ;
-		StringBuilder out = null ;
+	public static JsonNode getJsonObjectFromPath(Path path, Charset cs, Logger cLog) {
 
 		try (BufferedReader reader = Files.newBufferedReader(path, cs)) {
-			
-			if (cLog.isLoggable(Level.FINEST)) {
-				
-				cLog.finest("About to read json file " + path);
-				
-				// Put the input in a StringBuilder to be able to log it
-				out = new StringBuilder();
-		        String line;
-		        while ((line = reader.readLine()) != null) {
-		            out.append(line);
-		        }
-		        
-		        if (out != null) {
-		        	if (out.length() > 0) {
-		        		String outString = out.toString() ;
-		        		cLog.finest("getJsonObjectFromInputStream: String read from input " + outString) ;
 
-		        		// parse the POST body to get a JsonObject
-		        		jsonObject = JsonParser.parseString(outString).getAsJsonObject() ;
-		        	} else {
-		        		// empty json object
-		        		
-		        		cLog.finest(path + " is an empty file");
-		        		jsonObject = new JsonObject() ;
-		        	}
-		        }
+			if (cLog.isLoggable(Level.FINEST)) {
+
+				cLog.finest("About to read json file " + path);
+
+				// Put the input in a StringBuilder to be able to log it
+				StringBuilder out = new StringBuilder();
+				String line;
+				while ((line = reader.readLine()) != null) {
+					out.append(line);
+				}
+
+				if (out.length() > 0) {
+					String outString = out.toString();
+					cLog.finest("getJsonObjectFromInputStream: String read from input " + outString);
+
+					// parse the POST body to get a JsonObject
+					return mapper.readTree(outString);
+				} else {
+					// empty json object
+
+					cLog.finest(path + " is an empty file");
+					return JsonNodeFactory.instance.objectNode();
+				}
+
 			} else {
-				jsonObject = JsonParser.parseReader(reader).getAsJsonObject() ;
+				return mapper.readTree(reader);
 			}
-	        
+
 		} catch (Exception e) {
-			cLog.log(Level.SEVERE, "Erreur en lisant le fichier " + path, e) ;
+			cLog.log(Level.SEVERE, "Erreur en lisant le fichier " + path, e);
+			return null;
 		}
-		return jsonObject ;
 	}
 	
-	public static String getAsStringOrNull(JsonElement jElem) {
+	public static String getAsStringOrNull(JsonNode jElem) {
 		if (jElem != null) {
-			return jElem.getAsString() ;
+			return jElem.asText() ;
 		} else {
 			return null ;
 		}
 	}
 	
-	public static String getAsStringOrBlank(JsonElement jElem) {
+	public static String getAsStringOrBlank(JsonNode jElem) {
 		if (jElem != null) {
-			return jElem.getAsString() ;
+			return jElem.asText() ;
 		} else {
 			return "" ;
 		}
