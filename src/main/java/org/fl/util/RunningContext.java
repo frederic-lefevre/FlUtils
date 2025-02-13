@@ -27,7 +27,7 @@ package org.fl.util;
 import java.io.StringReader;
 import java.net.URI;
 import java.net.URL;
-import java.nio.file.Files;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Instant;
@@ -36,6 +36,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.Vector;
 import java.util.logging.Handler;
@@ -177,25 +178,23 @@ public class RunningContext {
 	private String findProjectProperties(String name) {
 		
 		try {
-			Path projectPropRelativePath = Paths.get(name + "_" + projectBuildPropertyFile);
+			String projectPropRelativeName = name + "_" + projectBuildPropertyFile;
 			
-			PropertiesStorage propsProjectStorage = new PropertiesStorage(projectPropRelativePath);
-			Path projectPropPath = Paths.get(propsProjectStorage.getPropertyLocation().toURI());
-			if (Files.exists(projectPropPath)) {
-				return Files.readString(projectPropPath);
+			URL projectPropUrl = Optional
+					.ofNullable(RunningContext.class.getClassLoader().getResource(projectPropRelativeName))
+					.orElseGet(() -> {
+						pLog.warning("Specific project property file not found: " + projectPropRelativeName);
+						pLog.warning("Project property file fallback: " + projectBuildPropertyFile);
+						return RunningContext.class.getClassLoader().getResource(projectBuildPropertyFile);
+					});
+
+			if (projectPropUrl != null) {
+				return new String(projectPropUrl.openStream().readAllBytes(), StandardCharsets.UTF_8);	
 			} else {
-				
-				pLog.info("Specific project property file not found: " + projectPropPath);
-				projectPropPath = Paths.get(projectBuildPropertyFile);
-				pLog.info("Project property file fallback: " + projectPropPath);
-				
-				if (Files.exists(projectPropPath)) {
-					return Files.readString(projectPropPath);
-				} else {
-					pLog.warning("No project properties (build information) found");
-					return null;
-				}
+				pLog.warning("No project properties (build information) found");
+				return null;
 			}
+			
 		} catch (Exception e) {
 			pLog.log(Level.WARNING, "Exception looking for build information for " + name, e);
 			return null;
