@@ -1,7 +1,7 @@
 /*
  * MIT License
 
-Copyright (c) 2017, 2024 Frederic Lefevre
+Copyright (c) 2017, 2025 Frederic Lefevre
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -28,6 +28,8 @@ import java.lang.StackWalker.Option;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+// A Logger that counts log record but never publish them
+// Useful in test, to count the expected error logged, but never print them on console
 public class LoggerCounter extends Logger {
 
 	// fully qualified method name

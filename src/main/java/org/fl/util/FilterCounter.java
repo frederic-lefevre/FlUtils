@@ -1,7 +1,7 @@
 /*
  * MIT License
 
-Copyright (c) 2017, 2024 Frederic Lefevre
+Copyright (c) 2017, 2025 Frederic Lefevre
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -60,9 +60,16 @@ public class FilterCounter implements Filter {
 		public boolean isLoggable(Level level) {
 			return logger.isLoggable(level);
 		}
+		
+		public void stopLogCountAndFilter() {
+			filterCounter.removeLogRecordCounters(name, logger);
+		}
 	}
 	
 	// Keys are fully qualified method names
+	// Each key is a method for which we want to count (and not publish) the log records
+	// Typically, it may be a test method : we want to count the log record triggered for this specific test
+	// Tests may be run in parallel, so this split between methods is mandatory
 	private Map<String, Map<Level, Integer>> logRecordCounts = new HashMap<>();
 	
 	@Override
@@ -94,6 +101,17 @@ public class FilterCounter implements Filter {
 		} else {
 			logRecordCounts.put(name, new HashMap<>());
 		}
+	}
+	
+	public synchronized void removeLogRecordCounters(String name, Logger logger) {
+
+		logRecordCounts.remove(name);
+		if (logRecordCounts.isEmpty()) {
+			// There is no more log record counter
+			// Remove the filter on the logger, the log records will be published
+			logger.setFilter(null);
+		}
+
 	}
 	
 	public int getLogRecordCount(String name) {
