@@ -1,7 +1,7 @@
 /*
  * MIT License
 
-Copyright (c) 2017, 2024 Frederic Lefevre
+Copyright (c) 2017, 2025 Frederic Lefevre
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -44,13 +44,13 @@ class LoggerCounterTest {
 		
 		assertThat(logCounter.isLoggable(Level.SEVERE)).isTrue();
 		
-		Filter logFiler = logCounter.getFilter();
-		assertThat(logFiler).isNotNull().isInstanceOf(FilterCounter.class);
+		Filter logFilter = logCounter.getFilter();
+		assertThat(logFilter).isNotNull().isInstanceOf(FilterCounter.class);
 		
-		assertThat(logFiler.isLoggable(new LogRecord(Level.SEVERE, ""))).isFalse();
-		assertThat(logFiler.isLoggable(new LogRecord(Level.WARNING, ""))).isFalse();
-		assertThat(logFiler.isLoggable(new LogRecord(Level.INFO, ""))).isFalse();
-		assertThat(logFiler.isLoggable(new LogRecord(Level.FINE, ""))).isFalse();
+		assertThat(logFilter.isLoggable(new LogRecord(Level.SEVERE, ""))).isFalse();
+		assertThat(logFilter.isLoggable(new LogRecord(Level.WARNING, ""))).isFalse();
+		assertThat(logFilter.isLoggable(new LogRecord(Level.INFO, ""))).isFalse();
+		assertThat(logFilter.isLoggable(new LogRecord(Level.FINE, ""))).isFalse();
 	}
 	
 	@Test
