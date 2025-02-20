@@ -55,7 +55,7 @@ class FilterCounterTest {
 	}
 	
 	@Test
-	void filterCounterETest() {
+	void filterCounterTest() {
 		
 		Logger loggerForTest = Logger.getLogger(ForTest.class.getName());
 		
