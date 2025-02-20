@@ -26,17 +26,94 @@ package org.fl.util;
 
 import static org.assertj.core.api.Assertions.*;
 
+import java.util.logging.Filter;
+import java.util.logging.Level;
+import java.util.logging.LogRecord;
+
 import org.junit.jupiter.api.Test;
 
 class LoggerCounterTest {
 
 	@Test
-	void test() {
+	void loggerCounterTest() {
 		
 		LoggerCounter logCounter = LoggerCounter.getLogger();
 		
 		assertThat(logCounter).isNotNull();	
-		assertThat(logCounter.getName()).isEqualTo("toto");
+		assertThat(logCounter.getName()).isNull();
+		
+		assertThat(logCounter.isLoggable(Level.SEVERE)).isTrue();
+		
+		Filter logFiler = logCounter.getFilter();
+		assertThat(logFiler).isNotNull().isInstanceOf(FilterCounter.class);
+		
+		assertThat(logFiler.isLoggable(new LogRecord(Level.SEVERE, ""))).isFalse();
+		assertThat(logFiler.isLoggable(new LogRecord(Level.WARNING, ""))).isFalse();
+		assertThat(logFiler.isLoggable(new LogRecord(Level.INFO, ""))).isFalse();
+		assertThat(logFiler.isLoggable(new LogRecord(Level.FINE, ""))).isFalse();
+	}
 	
+	@Test
+	void severeErrorCountTest() {
+		
+		LoggerCounter logCounter = LoggerCounter.getLogger();
+		
+		assertThat(logCounter).isNotNull();	
+		assertThat(logCounter.getName()).isNull();
+		
+		assertThat(logCounter.isLoggable(Level.SEVERE)).isTrue();
+		logCounter.severe("severe error");
+		
+		assertThat(logCounter.getLogRecordCount()).isEqualTo(1);
+		assertThat(logCounter.getLogRecordCount(Level.SEVERE)).isEqualTo(1);
+		assertThat(logCounter.getLogRecordCount(Level.INFO)).isZero();
+		assertThat(logCounter.getLogRecordCount(Level.WARNING)).isZero();
+		assertThat(logCounter.getLogRecordCount(Level.FINE)).isZero();
+	}
+	
+	@Test
+	void warningAndSevereErrorCountTest() {
+		
+		LoggerCounter logCounter = LoggerCounter.getLogger();
+		
+		assertThat(logCounter).isNotNull();	
+		assertThat(logCounter.getName()).isNull();
+		
+		assertThat(logCounter.isLoggable(Level.WARNING)).isTrue();
+		logCounter.warning("warning error");
+		logCounter.severe("severe error");
+		logCounter.warning("warning error 2");
+		
+		assertThat(logCounter.getLogRecordCount()).isEqualTo(3);
+		assertThat(logCounter.getLogRecordCount(Level.SEVERE)).isEqualTo(1);
+		assertThat(logCounter.getLogRecordCount(Level.INFO)).isZero();
+		assertThat(logCounter.getLogRecordCount(Level.WARNING)).isEqualTo(2);
+		assertThat(logCounter.getLogRecordCount(Level.FINE)).isZero();
+		
+		logCounter.resetAllLogRecordCount();
+		assertThat(logCounter.getLogRecordCount()).isZero();
+		assertThat(logCounter.getLogRecordCount(Level.SEVERE)).isZero();
+		assertThat(logCounter.getLogRecordCount(Level.INFO)).isZero();
+		assertThat(logCounter.getLogRecordCount(Level.WARNING)).isZero();
+		assertThat(logCounter.getLogRecordCount(Level.FINE)).isZero();
+	}
+	
+	@Test
+	void fineErrorCountTest() {
+		
+		LoggerCounter logCounter = LoggerCounter.getLogger();
+		
+		assertThat(logCounter).isNotNull();	
+		assertThat(logCounter.getName()).isNull();
+		
+		assertThat(logCounter.isLoggable(Level.FINE)).isFalse();
+		logCounter.fine("fine logging");
+		logCounter.fine("fine logging 2");
+		
+		assertThat(logCounter.getLogRecordCount()).isZero();
+		assertThat(logCounter.getLogRecordCount(Level.SEVERE)).isZero();
+		assertThat(logCounter.getLogRecordCount(Level.INFO)).isZero();
+		assertThat(logCounter.getLogRecordCount(Level.WARNING)).isZero();
+		assertThat(logCounter.getLogRecordCount(Level.FINE)).isZero();
 	}
 }
