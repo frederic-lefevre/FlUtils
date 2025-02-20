@@ -32,6 +32,7 @@ import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
 import org.fl.util.FilterCounter.LogRecordCounter;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
 
 class FilterCounterTest {
@@ -70,7 +71,9 @@ class FilterCounterTest {
 		assertThat(logFilter.isLoggable(new LogRecord(Level.SEVERE, ""))).isFalse();
 		assertThat(logFilter.isLoggable(new LogRecord(Level.WARNING, ""))).isFalse();
 		assertThat(logFilter.isLoggable(new LogRecord(Level.INFO, ""))).isFalse();
-		assertThat(logFilter.isLoggable(new LogRecord(Level.FINE, ""))).isFalse();	
+		assertThat(logFilter.isLoggable(new LogRecord(Level.FINE, ""))).isFalse();
+		
+		logRecordCounter.stopLogCountAndFilter();
 	}
 	
 	@Test
@@ -84,6 +87,8 @@ class FilterCounterTest {
 		assertThat(logRecordCounter.getLogRecordCount()).isEqualTo(1);
 		assertThat(logRecordCounter.getLogRecordCount(Level.SEVERE)).isEqualTo(1);
 		assertThat(logRecordCounter.getLogRecordCount(Level.WARNING)).isZero();
+		
+		logRecordCounter.stopLogCountAndFilter();
 	}
 	
 	@Test
@@ -97,6 +102,8 @@ class FilterCounterTest {
 		assertThat(logRecordCounter.getLogRecordCount()).isEqualTo(1);
 		assertThat(logRecordCounter.getLogRecordCount(Level.SEVERE)).isEqualTo(1);
 		assertThat(logRecordCounter.getLogRecordCount(Level.WARNING)).isZero();
+		
+		logRecordCounter.stopLogCountAndFilter();
 	}
 	
 	@Test
@@ -110,5 +117,14 @@ class FilterCounterTest {
 		assertThat(logRecordCounter.getLogRecordCount()).isEqualTo(1);
 		assertThat(logRecordCounter.getLogRecordCount(Level.SEVERE)).isEqualTo(1);
 		assertThat(logRecordCounter.getLogRecordCount(Level.WARNING)).isZero();
+		
+		logRecordCounter.stopLogCountAndFilter();
+	}
+	
+	@AfterAll
+	static void check() {
+		
+		// Filter on logger should be removed because all log counter have been stopped
+		assertThat(Logger.getLogger(ForTest.class.getName()).getFilter()).isNull();
 	}
 }
