@@ -165,11 +165,21 @@ public class RunningContext {
 
 	}
 	
+	public void addBuildInformation(String moduleName) {
+		addBuildInformation(moduleName, false);
+	}
+	
 	private void addBuildInformation(String moduleName, boolean addToApplicationProps) {
 		
 		JsonNode moduleBuildInfo = getBuildInformation(moduleName, true);
 		if (moduleBuildInfo != null) {
 			buildInformation.add(moduleBuildInfo);
+		} else {
+			buildInformation.add(
+				JsonNodeFactory.instance.objectNode()
+					.put("moduleName", moduleName)
+					.put("buildInformation", "No build information")
+			);
 		}
 	}
 	

@@ -32,8 +32,10 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.fl.util.FilterCounter.LogRecordCounter;
 import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -148,5 +150,47 @@ class RunningContextTest {
 						assertThat(buildInfo.get("moduleName").asText()).isEqualTo("org.fl.util");
 					}
 					);
+	}
+	
+	@Test
+	void testRunningContextBuildInfo2() throws URISyntaxException, JsonProcessingException {
+							
+		RunningContext rc = new RunningContext(LOGGER_NAME, null, 
+				new URI("file:///C:/FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test1.properties"));
+		
+		LogRecordCounter logRecordCounter = 
+				FilterCounter.getLogRecordCounter(Logger.getLogger(LOGGER_NAME));
+		
+		rc.addBuildInformation("does.not.exists");
+		
+		JsonNode buildInformation = rc.getBuildInformationAsJson();
+		assertThat(buildInformation).isNotNull();
+		
+		assertThat(buildInformation).isNotEmpty().hasSize(3)
+			.satisfiesExactlyInAnyOrder(
+					buildInfo -> { 
+						assertThat(buildInfo.get("moduleName")).isNotNull();
+						assertThat(buildInfo.get("moduleName").asText()).isEqualTo(LOGGER_NAME);
+						assertThat(buildInfo.get("version")).isNotNull();
+						assertThat(buildInfo.get("version").asText()).isNotEmpty();
+					},
+					buildInfo -> { 
+						assertThat(buildInfo.get("moduleName")).isNotNull();
+						assertThat(buildInfo.get("moduleName").asText()).isEqualTo("org.fl.util");
+						assertThat(buildInfo.get("version")).isNotNull();
+						assertThat(buildInfo.get("version").asText()).isNotEmpty();
+					},
+					buildInfo -> { 
+						assertThat(buildInfo.get("moduleName")).isNotNull();
+						assertThat(buildInfo.get("moduleName").asText()).isEqualTo("does.not.exists");
+						assertThat(buildInfo.get("buildInformation")).isNotNull();
+						assertThat(buildInfo.get("buildInformation").asText()).isEqualTo("No build information");
+					}
+					);
+		
+		assertThat(logRecordCounter.getLogRecordCount()).isEqualTo(3);
+		assertThat(logRecordCounter.getLogRecordCount(Level.WARNING)).isEqualTo(3);
+		
+		logRecordCounter.stopLogCountAndFilter();
 	}
 }
