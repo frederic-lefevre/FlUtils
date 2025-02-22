@@ -137,10 +137,16 @@ class RunningContextTest {
 		JsonNode buildInformation = rc.getBuildInformationAsJson();
 		assertThat(buildInformation).isNotNull();
 		
-		assertThat(buildInformation).isNotEmpty().singleElement()
-			.satisfies(buildInfo -> { 
-				assertThat(buildInfo.get("moduleName")).isNotNull();
-				assertThat(buildInfo.get("moduleName").asText()).isEqualTo(LOGGER_NAME);
-			});
+		assertThat(buildInformation).isNotEmpty().hasSize(2)
+			.satisfiesExactlyInAnyOrder(
+					buildInfo -> { 
+						assertThat(buildInfo.get("moduleName")).isNotNull();
+						assertThat(buildInfo.get("moduleName").asText()).isEqualTo(LOGGER_NAME);
+					},
+					buildInfo -> { 
+						assertThat(buildInfo.get("moduleName")).isNotNull();
+						assertThat(buildInfo.get("moduleName").asText()).isEqualTo("org.fl.util");
+					}
+					);
 	}
 }
