@@ -6,7 +6,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.fl</groupId>
 	<artifactId>FlUtils</artifactId>
-	<version>6.2.0</version>
+	<version>6.3.0</version>
 
 	<dependencies>
 		<dependency>
@@ -47,15 +47,44 @@
 	<properties>
 		<maven.compiler.release>21</maven.compiler.release>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<timestamp>${maven.build.timestamp}</timestamp>
 	</properties>
 
 	<build>
+		<sourceDirectory>src/main/java</sourceDirectory>
+		<resources>
+			<resource>
+				<directory>src/main/java</directory>
+				<excludes>
+					<exclude>**/*.java</exclude>
+				</excludes>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>3.5.2</version>
 			</plugin>
+			<plugin>
+                <groupId>io.github.git-commit-id</groupId>
+				<artifactId>git-commit-id-maven-plugin</artifactId>
+                <version>9.0.1</version>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>revision</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                    <configuration>
+                    	<dateFormat>yyyy-MM-dd HH:mm:ss Z</dateFormat>
+                        <skipPoms>false</skipPoms>
+                        <commitIdGenerationMode>flat</commitIdGenerationMode>
+                        <injectAllReactorProjects>true</injectAllReactorProjects>
+                    </configuration>
+            </plugin>
 		</plugins>
 	</build>
 </project>
