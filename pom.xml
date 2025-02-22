@@ -4,9 +4,9 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>org.fl.FlUtils</groupId>
+	<groupId>org.fl</groupId>
 	<artifactId>FlUtils</artifactId>
-	<version>6.1.0</version>
+	<version>6.2.0</version>
 
 	<dependencies>
 		<dependency>
@@ -54,7 +54,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
-				<version>3.3.0</version>
+				<version>3.5.2</version>
 			</plugin>
 		</plugins>
 	</build>
