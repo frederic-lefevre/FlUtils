@@ -49,6 +49,7 @@ import org.fl.util.os.OperatingInfo;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.dataformat.javaprop.JavaPropsMapper;
@@ -133,6 +134,10 @@ public class RunningContext {
 		return JsonUtils.jsonPrettyPrint(buildInformation);
 	}
 	
+	public JsonNode getBuildInformationAsJson() throws JsonProcessingException {
+		return buildInformation;
+	}
+	
 	private void initRunningContext(String name, String systemProperty, String baseDir, Handler customLogHandler) {
 		
 		initializationDate = Instant.now();
@@ -158,7 +163,13 @@ public class RunningContext {
 				propsProject.load(new StringReader(propsProjectString));
 				applicationProperties.putAll(propsProject);
 
-				buildInformation = propsMapper.readTree(propsProjectString);
+				ObjectNode mainModuleBuildInformation = (ObjectNode)propsMapper.readTree(propsProjectString);
+				mainModuleBuildInformation.put("moduleName", name);
+
+				ArrayNode allBuildInfo = JsonNodeFactory.instance.arrayNode();
+				allBuildInfo.add(mainModuleBuildInformation);
+				
+				buildInformation = allBuildInfo;
 
 			} else {
 				buildInformation = null;

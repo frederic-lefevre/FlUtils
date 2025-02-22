@@ -37,6 +37,7 @@ import java.util.logging.Logger;
 import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 
 class RunningContextTest {
 	
@@ -120,5 +121,26 @@ class RunningContextTest {
 						"class java.util.logging.FileHandler", 
 						"class java.util.logging.ConsoleHandler",
 						"class org.fl.util.BufferLogHandler"));
+	}
+	
+	@Test
+	void testRunningContextBuildInfo() throws URISyntaxException, JsonProcessingException {
+		
+		RunningContext rc = new RunningContext(LOGGER_NAME, null, 
+				new URI("file:///C:/FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test1.properties"));
+		
+		assertThat(rc).isNotNull();
+		
+		String buildInformationString = rc.getBuildInformation();
+		assertThat(buildInformationString).isNotNull();
+		
+		JsonNode buildInformation = rc.getBuildInformationAsJson();
+		assertThat(buildInformation).isNotNull();
+		
+		assertThat(buildInformation).isNotEmpty().singleElement()
+			.satisfies(buildInfo -> { 
+				assertThat(buildInfo.get("moduleName")).isNotNull();
+				assertThat(buildInfo.get("moduleName").asText()).isEqualTo(LOGGER_NAME);
+			});
 	}
 }
