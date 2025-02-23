@@ -39,6 +39,7 @@ import java.util.logging.FileHandler;
 import java.util.logging.Formatter;
 import java.util.logging.Handler;
 import java.util.logging.Level;
+import java.util.logging.LogManager;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 import java.util.stream.Stream;
@@ -183,15 +184,6 @@ public class LoggerManager {
 			formatter = new SimpleFormatter();
 		}
 
-		// Console Handler : always have a console handler (level maybe set to OFF)
-		configureConsoleHandler();
-		
-		log.setUseParentHandlers(false);
-        
-        // -----------------------------------
-        // File handler		
-		String logFileNamePattern = properties.getProperty("logging.logfile.name");
-
 		int logfileLength = properties.getInt("logging.logfile.length", DEFAULT_LOG_FILE_LENGTH);
 		int logfileNumber = properties.getInt("logging.logfile.number", DEFAULT_LOG_FILE_NUMBER);
 		
@@ -201,31 +193,9 @@ public class LoggerManager {
 		} else {
 			logDirName = properties.getProperty("logging.directory.name", DEFAULT_LOG_FILE_DIR);
 		}
-		
-		if ((logFileNamePattern != null) && (!logFileNamePattern.isEmpty())) {
-			// File handler requested
-
-			logFilePattern = logDirName + logFileNamePattern;
-
-			// verify that the directory exists. If not, create it.
-			File logDir = new File(logDirName);
-			if (!logDir.exists()) {
-				logDir.mkdirs();
-			}
-
-			// encoding and level for file handler
-			String encoding = properties.getProperty("logging.file.encode", Charset.defaultCharset().name());
-			Level level = properties.getLevel("logging.file.level", Level.FINEST);
-
-			FileHandler fh = new FileHandler(logFilePattern, logfileLength, logfileNumber, true);
-			fh.setFormatter(formatter);
-			fh.setEncoding(encoding);
-			log.addHandler(fh);
-			fh.setLevel(level);		
-		}
 
 		// Root logger
-		Logger rootLogger = log.getParent();
+		Logger rootLogger = LogManager.getLogManager().getLogger("");
 		if (rootLogger != null) {
 			
 			Level rootFileLevel = properties.getLevel("logging.root.file.level", null);
@@ -247,6 +217,36 @@ public class LoggerManager {
 				chRoot.setLevel(properties.getLevel("logging.root.console.level", Level.FINEST));
 			}
 			rootLogger.setLevel(getHighestHandlerLevel(rootLogger));
+		}
+		
+		// Console Handler : always have a console handler (level maybe set to OFF)
+		configureConsoleHandler();
+		
+		log.setUseParentHandlers(false);
+		
+        // -----------------------------------
+        // File handler		
+		String logFileNamePattern = properties.getProperty("logging.logfile.name");
+		if ((logFileNamePattern != null) && (!logFileNamePattern.isEmpty())) {
+			// File handler requested
+
+			logFilePattern = logDirName + logFileNamePattern;
+
+			// verify that the directory exists. If not, create it.
+			File logDir = new File(logDirName);
+			if (!logDir.exists()) {
+				logDir.mkdirs();
+			}
+
+			// encoding and level for file handler
+			String encoding = properties.getProperty("logging.file.encode", Charset.defaultCharset().name());
+			Level level = properties.getLevel("logging.file.level", Level.FINEST);
+
+			FileHandler fh = new FileHandler(logFilePattern, logfileLength, logfileNumber, true);
+			fh.setFormatter(formatter);
+			fh.setEncoding(encoding);
+			log.addHandler(fh);
+			fh.setLevel(level);		
 		}
 
 		// Memory handler
