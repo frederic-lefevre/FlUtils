@@ -32,6 +32,7 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -46,21 +47,40 @@ class RunningContextTest {
 	private static final String LOGGER_NAME = "org.fl.util.test1";
 	
 	@Test
-	void testRunningContextWithNullParam() {
-		
-		RunningContext rc = new RunningContext(null, null, (URI)null);
-		
-		assertThat(rc).isNotNull();
-		assertThat(rc.getName()).isEqualTo("org.fl");
+	void testRunningContextWithNullStringParam() {		
+		testRunningContextWithNullParam(() -> new RunningContext(null, null, (String)null));
+	}
+
+	@Test
+	void testRunningContextWithNullUriParam() {
+		testRunningContextWithNullParam(() -> new RunningContext(null, null, (URI)null));
 	}
 	
-	@Test
-	void testRunningContextWithNullParam2() {
+	private void testRunningContextWithNullParam(Supplier<RunningContext> rcSupplier) {
+
+		LogRecordCounter propertiesStorageLogRecordCounter = 
+				FilterCounter.getLogRecordCounter(Logger.getLogger(PropertiesStorage.class.getName()));
 		
-		RunningContext rc = new RunningContext(null, null, (String)null);
+		LogRecordCounter runningContextLogRecordCounter = 
+				FilterCounter.getLogRecordCounter(Logger.getLogger("org.fl"));
+		
+		RunningContext rc = rcSupplier.get();
 		
 		assertThat(rc).isNotNull();
 		assertThat(rc.getName()).isEqualTo("org.fl");
+		
+		AdvancedProperties advancedProperties = rc.getProps();
+		assertThat(advancedProperties).isNotNull().isNotEmpty();
+		
+		assertThat(advancedProperties.get("buildOs"))
+			.isInstanceOfSatisfying(String.class, buildOs -> buildOs.contains("windows"));
+		
+		assertThat(propertiesStorageLogRecordCounter.getLogRecordCount()).isEqualTo(2);
+		assertThat(propertiesStorageLogRecordCounter.getLogRecordCount(Level.WARNING)).isEqualTo(2);
+		
+		assertThat(runningContextLogRecordCounter.getLogRecordCount()).isEqualTo(4);
+		assertThat(runningContextLogRecordCounter.getLogRecordCount(Level.SEVERE)).isEqualTo(1);
+		assertThat(runningContextLogRecordCounter.getLogRecordCount(Level.WARNING)).isEqualTo(3);
 	}
 	
 	@Test

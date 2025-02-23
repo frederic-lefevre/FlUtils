@@ -103,7 +103,6 @@ public class RunningContext {
 			initRunningContext(this.name, systemProperty) ;
 		} catch (Exception e) {
 			pLog.log(Level.SEVERE, "Exception processing property file.  ", e);
-			e.printStackTrace();
 			applicationProperties = new AdvancedProperties(pLog) ;			
 		}	
 	}
@@ -130,12 +129,14 @@ public class RunningContext {
 		}
 		
 		try {
-			Path defaultPropertyPath = Paths.get(defaultPropertyPathName);
-			propsStorage = new PropertiesStorage(systemProperty, defaultPropertyPath);
+			if (defaultPropertyPathName != null) {
+				propsStorage = new PropertiesStorage(systemProperty, Paths.get(defaultPropertyPathName));	
+			} else {
+				propsStorage = new PropertiesStorage(systemProperty, (Path)null);
+			}
 			initRunningContext(this.name, systemProperty);
 		} catch (Exception e) {
 			pLog.log(Level.SEVERE, "Exception processing property file.  ", e);
-			e.printStackTrace();
 			applicationProperties = new AdvancedProperties(pLog);
 		}
 	}
