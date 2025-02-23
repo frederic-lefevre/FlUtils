@@ -167,9 +167,13 @@ public class PropertiesStorage {
 					// path is absolute
 					propUrl = propPath.toUri().toURL();
 				}
-			} else {
-				psLogger.warning(buildPropErrorMsg("properties path is null", systemProperty, defaultPropertyPath));
-			}			
+				
+			}
+			
+			if (propUrl == null) {
+				psLogger.warning(buildPropErrorMsg("properties have not been found", systemProperty, defaultPropertyPath));
+			}
+			
 		} catch (Exception e) {
 			// Trace file load error
 			psLogger.log(Level.SEVERE, buildPropErrorMsg("Exception openning properties url", systemProperty, defaultPropertyPath));

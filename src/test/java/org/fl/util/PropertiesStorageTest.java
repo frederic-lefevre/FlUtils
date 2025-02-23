@@ -29,6 +29,7 @@ import static org.assertj.core.api.Assertions.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -92,7 +93,7 @@ class PropertiesStorageTest {
 	}
 	
 	@Test
-	void testPropertiesStorageWithPUnexistantSystemProp() throws Exception {
+	void testPropertiesStorageWithUnexistantSystemProp() throws Exception {
 		
 		LogRecordCounter logRecordCounter = 
 				FilterCounter.getLogRecordCounter(Logger.getLogger(PropertiesStorage.class.getName()));
@@ -103,6 +104,21 @@ class PropertiesStorageTest {
 		
 		assertThat(logRecordCounter.getLogRecordCount()).isEqualTo(4);
 		assertThat(logRecordCounter.getLogRecordCount(Level.INFO)).isEqualTo(1);
+		assertThat(logRecordCounter.getLogRecordCount(Level.WARNING)).isEqualTo(2);
+		assertThat(logRecordCounter.getLogRecordCount(Level.SEVERE)).isEqualTo(1);
+	}
+	
+	@Test
+	void testPropertiesStorageWithUnexistantPath() throws Exception {
+		
+		LogRecordCounter logRecordCounter = 
+				FilterCounter.getLogRecordCounter(Logger.getLogger(PropertiesStorage.class.getName()));
+		
+		PropertiesStorage ps = new PropertiesStorage(null, Paths.get("doesNotExists.properties"));
+		
+		testPropertiesStorageWithNullParam(ps);
+		
+		assertThat(logRecordCounter.getLogRecordCount()).isEqualTo(3);
 		assertThat(logRecordCounter.getLogRecordCount(Level.WARNING)).isEqualTo(2);
 		assertThat(logRecordCounter.getLogRecordCount(Level.SEVERE)).isEqualTo(1);
 	}
