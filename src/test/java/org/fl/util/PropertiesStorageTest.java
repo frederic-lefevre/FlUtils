@@ -27,6 +27,7 @@ package org.fl.util;
 import static org.assertj.core.api.Assertions.*;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -73,5 +74,20 @@ class PropertiesStorageTest {
 		
 		AdvancedProperties props = ps.getAdvanced(null);
 		assertThat(props).isNotNull().isEmpty();
+	}
+	
+	@Test
+	void testPropertiesStorageWithInvalidSystemProperty() throws Exception {
+		
+		LogRecordCounter logRecordCounter = 
+				FilterCounter.getLogRecordCounter(Logger.getLogger(PropertiesStorage.class.getName()));
+		
+		assertThatExceptionOfType(URISyntaxException.class)
+			.isThrownBy(() ->
+				 new PropertiesStorage( "os.name", (URI)null));
+		
+		assertThat(logRecordCounter.getLogRecordCount()).isEqualTo(1);
+		assertThat(logRecordCounter.getLogRecordCount(Level.SEVERE)).isEqualTo(1);
+		
 	}
 }
