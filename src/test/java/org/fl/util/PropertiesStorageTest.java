@@ -90,4 +90,20 @@ class PropertiesStorageTest {
 		assertThat(logRecordCounter.getLogRecordCount(Level.SEVERE)).isEqualTo(1);
 		
 	}
+	
+	@Test
+	void testPropertiesStorageWithPUnexistantSystemProp() throws Exception {
+		
+		LogRecordCounter logRecordCounter = 
+				FilterCounter.getLogRecordCounter(Logger.getLogger(PropertiesStorage.class.getName()));
+		
+		PropertiesStorage ps = new PropertiesStorage("systemPropThatdoesNotExists", (Path)null);
+		
+		testPropertiesStorageWithNullParam(ps);
+		
+		assertThat(logRecordCounter.getLogRecordCount()).isEqualTo(4);
+		assertThat(logRecordCounter.getLogRecordCount(Level.INFO)).isEqualTo(1);
+		assertThat(logRecordCounter.getLogRecordCount(Level.WARNING)).isEqualTo(2);
+		assertThat(logRecordCounter.getLogRecordCount(Level.SEVERE)).isEqualTo(1);
+	}
 }
