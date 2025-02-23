@@ -46,6 +46,24 @@ class RunningContextTest {
 	private static final String LOGGER_NAME = "org.fl.util.test1";
 	
 	@Test
+	void testRunningContextWithNullParam() {
+		
+		RunningContext rc = new RunningContext(null, null, (URI)null);
+		
+		assertThat(rc).isNotNull();
+		assertThat(rc.getName()).isEqualTo("org.fl");
+	}
+	
+	@Test
+	void testRunningContextWithNullParam2() {
+		
+		RunningContext rc = new RunningContext(null, null, (String)null);
+		
+		assertThat(rc).isNotNull();
+		assertThat(rc.getName()).isEqualTo("org.fl");
+	}
+	
+	@Test
 	void testRunningContextWithRelativePath() throws JsonProcessingException {
 		
 		RunningContext rc = new RunningContext(LOGGER_NAME, null, "test1.properties");
