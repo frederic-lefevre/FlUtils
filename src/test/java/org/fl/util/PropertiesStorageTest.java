@@ -142,6 +142,25 @@ class PropertiesStorageTest {
 		assertThat(props.get("logging.file.encode")).isEqualTo("UTF-8");
 	}
 	
+	@Test
+	void testPropertiesStorageWithPath() throws URISyntaxException, Exception {
+		
+		String pathString = "C:/FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test1.properties";
+		Path propertyPath = Paths.get(pathString);
+		
+		PropertiesStorage ps = new PropertiesStorage(null, propertyPath);
+		
+		assertThat(ps).isNotNull();	
+		assertThat(ps.getPropertyLocation()).isNotNull();
+		assertThat(ps.getPropertyLocation().toString()).isEqualTo("file:/" + pathString);
+		
+		AdvancedProperties props = ps.getAdvanced(null);;
+		assertThat(props).isNotNull();
+		
+		assertThat(props.get("doesNotExist")).isNull();
+		assertThat(props.get("logging.file.encode")).isEqualTo("UTF-8");
+	}
+	
 	private void testPropertiesStorageWithNullParam(PropertiesStorage ps) {
 		
 		assertThat(ps).isNotNull();	
