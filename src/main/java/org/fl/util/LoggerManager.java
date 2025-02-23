@@ -49,7 +49,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class LoggerManager {
 
-	private static final String DEFAULT_LOG_NAME = "default log name";
+	private static final String DEFAULT_LOG_NAME = "org.fl";
 	private static final String DEFAULT_LOG_FILE_DIR = "log";
 	private static final int DEFAULT_LOG_FILE_LENGTH = 8000000;
 	private static final int DEFAULT_LOG_FILE_NUMBER = 3;
@@ -239,7 +239,7 @@ public class LoggerManager {
 		ch.setFormatter(formatter);
 		ch.setEncoding(properties.getProperty("logging.console.encode", Charset.defaultCharset().name()));
 		log.addHandler(ch);
-		ch.setLevel(properties.getLevel("logging.console.level", Level.OFF));
+		ch.setLevel(properties.getLevel("logging.console.level", Level.WARNING));
 
 		if (rootLogger != null) {
 			Level rootConsoleLevel = properties.getLevel("logging.root.console.level", null);
