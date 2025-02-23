@@ -1,7 +1,7 @@
 /*
  * MIT License
 
-Copyright (c) 2017, 2024 Frederic Lefevre
+Copyright (c) 2017, 2025 Frederic Lefevre
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -37,12 +37,12 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.fl.util.PropertiesStorage;
-
 
 /**
  * @author Frédéric Lefèvre
@@ -51,6 +51,8 @@ import org.fl.util.PropertiesStorage;
  */
 public class PropertiesStorage {
 
+	private static final Logger psLogger = Logger.getLogger(PropertiesStorage.class.getName());
+	
     // URL of storage
     private URL propUrl;
     
@@ -102,7 +104,7 @@ public class PropertiesStorage {
 				if (propUrlName == null) {
 					// if the url name is not found in the system property, take the default
 					propUri = defaultPropertyUri ;
-					System.out.println("System property " + systemProperty + " not found. Default config will be used instead: " + defaultPropertyUri) ;
+					psLogger.info(() -> "System property " + systemProperty + " not found. Default config will be used instead: " + defaultPropertyUri) ;
 				} else {
 					propUri = new URI(propUrlName) ;
 				}
@@ -114,13 +116,12 @@ public class PropertiesStorage {
 			if (propUri != null) {	
 				propUrl = propUri.toURL() ;	
 			} else {
-				System.out.println(buildPropErrorMsg("properties url is null", systemProperty, defaultPropertyUri)) ;
+				psLogger.warning(buildPropErrorMsg("properties url is null", systemProperty, defaultPropertyUri)) ;
 			}
 			
 		} catch (Exception e) {
 			// Trace file load error
-			System.out.println(buildPropErrorMsg("Exception openning properties url", systemProperty, defaultPropertyUri)) ;
-			e.printStackTrace();
+			psLogger.log(Level.SEVERE, buildPropErrorMsg("Exception openning properties url", systemProperty, defaultPropertyUri), e);
 			throw e;
 		}
    }
@@ -136,7 +137,7 @@ public class PropertiesStorage {
 				if (propPathName == null) {
 					// if the path is not found in the system property, take the default
 					propPath = defaultPropertyPath ;
-					System.out.println("System property " + systemProperty + " not found. Default config will be used instead: " + defaultPropertyPath) ;
+					psLogger.info(() -> "System property " + systemProperty + " not found. Default config will be used instead: " + defaultPropertyPath) ;
 				} else {
 					propPath = Paths.get(propPathName) ;
 				}
@@ -153,9 +154,9 @@ public class PropertiesStorage {
 					
 					String userDir = System.getProperty("user.dir");
 					if (userDir != null) {
-						Path fullPath = Paths.get(userDir, propPath.toString()) ;
+						Path fullPath = Paths.get(userDir, propPath.toString());
 						if (Files.exists(fullPath)) {
-							propUrl = fullPath.toUri().toURL() ;
+							propUrl = fullPath.toUri().toURL();
 						} 
 					}
 					if (propUrl == null) {
@@ -164,28 +165,27 @@ public class PropertiesStorage {
 					}
 				} else {
 					// path is absolute
-					propUrl = propPath.toUri().toURL() ; ;
+					propUrl = propPath.toUri().toURL();
 				}
 			} else {
-				System.out.println(buildPropErrorMsg("properties path is null", systemProperty, defaultPropertyPath)) ;
+				psLogger.warning(buildPropErrorMsg("properties path is null", systemProperty, defaultPropertyPath));
 			}			
 		} catch (Exception e) {
 			// Trace file load error
-			System.out.println(buildPropErrorMsg("Exception openning properties url", systemProperty, defaultPropertyPath)) ;
-			e.printStackTrace();
+			psLogger.log(Level.SEVERE, buildPropErrorMsg("Exception openning properties url", systemProperty, defaultPropertyPath));
 			throw e;
 		}
    }
    
-   private String buildPropErrorMsg(String msg, String systemProperty, Object defaultProperty) {
-	   
-	   StringBuilder errorMsg = new StringBuilder() ;
-	   errorMsg.append(msg).append("\n") ;
-	   errorMsg.append( "System property: ").append(systemProperty).append("\n") ;
-	   errorMsg.append( "defaultProperty: ").append(defaultProperty).append("\n") ;
-	   errorMsg.append( "user.dir: ").append(System.getProperty("user.dir")).append("\n") ;
-	   return errorMsg.toString() ;
-   }
+	private String buildPropErrorMsg(String msg, String systemProperty, Object defaultProperty) {
+
+		StringBuilder errorMsg = new StringBuilder();
+		errorMsg.append(msg).append("\n");
+		errorMsg.append("System property: ").append(systemProperty).append("\n");
+		errorMsg.append("defaultProperty: ").append(Objects.toString(defaultProperty)).append("\n");
+		errorMsg.append("user.dir: ").append(System.getProperty("user.dir")).append("\n");
+		return errorMsg.toString();
+	}
 	
 	public AdvancedProperties getAdvanced(Logger log) {
 		
@@ -197,7 +197,7 @@ public class PropertiesStorage {
 		        props.load(reader);
 		    } catch (Exception e) {
 		    	if (log != null) {
-		    		log.log(Level.WARNING, "Properties not found " + propUrl, e) ;
+		    		log.log(Level.WARNING, "Properties not found " + propUrl, e);
 		    	} else {
 		    		 System.out.println("Property file loading error loading " + propUrl);
 		    		 e.printStackTrace();
@@ -217,15 +217,17 @@ public class PropertiesStorage {
 	 */
 	public void save(Properties props) throws IOException {
 
-	    File outFile = new File(propUrl.getPath()) ;
-	    if ((outFile != null) && (!outFile.exists() || (outFile.canWrite() && outFile.delete()))) {
-	        OutputStream outStream = getOutputFromUrl() ;
-	        props.store(outStream, "") ;
-	        outStream.flush() ;
-	        outStream.close() ;
-	    } else {
-	        throw new IOException("Cannot write property file") ;
-	    }
+		if (propUrl != null) {
+		    File outFile = new File(propUrl.getPath());
+		    if ((outFile != null) && (!outFile.exists() || (outFile.canWrite() && outFile.delete()))) {
+		        OutputStream outStream = getOutputFromUrl() ;
+		        props.store(outStream, "");
+		        outStream.flush();
+		        outStream.close();
+		    } else {
+		        throw new IOException("Cannot write property file") ;
+		    }
+		}
 	}
 	
 	
@@ -234,7 +236,8 @@ public class PropertiesStorage {
 	 * @return true if this properties storage writable, false otherwise
 	 */
 	public boolean isWritable() {
-	    return (propUrl.getProtocol().equals("file")) ;
+		return ((propUrl != null) &&
+				propUrl.getProtocol().equals("file"));
 	}
 	
 	/**
@@ -244,10 +247,10 @@ public class PropertiesStorage {
 	 */
 	private OutputStream getOutputFromUrl() throws FileNotFoundException {
 	    
-	    if (propUrl.getProtocol().equals("file")) {
+	    if (isWritable()) {
 	       return new BufferedOutputStream(new FileOutputStream(new File(propUrl.getPath()))) ;
 	    } else {
-	        return null ;
+	        return null;
 	    }
 	}
 	
