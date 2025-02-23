@@ -143,7 +143,7 @@ public class PropertiesStorage {
 				if (propPathName == null) {
 					// if the path is not found in the system property, take the default
 					propPath = defaultPropertyPath ;
-					psLogger.info(() -> "System property " + systemProperty + " not found. Default config will be used instead: " + defaultPropertyPath) ;
+					psLogger.fine(() -> "System property " + systemProperty + " not found. Default config will be used instead: " + defaultPropertyPath) ;
 				} else {
 					propPath = Paths.get(propPathName) ;
 				}
