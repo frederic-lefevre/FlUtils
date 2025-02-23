@@ -189,23 +189,25 @@ public class PropertiesStorage {
 	
 	public AdvancedProperties getAdvanced(Logger log) {
 		
+		Logger localLog;
+		if (log == null) {
+			localLog = psLogger;
+			psLogger.severe("Null logger. It will be replaced by a default logger");
+		} else {
+			localLog = log;
+		}
+		
 	    // load property from the property file		
-	    AdvancedProperties props = new AdvancedProperties(log);
+	    AdvancedProperties props = new AdvancedProperties(localLog);
 	    
 	    if (propUrl != null) {
 		    try (InputStreamReader reader = new InputStreamReader(propUrl.openStream(), StandardCharsets.UTF_8)) {
 		        props.load(reader);
 		    } catch (Exception e) {
-		    	if (log != null) {
-		    		log.log(Level.WARNING, "Properties not found " + propUrl, e);
-		    	} else {
-		    		 System.out.println("Property file loading error loading " + propUrl);
-		    		 e.printStackTrace();
-		    	}
-		        props = null ;
+		    	localLog.log(Level.SEVERE, "Property file loading error for " + propUrl, e);	
 		    }
 	    } else {
-	    	props = null ;
+	    	localLog.warning("Properties url is null");
 	    }
 		return props ;
 	}

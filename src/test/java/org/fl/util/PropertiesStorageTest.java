@@ -33,18 +33,28 @@ import org.junit.jupiter.api.Test;
 class PropertiesStorageTest {
 	
 	@Test
-	void testPropertiesStorageWithNullParam() throws Exception {
+	void testPropertiesStorageWithUriNullParam() throws Exception {
 		
 		PropertiesStorage ps = new PropertiesStorage(null, (URI)null);
 		
-		assertThat(ps).isNotNull();
+		testPropertiesStorageWithNullParam(ps);
+		
 	}
 	
 	@Test
-	void testPropertiesStorageWithNullParam2() throws Exception {
+	void testPropertiesStorageWithPathNullParam() throws Exception {
 		
 		PropertiesStorage ps = new PropertiesStorage(null, (Path)null);
 		
-		assertThat(ps).isNotNull();
+		testPropertiesStorageWithNullParam(ps);
+	}
+	
+	private void testPropertiesStorageWithNullParam(PropertiesStorage ps) {
+		
+		assertThat(ps).isNotNull();	
+		assertThat(ps.getPropertyLocation()).isNull();
+		
+		AdvancedProperties props = ps.getAdvanced(null);
+		assertThat(props).isNotNull();
 	}
 }
