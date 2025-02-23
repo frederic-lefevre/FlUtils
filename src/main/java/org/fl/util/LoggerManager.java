@@ -41,6 +41,7 @@ import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
+import java.util.stream.Stream;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -94,7 +95,7 @@ public class LoggerManager {
     
 		try {
 			// if the logger was already existing (due to a previous deployement)
-			removeAllHandlers() ;
+			removeAllHandlersExceptConsole() ;
 		} catch (SecurityException e) {
 			System.out.println("Security exception removing handlers in LoggerManager ") ;
 			e.printStackTrace() ;
@@ -182,23 +183,28 @@ public class LoggerManager {
 			formatter = new SimpleFormatter();
 		}
 
+		// Console Handler : always have a console handler (level maybe set to OFF)
+		configureConsoleHandler();
+		
 		log.setUseParentHandlers(false);
-
-		// Root logger
-		Logger rootLogger = log.getParent();
         
         // -----------------------------------
         // File handler		
 		String logFileNamePattern = properties.getProperty("logging.logfile.name");
+
+		int logfileLength = properties.getInt("logging.logfile.length", DEFAULT_LOG_FILE_LENGTH);
+		int logfileNumber = properties.getInt("logging.logfile.number", DEFAULT_LOG_FILE_NUMBER);
+		
+		String logDirName;
+		if ((rootDir != null) && (!rootDir.isEmpty())) {
+			logDirName = rootDir + properties.getProperty("logging.directory.relative.name", DEFAULT_LOG_FILE_DIR);
+		} else {
+			logDirName = properties.getProperty("logging.directory.name", DEFAULT_LOG_FILE_DIR);
+		}
+		
 		if ((logFileNamePattern != null) && (!logFileNamePattern.isEmpty())) {
 			// File handler requested
 
-			String logDirName;
-			if ((rootDir != null) && (!rootDir.isEmpty())) {
-				logDirName = rootDir + properties.getProperty("logging.directory.relative.name", DEFAULT_LOG_FILE_DIR);
-			} else {
-				logDirName = properties.getProperty("logging.directory.name", DEFAULT_LOG_FILE_DIR);
-			}
 			logFilePattern = logDirName + logFileNamePattern;
 
 			// verify that the directory exists. If not, create it.
@@ -206,9 +212,6 @@ public class LoggerManager {
 			if (!logDir.exists()) {
 				logDir.mkdirs();
 			}
-
-			int logfileLength = properties.getInt("logging.logfile.length", DEFAULT_LOG_FILE_LENGTH);
-			int logfileNumber = properties.getInt("logging.logfile.number", DEFAULT_LOG_FILE_NUMBER);
 
 			// encoding and level for file handler
 			String encoding = properties.getProperty("logging.file.encode", Charset.defaultCharset().name());
@@ -218,9 +221,13 @@ public class LoggerManager {
 			fh.setFormatter(formatter);
 			fh.setEncoding(encoding);
 			log.addHandler(fh);
-			fh.setLevel(level);
+			fh.setLevel(level);		
+		}
 
-			// Root logger
+		// Root logger
+		Logger rootLogger = log.getParent();
+		if (rootLogger != null) {
+			
 			Level rootFileLevel = properties.getLevel("logging.root.file.level", null);
 			if (rootFileLevel != null) {
 				String rootLogFileName = properties.getProperty("logging.rootLogfile.name");
@@ -232,16 +239,6 @@ public class LoggerManager {
 					rootFh.setLevel(properties.getLevel("logging.root.file.level", Level.FINEST));
 				}
 			}
-		}
-		
-		// Console Handler : always have a console handler (level maybe set to OFF)
-		ConsoleHandler ch = new ConsoleHandler();
-		ch.setFormatter(formatter);
-		ch.setEncoding(properties.getProperty("logging.console.encode", Charset.defaultCharset().name()));
-		log.addHandler(ch);
-		ch.setLevel(properties.getLevel("logging.console.level", Level.WARNING));
-
-		if (rootLogger != null) {
 			Level rootConsoleLevel = properties.getLevel("logging.root.console.level", null);
 			if (rootConsoleLevel != null) {
 				ConsoleHandler chRoot = new ConsoleHandler();
@@ -476,18 +473,43 @@ public class LoggerManager {
 		}
 	}
 
-	private void removeAllHandlers() {
+	private void removeAllHandlersExceptConsole() {
 
-		if (log != null) {
-			Handler[] handlers = log.getHandlers();
-			if (handlers != null) {
-				for (Handler handler : handlers) {
-					log.removeHandler(handler);
-				}
-			}
+		Handler[] handlers = log.getHandlers();
+		if (handlers != null) {
+			Stream.of(handlers)
+			.filter(handler -> !(handler instanceof ConsoleHandler))
+			.forEach(handler -> log.removeHandler(handler));
 		}
 	}
 
+	private void configureConsoleHandler() throws SecurityException, UnsupportedEncodingException {
+		
+		ConsoleHandler consoleHandler = getConsoleHandler();
+		if (consoleHandler == null) {
+			consoleHandler = new ConsoleHandler();
+			log.addHandler(consoleHandler);
+		}
+		
+		consoleHandler.setFormatter(formatter);
+		consoleHandler.setEncoding(properties.getProperty("logging.console.encode", Charset.defaultCharset().name()));
+		consoleHandler.setLevel(properties.getLevel("logging.console.level", Level.WARNING));
+	}
+	
+	private ConsoleHandler getConsoleHandler() {
+
+		Handler[] handlers = log.getHandlers();
+		if (handlers != null) {
+			return Stream.of(handlers)
+					.filter(handler -> (handler instanceof ConsoleHandler))
+					.map(handler -> (ConsoleHandler)handler)
+					.findFirst()
+					.orElse(null);
+		} else {
+			return null;
+		}	
+	}
+	
 	// Get memory log (from a handler which has the largest in-memory buffer)
 	public StringBuilder getMemoryLogs() {
 		if (bufferLogHandler != null) {
