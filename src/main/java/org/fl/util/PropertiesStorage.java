@@ -56,6 +56,9 @@ public class PropertiesStorage {
     // URL of storage
     private URL propUrl;
     
+    // Advanced Properties
+    private AdvancedProperties advancedProperties;
+    
  /**
      * Create a properties storage
      * 
@@ -98,15 +101,15 @@ public class PropertiesStorage {
 		propUrl = null;
 		try {
 			// Get the URI of the properties
-			URI propUri ;
+			URI propUri;
 			if (systemProperty != null) {
-				String propUrlName = System.getProperty(systemProperty) ;
+				String propUrlName = System.getProperty(systemProperty);
 				if (propUrlName == null) {
 					// if the url name is not found in the system property, take the default
-					propUri = defaultPropertyUri ;
-					psLogger.info(() -> "System property " + systemProperty + " not found. Default config will be used instead: " + defaultPropertyUri) ;
+					propUri = defaultPropertyUri;
+					psLogger.info(() -> "System property " + systemProperty + " not found. Default config will be used instead: " + defaultPropertyUri);
 				} else {
-					propUri = new URI(propUrlName) ;
+					propUri = new URI(propUrlName);
 				}
 			} else {
 				// systemProperty is null, take defaultPropertyUrl
@@ -114,9 +117,9 @@ public class PropertiesStorage {
 			}
 			
 			if (propUri != null) {	
-				propUrl = propUri.toURL() ;	
+				propUrl = propUri.toURL();	
 			} else {
-				psLogger.warning(buildPropErrorMsg("properties url is null", systemProperty, defaultPropertyUri)) ;
+				psLogger.warning(buildPropErrorMsg("properties url is null", systemProperty, defaultPropertyUri));
 			}
 			
 		} catch (Exception e) {
@@ -124,6 +127,9 @@ public class PropertiesStorage {
 			psLogger.log(Level.SEVERE, buildPropErrorMsg("Exception openning properties url", systemProperty, defaultPropertyUri), e);
 			throw e;
 		}
+		
+		// Finally get the advanced properties
+		advancedProperties = getAdvanced(psLogger);
    }
    
    private void initPropertiesStorage(String systemProperty, Path defaultPropertyPath) throws Exception {
@@ -165,9 +171,10 @@ public class PropertiesStorage {
 					}
 				} else {
 					// path is absolute
-					propUrl = propPath.toUri().toURL();
+					if (Files.exists(propPath)) {
+						propUrl = propPath.toUri().toURL();
+					}
 				}
-				
 			}
 			
 			if (propUrl == null) {
@@ -179,6 +186,9 @@ public class PropertiesStorage {
 			psLogger.log(Level.SEVERE, buildPropErrorMsg("Exception openning properties url", systemProperty, defaultPropertyPath));
 			throw e;
 		}
+		
+		// Finally get the advanced properties
+		advancedProperties = getAdvanced(psLogger);
    }
    
 	private String buildPropErrorMsg(String msg, String systemProperty, Object defaultProperty) {
@@ -193,27 +203,32 @@ public class PropertiesStorage {
 	
 	public AdvancedProperties getAdvanced(Logger log) {
 		
-		Logger localLog;
-		if (log == null) {
-			localLog = psLogger;
-			psLogger.severe("Null logger. It will be replaced by a default logger");
-		} else {
-			localLog = log;
+		if (advancedProperties == null) {
+			
+			Logger localLog;
+			if (log == null) {
+				localLog = psLogger;
+				psLogger.severe("Null logger. It will be replaced by a default logger");
+			} else {
+				localLog = log;
+			}
+
+			// load property from the property file		
+			advancedProperties = new AdvancedProperties(localLog);
+
+			if (propUrl != null) {
+				try (InputStreamReader reader = new InputStreamReader(propUrl.openStream(), StandardCharsets.UTF_8)) {
+					advancedProperties.load(reader);
+				} catch (Exception e) {
+					localLog.log(Level.SEVERE, "Property file loading error for " + propUrl, e);
+					// Invalid url
+					propUrl = null;
+				}
+			} else {
+				localLog.warning("Properties url is null");
+			}
 		}
-		
-	    // load property from the property file		
-	    AdvancedProperties props = new AdvancedProperties(localLog);
-	    
-	    if (propUrl != null) {
-		    try (InputStreamReader reader = new InputStreamReader(propUrl.openStream(), StandardCharsets.UTF_8)) {
-		        props.load(reader);
-		    } catch (Exception e) {
-		    	localLog.log(Level.SEVERE, "Property file loading error for " + propUrl, e);	
-		    }
-	    } else {
-	    	localLog.warning("Properties url is null");
-	    }
-		return props ;
+		return advancedProperties;
 	}
 	
 	/**
