@@ -66,15 +66,6 @@ class PropertiesStorageTest {
 		assertThat(logRecordCounter.getLogRecordCount(Level.WARNING)).isEqualTo(2);
 	}
 	
-	private void testPropertiesStorageWithNullParam(PropertiesStorage ps) {
-			
-		assertThat(ps).isNotNull();	
-		assertThat(ps.getPropertyLocation()).isNull();
-		
-		AdvancedProperties props = ps.getAdvanced(null);
-		assertThat(props).isNotNull().isEmpty();
-	}
-	
 	@Test
 	void testPropertiesStorageWithInvalidSystemProperty() throws Exception {
 		
@@ -132,4 +123,32 @@ class PropertiesStorageTest {
 		assertThat(logRecordCounter.getLogRecordCount()).isEqualTo(1);
 		assertThat(logRecordCounter.getLogRecordCount(Level.SEVERE)).isEqualTo(1);
 	}
+	
+	@Test
+	void testPropertiesStorageWithUri() throws URISyntaxException, Exception {
+		
+		URI propertyUri = new URI("file:///C:/FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test1.properties");
+		
+		PropertiesStorage ps = new PropertiesStorage(null, propertyUri);
+		
+		assertThat(ps).isNotNull();	
+		assertThat(ps.getPropertyLocation()).isNotNull();
+		assertThat(ps.getPropertyLocation().toString()).isEqualTo(propertyUri.toURL().toString());
+		
+		AdvancedProperties props = ps.getAdvanced(null);;
+		assertThat(props).isNotNull();
+		
+		assertThat(props.get("doesNotExist")).isNull();
+		assertThat(props.get("logging.file.encode")).isEqualTo("UTF-8");
+	}
+	
+	private void testPropertiesStorageWithNullParam(PropertiesStorage ps) {
+		
+		assertThat(ps).isNotNull();	
+		assertThat(ps.getPropertyLocation()).isNull();
+		
+		AdvancedProperties props = ps.getAdvanced(null);
+		assertThat(props).isNotNull().isEmpty();
+	}
+	
 }
