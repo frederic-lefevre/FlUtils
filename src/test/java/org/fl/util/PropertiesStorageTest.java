@@ -28,6 +28,10 @@ import static org.assertj.core.api.Assertions.*;
 
 import java.net.URI;
 import java.nio.file.Path;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import org.fl.util.FilterCounter.LogRecordCounter;
 import org.junit.jupiter.api.Test;
 
 class PropertiesStorageTest {
@@ -35,26 +39,39 @@ class PropertiesStorageTest {
 	@Test
 	void testPropertiesStorageWithUriNullParam() throws Exception {
 		
+		LogRecordCounter logRecordCounter = 
+				FilterCounter.getLogRecordCounter(Logger.getLogger(PropertiesStorage.class.getName()));
+		
 		PropertiesStorage ps = new PropertiesStorage(null, (URI)null);
 		
 		testPropertiesStorageWithNullParam(ps);
 		
+		assertThat(logRecordCounter.getLogRecordCount()).isEqualTo(3);
+		assertThat(logRecordCounter.getLogRecordCount(Level.WARNING)).isEqualTo(2);
+		assertThat(logRecordCounter.getLogRecordCount(Level.SEVERE)).isEqualTo(1);
 	}
 	
 	@Test
 	void testPropertiesStorageWithPathNullParam() throws Exception {
 		
+		LogRecordCounter logRecordCounter = 
+				FilterCounter.getLogRecordCounter(Logger.getLogger(PropertiesStorage.class.getName()));
+		
 		PropertiesStorage ps = new PropertiesStorage(null, (Path)null);
 		
 		testPropertiesStorageWithNullParam(ps);
+		
+		assertThat(logRecordCounter.getLogRecordCount()).isEqualTo(3);
+		assertThat(logRecordCounter.getLogRecordCount(Level.WARNING)).isEqualTo(2);
+		assertThat(logRecordCounter.getLogRecordCount(Level.SEVERE)).isEqualTo(1);
 	}
 	
 	private void testPropertiesStorageWithNullParam(PropertiesStorage ps) {
-		
+			
 		assertThat(ps).isNotNull();	
 		assertThat(ps.getPropertyLocation()).isNull();
 		
 		AdvancedProperties props = ps.getAdvanced(null);
-		assertThat(props).isNotNull();
+		assertThat(props).isNotNull().isEmpty();
 	}
 }
