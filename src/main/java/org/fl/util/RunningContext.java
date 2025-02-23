@@ -62,20 +62,20 @@ runningContext.operatingInfo.log=true
 
 public class RunningContext {
 
-	private final static String projectBuildPropertyFile = "project.properties" ;
-	
-	private final static String datePattern = "uuuu-MM-dd HH:mm:ss.SSS VV" ;
-	
-	private final static JavaPropsMapper propsMapper = new JavaPropsMapper();
-	
+	private static final String projectBuildPropertyFile = "project.properties";
+
+	private static final String datePattern = "uuuu-MM-dd HH:mm:ss.SSS VV";
+
+	private static final JavaPropsMapper propsMapper = new JavaPropsMapper();
+
 	private final String name;
 	private final Logger pLog;
 	private AdvancedProperties applicationProperties;
-	private PropertiesStorage propsStorage ;
-	private LoggerManager logMgr ;
-	private Instant initializationDate ;
-	
-	private ArrayNode buildInformation ;
+	private PropertiesStorage propsStorage;
+	private LoggerManager logMgr;
+	private Instant initializationDate;
+
+	private ArrayNode buildInformation;
 	
 	/**
 	 * @param name : normally named, using a hierarchical dot-separated namespace. 
@@ -95,8 +95,7 @@ public class RunningContext {
 		} catch (Exception e) {
 			pLog.log(Level.SEVERE, "Exception processing property file.  ", e);
 			e.printStackTrace();
-			applicationProperties = new AdvancedProperties(pLog) ;
-			
+			applicationProperties = new AdvancedProperties(pLog) ;			
 		}	
 	}
 
@@ -113,17 +112,16 @@ public class RunningContext {
 	public RunningContext(String name, String systemProperty, String defaultPropertyPathName) {
 
 		this.name = name;
-		pLog = Logger.getLogger(name) ;
+		pLog = Logger.getLogger(name);
 		try {
-			Path defaultPropertyPath = Paths.get(defaultPropertyPathName) ;
+			Path defaultPropertyPath = Paths.get(defaultPropertyPathName);
 			propsStorage = new PropertiesStorage(systemProperty, defaultPropertyPath);
-			initRunningContext(name, systemProperty, null, null) ;
+			initRunningContext(name, systemProperty, null, null);
 		} catch (Exception e) {
 			pLog.log(Level.SEVERE, "Exception processing property file.  ", e);
 			e.printStackTrace();
-			applicationProperties = new AdvancedProperties(pLog) ;
-
-		}	
+			applicationProperties = new AdvancedProperties(pLog);
+		}
 	}
 	
 	public String getName() {
@@ -158,9 +156,9 @@ public class RunningContext {
 		addBuildInformation(name, true);
 		addBuildInformation("org.fl.util", false);
 
-		boolean logOperatingInfos = applicationProperties.getBoolean("runningContext.operatingInfo.log", false) ;
+		boolean logOperatingInfos = applicationProperties.getBoolean("runningContext.operatingInfo.log", false);
 		if (logOperatingInfos) {
-			pLog.info(getOperatingInfos(true).toString()) ;
+			pLog.info(getOperatingInfos(true).toString());
 		}
 
 	}
@@ -292,16 +290,16 @@ public class RunningContext {
 	}
 	
 	public JsonNode getOperatingInfos(boolean withIpLookup) {
-		return (new OperatingInfo()).getInfo(withIpLookup) ;
+		return (new OperatingInfo()).getInfo(withIpLookup);
 	}
-	
+
 	public JsonNode getApplicationInfo(boolean withIpLookup) {
-		
+
 		ObjectNode applicationInfo = JsonNodeFactory.instance.objectNode();
-		String initDate = printInitializationDate() ;
-		JsonNode operatingContext = getOperatingInfos(withIpLookup) ;
-		
-		URL propsLocation = getPropertiesLocation() ;
+		String initDate = printInitializationDate();
+		JsonNode operatingContext = getOperatingInfos(withIpLookup);
+
+		URL propsLocation = getPropertiesLocation();
 		if (propsLocation != null) {
 			applicationInfo.put("propertiesLocation", propsLocation.toString());
 		} else {
@@ -310,22 +308,22 @@ public class RunningContext {
 		if ((buildInformation != null) && !buildInformation.isEmpty()) {
 			applicationInfo.set("buildInformation", buildInformation);
 		} else {
-			applicationInfo.put("buildInformation", "No build information") ;
+			applicationInfo.put("buildInformation", "No build information");
 		}
 		applicationInfo.put("initialisationDate", initDate);
-		applicationInfo.set("applicationProperties", getPropertiesAsJson()) ;
-		applicationInfo.set("operatingContext", operatingContext) ;
-		applicationInfo.set("fileSystemsInformation", FilesUtils.getFileSystemsInformation(pLog)) ;
-				
-		return applicationInfo ;
+		applicationInfo.set("applicationProperties", getPropertiesAsJson());
+		applicationInfo.set("operatingContext", operatingContext);
+		applicationInfo.set("fileSystemsInformation", FilesUtils.getFileSystemsInformation(pLog));
+
+		return applicationInfo;
 	}
-	
+
 	public JsonNode getPropertiesAsJson() {
-		
-		Enumeration<Object> keys = applicationProperties.keys() ;
+
+		Enumeration<Object> keys = applicationProperties.keys();
 		Vector<String> keyList = new Vector<String>();
 		while (keys.hasMoreElements()) {
-			keyList.add((String)keys.nextElement()) ;
+			keyList.add((String) keys.nextElement());
 		}
 		Collections.sort(keyList);
 		ObjectNode applicationPropsNode = JsonNodeFactory.instance.objectNode();
