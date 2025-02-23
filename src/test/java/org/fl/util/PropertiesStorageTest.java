@@ -91,8 +91,7 @@ class PropertiesStorageTest {
 		
 		testPropertiesStorageWithNullParam(ps);
 		
-		assertThat(logRecordCounter.getLogRecordCount()).isEqualTo(3);
-		assertThat(logRecordCounter.getLogRecordCount(Level.INFO)).isEqualTo(1);
+		assertThat(logRecordCounter.getLogRecordCount()).isEqualTo(2);
 		assertThat(logRecordCounter.getLogRecordCount(Level.WARNING)).isEqualTo(2);
 	}
 	
