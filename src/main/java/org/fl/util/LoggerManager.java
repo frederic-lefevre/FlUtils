@@ -39,7 +39,6 @@ import java.util.logging.FileHandler;
 import java.util.logging.Formatter;
 import java.util.logging.Handler;
 import java.util.logging.Level;
-import java.util.logging.LogManager;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 import java.util.stream.Stream;
@@ -56,6 +55,8 @@ public class LoggerManager {
 	private static final int DEFAULT_LOG_FILE_LENGTH = 8000000;
 	private static final int DEFAULT_LOG_FILE_NUMBER = 3;
 
+	private static final Logger rootLogger = Logger.getLogger("");
+			
 	// associated Logger
 	private final Logger log;
 
@@ -73,17 +74,13 @@ public class LoggerManager {
 	private LoggerManager() {
 		log = null;
 	}
-
-    
+  
     /**
      * Init a logger
      * @param logName : name of the Logger
-     * @param rootDir : a root directory for logging. The logging directory in the property file will be interpreted as relative to the root directory. 
-     *        So the property logging.directory.relative.name will be used
      * @param props : a set of properties
-     * @param customHandler : a custom handler (could be a bluemix cloudant handler for instance, or whatever)
      */
-    private LoggerManager(String logName, String rootDir, AdvancedProperties props, Handler customHandler) {
+    private LoggerManager(String logName, AdvancedProperties props) {
 
     	// get or create the logger (it may already exist, with all its handlers set, in the case of a J2EE container)
    		log = Logger.getLogger(logName);
@@ -96,26 +93,15 @@ public class LoggerManager {
     
 		try {
 			// if the logger was already existing (due to a previous deployement)
-			removeAllHandlersExceptConsole() ;
+			removeAllHandlersExceptConsole();
+			
+			initHandlers();
 		} catch (SecurityException e) {
-			System.out.println("Security exception removing handlers in LoggerManager ") ;
-			e.printStackTrace() ;
-		} catch (Exception e) {
-			System.out.println("Exception removing handlers in LoggerManager ") ;
-			e.printStackTrace();
-		}
-		
-		try {
-			initHandlers(rootDir, customHandler);
-		} catch (SecurityException e) {
-			System.out.println("Security exception in handler intialisation, LoggerManager ") ;
-			e.printStackTrace() ;
+			rootLogger.log(Level.SEVERE, "Security exception in LoggerManager init", e);
 		} catch (IOException e) {
-			System.out.println("IOException in handler intialisation, LoggerManager ") ;
-			e.printStackTrace();
+			rootLogger.log(Level.SEVERE, "IOException in intialisation, LoggerManager", e);
 		} catch (Exception e) {
-			System.out.println("Exception in handler intialisation, LoggerManager ") ;
-			e.printStackTrace();
+			rootLogger.log(Level.SEVERE, "Security exception in intialisation, LoggerManager", e);
 		}
     }
     
@@ -126,24 +112,15 @@ public class LoggerManager {
     public static class Builder {
     	
     	private String logName;
-    	private String rootDir;
     	private AdvancedProperties props;
-    	private Handler customHandler;
     	
     	private Builder() {
     		logName = DEFAULT_LOG_NAME;
-    		rootDir = null;
     		props = null;
-    		customHandler = null;
     	}
     	
     	public Builder logName(String logName) {
     		this.logName = logName;
-    		return this;
-    	}
-    	
-    	public Builder rootDir(String rootDir) {
-    		this.rootDir = rootDir;
     		return this;
     	}
     	
@@ -152,18 +129,13 @@ public class LoggerManager {
     		return this;
     	}
     	
-    	public Builder customHandler(Handler handler) {
-    		this.customHandler = handler;
-    		return this;
-    	}
-    	
     	public LoggerManager build() {
-    		return new LoggerManager(logName, rootDir, props, customHandler);
+    		return new LoggerManager(logName, props);
     	}
     }
     
     
-    private void initHandlers(String rootDir, Handler customHandler) throws SecurityException, IOException {
+    private void initHandlers() throws SecurityException, IOException {
     	
 		// Set custom format for SimpleFormatter
 		String customFormat = properties.getProperty("logging.simpleLogFormatter.format");
@@ -180,44 +152,27 @@ public class LoggerManager {
 		} else if (formatterName.equals(PlainLogFormatter.class.getName())) {
 			formatter = new PlainLogFormatter();
 		} else {
-			System.out.println("Unknown log formatter class (logging.formatter property): " + formatterName);
+			rootLogger.warning("Unknown log formatter class (logging.formatter property): " + formatterName);
 			formatter = new SimpleFormatter();
 		}
 
 		int logfileLength = properties.getInt("logging.logfile.length", DEFAULT_LOG_FILE_LENGTH);
-		int logfileNumber = properties.getInt("logging.logfile.number", DEFAULT_LOG_FILE_NUMBER);
+		int logfileNumber = properties.getInt("logging.logfile.number", DEFAULT_LOG_FILE_NUMBER);		
+		String logDirName = properties.getProperty("logging.directory.name", DEFAULT_LOG_FILE_DIR);
 		
-		String logDirName;
-		if ((rootDir != null) && (!rootDir.isEmpty())) {
-			logDirName = rootDir + properties.getProperty("logging.directory.relative.name", DEFAULT_LOG_FILE_DIR);
-		} else {
-			logDirName = properties.getProperty("logging.directory.name", DEFAULT_LOG_FILE_DIR);
-		}
-
 		// Root logger
-		Logger rootLogger = LogManager.getLogManager().getLogger("");
-		if (rootLogger != null) {
-			
-			Level rootFileLevel = properties.getLevel("logging.root.file.level", null);
-			if (rootFileLevel != null) {
-				String rootLogFileName = properties.getProperty("logging.rootLogfile.name");
-				if ((rootLogFileName != null) && (!rootLogFileName.isEmpty())) {
-					String rootLogFile = logDirName + rootLogFileName;
-					FileHandler rootFh = new FileHandler(rootLogFile, logfileLength, logfileNumber, true);
-					rootFh.setFormatter(formatter);
-					rootLogger.addHandler(rootFh);
-					rootFh.setLevel(properties.getLevel("logging.root.file.level", Level.FINEST));
-				}
+		Level rootFileLevel = properties.getLevel("logging.root.file.level", null);
+		if (rootFileLevel != null) {
+			String rootLogFileName = properties.getProperty("logging.rootLogfile.name");
+			if ((rootLogFileName != null) && (!rootLogFileName.isEmpty())) {
+				String rootLogFile = logDirName + rootLogFileName;
+				FileHandler rootFh = new FileHandler(rootLogFile, logfileLength, logfileNumber, true);
+				rootFh.setFormatter(formatter);
+				rootLogger.addHandler(rootFh);
+				rootFh.setLevel(rootFileLevel);
 			}
-			Level rootConsoleLevel = properties.getLevel("logging.root.console.level", null);
-			if (rootConsoleLevel != null) {
-				ConsoleHandler chRoot = new ConsoleHandler();
-				chRoot.setFormatter(formatter);
-				rootLogger.addHandler(chRoot);
-				chRoot.setLevel(properties.getLevel("logging.root.console.level", Level.FINEST));
-			}
-			rootLogger.setLevel(getHighestHandlerLevel(rootLogger));
 		}
+		rootLogger.setLevel(getHighestHandlerLevel(rootLogger));
 		
 		// Console Handler : always have a console handler (level maybe set to OFF)
 		configureConsoleHandler();
@@ -260,12 +215,8 @@ public class LoggerManager {
 			bufferLogHandler = null;
 		}
 
-		// Custom Handler, if any
-		addCustomHandler(customHandler);
-
 		// Set the log level to the highest level of the handlers
-		log.setLevel(getHighestHandlerLevel(log));
-        
+		log.setLevel(getHighestHandlerLevel(log));       
     }
     
     /**
@@ -316,11 +267,19 @@ public class LoggerManager {
 					bufferLogHandler = null;
 				}
 			} catch (SecurityException | UnsupportedEncodingException e) {
-				System.err.println("Unable to set encoding for the custom log handler: " + e);
+				rootLogger.log(Level.SEVERE, "Unable to set encoding for the custom log handler", e);
 			}
 		}
 	}
     
+	private static class LogFilter implements FileFilter {
+
+		public boolean accept(File pathname) {
+			return (!pathname.getName().endsWith("lck"));
+		}
+	}
+	
+	private static final LogFilter logFileFilter = new LogFilter();
     /**
      * Get the log files
      * @return the log files
@@ -331,18 +290,12 @@ public class LoggerManager {
 		if (logFilePattern != null) {
 			File logDir = (new File(logFilePattern)).getParentFile();
 			if ((logDir != null) && (logDir.isDirectory())) {
-				logFiles = logDir.listFiles(new logFilter());
+				logFiles = logDir.listFiles(logFileFilter);
 			}
 		}
 		return logFiles;
 	}
 
-	private class logFilter implements FileFilter {
-
-		public boolean accept(File pathname) {
-			return (!pathname.getName().endsWith("lck"));
-		}
-	}
 
 	// Get a JsonObject representing the levels of a logger (and all levels of its
 	// Handlers)
@@ -567,7 +520,6 @@ public class LoggerManager {
 
 			List<BufferLogHandler> inMemoryHandlers = getHandlersWithInMemoryLog();
 			if (inMemoryHandlers != null) {
-				;
 				for (BufferLogHandler inMemoryHandler : inMemoryHandlers) {
 					nbRemove = inMemoryHandler.deleteAndResizeMemoryLogs(newSize);
 					String hName = inMemoryHandler.getName();
@@ -583,6 +535,8 @@ public class LoggerManager {
 		return msg.toString();
 	}
 
+	private static final InMemoryHandlerComparator inMemoryHandlerComparator = new InMemoryHandlerComparator();
+	
 	// Get all handlers with in-memory logging, sorted by the size of their buffer
 	private List<BufferLogHandler> getHandlersWithInMemoryLog() {
 
@@ -595,7 +549,6 @@ public class LoggerManager {
 				}
 			}
 			if (!result.isEmpty()) {
-				InMemoryHandlerComparator inMemoryHandlerComparator = new InMemoryHandlerComparator();
 				Collections.sort(result, inMemoryHandlerComparator);
 			}
 		}
@@ -603,7 +556,7 @@ public class LoggerManager {
 	}
 
 	// BufferLogHandler comparator that compare the size of in-memory buffer
-	private class InMemoryHandlerComparator implements Comparator<BufferLogHandler> {
+	private static class InMemoryHandlerComparator implements Comparator<BufferLogHandler> {
 
 		public int compare(BufferLogHandler blh1, BufferLogHandler blh2) {
 			return (blh2.getMaxMemoryLogRecord() - blh1.getMaxMemoryLogRecord());
