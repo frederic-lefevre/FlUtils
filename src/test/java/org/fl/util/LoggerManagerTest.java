@@ -26,16 +26,122 @@ package org.fl.util;
 
 import static org.assertj.core.api.Assertions.*;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.FileHandler;
+import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
+
 import org.junit.jupiter.api.Test;
 
 class LoggerManagerTest {
 	
 	@Test
-	void testBasicLoggerMagger() {
+	void testDefaultLoggerConfiguration() {
 		
 		LoggerManager logMgr = LoggerManager.builder().build();
 		assertThat(logMgr).isNotNull();
 		
+		Logger defaultLogger = Logger.getLogger("org.fl");
+		
+		assertThat(defaultLogger.getLevel()).isEqualTo(Level.WARNING);
+		
+		Handler[] handlers = defaultLogger.getHandlers();
+		
+		assertThat(handlers).singleElement()
+			.satisfies(handler -> assertThat(handler).isInstanceOf(ConsoleHandler.class));
 	}
 
+	@Test
+	void testNamedLoggerBasicConfiguration() {
+		
+		String loggerName = LoggerManagerTest.class.getName();
+		
+		LoggerManager logMgr = LoggerManager.builder()
+				.logName(loggerName)
+				.build();
+		
+		assertThat(logMgr).isNotNull();
+		
+		Logger logger = Logger.getLogger(loggerName);
+		
+		assertThat(logger.getLevel()).isEqualTo(Level.WARNING);
+		
+		Handler[] handlers = logger.getHandlers();
+		
+		assertThat(handlers).singleElement()
+			.satisfies(handler -> assertThat(handler).isInstanceOf(ConsoleHandler.class));
+	}
+	
+	@Test
+	void testNamedLoggerSampleConfiguration() throws Exception {
+		
+		String loggerName = LoggerManagerTest.class.getName();
+		
+		String pathString = "C:/FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/main/java/flUtilsSample.properties";
+		Path propertyPath = Paths.get(pathString);
+		
+		PropertiesStorage ps = new PropertiesStorage(null, propertyPath);
+		
+		AdvancedProperties props = ps.getAdvanced(null);
+		assertThat(props).isNotNull();
+		
+		assertThat(props.get("logging.directory.name")).isEqualTo("/tmp/myLogDir/");
+		assertThat(props.get("logging.logfile.name")).isEqualTo("journal%g.log");
+		assertThat(props.get("logging.logfile.length")).isEqualTo("80000000");
+		assertThat(props.get("logging.logfile.number")).isEqualTo("3");
+				
+		assertThat(props.get("logging.file.level")).isEqualTo("WARNING");
+		assertThat(props.get("logging.console.level")).isEqualTo("INFO");
+				
+		assertThat(props.get("logging.console.encode")).isEqualTo("UTF-8");
+		assertThat(props.get("logging.file.encode")).isEqualTo("UTF-8");
+		
+		assertThat(props.get("logging.root.file.level")).isEqualTo("INFO");
+		assertThat(props.get("logging.rootLogfile.name")).isEqualTo("rootApp%g.log");
+		
+		assertThat(props.get("logging.simpleLogFormatter.format")).isEqualTo("%1$tY-%1$tm-%1$td %1$tH:%1$tM:%1$tS.%1$tL %3$S %2$s%n%4$s: %5$s%6$s%n");
+		
+		LoggerManager logMgr = LoggerManager.builder()
+				.logName(loggerName)
+				.properties(props)
+				.build();
+		
+		assertThat(logMgr).isNotNull();
+		
+		Logger logger = Logger.getLogger(loggerName);
+		
+		assertThat(logger.getLevel()).isEqualTo(Level.INFO);
+		
+		assertThat(System.getProperty("java.util.logging.SimpleFormatter.format"))
+			.isNotNull()
+			.isEqualTo("%1$tY-%1$tm-%1$td %1$tH:%1$tM:%1$tS.%1$tL %3$S %2$s%n%4$s: %5$s%6$s%n");
+		
+		Handler[] handlers = logger.getHandlers();
+		
+		assertThat(handlers).hasSize(2)
+			.satisfiesExactlyInAnyOrder(
+					handler -> { 
+						assertThat(handler).isInstanceOf(ConsoleHandler.class);
+						assertThat(handler.getEncoding()).isEqualTo("UTF-8");
+						assertThat(handler.getLevel()).isEqualTo(Level.INFO);
+						assertThat(handler.getFormatter()).isNotNull()
+							.isInstanceOf(SimpleFormatter.class);
+						assertThat(handler.getFilter()).isNull();
+						assertThat(handler.getErrorManager()).isNotNull();
+					},
+					handler -> { 
+						assertThat(handler).isInstanceOf(FileHandler.class);
+						assertThat(handler.getEncoding()).isEqualTo("UTF-8");
+						assertThat(handler.getLevel()).isEqualTo(Level.WARNING);
+						assertThat(handler.getFormatter()).isNotNull()
+							.isInstanceOf(SimpleFormatter.class);
+						assertThat(handler.getFilter()).isNull();
+						assertThat(handler.getErrorManager()).isNotNull();
+					}
+				);
+	}
 }

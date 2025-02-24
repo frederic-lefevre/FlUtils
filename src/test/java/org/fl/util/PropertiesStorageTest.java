@@ -153,7 +153,7 @@ class PropertiesStorageTest {
 		assertThat(ps.getPropertyLocation()).isNotNull();
 		assertThat(ps.getPropertyLocation().toString()).isEqualTo("file:/" + pathString);
 		
-		AdvancedProperties props = ps.getAdvanced(null);;
+		AdvancedProperties props = ps.getAdvanced(null);
 		assertThat(props).isNotNull();
 		
 		assertThat(props.get("doesNotExist")).isNull();
