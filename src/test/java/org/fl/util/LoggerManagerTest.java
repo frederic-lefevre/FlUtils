@@ -176,8 +176,14 @@ class LoggerManagerTest {
 		
 		assertThat(handlers).hasSize(3)
 			.satisfiesExactlyInAnyOrder(
-				handler -> assertThat(handler).isInstanceOf(ConsoleHandler.class),
-				handler -> assertThat(handler).isInstanceOf(FileHandler.class),
+				handler -> {
+					assertThat(handler).isInstanceOf(ConsoleHandler.class); 
+					assertThat(handler.getLevel()).isEqualTo(Level.OFF);
+				},
+				handler -> { 
+					assertThat(handler).isInstanceOf(FileHandler.class); 
+					assertThat(handler.getLevel()).isEqualTo(Level.OFF);
+				},
 				handler -> { 
 					assertThat(handler).isInstanceOf(BufferLogHandler.class);
 					assertThat(handler).isInstanceOfSatisfying(BufferLogHandler.class, 
@@ -186,7 +192,6 @@ class LoggerManagerTest {
 								assertThat(bufferLogHandler.getMaxMemoryLogRecord()).isEqualTo(100);
 							});
 					assertThat(handler.getLevel()).isEqualTo(Level.INFO);
-
 				}
 			);
 		
