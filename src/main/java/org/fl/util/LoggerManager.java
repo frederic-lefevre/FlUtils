@@ -507,7 +507,7 @@ public class LoggerManager {
 	}
 
 	// Delete all memory logs (i.e all logs stored in in-memory buffers of handlers)
-	// and resize thier buffer to a new size
+	// and resize the buffer to a new size
 	public String deleteMemoryLogsAndResize(int newSize) {
 
 		StringBuilder msg = new StringBuilder(64);

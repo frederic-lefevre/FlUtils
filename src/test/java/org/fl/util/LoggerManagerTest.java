@@ -58,7 +58,7 @@ class LoggerManagerTest {
 	@Test
 	void testNamedLoggerBasicConfiguration() {
 		
-		String loggerName = LoggerManagerTest.class.getName();
+		String loggerName = LoggerManagerTest.class.getName() + ".1";
 		
 		LoggerManager logMgr = LoggerManager.builder()
 				.logName(loggerName)
@@ -79,7 +79,7 @@ class LoggerManagerTest {
 	@Test
 	void testNamedLoggerSampleConfiguration() throws Exception {
 		
-		String loggerName = LoggerManagerTest.class.getName();
+		String loggerName = LoggerManagerTest.class.getName() + ".2";
 		
 		String pathString = "C:/FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/main/java/flUtilsSample.properties";
 		Path propertyPath = Paths.get(pathString);
@@ -143,5 +143,69 @@ class LoggerManagerTest {
 						assertThat(handler.getErrorManager()).isNotNull();
 					}
 				);
+	}
+	
+	@Test
+	void testBufferLogHandler() throws Exception {
+		
+		String loggerName = LoggerManagerTest.class.getName()  + ".3";
+		
+		String pathString = "C:/FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test2.properties";
+		Path propertyPath = Paths.get(pathString);
+		
+		PropertiesStorage ps = new PropertiesStorage(null, propertyPath);
+		
+		AdvancedProperties props = ps.getAdvanced(null);
+		assertThat(props).isNotNull();
+		
+		LoggerManager logMgr = LoggerManager.builder()
+				.logName(loggerName)
+				.properties(props)
+				.build();
+		
+		assertThat(logMgr).isNotNull();
+		
+		Logger logger = Logger.getLogger(loggerName);
+		
+		assertThat(logger.getLevel()).isEqualTo(Level.INFO);
+		
+		assertThat(props.get("logging.BufferLogHandler.bufferLength")).isEqualTo("100");
+		assertThat(props.get("logging.BufferLogHandler.level")).isEqualTo("INFO");
+		
+		Handler[] handlers = logger.getHandlers();
+		
+		assertThat(handlers).hasSize(3)
+			.satisfiesExactlyInAnyOrder(
+				handler -> assertThat(handler).isInstanceOf(ConsoleHandler.class),
+				handler -> assertThat(handler).isInstanceOf(FileHandler.class),
+				handler -> { 
+					assertThat(handler).isInstanceOf(BufferLogHandler.class);
+					assertThat(handler).isInstanceOfSatisfying(BufferLogHandler.class, 
+							bufferLogHandler -> { 
+								assertThat(bufferLogHandler.getName()).isEqualTo("standard bufferLogHandler");
+								assertThat(bufferLogHandler.getMaxMemoryLogRecord()).isEqualTo(100);
+							});
+					assertThat(handler.getLevel()).isEqualTo(Level.INFO);
+
+				}
+			);
+		
+		// Log a message
+		String logMessage = "essai de log dans le BufferLogHandler";
+		logger.info(logMessage);
+		
+		// Check it is in memory log
+		assertThat(logMgr.getMemoryLogs()).isNotNull().contains(logMessage);
+		
+		// Delete memory logs
+		assertThat(logMgr.deleteMemoryLogs()).isNotNull().contains("1 log records removed");
+		
+		// Check memory logs is empty
+		assertThat(logMgr.getMemoryLogs()).isNotNull().isEmpty();
+		
+		// Delete memory logs
+		assertThat(logMgr.deleteMemoryLogsAndResize(105)).isNotNull()
+			.contains("0 log records removed")
+			.contains("Maximum number of records resized to 105");
 	}
 }
