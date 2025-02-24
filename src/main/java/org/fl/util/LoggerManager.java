@@ -34,6 +34,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.function.Function;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.FileHandler;
 import java.util.logging.Formatter;
@@ -488,21 +489,7 @@ public class LoggerManager {
 		} else {
 			// search for in-memory handlers
 
-			List<BufferLogHandler> inMemoryHandlers = getHandlersWithInMemoryLog();
-			if (inMemoryHandlers != null) {
-
-				StringBuilder msg = new StringBuilder();
-				for (BufferLogHandler inMemoryHandler : inMemoryHandlers) {
-					int nbRemove = inMemoryHandler.deleteMemoryLogs();
-					String hName = inMemoryHandler.getName();
-					String cName = inMemoryHandler.getClass().getSimpleName();
-					msg.append(nbRemove).append(" log records removed from ").append(cName).append(" ").append(hName)
-							.append("\n");
-				}
-				return msg.toString();
-			} else {
-				return "No in-memory log handlers found";
-			}
+			return searchAndDestroy(new StringBuilder(), (memBuf) -> memBuf.deleteMemoryLogs());
 		}
 	}
 
@@ -511,31 +498,38 @@ public class LoggerManager {
 	public String deleteMemoryLogsAndResize(int newSize) {
 
 		StringBuilder msg = new StringBuilder(64);
-		int nbRemove = 0;
+
 		if (bufferLogHandler != null) {
-			nbRemove = bufferLogHandler.deleteAndResizeMemoryLogs(newSize);
+			int nbRemove = bufferLogHandler.deleteAndResizeMemoryLogs(newSize);
 			msg.append(nbRemove).append(" log records removed from memory; ");
 			msg.append("Maximum number of records resized to ").append(newSize);
+			return msg.toString();
 		} else {
 			// search for in-memory handlers
 
-			List<BufferLogHandler> inMemoryHandlers = getHandlersWithInMemoryLog();
-			if (inMemoryHandlers != null) {
-				for (BufferLogHandler inMemoryHandler : inMemoryHandlers) {
-					nbRemove = inMemoryHandler.deleteAndResizeMemoryLogs(newSize);
-					String hName = inMemoryHandler.getName();
-					String cName = inMemoryHandler.getClass().getSimpleName();
-					msg.append(nbRemove).append(" log records removed from ").append(cName).append(" ").append(hName)
-							.append("\n");
-				}
-				msg.append("Maximum number of records resized to ").append(newSize);
-			} else {
-				msg.append("No in-memory log handlers found");
-			}
+			return searchAndDestroy(msg, (memBuf) -> memBuf.deleteAndResizeMemoryLogs(newSize));
 		}
-		return msg.toString();
 	}
 
+	private String searchAndDestroy(StringBuilder msg, Function<BufferLogHandler, Integer> deleteOp) {
+		
+		// search for in-memory handlers
+		List<BufferLogHandler> inMemoryHandlers = getHandlersWithInMemoryLog();
+		if (inMemoryHandlers != null) {
+
+			for (BufferLogHandler inMemoryHandler : inMemoryHandlers) {
+				int nbRemove = deleteOp.apply(inMemoryHandler);
+				String hName = inMemoryHandler.getName();
+				String cName = inMemoryHandler.getClass().getSimpleName();
+				msg.append(nbRemove).append(" log records removed from ").append(cName).append(" ").append(hName)
+						.append("\n");
+			}
+			return msg.toString();
+		} else {
+			return "No in-memory log handlers found";
+		}
+	}
+	
 	private static final InMemoryHandlerComparator inMemoryHandlerComparator = new InMemoryHandlerComparator();
 	
 	// Get all handlers with in-memory logging, sorted by the size of their buffer
