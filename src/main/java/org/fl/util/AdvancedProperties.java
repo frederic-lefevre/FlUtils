@@ -1,7 +1,7 @@
 /*
  * MIT License
 
-Copyright (c) 2017, 2024 Frederic Lefevre
+Copyright (c) 2017, 2025 Frederic Lefevre
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -53,18 +53,28 @@ import org.fl.util.swing.ColorHelpers;
 public class AdvancedProperties extends Properties {
 
 	private static final long serialVersionUID = 1L;
-	private static final char keySeparator = '.' ; 
+	private static final char keySeparator = '.'; 
 
-	private final Logger log  ;
+	private static final Logger defaultLogger = Logger.getLogger(AdvancedProperties.class.getName());
+	
+	private final Logger log;
 	
 	public AdvancedProperties(Logger log) {
-		super() ;
-		this.log = log;
+		super();
+		if (log != null) {
+			this.log = log;
+		} else {
+			this.log = defaultLogger;
+		}
 	}
 
-	public AdvancedProperties(Properties properties, Logger l) {
+	public AdvancedProperties(Properties properties, Logger log) {
 		super(properties);
-		this.log = l ;
+		if (log != null) {
+			this.log = log;
+		} else {
+			this.log = defaultLogger;
+		}
 	}
 	
 	// Get all key elements following a root key

@@ -32,6 +32,7 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -44,6 +45,64 @@ import com.fasterxml.jackson.databind.JsonNode;
 class RunningContextTest {
 	
 	private static final String LOGGER_NAME = "org.fl.util.test1";
+	
+	@Test
+	void testRunningContextWithNullStringParam() throws JsonProcessingException {		
+		testRunningContextWithNullParam(() -> new RunningContext(null, null, (String)null));
+	}
+
+	@Test
+	void testRunningContextWithNullUriParam() throws JsonProcessingException {
+		testRunningContextWithNullParam(() -> new RunningContext(null, null, (URI)null));
+	}
+	
+	private void testRunningContextWithNullParam(Supplier<RunningContext> rcSupplier) throws JsonProcessingException {
+
+		LogRecordCounter propertiesStorageLogRecordCounter = 
+				FilterCounter.getLogRecordCounter(Logger.getLogger(PropertiesStorage.class.getName()));
+		
+		LogRecordCounter runningContextLogRecordCounter = 
+				FilterCounter.getLogRecordCounter(Logger.getLogger("org.fl"));
+		
+		RunningContext rc = rcSupplier.get();
+		
+		assertThat(rc).isNotNull();
+		assertThat(rc.getName()).isEqualTo("org.fl");
+		
+		AdvancedProperties advancedProperties = rc.getProps();
+		assertThat(advancedProperties).isNotNull().isNotEmpty();
+		
+		assertThat(advancedProperties.get("buildOs"))
+			.isInstanceOfSatisfying(String.class, buildOs -> buildOs.contains("windows"));
+		
+		JsonNode buildInformation = rc.getBuildInformationAsJson();
+		assertThat(buildInformation).isNotNull();
+		
+		assertThat(buildInformation).isNotEmpty().hasSize(2)
+		.satisfiesExactlyInAnyOrder(
+				buildInfo -> { 
+					assertThat(buildInfo.get("moduleName")).isNotNull();
+					assertThat(buildInfo.get("moduleName").asText()).isEqualTo("org.fl");
+					assertThat(buildInfo.get("buildInformation")).isNotNull();
+					assertThat(buildInfo.get("buildInformation").asText()).isEqualTo("No build information");
+				},
+				buildInfo -> { 
+					assertThat(buildInfo.get("moduleName")).isNotNull();
+					assertThat(buildInfo.get("moduleName").asText()).isEqualTo("org.fl.util");
+					assertThat(buildInfo.get("version")).isNotNull();
+					assertThat(buildInfo.get("version").asText()).isNotEmpty();
+				}
+				);
+		
+		assertThat(rc.getInitializationDate()).isCloseTo(Instant.now(), within(2, ChronoUnit.SECONDS));
+		
+		assertThat(propertiesStorageLogRecordCounter.getLogRecordCount()).isEqualTo(2);
+		assertThat(propertiesStorageLogRecordCounter.getLogRecordCount(Level.WARNING)).isEqualTo(2);
+		
+		assertThat(runningContextLogRecordCounter.getLogRecordCount()).isEqualTo(4);
+		assertThat(runningContextLogRecordCounter.getLogRecordCount(Level.SEVERE)).isEqualTo(1);
+		assertThat(runningContextLogRecordCounter.getLogRecordCount(Level.WARNING)).isEqualTo(3);
+	}
 	
 	@Test
 	void testRunningContextWithRelativePath() throws JsonProcessingException {
