@@ -33,25 +33,22 @@ import java.util.logging.LogRecord;
 
 public class LogRecordMemoryBuffer {
 
-	private final static String datePattern = "uuuu-MM-dd HH:mm:ss.SSS ";
-	private final static String BLANK = " ";
-	private final static String NEWLINE = "\n";
-	private final static String SEPARATOR = ": ";
+	private static final String DATE_PATTERN = "uuuu-MM-dd HH:mm:ss.SSS ";
+	private static final String BLANK = " ";
+	private static final String NEWLINE = "\n";
+	private static final String SEPARATOR = ": ";
 
-	private static int MAX_PRINTED_CAUSE_LEVEL = 20;
+	private static final int MAX_PRINTED_CAUSE_LEVEL = 20;
+	private static final int MEAN_PRINTED_LOG_RECORD_SIZE = 200;
 
-	private static int MEAN_PRINTED_LOG_RECORD_SIZE = 200;
-
-	int maxLogRecord;
-
+	private int maxLogRecord;
 	private LinkedBlockingQueue<LogRecord> logRecordBuffer;
 
-	private DateTimeFormatter dateTimeFormatter;
+	private static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(DATE_PATTERN);
 
 	public LogRecordMemoryBuffer(int maxRecord) {
 
 		maxLogRecord = maxRecord;
-		dateTimeFormatter = DateTimeFormatter.ofPattern(datePattern);
 		logRecordBuffer = new LinkedBlockingQueue<LogRecord>(maxRecord);
 	}
 
