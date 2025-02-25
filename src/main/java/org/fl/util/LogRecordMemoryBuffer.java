@@ -1,3 +1,27 @@
+/*
+ * MIT License
+
+Copyright (c) 2017, 2025 Frederic Lefevre
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
+
 package org.fl.util;
 
 import java.time.Instant;
@@ -9,114 +33,117 @@ import java.util.logging.LogRecord;
 
 public class LogRecordMemoryBuffer {
 
-	private final static String datePattern = "uuuu-MM-dd HH:mm:ss.SSS " ;
-	private final static String BLANK 	  = " " ;
-	private final static String NEWLINE   = "\n" ;
-	private final static String SEPARATOR = ": " ;
-	
-	private static int MAX_PRINTED_CAUSE_LEVEL = 20 ;
-	
-	private static int MEAN_PRINTED_LOG_RECORD_SIZE = 200 ;
-	
-	int maxLogRecord ;
-	
-	private LinkedBlockingQueue<LogRecord> logRecordBuffer ;
-	
-	private DateTimeFormatter dateTimeFormatter ;
-	
+	private final static String datePattern = "uuuu-MM-dd HH:mm:ss.SSS ";
+	private final static String BLANK = " ";
+	private final static String NEWLINE = "\n";
+	private final static String SEPARATOR = ": ";
+
+	private static int MAX_PRINTED_CAUSE_LEVEL = 20;
+
+	private static int MEAN_PRINTED_LOG_RECORD_SIZE = 200;
+
+	int maxLogRecord;
+
+	private LinkedBlockingQueue<LogRecord> logRecordBuffer;
+
+	private DateTimeFormatter dateTimeFormatter;
+
 	public LogRecordMemoryBuffer(int maxRecord) {
-		
-		maxLogRecord = maxRecord ;
-		dateTimeFormatter = DateTimeFormatter.ofPattern(datePattern) ;
-		logRecordBuffer = new LinkedBlockingQueue<LogRecord>(maxRecord) ;
+
+		maxLogRecord = maxRecord;
+		dateTimeFormatter = DateTimeFormatter.ofPattern(datePattern);
+		logRecordBuffer = new LinkedBlockingQueue<LogRecord>(maxRecord);
 	}
-	
+
 	// Add a log record (remove oldest log records to make space if necessary)
 	public synchronized void addLogRecord(LogRecord logRecord) {
-		
-		// Try to add the log and as long as there is no space, remove the oldest element
+
+		// Try to add the log and as long as there is no space, remove the oldest
+		// element
 		while (!logRecordBuffer.offer(logRecord)) {
-			 
+
 			// remove the oldest element
-			logRecordBuffer.poll() ;
+			logRecordBuffer.poll();
 		}
-		
+
 	}
 	
 	public StringBuilder getFormattedRecords() {
-		
-		StringBuilder result = new StringBuilder(logRecordBuffer.size()*MEAN_PRINTED_LOG_RECORD_SIZE) ;
-		synchronized(logRecordBuffer) {
-			
+
+		StringBuilder result = new StringBuilder(logRecordBuffer.size() * MEAN_PRINTED_LOG_RECORD_SIZE);
+		synchronized (logRecordBuffer) {
+
 			if (logRecordBuffer.size() > 0) {
 				for (LogRecord rec : logRecordBuffer) {
-					appendLogRecord(result, rec) ;
+					appendLogRecord(result, rec);
 				}
 			}
 		}
-		return result ;
+		return result;
 	}
-	
+
 	public StringBuilder getAndDeleteFormattedRecords() {
-		
-		StringBuilder result = new StringBuilder(logRecordBuffer.size()*MEAN_PRINTED_LOG_RECORD_SIZE) ;
-		synchronized(logRecordBuffer) {
-			
+
+		StringBuilder result = new StringBuilder(logRecordBuffer.size() * MEAN_PRINTED_LOG_RECORD_SIZE);
+		synchronized (logRecordBuffer) {
+
 			if (logRecordBuffer.size() > 0) {
-				LogRecord recd ;
+				LogRecord recd;
 				while ((recd = logRecordBuffer.poll()) != null) {
-					appendLogRecord(result, recd) ;
+					appendLogRecord(result, recd);
 				}
 			}
 		}
-		return result ;
+		return result;
 	}
 	
 	private void appendLogRecord(StringBuilder lBuff, LogRecord record) {
-		// StringBuilder is always converting its argument to a String, even if it is a char
+		// StringBuilder is always converting its argument to a String, even if it is a
+		// char
 		// so it is better to always append String
-		
-		lBuff.append(dateTimeFormatter.format(LocalDateTime.ofInstant(Instant.ofEpochMilli(record.getMillis()), ZoneId.systemDefault()))) ;
-		lBuff.append(record.getSequenceNumber()).append(BLANK) ;
-		lBuff.append(record.getLoggerName()).append(BLANK) ;
-		String srcClassName = record.getSourceClassName() ;
+
+		lBuff.append(dateTimeFormatter
+				.format(LocalDateTime.ofInstant(Instant.ofEpochMilli(record.getMillis()), ZoneId.systemDefault())));
+		lBuff.append(record.getSequenceNumber()).append(BLANK);
+		lBuff.append(record.getLoggerName()).append(BLANK);
+		String srcClassName = record.getSourceClassName();
 		if (srcClassName != null) {
-			lBuff.append(record.getSourceClassName()).append(BLANK) ;
+			lBuff.append(record.getSourceClassName()).append(BLANK);
 		}
-		String methodName = record.getSourceMethodName() ;
+		String methodName = record.getSourceMethodName();
 		if (methodName != null) {
-			lBuff.append(record.getSourceMethodName()) ;
+			lBuff.append(record.getSourceMethodName());
 		}
-		lBuff.append(NEWLINE) ;
-		lBuff.append(record.getLevel().getName()).append(SEPARATOR) ;
-		lBuff.append(record.getMessage()).append(NEWLINE) ;
-		
-		Throwable thrown = record.getThrown() ;
+		lBuff.append(NEWLINE);
+		lBuff.append(record.getLevel().getName()).append(SEPARATOR);
+		lBuff.append(record.getMessage()).append(NEWLINE);
+
+		Throwable thrown = record.getThrown();
 		if (thrown != null) {
-			String thrownMsg = thrown.toString() ;
-			if ((thrownMsg != null) && (! thrownMsg.isEmpty())) {
-				lBuff.append(ExceptionLogging.printExceptionInfos(thrown, MAX_PRINTED_CAUSE_LEVEL)).append(NEWLINE) ;
+			String thrownMsg = thrown.toString();
+			if ((thrownMsg != null) && (!thrownMsg.isEmpty())) {
+				lBuff.append(ExceptionLogging.printExceptionInfos(thrown, MAX_PRINTED_CAUSE_LEVEL)).append(NEWLINE);
 			}
 		}
-		lBuff.append(NEWLINE) ;
+		lBuff.append(NEWLINE);
 	}
 
 	public int remainingCapacity() {
-		return logRecordBuffer.remainingCapacity() ;
+		return logRecordBuffer.remainingCapacity();
 	}
-	
+
 	public int logRecordNumber() {
-		return logRecordBuffer.size() ;
+		return logRecordBuffer.size();
 	}
-	
+
 	public void clear() {
 		logRecordBuffer.clear();
 	}
 	
 	public void clearAndResize(int maxRecord) {
 		logRecordBuffer.clear();
-		maxLogRecord = maxRecord ;
-		logRecordBuffer = new LinkedBlockingQueue<LogRecord>(maxRecord) ;
+		maxLogRecord = maxRecord;
+		logRecordBuffer = new LinkedBlockingQueue<LogRecord>(maxRecord);
 
 	}
 
