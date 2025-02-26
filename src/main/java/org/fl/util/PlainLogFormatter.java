@@ -32,7 +32,7 @@ import java.util.logging.LogRecord;
 
 public class PlainLogFormatter extends Formatter {
 
-	private static final String DATE_PATTERN = "uuuu-MM-dd HH:mm:ss.SSS ";
+	private static final String DATE_PATTERN = "uuuu-MM-dd HH:mm:ss.SSS v ";
 
 	private static final String BLANK = " ";
 	private static final String NEWLINE = "\n";
