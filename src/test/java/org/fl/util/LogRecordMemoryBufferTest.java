@@ -180,4 +180,10 @@ class LogRecordMemoryBufferTest {
 			.isEqualTo(logMemoryBuffer.remainingCapacity())
 			.isEqualTo(newSize);
 	}
+	
+	@Test
+	void testZeroBufferSize() {
+		
+		assertThatIllegalArgumentException().isThrownBy(() -> new LogRecordMemoryBuffer(0));
+	}
 }
