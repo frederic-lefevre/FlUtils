@@ -98,7 +98,7 @@ class LogRecordMemoryBufferTest {
 		logRecord.setSequenceNumber(dummySequenceNumber);
 		
 		
-		String logRecordExpectedDateTime = DateTimeFormatter.ofPattern(LogRecordMemoryBuffer.DATE_PATTERN)
+		String logRecordExpectedDateTime = DateTimeFormatter.ofPattern(logMemoryBuffer.getDatePatternFormat())
 				.format(ZonedDateTime.ofInstant(logRecord.getInstant(), ZoneId.systemDefault()));
 		assertThat(logRecord.getInstant()).isCloseTo(Instant.now(), within(2, ChronoUnit.SECONDS));
 		

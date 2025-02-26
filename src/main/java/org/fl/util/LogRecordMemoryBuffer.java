@@ -24,26 +24,17 @@ SOFTWARE.
 
 package org.fl.util;
 
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.LogRecord;
 
 public class LogRecordMemoryBuffer {
 
-	protected static final String DATE_PATTERN = "uuuu-MM-dd HH:mm:ss.SSS ";
-	private static final String BLANK = " ";
-	private static final String NEWLINE = "\n";
-	private static final String SEPARATOR = ": ";
-
-	private static final int MAX_PRINTED_CAUSE_LEVEL = 20;
 	private static final int MEAN_PRINTED_LOG_RECORD_SIZE = 200;
 
 	private int maxLogRecord;
 	private LinkedBlockingQueue<LogRecord> logRecordBuffer;
 
-	private static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(DATE_PATTERN);
+	private static final PlainLogFormatter logRecordFormatter = new PlainLogFormatter();
 
 	public LogRecordMemoryBuffer(int maxRecord) {
 
@@ -84,9 +75,9 @@ public class LogRecordMemoryBuffer {
 		synchronized (logRecordBuffer) {
 
 			if (logRecordBuffer.size() > 0) {
-				LogRecord recd;
-				while ((recd = logRecordBuffer.poll()) != null) {
-					appendLogRecord(result, recd);
+				LogRecord logRecord;
+				while ((logRecord = logRecordBuffer.poll()) != null) {
+					result.append(logRecordFormatter.format(logRecord));
 				}
 			}
 		}
@@ -94,33 +85,7 @@ public class LogRecordMemoryBuffer {
 	}
 	
 	private void appendLogRecord(StringBuilder lBuff, LogRecord record) {
-		// StringBuilder is always converting its argument to a String, even if it is a
-		// char
-		// so it is better to always append String
-
-		lBuff.append(dateTimeFormatter.format(ZonedDateTime.ofInstant(record.getInstant(), ZoneId.systemDefault())));
-		lBuff.append(record.getSequenceNumber()).append(BLANK);
-		lBuff.append(record.getLoggerName()).append(BLANK);
-		String srcClassName = record.getSourceClassName();
-		if (srcClassName != null) {
-			lBuff.append(record.getSourceClassName()).append(BLANK);
-		}
-		String methodName = record.getSourceMethodName();
-		if (methodName != null) {
-			lBuff.append(record.getSourceMethodName());
-		}
-		lBuff.append(NEWLINE);
-		lBuff.append(record.getLevel().getName()).append(SEPARATOR);
-		lBuff.append(record.getMessage()).append(NEWLINE);
-
-		Throwable thrown = record.getThrown();
-		if (thrown != null) {
-			String thrownMsg = thrown.toString();
-			if ((thrownMsg != null) && (!thrownMsg.isEmpty())) {
-				lBuff.append(ExceptionLogging.printExceptionInfos(thrown, MAX_PRINTED_CAUSE_LEVEL)).append(NEWLINE);
-			}
-		}
-		lBuff.append(NEWLINE);
+		lBuff.append(logRecordFormatter.format(record));
 	}
 
 	public int remainingCapacity() {
@@ -144,5 +109,9 @@ public class LogRecordMemoryBuffer {
 
 	public int getMaxLogRecord() {
 		return maxLogRecord;
+	}
+	
+	protected String getDatePatternFormat() {
+		return logRecordFormatter.getDateFormatPattern();
 	}
 }
