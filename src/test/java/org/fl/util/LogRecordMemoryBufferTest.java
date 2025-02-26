@@ -94,7 +94,7 @@ class LogRecordMemoryBufferTest {
 
 		logRecord.setLoggerName(loggerName);
 		logRecord.setSourceClassName(LogRecordMemoryBufferTest.class.getName());
-		logRecord.setSourceMethodName("testLogErrorContent");
+		logRecord.setSourceMethodName(sourceMethod);
 		logRecord.setSequenceNumber(dummySequenceNumber);
 		
 		
@@ -112,10 +112,6 @@ class LogRecordMemoryBufferTest {
 			.contains(sourceMethod)
 			.contains(Long.toString(dummySequenceNumber))
 			.contains(logRecordExpectedDateTime);
-		
-		
-		
-		System.out.print(logMemoryBuffer.getFormattedRecords());
 	}
 	
 	@Test
