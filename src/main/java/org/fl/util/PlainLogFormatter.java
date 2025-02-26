@@ -24,9 +24,8 @@ SOFTWARE.
 
 package org.fl.util;
 
-import java.time.Instant;
-import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.logging.Formatter;
 import java.util.logging.LogRecord;
@@ -74,7 +73,7 @@ public class PlainLogFormatter extends Formatter {
 		// so it is better to always append String
 		StringBuilder lBuff = new StringBuilder(recordAllocSize);
 		lBuff.append(dateTimeFormatter
-				.format(LocalDateTime.ofInstant(Instant.ofEpochMilli(record.getMillis()), ZoneId.systemDefault())));
+				.format(ZonedDateTime.ofInstant(record.getInstant(), ZoneId.systemDefault())));
 		lBuff.append(record.getSequenceNumber()).append(BLANK);
 		lBuff.append(record.getLoggerName()).append(BLANK);
 
