@@ -81,4 +81,23 @@ class PlainLogFormatterTest {
 			.contains(exceptionMessage)
 			.contains(expectedStackTraceFragment);
 	}
+	
+
+	@Test
+	void testMinimalLogErrorFormat() {
+		
+		PlainLogFormatter plainLogFormatter = new PlainLogFormatter();
+		
+		LogRecord logRecord = new LogRecord(Level.WARNING, null);		
+		assertThat(logRecord).isNotNull();
+		
+		String logRecordExpectedDateTime = DateTimeFormatter.ofPattern(plainLogFormatter.getDateFormatPattern())
+				.format(ZonedDateTime.ofInstant(logRecord.getInstant(), ZoneId.systemDefault()));
+		
+		String formattedLogRecord = plainLogFormatter.format(logRecord);
+		assertThat(formattedLogRecord)
+			.isNotNull()
+			.contains(logRecordExpectedDateTime)
+			.contains("WARNING: null");
+	}
 }

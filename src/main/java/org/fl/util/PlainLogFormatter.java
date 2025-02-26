@@ -27,6 +27,7 @@ package org.fl.util;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Optional;
 import java.util.logging.Formatter;
 import java.util.logging.LogRecord;
 
@@ -58,7 +59,9 @@ public class PlainLogFormatter extends Formatter {
 	public String format(LogRecord record) {
 
 		String msgFormattedWithParam = formatMessage(record);
-		int recordAllocSize = MIN_PRINTED_LOG_RECORD_SIZE + msgFormattedWithParam.length();
+		
+		// Prevent any NPE: a LogRecord with null message can be created and formatMessage() will return null
+		int recordAllocSize = MIN_PRINTED_LOG_RECORD_SIZE + Optional.ofNullable(msgFormattedWithParam).map(s -> s.length()).orElse(0);
 
 		String exceptionMsg = null;
 		Throwable thrown = record.getThrown();
@@ -88,6 +91,8 @@ public class PlainLogFormatter extends Formatter {
 			lBuff.append(record.getSourceMethodName());
 		}
 		lBuff.append(NEWLINE);
+		
+		// record.getLevel() cannot be null (trying to set level to null triggers a NPE)
 		lBuff.append(record.getLevel().getName()).append(SEPARATOR);
 		lBuff.append(msgFormattedWithParam).append(NEWLINE);
 
