@@ -26,6 +26,11 @@ package org.fl.util;
 
 import static org.assertj.core.api.Assertions.*;
 
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.function.IntFunction;
 import java.util.logging.Level;
@@ -36,7 +41,7 @@ import java.util.stream.IntStream;
 import org.junit.jupiter.api.Test;
 
 class LogRecordMemoryBufferTest {
-
+	
 	@Test
 	void testCreateBuffer() {
 		
@@ -75,7 +80,37 @@ class LogRecordMemoryBufferTest {
 		assertThat(logMemoryBuffer.getFormattedRecords()).isNotNull().isEmpty();
 	}
 	
+	@Test
+	void testLogErrorContent() {
+		
+		int bufferSize = 3;
+		LogRecordMemoryBuffer logMemoryBuffer = new LogRecordMemoryBuffer(bufferSize);
 
+		String loggerName = "org.fl.util.DummyLoggerName";
+		String recordMessage = "A record log message";
+		LogRecord logRecord = new LogRecord(Level.WARNING, recordMessage);
+
+		logRecord.setLoggerName(loggerName);
+		logRecord.setSourceClassName(LogRecordMemoryBufferTest.class.getName());
+		
+		logMemoryBuffer.addLogRecord(logRecord);
+		
+		String logRecordExpectedDateTime = DateTimeFormatter.ofPattern(LogRecordMemoryBuffer.DATE_PATTERN)
+				.format(ZonedDateTime.ofInstant(logRecord.getInstant(), ZoneId.systemDefault()));
+		assertThat(logRecord.getInstant()).isCloseTo(Instant.now(), within(2, ChronoUnit.SECONDS));
+		
+		assertThat(logMemoryBuffer.getFormattedRecords()).isNotNull()
+			.contains(recordMessage)
+			.contains(Level.WARNING.getName())
+			.contains(loggerName)
+			.contains(LogRecordMemoryBufferTest.class.getName())
+			.contains(logRecordExpectedDateTime);
+		
+		
+		
+		System.out.print(logMemoryBuffer.getFormattedRecords());
+	}
+	
 	@Test
 	void zeroCapacityShouldThrowExceptio() {
 		assertThatIllegalArgumentException().isThrownBy(() -> new LogRecordMemoryBuffer(0));

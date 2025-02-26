@@ -24,16 +24,15 @@ SOFTWARE.
 
 package org.fl.util;
 
-import java.time.Instant;
-import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.LogRecord;
 
 public class LogRecordMemoryBuffer {
 
-	private static final String DATE_PATTERN = "uuuu-MM-dd HH:mm:ss.SSS ";
+	protected static final String DATE_PATTERN = "uuuu-MM-dd HH:mm:ss.SSS ";
 	private static final String BLANK = " ";
 	private static final String NEWLINE = "\n";
 	private static final String SEPARATOR = ": ";
@@ -99,8 +98,7 @@ public class LogRecordMemoryBuffer {
 		// char
 		// so it is better to always append String
 
-		lBuff.append(dateTimeFormatter
-				.format(LocalDateTime.ofInstant(Instant.ofEpochMilli(record.getMillis()), ZoneId.systemDefault())));
+		lBuff.append(dateTimeFormatter.format(ZonedDateTime.ofInstant(record.getInstant(), ZoneId.systemDefault())));
 		lBuff.append(record.getSequenceNumber()).append(BLANK);
 		lBuff.append(record.getLoggerName()).append(BLANK);
 		String srcClassName = record.getSourceClassName();
