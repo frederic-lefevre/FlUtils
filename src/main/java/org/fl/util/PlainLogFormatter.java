@@ -30,6 +30,9 @@ import java.time.format.DateTimeFormatter;
 import java.util.logging.Formatter;
 import java.util.logging.LogRecord;
 
+// Close to the java.util.logging.SimpleFormatter
+// It has its own date format pattern including the time zone
+// It also includes the log record sequence number
 public class PlainLogFormatter extends Formatter {
 
 	private static final String DATE_PATTERN = "uuuu-MM-dd HH:mm:ss.SSS v ";
@@ -54,9 +57,8 @@ public class PlainLogFormatter extends Formatter {
 	@Override
 	public String format(LogRecord record) {
 
-		int recordAllocSize = MIN_PRINTED_LOG_RECORD_SIZE;
-		String msg = record.getMessage();
-		recordAllocSize = recordAllocSize + msg.length();
+		String msgFormattedWithParam = formatMessage(record);
+		int recordAllocSize = MIN_PRINTED_LOG_RECORD_SIZE + msgFormattedWithParam.length();
 
 		String exceptionMsg = null;
 		Throwable thrown = record.getThrown();
@@ -87,7 +89,7 @@ public class PlainLogFormatter extends Formatter {
 		}
 		lBuff.append(NEWLINE);
 		lBuff.append(record.getLevel().getName()).append(SEPARATOR);
-		lBuff.append(msg).append(NEWLINE);
+		lBuff.append(msgFormattedWithParam).append(NEWLINE);
 
 		if (exceptionMsg != null) {
 			lBuff.append(exceptionMsg).append(NEWLINE);

@@ -25,8 +25,8 @@ SOFTWARE.
 package org.fl.util;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.assertj.core.api.Assertions.within;
 
+import java.text.MessageFormat;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -45,31 +45,33 @@ class PlainLogFormatterTest {
 		PlainLogFormatter plainLogFormatter = new PlainLogFormatter();
 		
 		String loggerName = "org.fl.util.DummyLoggerName";
-		String recordMessage = "A record log message";
+		String recordMessage = "A record log message with parameters: {0} {1}";
+		Object[] parameters = new Object[] { "mon paramètre", 987 };
 		LogRecord logRecord = new LogRecord(Level.WARNING, recordMessage);
 		String sourceMethod = "testLogErrorFormat";
 		String exceptionMessage = "An special exception message";
 		long dummySequenceNumber = System.currentTimeMillis() - 1234;
-
+		
 		logRecord.setLoggerName(loggerName);
 		logRecord.setSourceClassName(PlainLogFormatterTest.class.getName());
 		logRecord.setSourceMethodName(sourceMethod);
 		logRecord.setSequenceNumber(dummySequenceNumber);
+		logRecord.setParameters(parameters);
 		
 		logRecord.setThrown(new IllegalArgumentException(exceptionMessage));
-		
 		
 		String logRecordExpectedDateTime = DateTimeFormatter.ofPattern(plainLogFormatter.getDateFormatPattern())
 				.format(ZonedDateTime.ofInstant(logRecord.getInstant(), ZoneId.systemDefault()));
 		
 		assertThat(logRecord.getInstant()).isCloseTo(Instant.now(), within(2, ChronoUnit.SECONDS));
 		
+		String expectedFormattedMessage = MessageFormat.format(recordMessage, parameters);
 		String expectedStackTraceFragment = "at org.junit.platform.commons.util.ReflectionUtils invokeMethod";
 		
 		String formattedLogRecord = plainLogFormatter.format(logRecord);
 		assertThat(formattedLogRecord)
 			.isNotNull()
-			.contains(recordMessage)
+			.contains(expectedFormattedMessage)
 			.contains(Level.WARNING.getName())
 			.contains(loggerName)
 			.contains(PlainLogFormatterTest.class.getName())
@@ -78,7 +80,5 @@ class PlainLogFormatterTest {
 			.contains(logRecordExpectedDateTime)
 			.contains(exceptionMessage)
 			.contains(expectedStackTraceFragment);
-		
-		System.out.print(formattedLogRecord);
 	}
 }
