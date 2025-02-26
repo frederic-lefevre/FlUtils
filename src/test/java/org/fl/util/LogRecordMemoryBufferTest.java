@@ -89,21 +89,28 @@ class LogRecordMemoryBufferTest {
 		String loggerName = "org.fl.util.DummyLoggerName";
 		String recordMessage = "A record log message";
 		LogRecord logRecord = new LogRecord(Level.WARNING, recordMessage);
+		String sourceMethod = "testLogErrorContent";
+		long dummySequenceNumber = System.currentTimeMillis() - 1234;
 
 		logRecord.setLoggerName(loggerName);
 		logRecord.setSourceClassName(LogRecordMemoryBufferTest.class.getName());
+		logRecord.setSourceMethodName("testLogErrorContent");
+		logRecord.setSequenceNumber(dummySequenceNumber);
 		
-		logMemoryBuffer.addLogRecord(logRecord);
 		
 		String logRecordExpectedDateTime = DateTimeFormatter.ofPattern(LogRecordMemoryBuffer.DATE_PATTERN)
 				.format(ZonedDateTime.ofInstant(logRecord.getInstant(), ZoneId.systemDefault()));
 		assertThat(logRecord.getInstant()).isCloseTo(Instant.now(), within(2, ChronoUnit.SECONDS));
+		
+		logMemoryBuffer.addLogRecord(logRecord);
 		
 		assertThat(logMemoryBuffer.getFormattedRecords()).isNotNull()
 			.contains(recordMessage)
 			.contains(Level.WARNING.getName())
 			.contains(loggerName)
 			.contains(LogRecordMemoryBufferTest.class.getName())
+			.contains(sourceMethod)
+			.contains(Long.toString(dummySequenceNumber))
 			.contains(logRecordExpectedDateTime);
 		
 		
