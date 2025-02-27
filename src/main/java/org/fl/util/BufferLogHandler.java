@@ -27,6 +27,8 @@ package org.fl.util;
 import java.util.logging.Handler;
 import java.util.logging.LogRecord;
 
+// Contrary to java.util.logging.MemoryBuffer, BufferLogHandler has no target handler
+// So log records which are not picked on time are lost
 public class BufferLogHandler extends Handler {
 
 	private LogRecordMemoryBuffer logRecordBuffer;
@@ -41,7 +43,9 @@ public class BufferLogHandler extends Handler {
 
 	@Override
 	public void publish(LogRecord record) {
-		logRecordBuffer.addLogRecord(record);
+		if (isLoggable(record)) {
+			logRecordBuffer.addLogRecord(record);
+		}
 	}
 
 	@Override
