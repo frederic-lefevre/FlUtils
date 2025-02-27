@@ -195,7 +195,7 @@ class LoggerManagerTest {
 				}
 			);
 		
-		// Log a message
+		// Log a INFO message
 		String logMessage = "essai de log dans le BufferLogHandler";
 		logger.info(logMessage);
 		
@@ -212,5 +212,9 @@ class LoggerManagerTest {
 		assertThat(logMgr.deleteMemoryLogsAndResize(105)).isNotNull()
 			.contains("0 log records removed")
 			.contains("Maximum number of records resized to 105");
+		
+		logger.fine("Should not be published");
+		// Check memory log is empty
+		assertThat(logMgr.getMemoryLogs()).isNotNull().isEmpty();
 	}
 }
