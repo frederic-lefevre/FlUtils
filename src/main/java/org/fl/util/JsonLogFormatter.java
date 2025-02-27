@@ -33,7 +33,7 @@ import java.util.logging.LogRecord;
 
 public class JsonLogFormatter extends Formatter {
 
-	private final static String datePattern = "dd/MM/uuuu hh:mm:ss.SSS";
+	private final static String datePattern = "uuuu-MM-dd HH:mm:ss.SSS v ";
 
 	private final static String SEP = "\",";
 	private final static String DATE = "\"date\":\"";
