@@ -38,77 +38,77 @@ import org.fl.util.swing.text.TextAreaElementList;
 
 public class LogRecordAreas {
 
-	private final JTextComponent 					 textComponent ;
-	private final Logger		 					 lLog ;
-	private HashMap<Level,TextAreaElementList> 		 logRecordAreas ;
+	private final JTextComponent textComponent;
+	private final Logger lLog;
+	private HashMap<Level, TextAreaElementList> logRecordAreas;
+
+	private final int lastNonHighLighedLevel;
+	private final Color colorForHigLevelRecords;
+	private final ArrayList<LogHighLightListener> highLightListeners;
 	
-	private final int 								 lastNonHighLighedLevel ;
-	private final Color 							 colorForHigLevelRecords ;
-	private final ArrayList<LogHighLightListener> 	 highLightListeners ;
-	
-	private boolean hasHighLight ;
-	
+	private boolean hasHighLight;
+
 	public LogRecordAreas(JTextComponent tc, int lvl, Color c, Logger l) {
-		textComponent  	   = tc ;
-		lLog		   	   = l ;
-		logRecordAreas	   = new HashMap<Level,TextAreaElementList>() ;
-		highLightListeners = new ArrayList<LogHighLightListener>() ;
-		
-		lastNonHighLighedLevel 	= lvl ;
-		colorForHigLevelRecords	= c ;
-		hasHighLight			= false ;
+		textComponent = tc;
+		lLog = l;
+		logRecordAreas = new HashMap<Level, TextAreaElementList>();
+		highLightListeners = new ArrayList<LogHighLightListener>();
+
+		lastNonHighLighedLevel = lvl;
+		colorForHigLevelRecords = c;
+		hasHighLight = false;
 	}
 	
 	public void addLogRecordArea(TextAreaElement recordArea, Level recordLevel) {
-		
-		TextAreaElementList recordsForTheSameLevel = logRecordAreas.get(recordLevel) ;
-		Color highLightRecord = null ;
+
+		TextAreaElementList recordsForTheSameLevel = logRecordAreas.get(recordLevel);
+		Color highLightRecord = null;
 		if (recordLevel.intValue() > lastNonHighLighedLevel) {
-			highLightRecord = colorForHigLevelRecords ;
+			highLightRecord = colorForHigLevelRecords;
 		}
-		if (recordsForTheSameLevel == null) {			
-			recordsForTheSameLevel = new TextAreaElementList(textComponent, recordLevel.getName(), highLightRecord, lLog) ;	    			    	
-			logRecordAreas.put(recordLevel, recordsForTheSameLevel) ;
+		if (recordsForTheSameLevel == null) {
+			recordsForTheSameLevel = new TextAreaElementList(textComponent, recordLevel.getName(), highLightRecord, lLog);
+			logRecordAreas.put(recordLevel, recordsForTheSameLevel);
 		}
-		
-		if ((! hasHighLight) && (highLightRecord != null))  {
-			
-			hasHighLight = true ;
+
+		if ((!hasHighLight) && (highLightRecord != null)) {
+
+			hasHighLight = true;
 			for (LogHighLightListener highLightListener : highLightListeners) {
-				highLightListener.logsHightLighted(true) ;
+				highLightListener.logsHightLighted(true);
 			}
 		}
-		recordsForTheSameLevel.addTextElement(recordArea) ;		
+		recordsForTheSameLevel.addTextElement(recordArea);
 	}
 	
 	public Set<Level> getRecordLevels() {
-		return logRecordAreas.keySet() ;
+		return logRecordAreas.keySet();
 	}
-	
+
 	public TextAreaElementList getLogRecordsForThisLevel(Level level) {
-		return logRecordAreas.get(level) ;
+		return logRecordAreas.get(level);
 	}
-	
+
 	public void addHighLightListener(LogHighLightListener highLightListener) {
-		highLightListeners.add(highLightListener) ;
+		highLightListeners.add(highLightListener);
 	}
-	
+
 	public boolean hasHighlight() {
-		return hasHighLight ;
+		return hasHighLight;
 	}
-	
+
 	public void removeHighLight() {
 		for (TextAreaElementList elementList : logRecordAreas.values()) {
-			elementList.removeHighLights() ;
+			elementList.removeHighLights();
 		}
 		for (LogHighLightListener highLightListener : highLightListeners) {
-			highLightListener.logsHightLighted(false) ;
+			highLightListener.logsHightLighted(false);
 		}
-		hasHighLight = false ;
+		hasHighLight = false;
 	}
 
 	public void clear() {
-		removeHighLight() ;
-		logRecordAreas 	= new HashMap<Level,TextAreaElementList>() ;		
+		removeHighLight();
+		logRecordAreas = new HashMap<Level, TextAreaElementList>();
 	}
 }
