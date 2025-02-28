@@ -41,11 +41,10 @@ import org.fl.util.swing.logPane.LogsDisplayPane;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 public class ApplicationTabbedPane extends JTabbedPane {
-
-	private static final Logger logger = Logger.getLogger(ApplicationTabbedPane.class.getName());
 			
 	private static final long serialVersionUID = 1L;
 
+	private final Logger logger;
 	private ApplicationInfoPane appInfoPane;
 	private LogsDisplayPane logsDisplayPane;
 
@@ -55,6 +54,9 @@ public class ApplicationTabbedPane extends JTabbedPane {
 	public ApplicationTabbedPane(RunningContext runningContext) {
 		super();
 
+		// Get the root logger for the application
+		logger = Logger.getLogger(runningContext.getName());
+		
 		AdvancedProperties props = runningContext.getProps();
 		logTabHighLightColor = props.getColor("appTabbedPane.logging.logTabHighLightColor", Color.RED);
 
