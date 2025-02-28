@@ -24,10 +24,14 @@ SOFTWARE.
 
 package org.fl.util;
 
+import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.List;
 import java.util.logging.Formatter;
 import java.util.logging.Handler;
 import java.util.logging.Level;
+import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -39,6 +43,20 @@ public class LoggerUtils {
 
 	private LoggerUtils() {
 		// Hide constructor
+	}
+	
+	public static List<String> getChildLoggerNames(String loggerNameSpace) {
+		
+		List<String> childLoggerNames = new ArrayList<>();
+		
+		Enumeration<String> loggerNames = LogManager.getLogManager().getLoggerNames();
+		while (loggerNames.hasMoreElements()) {
+			String loggerName = loggerNames.nextElement();
+			if (loggerName.startsWith(loggerNameSpace)) {
+				childLoggerNames.add(loggerName);
+			}
+		}
+		return childLoggerNames;
 	}
 	
 	// Get a JsonObject representing the levels of a logger (and all levels of its
