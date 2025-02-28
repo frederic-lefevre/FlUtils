@@ -39,7 +39,7 @@ public class LogsDisplayPane  extends JTabbedPane {
 	private static final long serialVersionUID = 1L;
 
 	private final ArrayList<SearchableLogDisplay> searchableLogDisplays;
-	private final TextAreaLogHandler logTextAreaHandler;
+	private final TextAreaLogHandler textAreaLogHandler;
 
 	private int oldLogLastNum;
 	private int currentLogDisplayIndex;
@@ -80,11 +80,11 @@ public class LogsDisplayPane  extends JTabbedPane {
 		logTabRegularColor = getBackgroundAt(0);
 		selectCurrentLogDisplay();
 
-		logTextAreaHandler = new TextAreaLogHandler(currentLogDisplay, new SearchLogDisplayChanger());
-		logTextAreaHandler.setLevel(logger.getLevel());
-		logTextAreaHandler.setLogDisplayMaxLength(logDisplayMaxLength);
-		logTextAreaHandler.setFormatter(runningContext.getCommonLogFormatter());
-		logger.addHandler(logTextAreaHandler);
+		textAreaLogHandler = new TextAreaLogHandler(currentLogDisplay, new SearchLogDisplayChanger());
+		textAreaLogHandler.setLevel(logger.getLevel());
+		textAreaLogHandler.setLogDisplayMaxLength(logDisplayMaxLength);
+		textAreaLogHandler.setFormatter(runningContext.getCommonLogFormatter());
+		logger.addHandler(textAreaLogHandler);
 	}
 
 	public boolean hasHighlight() {
