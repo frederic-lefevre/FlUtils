@@ -42,54 +42,48 @@ public class JsonLogFormatter extends Formatter {
 
 	private static int MAX_PRINTED_CAUSE_LEVEL = 20;
 	
-	private static final String DATE_PATTERN = "uuuu-MM-dd HH:mm:ss.SSS v ";
-
-	private static final String DATE = "date";
-	private static final String SEQ_NUM = "sequenceNumber";
-	private static final String LOGGER_NAME = "loggerName";
-	private static final String LEVEL = "level";
-	private static final String CLASS_NAME = "class";
-	private static final String METHOD_NAME = "method";
-	private static final String MESSAGE = "message";
-	private static final String EXCEPTION = "exception";
-	
 	private DateTimeFormatter dateTimeFormatter;
 
 	private static final Logger safeLogger = Logger.getLogger("");
 	
 	public JsonLogFormatter() {
 		super();
-		dateTimeFormatter = DateTimeFormatter.ofPattern(DATE_PATTERN);
+		dateTimeFormatter = DateTimeFormatter.ofPattern(LogRecordForJson.DATE_PATTERN);
 	}
 
+	protected String getDateFormatPattern() {
+		return LogRecordForJson.DATE_PATTERN;
+	}
+	
 	@Override
 	public String format(LogRecord record) {
 
+		// Build manually to be faster
 		ObjectNode jsonLogRecord = JsonNodeFactory.instance.objectNode();
 		
 		jsonLogRecord.put(
-				DATE, 
+				LogRecordForJson.DATE, 
 				dateTimeFormatter.format(ZonedDateTime.ofInstant(record.getInstant(), ZoneId.systemDefault())));
-		jsonLogRecord.put(SEQ_NUM, record.getSequenceNumber());
-		jsonLogRecord.put(LOGGER_NAME, record.getLoggerName());
+		jsonLogRecord.put(LogRecordForJson.SEQ_NUM, record.getSequenceNumber());
+		jsonLogRecord.put(LogRecordForJson.LOGGER_NAME, record.getLoggerName());
 		
 		String srcClassName = record.getSourceClassName();
 		if (srcClassName != null) {
-			jsonLogRecord.put(CLASS_NAME, srcClassName);
+			jsonLogRecord.put(LogRecordForJson.CLASS_NAME, srcClassName);
 		}
 		String methodName = record.getSourceMethodName();
 		if (methodName != null) {
-			jsonLogRecord.put(METHOD_NAME, methodName);
+			jsonLogRecord.put(LogRecordForJson.METHOD_NAME, methodName);
 		}
 		
 		// record.getLevel() cannot be null (trying to set level to null triggers a NPE)
-		jsonLogRecord.put(LEVEL, record.getLevel().getName());
+		jsonLogRecord.put(LogRecordForJson.LEVEL, record.getLevel().getName());
 		
-		jsonLogRecord.put(MESSAGE, formatMessage(record));
+		jsonLogRecord.put(LogRecordForJson.MESSAGE, formatMessage(record));
 		
 		Throwable thrown = record.getThrown();
 		if (thrown != null) {
-			jsonLogRecord.put(EXCEPTION, ExceptionLogging.printExceptionInfos(thrown, MAX_PRINTED_CAUSE_LEVEL));
+			jsonLogRecord.put(LogRecordForJson.EXCEPTION, ExceptionLogging.printExceptionInfos(thrown, MAX_PRINTED_CAUSE_LEVEL));
 			
 		}
 		
