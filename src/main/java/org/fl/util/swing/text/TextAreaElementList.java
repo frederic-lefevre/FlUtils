@@ -37,46 +37,46 @@ import javax.swing.text.Highlighter.HighlightPainter;
 
 public class TextAreaElementList {
 
-	private final String 				name ;
-	private final JTextComponent 		textComponent ;
-	private final Logger		 		lLog ;
-	private final List<TextAreaElement>	textElements ;
-	
-	private int 					   	currentTextElement ;
-	
-	private final Highlighter 			highLighter ;
-	
+	private final String name;
+	private final JTextComponent textComponent;
+	private final Logger lLog;
+	private final List<TextAreaElement> textElements;
+
+	private int currentTextElement;
+
+	private final Highlighter highLighter;
+
 	// HighLights for all elements
-	private final HighlightPainter 		painter ;
-	private final Color  				highLightColor ;
-	private List<Object> 		   		currentHighLights ;
-		
+	private final HighlightPainter painter;
+	private final Color highLightColor;
+	private List<Object> currentHighLights;
+
 	// HighLights for current element
-	private Object					   	currentElementHighLight ;
-	private final HighlightPainter 		currentElementPainter ;
+	private Object currentElementHighLight;
+	private final HighlightPainter currentElementPainter;
 	
 	private static Color currentElementHighLightColor = Color.GREEN;
 	
 	public TextAreaElementList(JTextComponent tc, String n, Color hlc, Logger l) {
-		name			   = n ;
-		textComponent 	   = tc ;
-		highLightColor     = hlc ;
-		lLog			   = l ;
-		textElements	   = new ArrayList<>() ;
-		currentTextElement = -1 ;
-		highLighter 	   = textComponent.getHighlighter() ;
+		name = n;
+		textComponent = tc;
+		highLightColor = hlc;
+		lLog = l;
+		textElements = new ArrayList<>();
+		currentTextElement = -1;
+		highLighter = textComponent.getHighlighter();
 		if (highLightColor != null) {
-			painter			   = new MultiHighLightPainter(highLightColor) ;
-			currentHighLights  = new ArrayList<>() ;
+			painter = new MultiHighLightPainter(highLightColor);
+			currentHighLights = new ArrayList<>();
 		} else {
-			painter 		  = null ;
-			currentHighLights = null ;
+			painter = null;
+			currentHighLights = null;
 		}
-		currentElementHighLight = null ;
+		currentElementHighLight = null;
 		if (currentElementHighLightColor != null) {
-			currentElementPainter = new MultiHighLightPainter(currentElementHighLightColor) ;
+			currentElementPainter = new MultiHighLightPainter(currentElementHighLightColor);
 		} else {
-			currentElementPainter = null ;
+			currentElementPainter = null;
 		}
 	}
 
