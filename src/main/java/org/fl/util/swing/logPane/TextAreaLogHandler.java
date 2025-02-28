@@ -24,28 +24,16 @@ SOFTWARE.
 
 package org.fl.util.swing.logPane;
 
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
+import java.util.logging.Formatter;
 import java.util.logging.Handler;
 import java.util.logging.LogRecord;
+import java.util.logging.SimpleFormatter;
 
 import javax.swing.SwingUtilities;
 
-import org.fl.util.ExceptionLogging;
-
 public class TextAreaLogHandler extends Handler {
 
-	private final static String datePattern = "uuuu-MM-dd HH:mm:ss.SSS ";
-	private final static String BLANK = " ";
-	private final static String NEWLINE = "\n";
-	private final static String SEPARATOR = ": ";
-
-	private static int MAX_PRINTED_CAUSE_LEVEL = 20;
-
 	private LogDisplayComponent logDisplayComponent;
-	private final DateTimeFormatter dateTimeFormatter;
 	private final LogDisplayChanger logDisplayChanger;
 
 	private int logDisplayMaxLength;
@@ -56,7 +44,6 @@ public class TextAreaLogHandler extends Handler {
 		super();
 		logDisplayComponent = ldc;
 		logDisplayChanger = lChanger;
-		dateTimeFormatter = DateTimeFormatter.ofPattern(datePattern);
 		logDisplayMaxLength = DEFAULT_LOG_DISPLAY_MAX_LENGTH;
 	}
 
@@ -81,37 +68,13 @@ public class TextAreaLogHandler extends Handler {
 					startRecord = 0;
 				}
 
-				logDisplayComponent.appendToText(dateTimeFormatter.format(
-						LocalDateTime.ofInstant(Instant.ofEpochMilli(record.getMillis()), ZoneId.systemDefault())));
-				logDisplayComponent.appendToText(Long.toString(record.getSequenceNumber()));
-				logDisplayComponent.appendToText(BLANK);
-				logDisplayComponent.appendToText(record.getLoggerName());
-				logDisplayComponent.appendToText(BLANK);
-				String srcClassName = record.getSourceClassName();
-				if (srcClassName != null) {
-					logDisplayComponent.appendToText(record.getSourceClassName());
-					logDisplayComponent.appendToText(BLANK);
+				Formatter formatter = getFormatter();
+				if (formatter == null) {
+					formatter = new SimpleFormatter();
+					setFormatter(formatter);	
 				}
-				String methodName = record.getSourceMethodName();
-				if (methodName != null) {
-					logDisplayComponent.appendToText(record.getSourceMethodName());
-				}
-				logDisplayComponent.appendToText(NEWLINE);
-				logDisplayComponent.appendToText(record.getLevel().getName());
-				logDisplayComponent.appendToText(SEPARATOR);
-				logDisplayComponent.appendToText(record.getMessage());
-				logDisplayComponent.appendToText(NEWLINE);
-
-				Throwable thrown = record.getThrown();
-				if (thrown != null) {
-					String thrownMsg = thrown.toString();
-					if ((thrownMsg != null) && (!thrownMsg.isEmpty())) {
-						logDisplayComponent
-								.appendToText(ExceptionLogging.printExceptionInfos(thrown, MAX_PRINTED_CAUSE_LEVEL));
-						logDisplayComponent.appendToText(NEWLINE);
-					}
-				}
-				logDisplayComponent.appendToText(NEWLINE);
+				
+				logDisplayComponent.appendToText(formatter.format(record));
 
 				int endRecord = logDisplayComponent.textLength() - 1;
 				logDisplayComponent.addLogRecord(record.getLevel(), startRecord, endRecord);
