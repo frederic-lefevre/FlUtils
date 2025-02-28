@@ -32,6 +32,7 @@ import java.util.logging.Logger;
 import javax.swing.JTabbedPane;
 
 import org.fl.util.AdvancedProperties;
+import org.fl.util.RunningContext;
 
 public class LogsDisplayPane  extends JTabbedPane {
 
@@ -52,10 +53,11 @@ public class LogsDisplayPane  extends JTabbedPane {
 	private final int logDisplaySubTabNumber;
 	private final int logDisplayMaxLength;
 	
-	public LogsDisplayPane(AdvancedProperties props, String loggerNameSpace) {
+	public LogsDisplayPane(RunningContext runningContext) {
 		
 		super();
 		
+		AdvancedProperties props = runningContext.getProps();
 		Level lastNonHighLightedLevel = props.getLevel("appTabbedPane.logging.lastNonHighLighedLevel", Level.INFO);
 		Color recordHighLightColor = props.getColor("appTabbedPane.logging.recordHighLightColor", Color.PINK) ;
 		logDisplaySubTabNumber = props.getInt("appTabbedPane.logging.subTabNumber", 3);
@@ -64,7 +66,7 @@ public class LogsDisplayPane  extends JTabbedPane {
 		
 		Color[] searchHighLightColors = props.getColors("appTabbedPane.logging.searchHighLightColors", DEFAULT_SEARCH_HIGHLIGHTCOLORS);
 		
-		Logger logger = Logger.getLogger(loggerNameSpace);
+		Logger logger = Logger.getLogger(runningContext.getName());
 		searchableLogDisplays = new ArrayList<SearchableLogDisplay>();
 		for (int i = 0; i < logDisplaySubTabNumber; i++) {
 			SearchableLogDisplay logDisplay = new SearchableLogDisplay(lastNonHighLightedLevel, searchHighLightColors, recordHighLightColor, logger);
@@ -81,6 +83,7 @@ public class LogsDisplayPane  extends JTabbedPane {
 		logTextAreaHandler = new TextAreaLogHandler(currentLogDisplay, new SearchLogDisplayChanger());
 		logTextAreaHandler.setLevel(logger.getLevel());
 		logTextAreaHandler.setLogDisplayMaxLength(logDisplayMaxLength);
+		logTextAreaHandler.setFormatter(runningContext.getCommonLogFormatter());
 		logger.addHandler(logTextAreaHandler);
 	}
 

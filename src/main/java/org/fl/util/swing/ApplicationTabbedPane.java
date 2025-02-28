@@ -65,7 +65,7 @@ public class ApplicationTabbedPane extends JTabbedPane {
 		addTab("Informations", appInfoPane);
 
 		// Tabbed Panel for logs display
-		logsDisplayPane = new LogsDisplayPane(props, runningContext.getName());
+		logsDisplayPane = new LogsDisplayPane(runningContext);
 		addTab("Logs display", logsDisplayPane);
 		int logTabIdx = indexOfComponent(logsDisplayPane);
 		if (logTabIdx > -1) {
