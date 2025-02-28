@@ -45,11 +45,11 @@ public class ApplicationTabbedPane extends JTabbedPane {
 	private static final long serialVersionUID = 1L;
 
 	private final Logger logger;
-	private ApplicationInfoPane appInfoPane;
-	private LogsDisplayPane logsDisplayPane;
+	private final ApplicationInfoPane appInfoPane;
+	private final LogsDisplayPane logsDisplayPane;
 
+	private final Color logTabRegularColor;
 	private Color logTabHighLightColor;
-	private Color logTabRegularColor;
 
 	public ApplicationTabbedPane(RunningContext runningContext) {
 		super();
@@ -70,6 +70,9 @@ public class ApplicationTabbedPane extends JTabbedPane {
 		int logTabIdx = indexOfComponent(logsDisplayPane);
 		if (logTabIdx > -1) {
 			logTabRegularColor = getBackgroundAt(logTabIdx);
+		} else {
+			// should not happen
+			logTabRegularColor = Color.LIGHT_GRAY;
 		}
 
 		addChangeListener(new BackUpTabChangeListener());
