@@ -125,5 +125,7 @@ class JsonLogFormatterTest {
 		assertThat(record.getException())
 			.contains(exceptionMessage)
 			.contains(expectedStackTraceFragment);
+		
+		assertThat(record.getException().lines().count()).isGreaterThan(60);
 	}
 }
