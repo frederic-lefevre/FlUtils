@@ -24,65 +24,82 @@ SOFTWARE.
 
 package org.fl.util;
 
-import java.time.Instant;
-import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.logging.Formatter;
+import java.util.logging.Level;
 import java.util.logging.LogRecord;
+import java.util.logging.Logger;
+
+import org.fl.util.json.JsonUtils;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class JsonLogFormatter extends Formatter {
 
-	private final static String datePattern = "uuuu-MM-dd HH:mm:ss.SSS v ";
+	private static int MAX_PRINTED_CAUSE_LEVEL = 20;
+	
+	private static final String DATE_PATTERN = "uuuu-MM-dd HH:mm:ss.SSS v ";
 
-	private final static String SEP = "\",";
-	private final static String DATE = "\"date\":\"";
-	private final static String SEQ_NUM = "\"number\":\"";
-	private final static String LOGGER_NAME = "\"logger name\":\"";
-	private final static String LEVEL = "\"level\":\"";
-	private final static String CLASS_NAME = "\"class\":\"";
-	private final static String METHOD_NAME = "\"method\":\"";
-	private final static String MESSAGE = "\"message\":\"";
-	private final static String EXCEPTION = "\"exception\":\"";
-	private final static String END = "\"}";
-
+	private static final String DATE = "date";
+	private static final String SEQ_NUM = "sequenceNumber";
+	private static final String LOGGER_NAME = "loggerName";
+	private static final String LEVEL = "level";
+	private static final String CLASS_NAME = "class";
+	private static final String METHOD_NAME = "method";
+	private static final String MESSAGE = "message";
+	private static final String EXCEPTION = "exception";
+	
 	private DateTimeFormatter dateTimeFormatter;
 
+	private static final Logger safeLogger = Logger.getLogger("");
+	
 	public JsonLogFormatter() {
 		super();
-		dateTimeFormatter = DateTimeFormatter.ofPattern(datePattern);
+		dateTimeFormatter = DateTimeFormatter.ofPattern(DATE_PATTERN);
 	}
 
 	@Override
 	public String format(LogRecord record) {
 
-		StringBuilder sb = new StringBuilder();
-
-		sb.append('{');
-		sb.append(DATE)
-				.append(dateTimeFormatter.format(
-						LocalDateTime.ofInstant(Instant.ofEpochMilli(record.getMillis()), ZoneId.systemDefault())))
-				.append(SEP);
-		sb.append(SEQ_NUM).append(record.getSequenceNumber()).append(SEP);
-		sb.append(LOGGER_NAME).append(record.getLoggerName()).append(SEP);
-		sb.append(LEVEL).append(record.getLevel().getName()).append(SEP);
-		sb.append(CLASS_NAME).append(record.getSourceClassName()).append(SEP);
-		sb.append(METHOD_NAME).append(record.getSourceMethodName()).append(SEP);
-		sb.append(MESSAGE).append(formatMessage(record));
-
+		ObjectNode jsonLogRecord = JsonNodeFactory.instance.objectNode();
+		
+		jsonLogRecord.put(
+				DATE, 
+				dateTimeFormatter.format(ZonedDateTime.ofInstant(record.getInstant(), ZoneId.systemDefault())));
+		jsonLogRecord.put(SEQ_NUM, record.getSequenceNumber());
+		jsonLogRecord.put(LOGGER_NAME, record.getLoggerName());
+		
+		String srcClassName = record.getSourceClassName();
+		if (srcClassName != null) {
+			jsonLogRecord.put(CLASS_NAME, srcClassName);
+		}
+		String methodName = record.getSourceMethodName();
+		if (methodName != null) {
+			jsonLogRecord.put(METHOD_NAME, methodName);
+		}
+		
+		// record.getLevel() cannot be null (trying to set level to null triggers a NPE)
+		jsonLogRecord.put(LEVEL, record.getLevel().getName());
+		
+		jsonLogRecord.put(MESSAGE, formatMessage(record));
+		
 		Throwable thrown = record.getThrown();
 		if (thrown != null) {
-			String thrownMsg = thrown.getMessage();
-
-			if ((thrownMsg != null) && (!thrownMsg.isEmpty())) {
-				sb.append(SEP).append(EXCEPTION).append(thrownMsg).append(END);
-			} else {
-				sb.append(END);
-			}
-		} else {
-			sb.append(END);
+			jsonLogRecord.put(EXCEPTION, ExceptionLogging.printExceptionInfos(thrown, MAX_PRINTED_CAUSE_LEVEL));
+			
 		}
-		return sb.toString();
+		
+		try {
+			return JsonUtils.jsonPrettyPrint(jsonLogRecord);
+		} catch (JsonProcessingException e) {
+			
+			// Log with the root logger in order to avoid infinite recursion, re-entering the same formatter
+			safeLogger.log(Level.SEVERE, "JsonProcessingException when formatting the error", e);
+			return jsonLogRecord.toString();
+		}
 	}
-
 }
