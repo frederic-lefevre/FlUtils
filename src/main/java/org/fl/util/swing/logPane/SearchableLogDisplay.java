@@ -38,23 +38,24 @@ import org.fl.util.swing.text.TextAreaElement;
 
 public class SearchableLogDisplay implements LogDisplayComponent  {
 
-	private final JTextArea 		 	  logArea ;
-	private final SearchableTextPane 	  searchableTextArea ;
-	private final LogRecordCategoriesPane logRecordCategoriesPane ;	
-	private final LogRecordAreas 		  logRecordAreas ;
-	private final Logger 				  sLog ;
-	
-	public SearchableLogDisplay(int lastNonHighLighedLevel, Color[] colorsForSearchResults, Color colorForHighLevel, Logger l) {
-		
-		sLog = l ;
-		logArea = new JTextArea(50, 120) ;
-		logArea.setEditable(false);
-		logArea.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
+	private final JTextArea logArea;
+	private final SearchableTextPane searchableTextArea;
+	private final LogRecordCategoriesPane logRecordCategoriesPane;
+	private final LogRecordAreas logRecordAreas;
+	private final Logger sLog;
 
-		searchableTextArea 		= new SearchableTextPane(logArea, colorsForSearchResults, sLog) ;		
-		logRecordAreas	   		= new LogRecordAreas(logArea, lastNonHighLighedLevel, colorForHighLevel, sLog) ;		
-		logRecordCategoriesPane = new LogRecordCategoriesPane(logRecordAreas) ;
-		searchableTextArea.getCommandPanel().add(logRecordCategoriesPane) ;	
+	public SearchableLogDisplay(Level lastNonHighLighedLevel, Color[] colorsForSearchResults, Color colorForHighLevel,
+			Logger l) {
+
+		sLog = l;
+		logArea = new JTextArea(50, 120);
+		logArea.setEditable(false);
+		logArea.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+		searchableTextArea = new SearchableTextPane(logArea, colorsForSearchResults, sLog);
+		logRecordAreas = new LogRecordAreas(logArea, lastNonHighLighedLevel, colorForHighLevel, sLog);
+		logRecordCategoriesPane = new LogRecordCategoriesPane(logRecordAreas);
+		searchableTextArea.getCommandPanel().add(logRecordCategoriesPane);
 	}
 
 	@Override
@@ -68,36 +69,36 @@ public class SearchableLogDisplay implements LogDisplayComponent  {
 	}
 
 	@Override
-	public void addLogRecord(Level level, int start, int end) {		
-		logRecordAreas.addLogRecordArea(new TextAreaElement(logArea, start, end, sLog), level) ;
+	public void addLogRecord(Level level, int start, int end) {
+		logRecordAreas.addLogRecordArea(new TextAreaElement(logArea, start, end, sLog), level);
 	}
 
 	@Override
 	public JTextComponent getTextComponent() {
 		return logArea;
 	}
-	
+
 	@Override
 	public void clear() {
-		logArea.setText("") ;
-		logRecordAreas.clear() ;
-		logRecordCategoriesPane.clear() ;
-		searchableTextArea.clear() ;
+		logArea.setText("");
+		logRecordAreas.clear();
+		logRecordCategoriesPane.clear();
+		searchableTextArea.clear();
 	}
-	
+
 	public boolean hasHighlight() {
-		return logRecordAreas.hasHighlight() ;
+		return logRecordAreas.hasHighlight();
 	}
-	
+
 	public void addHighLightListener(LogHighLightListener highLightListener) {
 		logRecordAreas.addHighLightListener(highLightListener);
 	}
-	
+
 	public void refreshLogRecordCategories() {
 		logRecordCategoriesPane.displayPane();
 	}
-	
+
 	public JPanel getPanel() {
-		return searchableTextArea ;
+		return searchableTextArea;
 	}
 }

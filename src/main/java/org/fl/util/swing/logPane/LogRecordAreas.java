@@ -42,13 +42,13 @@ public class LogRecordAreas {
 	private final Logger lLog;
 	private HashMap<Level, TextAreaElementList> logRecordAreas;
 
-	private final int lastNonHighLighedLevel;
+	private final Level lastNonHighLighedLevel;
 	private final Color colorForHigLevelRecords;
 	private final ArrayList<LogHighLightListener> highLightListeners;
 	
 	private boolean hasHighLight;
 
-	public LogRecordAreas(JTextComponent tc, int lvl, Color c, Logger l) {
+	public LogRecordAreas(JTextComponent tc, Level lvl, Color c, Logger l) {
 		textComponent = tc;
 		lLog = l;
 		logRecordAreas = new HashMap<Level, TextAreaElementList>();
@@ -63,7 +63,7 @@ public class LogRecordAreas {
 
 		TextAreaElementList recordsForTheSameLevel = logRecordAreas.get(recordLevel);
 		Color highLightRecord = null;
-		if (recordLevel.intValue() > lastNonHighLighedLevel) {
+		if (recordLevel.intValue() > lastNonHighLighedLevel.intValue()) {
 			highLightRecord = colorForHigLevelRecords;
 		}
 		if (recordsForTheSameLevel == null) {
