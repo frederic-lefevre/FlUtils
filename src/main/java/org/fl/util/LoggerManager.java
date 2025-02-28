@@ -32,7 +32,6 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 import java.util.function.Function;
 import java.util.logging.ConsoleHandler;
@@ -45,9 +44,6 @@ import java.util.logging.SimpleFormatter;
 import java.util.stream.Stream;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class LoggerManager {
 
@@ -185,8 +181,7 @@ public class LoggerManager {
 				rootLogger.setLevel(getHighestHandlerLevel(rootLogger));
 			}
 		}
-	
-		
+			
 		// Console Handler : always have a console handler (level maybe set to OFF)
 		configureConsoleHandler();
 		
@@ -282,14 +277,15 @@ public class LoggerManager {
 		}
 	}
     
-	private static class LogFilter implements FileFilter {
+	private static class LogFileFilter implements FileFilter {
 
 		public boolean accept(File pathname) {
 			return (!pathname.getName().endsWith("lck"));
 		}
 	}
 	
-	private static final LogFilter logFileFilter = new LogFilter();
+	private static final LogFileFilter logFileFilter = new LogFileFilter();
+	
     /**
      * Get the log files
      * @return the log files
@@ -303,134 +299,17 @@ public class LoggerManager {
 		}
 	}
 
-	// Get a JsonObject representing the levels of a logger (and all levels of its
-	// Handlers)
-	private static final String LOG_LEVEL = "logLevel";
-	private static final String HANDLERS = "handlers";
-	private static final String HANDLER_LEVEL = "handlerLevel";
-	private static final String HANDLER_NAME = "handlerName";
-	private static final String FORMATTER = "formatter";
-	private static final String MEMORY_BUF_SZ = "memoryBufferSize";
-
-	private static final String NO_FORMATTER = "No formatter";
-	private static final String NO_MEMORY_LOGGING = " No in-memory logging";
 	
 	// Get the logger level and the levels, formatter of all handlers
 	public JsonNode getLoggerLevels() {
-	    
-		ObjectNode levelsJson = JsonNodeFactory.instance.objectNode();
-
-		Level lLevel = log.getLevel() ;
-		if (lLevel != null) {
-			levelsJson.put(LOG_LEVEL, lLevel.getName());
-		}
-		
-		Handler[] handlers = log.getHandlers() ;
-		if (handlers != null) {
-			
-			ArrayNode handlerJsonArray = JsonNodeFactory.instance.arrayNode();
-			for (Handler handler : handlers) {
-				
-				ObjectNode handlerJson = JsonNodeFactory.instance.objectNode();
-				handlerJson.put(HANDLER_NAME,  handler.getClass().getName());
-				handlerJson.put(HANDLER_LEVEL, handler.getLevel().getName());
-				Formatter formatter = handler.getFormatter() ;
-				String formatterName ;
-				if (formatter == null) {
-					formatterName = NO_FORMATTER; 
-				} else {
-					formatterName = formatter.getClass().getName() ;
-				}
-				handlerJson.put(FORMATTER, 	formatterName);
-				if (handler instanceof BufferLogHandler) {
-					handlerJson.put(MEMORY_BUF_SZ, ((BufferLogHandler) handler).getMaxMemoryLogRecord()) ;
-				} else {
-					handlerJson.put(MEMORY_BUF_SZ, NO_MEMORY_LOGGING) ;
-				}
-				handlerJsonArray.add(handlerJson);
-			}
-			levelsJson.set(HANDLERS, handlerJsonArray);
-		}
-		
-		return levelsJson ;	    
+		return LoggerUtils.getLoggerLevels(log);
 	}
 	
     // Set the levels of logger and handlers
     public boolean setLogsLevels(JsonNode levelsJson) {
-    	
-		boolean success = true;
-		if (levelsJson != null) {
-
-			try {
-				// Log level
-				JsonNode logLevelElem = levelsJson.get(LOG_LEVEL);
-				if (logLevelElem != null) {
-					String levelString = logLevelElem.asText();
-					try {
-						Level newLevel = Level.parse(levelString);
-						log.setLevel(newLevel);
-					} catch (IllegalArgumentException e) {
-						// parse level exception
-						log.log(Level.WARNING, "Bad level in setLogsLevel json\n " + levelsJson.toString(), e);
-						success = false;
-					}
-				}
-	    		
-				// Handlers levels
-				JsonNode handlersLevelsElem = levelsJson.get(HANDLERS);
-				if ((handlersLevelsElem != null) && (handlersLevelsElem.isArray())) {
-
-					HashMap<String, Level> handlers = new HashMap<String, Level>();
-					for (JsonNode handlerElem : handlersLevelsElem) {
-
-						String handlerName = handlerElem.get(HANDLER_NAME).asText();
-						String handlerLevel = handlerElem.get(HANDLER_LEVEL).asText();
-						try {
-							Level newLevel = Level.parse(handlerLevel);
-							handlers.put(handlerName, newLevel);
-						} catch (IllegalArgumentException e) {
-							// parse level exception
-							log.log(Level.WARNING, "Bad handler level in setLogsLevel for handler " + handlerName
-									+ "\nin json: " + levelsJson.toString(), e);
-							success = false;
-						}
-					}
-
-					Handler[] logHandlers = log.getHandlers();
-					for (Handler handler : logHandlers) {
-						String handlerName = handler.getClass().getName();
-						Level newHandlerLevel = handlers.get(handlerName);
-						if (newHandlerLevel != null) {
-							handler.setLevel(newHandlerLevel);
-						} else {
-							// handler not found
-							success = false;
-						}
-					}
-				}
-			} catch (Exception e1) {
-				log.log(Level.WARNING, "Exception in setLogsLevel json\n " + levelsJson.toString(), e1);
-				success = false;
-			}
-		} else {
-			// no input
-			success = false;
-		}
-		return success;
-
+    	return LoggerUtils.setLogsLevels(log, levelsJson);
 	}
     
-	public static void flushAllHandlers(Logger log) {
-
-		if (log != null) {
-			Handler[] handlers = log.getHandlers();
-			if (handlers != null) {
-				for (Handler handler : handlers) {
-					handler.flush();
-				}
-			}
-		}
-	}
 
 	private void removeAllHandlersExceptConsole() {
 
