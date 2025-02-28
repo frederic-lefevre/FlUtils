@@ -63,14 +63,13 @@ public class PlainLogFormatter extends Formatter {
 		// Prevent any NPE: a LogRecord with null message can be created and formatMessage() will return null
 		int recordAllocSize = MIN_PRINTED_LOG_RECORD_SIZE + Optional.ofNullable(msgFormattedWithParam).map(s -> s.length()).orElse(0);
 
-		String exceptionMsg = null;
+		String exceptionMsg;
 		Throwable thrown = record.getThrown();
 		if (thrown != null) {
-			String thrownMsg = thrown.toString();
-			if ((thrownMsg != null) && (!thrownMsg.isEmpty())) {
-				exceptionMsg = ExceptionLogging.printExceptionInfos(thrown, MAX_PRINTED_CAUSE_LEVEL);
-				recordAllocSize = recordAllocSize + exceptionMsg.length();
-			}
+			exceptionMsg = ExceptionLogging.printExceptionInfos(thrown, MAX_PRINTED_CAUSE_LEVEL);
+			recordAllocSize = recordAllocSize + exceptionMsg.length();			
+		} else {
+			exceptionMsg = null;
 		}
 
 		// StringBuilder is always converting its argument to a String, even if it is a
