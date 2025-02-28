@@ -242,6 +242,10 @@ public class LoggerManager {
 		return highestLevel;
 	}
     
+	public Formatter getCommonFormatter() {
+		return formatter;
+	}
+	
 	// Add a custom handler to the logger
 	public void addCustomHandler(Handler customHandler) {
 

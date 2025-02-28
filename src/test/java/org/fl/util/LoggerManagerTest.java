@@ -53,6 +53,8 @@ class LoggerManagerTest {
 		
 		assertThat(handlers).singleElement()
 			.satisfies(handler -> assertThat(handler).isInstanceOf(ConsoleHandler.class));
+		
+		assertThat(logMgr.getCommonFormatter()).isInstanceOf(SimpleFormatter.class);
 	}
 
 	@Test
@@ -120,6 +122,8 @@ class LoggerManagerTest {
 			.isNotNull()
 			.isEqualTo("%1$tY-%1$tm-%1$td %1$tH:%1$tM:%1$tS.%1$tL %3$S %2$s%n%4$s: %5$s%6$s%n");
 		
+		assertThat(logMgr.getCommonFormatter()).isInstanceOf(SimpleFormatter.class);
+		
 		Handler[] handlers = logger.getHandlers();
 		
 		assertThat(handlers).hasSize(2)
@@ -171,6 +175,8 @@ class LoggerManagerTest {
 		
 		assertThat(props.get("logging.BufferLogHandler.bufferLength")).isEqualTo("100");
 		assertThat(props.get("logging.BufferLogHandler.level")).isEqualTo("INFO");
+		
+		assertThat(logMgr.getCommonFormatter()).isInstanceOf(PlainLogFormatter.class);
 		
 		Handler[] handlers = logger.getHandlers();
 		
