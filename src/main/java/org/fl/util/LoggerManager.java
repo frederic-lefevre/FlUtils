@@ -307,7 +307,7 @@ public class LoggerManager {
 	
     // Set the levels of logger and handlers
     public boolean setLogsLevels(JsonNode levelsJson) {
-    	return LoggerUtils.setLogsLevels(log, levelsJson);
+    	return LoggerUtils.setLoggerLevels(log, levelsJson);
 	}
     
 

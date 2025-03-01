@@ -41,6 +41,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class LoggerUtils {
 
+	private static final Logger logger = Logger.getLogger(LoggerUtils.class.getName());
+	
 	private LoggerUtils() {
 		// Hide constructor
 	}
@@ -106,64 +108,61 @@ public class LoggerUtils {
 	}
 	
     // Set the levels of logger and handlers
-    public static boolean setLogsLevels(Logger log, JsonNode levelsJson) {
+    public static boolean setLoggerLevels(Logger log, JsonNode levelsJson) {
     	
+    	if (log == null) {
+    		throw new IllegalArgumentException("Logger parameter must not be null");
+    	}
+    	if (levelsJson == null) {
+    		throw new IllegalArgumentException("Level json parameter must not be null");
+    	}
 		boolean success = true;
-		if (levelsJson != null) {
+		try {
+			// Log level
+			JsonNode logLevelElem = levelsJson.get(LOG_LEVEL);
+			if (logLevelElem != null) {
+				String levelString = logLevelElem.asText();
+				try {
+					Level newLevel = Level.parse(levelString);
+					log.setLevel(newLevel);
+				} catch (IllegalArgumentException e) {
+					// parse level exception
+					logger.log(Level.WARNING, "Bad level in setLogsLevel json\n " + levelsJson.toString(), e);
+					success = false;
+				}
+			}
+			
+			// Handlers levels
+			JsonNode handlersLevelsElem = levelsJson.get(HANDLERS);
+			if ((handlersLevelsElem != null) && (handlersLevelsElem.isArray())) {
 
-			try {
-				// Log level
-				JsonNode logLevelElem = levelsJson.get(LOG_LEVEL);
-				if (logLevelElem != null) {
-					String levelString = logLevelElem.asText();
+				HashMap<String, Level> handlers = new HashMap<String, Level>();
+				for (JsonNode handlerElem : handlersLevelsElem) {
+
+					String handlerName = handlerElem.get(HANDLER_NAME).asText();
+					String handlerLevel = handlerElem.get(HANDLER_LEVEL).asText();
 					try {
-						Level newLevel = Level.parse(levelString);
-						log.setLevel(newLevel);
+						Level newLevel = Level.parse(handlerLevel);
+						handlers.put(handlerName, newLevel);
 					} catch (IllegalArgumentException e) {
 						// parse level exception
-						log.log(Level.WARNING, "Bad level in setLogsLevel json\n " + levelsJson.toString(), e);
+						logger.log(Level.WARNING, "Bad handler level in setLogsLevel for handler " + handlerName
+								+ "\nin json: " + levelsJson.toString(), e);
 						success = false;
 					}
 				}
-	    		
-				// Handlers levels
-				JsonNode handlersLevelsElem = levelsJson.get(HANDLERS);
-				if ((handlersLevelsElem != null) && (handlersLevelsElem.isArray())) {
 
-					HashMap<String, Level> handlers = new HashMap<String, Level>();
-					for (JsonNode handlerElem : handlersLevelsElem) {
-
-						String handlerName = handlerElem.get(HANDLER_NAME).asText();
-						String handlerLevel = handlerElem.get(HANDLER_LEVEL).asText();
-						try {
-							Level newLevel = Level.parse(handlerLevel);
-							handlers.put(handlerName, newLevel);
-						} catch (IllegalArgumentException e) {
-							// parse level exception
-							log.log(Level.WARNING, "Bad handler level in setLogsLevel for handler " + handlerName
-									+ "\nin json: " + levelsJson.toString(), e);
-							success = false;
-						}
-					}
-
-					Handler[] logHandlers = log.getHandlers();
-					for (Handler handler : logHandlers) {
-						String handlerName = handler.getClass().getName();
-						Level newHandlerLevel = handlers.get(handlerName);
-						if (newHandlerLevel != null) {
-							handler.setLevel(newHandlerLevel);
-						} else {
-							// handler not found
-							success = false;
-						}
+				Handler[] logHandlers = log.getHandlers();
+				for (Handler handler : logHandlers) {
+					String handlerName = handler.getClass().getName();
+					Level newHandlerLevel = handlers.get(handlerName);
+					if (newHandlerLevel != null) {
+						handler.setLevel(newHandlerLevel);
 					}
 				}
-			} catch (Exception e1) {
-				log.log(Level.WARNING, "Exception in setLogsLevel json\n " + levelsJson.toString(), e1);
-				success = false;
 			}
-		} else {
-			// no input
+		} catch (Exception e1) {
+			logger.log(Level.WARNING, "Exception in setLogsLevel json\n " + levelsJson.toString(), e1);
 			success = false;
 		}
 		return success;
