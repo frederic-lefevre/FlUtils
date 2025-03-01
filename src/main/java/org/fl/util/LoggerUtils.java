@@ -46,14 +46,15 @@ public class LoggerUtils {
 	}
 	
 	public static List<String> getChildLoggerNames(String loggerNameSpace) {
-		
+
 		List<String> childLoggerNames = new ArrayList<>();
-		
-		Enumeration<String> loggerNames = LogManager.getLogManager().getLoggerNames();
-		while (loggerNames.hasMoreElements()) {
-			String loggerName = loggerNames.nextElement();
-			if (loggerName.startsWith(loggerNameSpace)) {
-				childLoggerNames.add(loggerName);
+		if (loggerNameSpace != null) {
+			Enumeration<String> loggerNames = LogManager.getLogManager().getLoggerNames();
+			while (loggerNames.hasMoreElements()) {
+				String loggerName = loggerNames.nextElement();
+				if ((loggerName != null) && (loggerName.startsWith(loggerNameSpace))) {
+					childLoggerNames.add(loggerName);
+				}
 			}
 		}
 		return childLoggerNames;
