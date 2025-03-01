@@ -62,22 +62,19 @@ public class LoggerUtils {
 	
 	// Get a JsonObject representing the levels of a logger (and all levels of its
 	// Handlers)
-	private static final String LOG_LEVEL = "logLevel";
-	private static final String HANDLERS = "handlers";
-	private static final String HANDLER_LEVEL = "handlerLevel";
-	private static final String HANDLER_NAME = "handlerName";
-	private static final String FORMATTER = "formatter";
-	private static final String MEMORY_BUF_SZ = "memoryBufferSize";
-
-	private static final String NO_FORMATTER = "No formatter";
-	private static final String NO_MEMORY_LOGGING = " No in-memory logging";
+	public static final String LOG_LEVEL = "logLevel";
+	public static final String HANDLERS = "handlers";
+	public static final String HANDLER_LEVEL = "handlerLevel";
+	public static final String HANDLER_NAME = "handlerName";
+	public static final String FORMATTER = "formatter";
+	public static final String MEMORY_BUF_SZ = "memoryBufferSize";
 	
 	// Get the logger level and the levels, formatter of all handlers
 	public static JsonNode getLoggerLevels(Logger log) {
 	    
 		ObjectNode levelsJson = JsonNodeFactory.instance.objectNode();
 
-		Level lLevel = log.getLevel() ;
+		Level lLevel = log.getLevel();
 		if (lLevel != null) {
 			levelsJson.put(LOG_LEVEL, lLevel.getName());
 		}
@@ -93,22 +90,18 @@ public class LoggerUtils {
 				handlerJson.put(HANDLER_LEVEL, handler.getLevel().getName());
 				Formatter formatter = handler.getFormatter() ;
 				String formatterName ;
-				if (formatter == null) {
-					formatterName = NO_FORMATTER; 
-				} else {
-					formatterName = formatter.getClass().getName() ;
+				if (formatter != null) {
+					formatterName = formatter.getClass().getName();
+					handlerJson.put(FORMATTER, 	formatterName);
 				}
-				handlerJson.put(FORMATTER, 	formatterName);
+				
 				if (handler instanceof BufferLogHandler) {
 					handlerJson.put(MEMORY_BUF_SZ, ((BufferLogHandler) handler).getMaxMemoryLogRecord()) ;
-				} else {
-					handlerJson.put(MEMORY_BUF_SZ, NO_MEMORY_LOGGING) ;
 				}
 				handlerJsonArray.add(handlerJson);
 			}
 			levelsJson.set(HANDLERS, handlerJsonArray);
-		}
-		
+		}		
 		return levelsJson ;	    
 	}
 	

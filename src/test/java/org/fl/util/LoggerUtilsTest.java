@@ -28,11 +28,15 @@ import static org.assertj.core.api.Assertions.*;
 
 import java.util.List;
 import java.util.function.IntFunction;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import org.junit.jupiter.api.Test;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 
 class LoggerUtilsTest {
 
@@ -93,5 +97,63 @@ class LoggerUtilsTest {
 			.anyMatch(loggerName -> loggerName.startsWith("org.junit.platform"))
 			.anyMatch(loggerName -> loggerName.startsWith("org.junit.jupiter"))
 			.containsAll(specificLoggers.stream().map(l -> l.getName()).collect(Collectors.toList()));
+	}
+	
+	@Test	
+	void getLoggerLevelsOfNullThrowsNPE() {
+		
+		assertThatNullPointerException().isThrownBy(() -> LoggerUtils.getLoggerLevels(null));
+	}
+	
+	@Test	
+	void getMinimalLoggerLevels() throws JsonProcessingException {
+		
+		Logger logger = Logger.getLogger(LoggerUtilsTest.class.getName() + ".test1");
+		assertThat(logger.getLevel()).isNull();
+		assertThat(logger.getHandlers()).isNotNull().isEmpty();
+		JsonNode loggerLevelsJson = LoggerUtils.getLoggerLevels(logger);
+		
+		assertThat(loggerLevelsJson.get(LoggerUtils.LOG_LEVEL)).isNull();
+		assertThat(loggerLevelsJson.get(LoggerUtils.HANDLERS)).isNotNull().isEmpty();
+	}
+	
+	private static final String APPLICATION_NAME = "org.fl.util.test1";
+	
+	@Test	
+	void getLoggerLevels() throws JsonProcessingException {
+		
+		RunningContext rc = new RunningContext(APPLICATION_NAME, null, 
+				"C:/FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test1.properties");
+		assertThat(rc.getName()).isNotNull().isEqualTo(APPLICATION_NAME);
+		
+		Logger logger = Logger.getLogger(APPLICATION_NAME);
+		assertThat(logger.getLevel()).isNotNull().isEqualTo(Level.INFO);
+		assertThat(logger.getHandlers()).isNotNull().hasSize(3);
+		JsonNode loggerLevelsJson = LoggerUtils.getLoggerLevels(logger);
+		
+		String consoleHandlerName = "java.util.logging.ConsoleHandler";
+		String fileHandlerName = "java.util.logging.FileHandler";
+		String bufferHandlerName = "org.fl.util.BufferLogHandler";
+		String formatterName = "org.fl.util.PlainLogFormatter";
+		assertThat(loggerLevelsJson.get(LoggerUtils.LOG_LEVEL).asText()).isEqualTo(Level.INFO.getName());
+		assertThat(loggerLevelsJson.get(LoggerUtils.HANDLERS)).isNotNull().hasSize(3)
+			.satisfiesExactlyInAnyOrder(
+					jsonHandler -> { 
+						assertThat(jsonHandler.get(LoggerUtils.HANDLER_NAME).asText()).isEqualTo(consoleHandlerName);
+						assertThat(jsonHandler.get(LoggerUtils.HANDLER_LEVEL).asText()).isEqualTo(Level.INFO.getName());
+						assertThat(jsonHandler.get(LoggerUtils.FORMATTER).asText()).isEqualTo(formatterName);
+					},
+					jsonHandler -> { 
+						assertThat(jsonHandler.get(LoggerUtils.HANDLER_NAME).asText()).isEqualTo(fileHandlerName);
+						assertThat(jsonHandler.get(LoggerUtils.HANDLER_LEVEL).asText()).isEqualTo(Level.INFO.getName());
+						assertThat(jsonHandler.get(LoggerUtils.FORMATTER).asText()).isEqualTo(formatterName);
+					},
+					jsonHandler -> { 
+						assertThat(jsonHandler.get(LoggerUtils.HANDLER_NAME).asText()).isEqualTo(bufferHandlerName);
+						assertThat(jsonHandler.get(LoggerUtils.HANDLER_LEVEL).asText()).isEqualTo(Level.INFO.getName());
+						assertThat(jsonHandler.get(LoggerUtils.FORMATTER)).isNull();
+						assertThat(jsonHandler.get(LoggerUtils.MEMORY_BUF_SZ).asInt()).isEqualTo(100);
+					}
+				);
 	}
 }
