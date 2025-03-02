@@ -24,37 +24,29 @@ SOFTWARE.
 
 package org.fl.util.swing.logConfiguration;
 
-
-import java.awt.Color;
-
-import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import org.fl.util.RunningContext;
+public class ConfigureLoggerPane extends JPanel {
 
-public class LogConfigurationPane extends JPanel {
-	
 	private static final long serialVersionUID = 1L;
 	
-
-
+	private static final String TITLE_PREFIX = "Configure logger ";
 	
-
+	private final JLabel configurationTitleLabel;
 	
-	public LogConfigurationPane(RunningContext runningContext) {
-		
+	public ConfigureLoggerPane() {
 		super();
-
-		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-		setBorder(BorderFactory.createLineBorder(Color.BLACK, 5, true));
 		
-		ConfigureLoggerPane configureLoggerPane = new ConfigureLoggerPane();
-		
-		LoggerSelectionPane loggerSelectionPane = new LoggerSelectionPane(runningContext, configureLoggerPane);
-		add(loggerSelectionPane);
-		
-		add(configureLoggerPane);
+		configurationTitleLabel = new JLabel();
+		add(configurationTitleLabel);
 	}
+
+	public void setLoggerToBeConfigured(String loggerName) {
+		
+		if (loggerName != null) {
+			configurationTitleLabel.setText(TITLE_PREFIX + loggerName);
+		}
+	}
+	
 }

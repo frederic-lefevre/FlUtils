@@ -28,6 +28,8 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.util.Collections;
 import java.util.List;
 
@@ -49,14 +51,20 @@ public class LoggerSelectionPane extends JPanel {
 	private static final long serialVersionUID = 1L;
 	
 	private final RunningContext runningContext;
+	private final ConfigureLoggerPane configureLoggerPane;
 	private final DefaultComboBoxModel<String> loggerNamesModel;
 	private final JComboBox<String> loggerNameChoice;
 	private final JTextField loggersRootField;
+	private String selectedLoggerName;
 	
-	public LoggerSelectionPane(RunningContext runningContext) {
+	public LoggerSelectionPane(RunningContext runningContext, ConfigureLoggerPane configureLoggerPane) {
 		
+		super();
 		this.runningContext = runningContext;
+		this.configureLoggerPane = configureLoggerPane;
+		
 		String applicationName = runningContext.getName();
+		selectedLoggerName = applicationName;
 		
 //		setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
 		setBorder(BorderFactory.createLineBorder(Color.BLACK, 5, true));
@@ -75,12 +83,17 @@ public class LoggerSelectionPane extends JPanel {
 		updateLoggersList();
 		
 		loggerNameChoice.addPopupMenuListener(loggersRootSelectionListener);
+		loggerNameChoice.addItemListener(new LoggerSelectionListener());
 		
 		setPreferredSize(new Dimension(1200, 50));
 		
 		add(loggerNameChoice);
 	}
 	
+	public String getSelectedLoggerName() {
+		return selectedLoggerName;
+	}
+
 	private class LoggersRootSelectionListener implements ActionListener,PopupMenuListener  {
 
 		@Override
@@ -99,6 +112,18 @@ public class LoggerSelectionPane extends JPanel {
 		public void popupMenuCanceled(PopupMenuEvent e) {}
 	}
 	
+	private class  LoggerSelectionListener implements ItemListener {
+
+		@Override
+		public void itemStateChanged(ItemEvent e) {
+			
+			if (e.getStateChange() == ItemEvent.SELECTED) {
+				selectedLoggerName = (String)loggerNameChoice.getSelectedItem();
+				configureLoggerPane.setLoggerToBeConfigured(selectedLoggerName);
+			}
+		}
+		
+	}
 	private void updateLoggersList() {
 		
 		List<String> applicationLoggerNames = LoggerUtils.getChildLoggerNames(loggersRootField.getText());
