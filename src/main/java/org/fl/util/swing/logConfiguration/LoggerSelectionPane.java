@@ -26,6 +26,7 @@ package org.fl.util.swing.logConfiguration;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.util.Collections;
 import java.util.List;
 
 import javax.swing.BorderFactory;
@@ -56,7 +57,10 @@ public class LoggerSelectionPane extends JPanel {
 
 		JLabel selectLoggerLabel = new JLabel("Select the logger");
 		add(selectLoggerLabel);
+		
 		List<String> applicationLoggerNames = LoggerUtils.getChildLoggerNames(applicationName);
+		Collections.sort(applicationLoggerNames, String.CASE_INSENSITIVE_ORDER);
+		
 		loggerNamesModel = new DefaultComboBoxModel<>();
 		loggerNameChoice = new JComboBox<String>(loggerNamesModel);
 		loggerNamesModel.addAll(applicationLoggerNames);
