@@ -24,37 +24,44 @@ SOFTWARE.
 
 package org.fl.util.swing.logConfiguration;
 
-
 import java.awt.Color;
+import java.awt.Dimension;
+import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import org.fl.util.LoggerUtils;
 import org.fl.util.RunningContext;
 
-public class LogConfigurationPane extends JPanel {
-	
+public class LoggerSelectionPane extends JPanel {
+
 	private static final long serialVersionUID = 1L;
 	
-
-
+	private final RunningContext runningContext;
+	private final DefaultComboBoxModel<String> loggerNamesModel;
+	private final JComboBox<String> loggerNameChoice;
 	
-
-	
-	public LogConfigurationPane(RunningContext runningContext) {
-		super();
-
-		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+	public LoggerSelectionPane(RunningContext runningContext) {
+		
+		this.runningContext = runningContext;
+		String applicationName = runningContext.getName();
+		
+//		setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
 		setBorder(BorderFactory.createLineBorder(Color.BLACK, 5, true));
+
+		JLabel selectLoggerLabel = new JLabel("Select the logger");
+		add(selectLoggerLabel);
+		List<String> applicationLoggerNames = LoggerUtils.getChildLoggerNames(applicationName);
+		loggerNamesModel = new DefaultComboBoxModel<>();
+		loggerNameChoice = new JComboBox<String>(loggerNamesModel);
+		loggerNamesModel.addAll(applicationLoggerNames);
+		setPreferredSize(new Dimension(1200, 50));
 		
-		LoggerSelectionPane loggerSelectionPane = new LoggerSelectionPane(runningContext);
-		add(loggerSelectionPane);
-		
-		JPanel configureLoggerPane = new JPanel();
-		JLabel toBeChanged = new JLabel("configuration here");
-		configureLoggerPane.add(toBeChanged);
-		add(configureLoggerPane);
+		add(loggerNameChoice);
 	}
 }
