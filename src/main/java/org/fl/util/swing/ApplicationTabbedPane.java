@@ -34,7 +34,7 @@ import javax.swing.event.ChangeListener;
 
 import org.fl.util.AdvancedProperties;
 import org.fl.util.RunningContext;
-
+import org.fl.util.swing.logConfiguration.LogConfigurationPane;
 import org.fl.util.swing.logPane.LogHighLightListener;
 import org.fl.util.swing.logPane.LogsDisplayPane;
 
@@ -47,6 +47,7 @@ public class ApplicationTabbedPane extends JTabbedPane {
 	private final Logger logger;
 	private final ApplicationInfoPane appInfoPane;
 	private final LogsDisplayPane logsDisplayPane;
+	private final LogConfigurationPane logConfigurationPane;
 
 	private final Color logTabRegularColor;
 	private Color logTabHighLightColor;
@@ -64,6 +65,10 @@ public class ApplicationTabbedPane extends JTabbedPane {
 		appInfoPane = new ApplicationInfoPane(runningContext);
 		addTab("Informations", appInfoPane);
 
+		// Tabbed Panel for application information
+		logConfigurationPane = new LogConfigurationPane(runningContext);
+		addTab("Log Configuration", logConfigurationPane);
+		
 		// Tabbed Panel for logs display
 		logsDisplayPane = new LogsDisplayPane(runningContext);
 		addTab("Logs display", logsDisplayPane);
