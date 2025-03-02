@@ -26,6 +26,8 @@ package org.fl.util.swing.logConfiguration;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.Collections;
 import java.util.List;
 
@@ -35,6 +37,9 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
 
 import org.fl.util.LoggerUtils;
 import org.fl.util.RunningContext;
@@ -46,6 +51,7 @@ public class LoggerSelectionPane extends JPanel {
 	private final RunningContext runningContext;
 	private final DefaultComboBoxModel<String> loggerNamesModel;
 	private final JComboBox<String> loggerNameChoice;
+	private final JTextField loggersRootField;
 	
 	public LoggerSelectionPane(RunningContext runningContext) {
 		
@@ -55,17 +61,49 @@ public class LoggerSelectionPane extends JPanel {
 //		setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
 		setBorder(BorderFactory.createLineBorder(Color.BLACK, 5, true));
 
-		JLabel selectLoggerLabel = new JLabel("Select the logger");
+		JLabel selectLoggerLabel = new JLabel("Select the logger from root");
 		add(selectLoggerLabel);
-		
-		List<String> applicationLoggerNames = LoggerUtils.getChildLoggerNames(applicationName);
-		Collections.sort(applicationLoggerNames, String.CASE_INSENSITIVE_ORDER);
 		
 		loggerNamesModel = new DefaultComboBoxModel<>();
 		loggerNameChoice = new JComboBox<String>(loggerNamesModel);
-		loggerNamesModel.addAll(applicationLoggerNames);
+		
+		LoggersRootSelectionListener loggersRootSelectionListener = new LoggersRootSelectionListener();
+		loggersRootField = new JTextField(80);
+		add(loggersRootField);
+		loggersRootField.addActionListener(loggersRootSelectionListener);
+		loggersRootField.setText(applicationName);
+		updateLoggersList();
+		
+		loggerNameChoice.addPopupMenuListener(loggersRootSelectionListener);
+		
 		setPreferredSize(new Dimension(1200, 50));
 		
 		add(loggerNameChoice);
+	}
+	
+	private class LoggersRootSelectionListener implements ActionListener,PopupMenuListener  {
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			updateLoggersList();			
+		}
+
+		@Override
+		public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
+			updateLoggersList();			
+		}
+
+		@Override
+		public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {}
+		@Override
+		public void popupMenuCanceled(PopupMenuEvent e) {}
+	}
+	
+	private void updateLoggersList() {
+		
+		List<String> applicationLoggerNames = LoggerUtils.getChildLoggerNames(loggersRootField.getText());
+		Collections.sort(applicationLoggerNames, String.CASE_INSENSITIVE_ORDER);
+		loggerNamesModel.removeAllElements();
+		loggerNamesModel.addAll(applicationLoggerNames);
 	}
 }
