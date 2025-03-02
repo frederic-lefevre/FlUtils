@@ -52,11 +52,11 @@ public class ApplicationInfoPane extends JPanel {
 			
 	private static final long serialVersionUID = 1L;
 
-	private RunningContext runningContext;
+	private final RunningContext runningContext;
 
-	private JTextArea infosText;
+	private final JTextArea infosText;
 	private final JScrollPane scrollInfos;
-	private JCheckBox doIpLookUp;
+	private final JCheckBox doIpLookUp;
 
 	public ApplicationInfoPane(RunningContext rc) {
 		super();
