@@ -26,6 +26,7 @@ package org.fl.util.swing.logConfiguration;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -65,13 +66,18 @@ public class LoggerSelectionPane extends JPanel {
 		setBorder(BorderFactory.createLineBorder(Color.BLACK, 5, true));
 
 		JLabel selectLoggerLabel = new JLabel("Select the logger from root");
+		Font labelFont = new Font("Verdana", Font.BOLD, 16);
+		selectLoggerLabel.setFont(labelFont);
 		add(selectLoggerLabel);
 		
+		Font loggerNamesFont = new Font("Courier New", Font.BOLD, 14);
 		loggerNamesModel = new DefaultComboBoxModel<>();
 		loggerNameChoice = new JComboBox<String>(loggerNamesModel);
+		loggerNameChoice.setFont(loggerNamesFont);
 		
 		LoggersRootSelectionListener loggersRootSelectionListener = new LoggersRootSelectionListener();
 		loggersRootField = new JTextField(80);
+		loggersRootField.setFont(loggerNamesFont);
 		add(loggersRootField);
 		loggersRootField.addActionListener(loggersRootSelectionListener);
 		loggersRootField.setText(selectedLoggerName);
@@ -79,8 +85,6 @@ public class LoggerSelectionPane extends JPanel {
 		
 		loggerNameChoice.addPopupMenuListener(loggersRootSelectionListener);
 		loggerNameChoice.addItemListener(new LoggerSelectionListener());
-		
-		setPreferredSize(new Dimension(1200, 50));
 		
 		add(loggerNameChoice);
 	}

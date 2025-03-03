@@ -48,7 +48,7 @@ public class LogConfigurationPane extends JPanel {
 		setBorder(BorderFactory.createLineBorder(Color.BLACK, 5, true));
 		
 		ConfigureLoggerPane configureLoggerPane = new ConfigureLoggerPane();
-		configureLoggerPane.setPreferredSize(new Dimension(1800,700));
+		configureLoggerPane.setPreferredSize(new Dimension(1800,750));
 		
 		LoggerSelectionPane loggerSelectionPane = new LoggerSelectionPane(applicationRootLoggerng, configureLoggerPane);
 		add(loggerSelectionPane);
