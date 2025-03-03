@@ -24,6 +24,12 @@ SOFTWARE.
 
 package org.fl.util.swing.logConfiguration;
 
+
+import java.awt.Font;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
@@ -33,19 +39,47 @@ public class ConfigureLoggerPane extends JPanel {
 	
 	private static final String TITLE_PREFIX = "Configure logger ";
 	
+	private static final Level[] LEVELS = new Level[] {
+			Level.ALL, 
+			Level.FINEST, 
+			Level.FINER, 
+			Level.FINE, 
+			Level.CONFIG, 
+			Level.INFO, 
+			Level.WARNING, 
+			Level.SEVERE, 
+			Level.OFF};
+	
 	private final JLabel configurationTitleLabel;
+	
+	private final JComboBox<Level> loggerLevelChoice;
 	
 	public ConfigureLoggerPane() {
 		super();
 		
+		loggerLevelChoice = new JComboBox<>(LEVELS);
+		loggerLevelChoice.setSelectedItem(null);
+		
 		configurationTitleLabel = new JLabel();
+		Font font = new Font("Verdana", Font.BOLD, 14);
+		configurationTitleLabel.setFont(font);
 		add(configurationTitleLabel);
+		
+		add(new JLabel("Logger level"));
+		add(loggerLevelChoice);
 	}
 
 	public void setLoggerToBeConfigured(String loggerName) {
 		
 		if (loggerName != null) {
+			
 			configurationTitleLabel.setText(TITLE_PREFIX + loggerName);
+			
+			Logger logger = Logger.getLogger(loggerName);
+			
+			 Level loggerLevel = logger.getLevel();
+			 
+			 loggerLevelChoice.setSelectedItem(loggerLevel);
 		}
 	}
 	

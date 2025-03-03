@@ -26,6 +26,7 @@ package org.fl.util.swing.logConfiguration;
 
 
 import java.awt.Color;
+import java.awt.Dimension;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -47,6 +48,7 @@ public class LogConfigurationPane extends JPanel {
 		setBorder(BorderFactory.createLineBorder(Color.BLACK, 5, true));
 		
 		ConfigureLoggerPane configureLoggerPane = new ConfigureLoggerPane();
+		configureLoggerPane.setPreferredSize(new Dimension(1800,700));
 		
 		LoggerSelectionPane loggerSelectionPane = new LoggerSelectionPane(applicationRootLoggerng, configureLoggerPane);
 		add(loggerSelectionPane);
