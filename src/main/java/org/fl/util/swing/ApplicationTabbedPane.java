@@ -66,7 +66,7 @@ public class ApplicationTabbedPane extends JTabbedPane {
 		addTab("Informations", appInfoPane);
 
 		// Tabbed Panel for application information
-		logConfigurationPane = new LogConfigurationPane(runningContext);
+		logConfigurationPane = new LogConfigurationPane(runningContext.getName());
 		addTab("Log Configuration", logConfigurationPane);
 		
 		// Tabbed Panel for logs display

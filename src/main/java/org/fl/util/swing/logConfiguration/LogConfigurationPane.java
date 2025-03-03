@@ -29,11 +29,7 @@ import java.awt.Color;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
-
-import org.fl.util.RunningContext;
-
 public class LogConfigurationPane extends JPanel {
 	
 	private static final long serialVersionUID = 1L;
@@ -43,7 +39,7 @@ public class LogConfigurationPane extends JPanel {
 	
 
 	
-	public LogConfigurationPane(RunningContext runningContext) {
+	public LogConfigurationPane(String applicationRootLoggerng) {
 		
 		super();
 
@@ -52,7 +48,7 @@ public class LogConfigurationPane extends JPanel {
 		
 		ConfigureLoggerPane configureLoggerPane = new ConfigureLoggerPane();
 		
-		LoggerSelectionPane loggerSelectionPane = new LoggerSelectionPane(runningContext, configureLoggerPane);
+		LoggerSelectionPane loggerSelectionPane = new LoggerSelectionPane(applicationRootLoggerng, configureLoggerPane);
 		add(loggerSelectionPane);
 		
 		add(configureLoggerPane);

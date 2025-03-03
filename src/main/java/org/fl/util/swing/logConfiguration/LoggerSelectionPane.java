@@ -44,27 +44,22 @@ import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 
 import org.fl.util.LoggerUtils;
-import org.fl.util.RunningContext;
 
 public class LoggerSelectionPane extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 	
-	private final RunningContext runningContext;
 	private final ConfigureLoggerPane configureLoggerPane;
 	private final DefaultComboBoxModel<String> loggerNamesModel;
 	private final JComboBox<String> loggerNameChoice;
 	private final JTextField loggersRootField;
 	private String selectedLoggerName;
 	
-	public LoggerSelectionPane(RunningContext runningContext, ConfigureLoggerPane configureLoggerPane) {
+	public LoggerSelectionPane(String selectedLoggerName, ConfigureLoggerPane configureLoggerPane) {
 		
 		super();
-		this.runningContext = runningContext;
 		this.configureLoggerPane = configureLoggerPane;
-		
-		String applicationName = runningContext.getName();
-		selectedLoggerName = applicationName;
+		this.selectedLoggerName = selectedLoggerName;
 		
 //		setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
 		setBorder(BorderFactory.createLineBorder(Color.BLACK, 5, true));
@@ -79,7 +74,7 @@ public class LoggerSelectionPane extends JPanel {
 		loggersRootField = new JTextField(80);
 		add(loggersRootField);
 		loggersRootField.addActionListener(loggersRootSelectionListener);
-		loggersRootField.setText(applicationName);
+		loggersRootField.setText(selectedLoggerName);
 		updateLoggersList();
 		
 		loggerNameChoice.addPopupMenuListener(loggersRootSelectionListener);
