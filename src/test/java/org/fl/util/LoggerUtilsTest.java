@@ -251,4 +251,46 @@ class LoggerUtilsTest {
 			.hasValueSatisfying(consoleHandler -> 
 				assertThat(consoleHandler.getLevel()).isEqualTo(newHandlerLevel));
 	}
+	
+	@Test	
+	void getLevelFromHierarchyOfNullShouldThrowException() {
+		assertThatIllegalArgumentException().isThrownBy(() -> LoggerUtils.getLevelFromHierarchy(null))
+			.withMessage("Logger parameter must not be null");
+	}
+	
+	@Test	
+	void getLevelFromHierarchyRootLogger() {
+		
+		Logger rootLogger = Logger.getLogger("");
+		assertThat(LoggerUtils.getLevelFromHierarchy(rootLogger)).isEqualTo(rootLogger.getLevel());
+	}
+	
+	@Test	
+	void getLevelFromHierarchyOfLoggerWithLevelShouldReturnThisLevel() {
+		
+		Logger logger = Logger.getLogger("my.logger");
+		logger.setLevel(Level.FINER);
+		
+		assertThat(LoggerUtils.getLevelFromHierarchy(logger)).isEqualTo(Level.FINER);
+	}
+	
+	@Test	
+	void getLevelFromHierarchyShouldReturnParentLevel() {
+		
+		Logger loggerWithoutLevel = Logger.getLogger("my.logger.without.level");
+		Logger logger = Logger.getLogger("my.logger");
+		logger.setLevel(Level.FINER);
+		
+		assertThat(LoggerUtils.getLevelFromHierarchy(loggerWithoutLevel)).isEqualTo(Level.FINER);
+	}
+	
+	@Test	
+	void noLevelInHierarchyShouldReturnRootLevel() {
+		
+		Logger loggerWithoutLevel = Logger.getLogger("a.logger.without.level.in.its.hierarchy");
+		Level rootLoggerLevel = Logger.getLogger("").getLevel();
+
+		
+		assertThat(LoggerUtils.getLevelFromHierarchy(loggerWithoutLevel)).isEqualTo(rootLoggerLevel);
+	}
 }
