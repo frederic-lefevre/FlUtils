@@ -26,6 +26,9 @@ package org.fl.util.swing.logConfiguration;
 
 
 import java.awt.Font;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -54,11 +57,16 @@ public class ConfigureLoggerPane extends JPanel {
 	
 	private final JComboBox<Level> loggerLevelChoice;
 	
+	private Logger loggerToConfigure;
+	
 	public ConfigureLoggerPane() {
 		super();
 		
+		loggerToConfigure = null;
+		
 		loggerLevelChoice = new JComboBox<>(LEVELS);
 		loggerLevelChoice.setSelectedItem(null);
+		loggerLevelChoice.addItemListener(new LoggerLevelListener());
 		
 		configurationTitleLabel = new JLabel();
 		Font font = new Font("Verdana", Font.BOLD, 14);
@@ -75,12 +83,26 @@ public class ConfigureLoggerPane extends JPanel {
 			
 			configurationTitleLabel.setText(TITLE_PREFIX + loggerName);
 			
-			Logger logger = Logger.getLogger(loggerName);
+			loggerToConfigure = Logger.getLogger(loggerName);
 			
-			 Level loggerLevel = logger.getLevel();
+			 Level loggerLevel = loggerToConfigure.getLevel();
 			 
 			 loggerLevelChoice.setSelectedItem(loggerLevel);
+			 
+			 Handler[] handlers = loggerToConfigure.getHandlers();
 		}
+	}
+	
+	private class  LoggerLevelListener implements ItemListener {
+
+		@Override
+		public void itemStateChanged(ItemEvent e) {
+			
+			if ((e.getStateChange() == ItemEvent.SELECTED) && (loggerToConfigure != null)) {
+				
+				loggerToConfigure.setLevel((Level)(loggerLevelChoice.getSelectedItem()));			
+			}			
+		}		
 	}
 	
 }
