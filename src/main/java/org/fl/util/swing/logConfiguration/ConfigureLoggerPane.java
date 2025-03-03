@@ -36,6 +36,8 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import org.fl.util.LoggerUtils;
+
 public class ConfigureLoggerPane extends JPanel {
 
 	private static final long serialVersionUID = 1L;
@@ -54,6 +56,8 @@ public class ConfigureLoggerPane extends JPanel {
 			Level.OFF};
 	
 	private final JLabel configurationTitleLabel;
+	private final JLabel loggerNameLabel;
+	private final JLabel hierarchyLevelLabel;
 	
 	private final JComboBox<Level> loggerLevelChoice;
 	
@@ -68,20 +72,28 @@ public class ConfigureLoggerPane extends JPanel {
 		loggerLevelChoice.setSelectedItem(null);
 		loggerLevelChoice.addItemListener(new LoggerLevelListener());
 		
-		configurationTitleLabel = new JLabel();
-		Font font = new Font("Verdana", Font.BOLD, 14);
-		configurationTitleLabel.setFont(font);
+		configurationTitleLabel = new JLabel(TITLE_PREFIX);
+		loggerNameLabel = new JLabel();
+		Font titleFont = new Font("Verdana", Font.BOLD, 16);
+		configurationTitleLabel.setFont(titleFont);
+		loggerNameLabel.setFont(titleFont);
 		add(configurationTitleLabel);
+		add(loggerNameLabel);
 		
 		add(new JLabel("Logger level"));
 		add(loggerLevelChoice);
+		
+		hierarchyLevelLabel = new JLabel();
+		Font font = new Font("Verdana", Font.BOLD, 14);
+		hierarchyLevelLabel.setFont(font);
+		add(hierarchyLevelLabel);
 	}
 
 	public void setLoggerToBeConfigured(String loggerName) {
 		
 		if (loggerName != null) {
 			
-			configurationTitleLabel.setText(TITLE_PREFIX + loggerName);
+			loggerNameLabel.setText("\"" + loggerName + "\"");
 			
 			loggerToConfigure = Logger.getLogger(loggerName);
 			
@@ -89,7 +101,15 @@ public class ConfigureLoggerPane extends JPanel {
 			 
 			 loggerLevelChoice.setSelectedItem(loggerLevel);
 			 
+			 if (loggerLevel == null) {
+				 hierarchyLevelLabel.setText("Level from logger hierarchy: " + LoggerUtils.getLevelFromHierarchy(loggerToConfigure));
+			 } else {
+				 hierarchyLevelLabel.setText("");
+			 }
+			 
 			 Handler[] handlers = loggerToConfigure.getHandlers();
+		} else {
+			loggerNameLabel.setText("");
 		}
 	}
 	
