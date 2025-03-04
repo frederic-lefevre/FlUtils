@@ -80,6 +80,7 @@ public class ConfigureHandlerPane extends JPanel {
 		
 		formatterChoice = new JComboBox<>(AVAILABLE_FORMATTER_NAMES);
 		setSelectedFormatterName();
+		formatterChoice.addItemListener(new FormatterListener());
 		add(formatterChoice);
 	}
 
@@ -106,4 +107,25 @@ public class ConfigureHandlerPane extends JPanel {
 			formatterChoice.setSelectedItem(formatterName);
 		}
 	}
+	
+	private class FormatterListener implements ItemListener {
+		
+		@Override
+		public void itemStateChanged(ItemEvent e) {
+			
+			if ((e.getStateChange() == ItemEvent.SELECTED) && (handlerToConfigure != null)) {
+				String selectedFormatterName = (String)formatterChoice.getSelectedItem();
+				if (SimpleFormatter.class.getName().equals(selectedFormatterName)) {
+					handlerToConfigure.setFormatter(new SimpleFormatter());
+				} else if (PlainLogFormatter.class.getName().equals(selectedFormatterName)) {
+					handlerToConfigure.setFormatter(new PlainLogFormatter());
+				} else if (JsonLogFormatter.class.getName().equals(selectedFormatterName)) {
+					handlerToConfigure.setFormatter(new JsonLogFormatter());
+				} else if (XMLFormatter.class.getName().equals(selectedFormatterName)) {
+					handlerToConfigure.setFormatter(new XMLFormatter());
+				}			
+			}			
+		}		
+	}
+	
 }
