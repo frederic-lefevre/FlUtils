@@ -25,7 +25,6 @@ SOFTWARE.
 package org.fl.util.swing.logConfiguration;
 
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -35,7 +34,6 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -65,7 +63,7 @@ public class LoggerSelectionPane extends JPanel {
 //		setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
 		setBorder(BorderFactory.createLineBorder(Color.BLACK, 5, true));
 
-		JLabel selectLoggerLabel = new JLabel("Select the logger from root");
+		JLabel selectLoggerLabel = new JLabel("Select the logger from the following root:");
 		Font labelFont = new Font("Verdana", Font.BOLD, 16);
 		selectLoggerLabel.setFont(labelFont);
 		add(selectLoggerLabel);

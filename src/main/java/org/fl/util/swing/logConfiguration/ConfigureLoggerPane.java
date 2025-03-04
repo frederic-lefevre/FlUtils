@@ -32,6 +32,7 @@ import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.swing.BoxLayout;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -66,48 +67,62 @@ public class ConfigureLoggerPane extends JPanel {
 	public ConfigureLoggerPane() {
 		super();
 		
+		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+		
 		loggerToConfigure = null;
 		
-		loggerLevelChoice = new JComboBox<>(LEVELS);
-		loggerLevelChoice.setSelectedItem(null);
-		loggerLevelChoice.addItemListener(new LoggerLevelListener());
-		
+		// Title
+		JPanel configureLoggerTitlePane = new JPanel();
 		configurationTitleLabel = new JLabel(TITLE_PREFIX);
 		loggerNameLabel = new JLabel();
 		Font titleFont = new Font("Verdana", Font.BOLD, 16);
 		configurationTitleLabel.setFont(titleFont);
 		loggerNameLabel.setFont(titleFont);
-		add(configurationTitleLabel);
-		add(loggerNameLabel);
+		configureLoggerTitlePane.add(configurationTitleLabel);
+		configureLoggerTitlePane.add(loggerNameLabel);
+		add(configureLoggerTitlePane);
 		
-		add(new JLabel("Logger level"));
-		add(loggerLevelChoice);
+		Font font = new Font("Verdana", Font.BOLD, 14);
+		
+		// Logger Level Configuration
+		JPanel logLevelConfigurePane = new JPanel();
+		
+		JLabel loggerLevelTitle = new JLabel("Logger level");
+		loggerLevelTitle.setFont(font);
+		logLevelConfigurePane.add(loggerLevelTitle);
+		
+		// Combo Box to select logger level
+		loggerLevelChoice = new JComboBox<>(LEVELS);
+		loggerLevelChoice.setSelectedItem(null);
+		loggerLevelChoice.addItemListener(new LoggerLevelListener());
+		logLevelConfigurePane.add(loggerLevelChoice);
 		
 		hierarchyLevelLabel = new JLabel();
-		Font font = new Font("Verdana", Font.BOLD, 14);
 		hierarchyLevelLabel.setFont(font);
-		add(hierarchyLevelLabel);
+		logLevelConfigurePane.add(hierarchyLevelLabel);
+		
+		add(logLevelConfigurePane);
 	}
 
 	public void setLoggerToBeConfigured(String loggerName) {
-		
+
 		if (loggerName != null) {
-			
+
 			loggerNameLabel.setText("\"" + loggerName + "\"");
-			
+
 			loggerToConfigure = Logger.getLogger(loggerName);
-			
-			 Level loggerLevel = loggerToConfigure.getLevel();
-			 
-			 loggerLevelChoice.setSelectedItem(loggerLevel);
-			 
-			 if (loggerLevel == null) {
-				 hierarchyLevelLabel.setText("Level from logger hierarchy: " + LoggerUtils.getLevelFromHierarchy(loggerToConfigure));
-			 } else {
-				 hierarchyLevelLabel.setText("");
-			 }
-			 
-			 Handler[] handlers = loggerToConfigure.getHandlers();
+
+			Level loggerLevel = loggerToConfigure.getLevel();
+
+			loggerLevelChoice.setSelectedItem(loggerLevel);
+
+			if (loggerLevel == null) {
+				hierarchyLevelLabel.setText("Level from logger hierarchy: " + LoggerUtils.getLevelFromHierarchy(loggerToConfigure));
+			} else {
+				hierarchyLevelLabel.setText("");
+			}
+
+			Handler[] handlers = loggerToConfigure.getHandlers();
 		} else {
 			loggerNameLabel.setText("");
 		}

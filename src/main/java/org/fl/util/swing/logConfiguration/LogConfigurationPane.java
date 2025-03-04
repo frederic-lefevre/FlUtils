@@ -35,11 +35,6 @@ public class LogConfigurationPane extends JPanel {
 	
 	private static final long serialVersionUID = 1L;
 	
-
-
-	
-
-	
 	public LogConfigurationPane(String applicationRootLoggerng) {
 		
 		super();
