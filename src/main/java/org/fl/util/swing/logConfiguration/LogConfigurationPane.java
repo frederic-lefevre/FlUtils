@@ -35,7 +35,7 @@ public class LogConfigurationPane extends JPanel {
 	
 	private static final long serialVersionUID = 1L;
 	
-	public LogConfigurationPane(String applicationRootLoggerng) {
+	public LogConfigurationPane(String applicationRootLoggerName) {
 		
 		super();
 
@@ -45,7 +45,7 @@ public class LogConfigurationPane extends JPanel {
 		ConfigureLoggerPane configureLoggerPane = new ConfigureLoggerPane();
 		configureLoggerPane.setPreferredSize(new Dimension(1800,750));
 		
-		LoggerSelectionPane loggerSelectionPane = new LoggerSelectionPane(applicationRootLoggerng, configureLoggerPane);
+		LoggerSelectionPane loggerSelectionPane = new LoggerSelectionPane(applicationRootLoggerName, configureLoggerPane);
 		add(loggerSelectionPane);
 		
 		add(configureLoggerPane);

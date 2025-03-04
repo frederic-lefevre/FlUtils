@@ -25,33 +25,50 @@ SOFTWARE.
 package org.fl.util.swing.logConfiguration;
 
 import java.awt.Font;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.util.logging.Handler;
 import java.util.logging.Level;
+import java.util.logging.SimpleFormatter;
+import java.util.logging.XMLFormatter;
 
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import org.fl.util.JsonLogFormatter;
 import org.fl.util.LoggerUtils;
+import org.fl.util.PlainLogFormatter;
 
 public class ConfigureHandlerPane extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 	private static final Font font = new Font("Verdana", Font.BOLD, 14);
 	
+	private static final String[] AvailableLoggingFormatterName = {
+			SimpleFormatter.class.getName(),
+			XMLFormatter.class.getName(),
+			JsonLogFormatter.class.getName(), 
+			PlainLogFormatter.class.getName()};
+	
+	private final JComboBox<Level> handlerLevelChoice;
+	private final Handler handlerToConfigure;
+	
 	public ConfigureHandlerPane(Handler handler) {
 		
 		super();
-		Handler handlerToConfigure = handler;
+		handlerToConfigure = handler;
 		
 		JLabel handlerTitle = new JLabel();
 		handlerTitle.setFont(font);		
 		handlerTitle.setText("Handler " + handlerToConfigure.getClass().getName());
 		add(handlerTitle);
 		
-		JComboBox<Level> loggerLevelChoice = new JComboBox<>(LoggerUtils.LEVELS);
-		loggerLevelChoice.setSelectedItem(handler.getLevel());
-		add(loggerLevelChoice);
+		handlerLevelChoice = new JComboBox<>(LoggerUtils.LEVELS);
+		handlerLevelChoice.setSelectedItem(handler.getLevel());
+		handlerLevelChoice.addItemListener(new HandlerLevelListener());
+		add(handlerLevelChoice);
+		
 		
 		JLabel formatterTitle = new JLabel();
 		formatterTitle.setFont(font);
@@ -64,4 +81,14 @@ public class ConfigureHandlerPane extends JPanel {
 		add(formatterLabel);
 	}
 
+	private class  HandlerLevelListener implements ItemListener {
+		
+		@Override
+		public void itemStateChanged(ItemEvent e) {
+			
+			if ((e.getStateChange() == ItemEvent.SELECTED) && (handlerToConfigure != null)) {				
+				handlerToConfigure.setLevel((Level)(handlerLevelChoice.getSelectedItem()));			
+			}			
+		}		
+	}
 }
