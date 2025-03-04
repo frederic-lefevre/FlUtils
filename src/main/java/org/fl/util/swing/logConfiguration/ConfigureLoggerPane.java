@@ -26,18 +26,12 @@ package org.fl.util.swing.logConfiguration;
 
 
 import java.awt.Font;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.util.logging.Handler;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.BoxLayout;
-import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-
-import org.fl.util.LoggerUtils;
 
 public class ConfigureLoggerPane extends JPanel {
 
@@ -45,22 +39,9 @@ public class ConfigureLoggerPane extends JPanel {
 	
 	private static final String TITLE_PREFIX = "Configure logger ";
 	
-	private static final Level[] LEVELS = new Level[] {
-			Level.ALL, 
-			Level.FINEST, 
-			Level.FINER, 
-			Level.FINE, 
-			Level.CONFIG, 
-			Level.INFO, 
-			Level.WARNING, 
-			Level.SEVERE, 
-			Level.OFF};
-	
 	private final JLabel configurationTitleLabel;
 	private final JLabel loggerNameLabel;
-	private final JLabel hierarchyLevelLabel;
-	
-	private final JComboBox<Level> loggerLevelChoice;
+	private final ConfigureLoggerLevelPane logLevelConfigurePane;
 	
 	private Logger loggerToConfigure;
 	
@@ -82,25 +63,8 @@ public class ConfigureLoggerPane extends JPanel {
 		configureLoggerTitlePane.add(loggerNameLabel);
 		add(configureLoggerTitlePane);
 		
-		Font font = new Font("Verdana", Font.BOLD, 14);
-		
 		// Logger Level Configuration
-		JPanel logLevelConfigurePane = new JPanel();
-		
-		JLabel loggerLevelTitle = new JLabel("Logger level");
-		loggerLevelTitle.setFont(font);
-		logLevelConfigurePane.add(loggerLevelTitle);
-		
-		// Combo Box to select logger level
-		loggerLevelChoice = new JComboBox<>(LEVELS);
-		loggerLevelChoice.setSelectedItem(null);
-		loggerLevelChoice.addItemListener(new LoggerLevelListener());
-		logLevelConfigurePane.add(loggerLevelChoice);
-		
-		hierarchyLevelLabel = new JLabel();
-		hierarchyLevelLabel.setFont(font);
-		logLevelConfigurePane.add(hierarchyLevelLabel);
-		
+		logLevelConfigurePane = new ConfigureLoggerLevelPane();
 		add(logLevelConfigurePane);
 	}
 
@@ -112,32 +76,12 @@ public class ConfigureLoggerPane extends JPanel {
 
 			loggerToConfigure = Logger.getLogger(loggerName);
 
-			Level loggerLevel = loggerToConfigure.getLevel();
-
-			loggerLevelChoice.setSelectedItem(loggerLevel);
-
-			if (loggerLevel == null) {
-				hierarchyLevelLabel.setText("Level from logger hierarchy: " + LoggerUtils.getLevelFromHierarchy(loggerToConfigure));
-			} else {
-				hierarchyLevelLabel.setText("");
-			}
+			logLevelConfigurePane.setLoggerToBeConfigured(loggerToConfigure);
 
 			Handler[] handlers = loggerToConfigure.getHandlers();
 		} else {
 			loggerNameLabel.setText("");
 		}
-	}
-	
-	private class  LoggerLevelListener implements ItemListener {
-
-		@Override
-		public void itemStateChanged(ItemEvent e) {
-			
-			if ((e.getStateChange() == ItemEvent.SELECTED) && (loggerToConfigure != null)) {
-				
-				loggerToConfigure.setLevel((Level)(loggerLevelChoice.getSelectedItem()));			
-			}			
-		}		
 	}
 	
 }

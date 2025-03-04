@@ -43,6 +43,17 @@ public class LoggerUtils {
 
 	private static final Logger logger = Logger.getLogger(LoggerUtils.class.getName());
 	
+	public static final Level[] LEVELS = new Level[] {
+			Level.ALL, 
+			Level.FINEST, 
+			Level.FINER, 
+			Level.FINE, 
+			Level.CONFIG, 
+			Level.INFO, 
+			Level.WARNING, 
+			Level.SEVERE, 
+			Level.OFF};
+	
 	private LoggerUtils() {
 		// Hide constructor
 	}
