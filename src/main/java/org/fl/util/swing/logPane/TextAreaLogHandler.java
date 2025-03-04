@@ -54,30 +54,32 @@ public class TextAreaLogHandler extends Handler {
 			@Override
 			public void run() {
 
-				int startRecord;
-				int textLength = logDisplayComponent.textLength();
-
-				if (textLength > logDisplayMaxLength) {
-					logDisplayComponent = logDisplayChanger.changeLogDisplayComponent();
-					textLength = logDisplayComponent.textLength();
+				if (isLoggable(record)) {
+					int startRecord;
+					int textLength = logDisplayComponent.textLength();
+	
+					if (textLength > logDisplayMaxLength) {
+						logDisplayComponent = logDisplayChanger.changeLogDisplayComponent();
+						textLength = logDisplayComponent.textLength();
+					}
+	
+					if (textLength > 0) {
+						startRecord = textLength - 1;
+					} else {
+						startRecord = 0;
+					}
+	
+					Formatter formatter = getFormatter();
+					if (formatter == null) {
+						formatter = new SimpleFormatter();
+						setFormatter(formatter);	
+					}
+					
+					logDisplayComponent.appendToText(formatter.format(record));
+	
+					int endRecord = logDisplayComponent.textLength() - 1;
+					logDisplayComponent.addLogRecord(record.getLevel(), startRecord, endRecord);
 				}
-
-				if (textLength > 0) {
-					startRecord = textLength - 1;
-				} else {
-					startRecord = 0;
-				}
-
-				Formatter formatter = getFormatter();
-				if (formatter == null) {
-					formatter = new SimpleFormatter();
-					setFormatter(formatter);	
-				}
-				
-				logDisplayComponent.appendToText(formatter.format(record));
-
-				int endRecord = logDisplayComponent.textLength() - 1;
-				logDisplayComponent.addLogRecord(record.getLevel(), startRecord, endRecord);
 			}
 		});
 	}
