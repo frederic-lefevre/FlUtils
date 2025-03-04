@@ -24,50 +24,33 @@ SOFTWARE.
 
 package org.fl.util.swing.logConfiguration;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.awt.Font;
 import java.util.logging.Handler;
-import java.util.logging.Logger;
 
-import javax.swing.BoxLayout;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-public class ConfigureLoggerHandlersPane extends JPanel {
+public class ConfigureHandlerPane extends JPanel {
 
 	private static final long serialVersionUID = 1L;
-
-	private Logger loggerToConfigure;
-	private final List<ConfigureHandlerPane> configureHandlerPanes;
 	
-	public ConfigureLoggerHandlersPane() {
+	private Handler handlerToConfigure;
+	
+	public ConfigureHandlerPane(Handler handler) {
 		
 		super();
-		loggerToConfigure = null;
-		configureHandlerPanes = new ArrayList<>();
+		handlerToConfigure = handler;
 		
-		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+		Font font = new Font("Verdana", Font.BOLD, 14);
+		
+		JLabel title = new JLabel();
+		title.setFont(font);
+		
+		title.setText("Handler " + handlerToConfigure.getClass().getName());
+		add(title);
 	}
 	
-	public void setLoggerToBeConfigured(Logger logger) {
-
-		if (logger != null) {
-			
-			// Remove previous handler panes
-			for (ConfigureHandlerPane configureHandlerPane : configureHandlerPanes) {
-				remove(configureHandlerPane);
-			}
-			
-			loggerToConfigure = logger;
-			
-			// Add handler to configure
-			Handler[] handlers = loggerToConfigure.getHandlers();
-			if (handlers != null) {
-				for (Handler handler : handlers) {
-					ConfigureHandlerPane handlerPane = new ConfigureHandlerPane(handler);
-					configureHandlerPanes.add(handlerPane);
-					add(handlerPane);
-				}
-			}
-		}
+	public void setHandlerToConfigure(Handler handler) {
+		handlerToConfigure = handler;
 	}
 }
