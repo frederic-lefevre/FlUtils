@@ -47,6 +47,8 @@ public class ConfigureLoggerLevelPane extends JPanel {
 	
 	public ConfigureLoggerLevelPane() {
 		
+		loggerToConfigure = null;
+		
 		Font font = new Font("Verdana", Font.BOLD, 14);
 		
 		JLabel loggerLevelTitle = new JLabel("Logger level");

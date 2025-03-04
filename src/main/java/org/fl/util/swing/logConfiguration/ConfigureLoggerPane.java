@@ -24,9 +24,7 @@ SOFTWARE.
 
 package org.fl.util.swing.logConfiguration;
 
-
 import java.awt.Font;
-import java.util.logging.Handler;
 import java.util.logging.Logger;
 
 import javax.swing.BoxLayout;
@@ -41,7 +39,8 @@ public class ConfigureLoggerPane extends JPanel {
 	
 	private final JLabel configurationTitleLabel;
 	private final JLabel loggerNameLabel;
-	private final ConfigureLoggerLevelPane logLevelConfigurePane;
+	private final ConfigureLoggerLevelPane configureLoggerLevelPane;
+	private final ConfigureLoggerHandlersPane configureLoggerHandlersPane;
 	
 	private Logger loggerToConfigure;
 	
@@ -64,8 +63,11 @@ public class ConfigureLoggerPane extends JPanel {
 		add(configureLoggerTitlePane);
 		
 		// Logger Level Configuration
-		logLevelConfigurePane = new ConfigureLoggerLevelPane();
-		add(logLevelConfigurePane);
+		configureLoggerLevelPane = new ConfigureLoggerLevelPane();
+		add(configureLoggerLevelPane);
+		
+		configureLoggerHandlersPane = new ConfigureLoggerHandlersPane();
+		add(configureLoggerHandlersPane);
 	}
 
 	public void setLoggerToBeConfigured(String loggerName) {
@@ -76,9 +78,9 @@ public class ConfigureLoggerPane extends JPanel {
 
 			loggerToConfigure = Logger.getLogger(loggerName);
 
-			logLevelConfigurePane.setLoggerToBeConfigured(loggerToConfigure);
-
-			Handler[] handlers = loggerToConfigure.getHandlers();
+			configureLoggerLevelPane.setLoggerToBeConfigured(loggerToConfigure);
+			configureLoggerHandlersPane.setLoggerToBeConfigured(loggerToConfigure);
+			
 		} else {
 			loggerNameLabel.setText("");
 		}
