@@ -27,6 +27,8 @@ package org.fl.util.swing.logConfiguration;
 import java.awt.Font;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.util.Arrays;
+import java.util.logging.Formatter;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.SimpleFormatter;
@@ -45,13 +47,14 @@ public class ConfigureHandlerPane extends JPanel {
 	private static final long serialVersionUID = 1L;
 	private static final Font font = new Font("Verdana", Font.BOLD, 14);
 	
-	private static final String[] AvailableLoggingFormatterName = {
+	private static final String[] AVAILABLE_FORMATTER_NAMES = {
 			SimpleFormatter.class.getName(),
 			XMLFormatter.class.getName(),
 			JsonLogFormatter.class.getName(), 
 			PlainLogFormatter.class.getName()};
 	
 	private final JComboBox<Level> handlerLevelChoice;
+	private final JComboBox<String> formatterChoice;
 	private final Handler handlerToConfigure;
 	
 	public ConfigureHandlerPane(Handler handler) {
@@ -75,10 +78,9 @@ public class ConfigureHandlerPane extends JPanel {
 		formatterTitle.setText("Formatter: ");
 		add(formatterTitle);
 		
-		JLabel formatterLabel = new JLabel();
-		formatterLabel.setFont(font);
-		formatterLabel.setText(handler.getFormatter().getClass().getName());
-		add(formatterLabel);
+		formatterChoice = new JComboBox<>(AVAILABLE_FORMATTER_NAMES);
+		setSelectedFormatterName();
+		add(formatterChoice);
 	}
 
 	private class  HandlerLevelListener implements ItemListener {
@@ -90,5 +92,18 @@ public class ConfigureHandlerPane extends JPanel {
 				handlerToConfigure.setLevel((Level)(handlerLevelChoice.getSelectedItem()));			
 			}			
 		}		
+	}
+	
+	private void setSelectedFormatterName() {
+		
+		Formatter formatter = handlerToConfigure.getFormatter();
+		if (formatter != null) {
+			String formatterName = formatter.getClass().getName();
+			if (! Arrays.stream(AVAILABLE_FORMATTER_NAMES).anyMatch(formatterName::equals)) {
+				// Formatter ins not in the available ones
+				formatterChoice.addItem(formatterName);
+			}
+			formatterChoice.setSelectedItem(formatterName);
+		}
 	}
 }
