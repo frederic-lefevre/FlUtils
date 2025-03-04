@@ -26,31 +26,42 @@ package org.fl.util.swing.logConfiguration;
 
 import java.awt.Font;
 import java.util.logging.Handler;
+import java.util.logging.Level;
 
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+
+import org.fl.util.LoggerUtils;
 
 public class ConfigureHandlerPane extends JPanel {
 
 	private static final long serialVersionUID = 1L;
-	
-	private Handler handlerToConfigure;
+	private static final Font font = new Font("Verdana", Font.BOLD, 14);
 	
 	public ConfigureHandlerPane(Handler handler) {
 		
 		super();
-		handlerToConfigure = handler;
+		Handler handlerToConfigure = handler;
 		
-		Font font = new Font("Verdana", Font.BOLD, 14);
+		JLabel handlerTitle = new JLabel();
+		handlerTitle.setFont(font);		
+		handlerTitle.setText("Handler " + handlerToConfigure.getClass().getName());
+		add(handlerTitle);
 		
-		JLabel title = new JLabel();
-		title.setFont(font);
+		JComboBox<Level> loggerLevelChoice = new JComboBox<>(LoggerUtils.LEVELS);
+		loggerLevelChoice.setSelectedItem(handler.getLevel());
+		add(loggerLevelChoice);
 		
-		title.setText("Handler " + handlerToConfigure.getClass().getName());
-		add(title);
+		JLabel formatterTitle = new JLabel();
+		formatterTitle.setFont(font);
+		formatterTitle.setText("Formatter: ");
+		add(formatterTitle);
+		
+		JLabel formatterLabel = new JLabel();
+		formatterLabel.setFont(font);
+		formatterLabel.setText(handler.getFormatter().getClass().getName());
+		add(formatterLabel);
 	}
-	
-	public void setHandlerToConfigure(Handler handler) {
-		handlerToConfigure = handler;
-	}
+
 }
