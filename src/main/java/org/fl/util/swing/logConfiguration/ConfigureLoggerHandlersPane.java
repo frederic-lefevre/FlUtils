@@ -24,6 +24,7 @@ SOFTWARE.
 
 package org.fl.util.swing.logConfiguration;
 
+import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Handler;
@@ -31,13 +32,15 @@ import java.util.logging.Logger;
 
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 
-public class ConfigureLoggerHandlersPane extends JPanel {
+public class ConfigureLoggerHandlersPane extends JScrollPane {
 
 	private static final long serialVersionUID = 1L;
 
 	private Logger loggerToConfigure;
 	private final List<ConfigureHandlerPane> configureHandlerPanes;
+	private final JPanel contentPane;
 	
 	public ConfigureLoggerHandlersPane() {
 		
@@ -45,7 +48,10 @@ public class ConfigureLoggerHandlersPane extends JPanel {
 		loggerToConfigure = null;
 		configureHandlerPanes = new ArrayList<>();
 		
-		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+		setPreferredSize(new Dimension(1800,700));
+		contentPane = new JPanel();
+		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
+		setViewportView(contentPane);
 	}
 	
 	public void setLoggerToBeConfigured(Logger logger) {
@@ -54,7 +60,7 @@ public class ConfigureLoggerHandlersPane extends JPanel {
 			
 			// Remove previous handler panes
 			for (ConfigureHandlerPane configureHandlerPane : configureHandlerPanes) {
-				remove(configureHandlerPane);
+				contentPane.remove(configureHandlerPane);
 			}
 			
 			loggerToConfigure = logger;
@@ -65,7 +71,7 @@ public class ConfigureLoggerHandlersPane extends JPanel {
 				for (Handler handler : handlers) {
 					ConfigureHandlerPane handlerPane = new ConfigureHandlerPane(handler);
 					configureHandlerPanes.add(handlerPane);
-					add(handlerPane);
+					contentPane.add(handlerPane);
 				}
 			}
 		}
