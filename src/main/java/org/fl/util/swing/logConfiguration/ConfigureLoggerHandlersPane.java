@@ -25,12 +25,16 @@ SOFTWARE.
 package org.fl.util.swing.logConfiguration;
 
 import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Handler;
 import java.util.logging.Logger;
 
 import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
@@ -41,6 +45,7 @@ public class ConfigureLoggerHandlersPane extends JScrollPane {
 	private Logger loggerToConfigure;
 	private final List<ConfigureHandlerPane> configureHandlerPanes;
 	private final JPanel contentPane;
+	private final JButton addHandlerButton;
 	
 	public ConfigureLoggerHandlersPane() {
 		
@@ -51,6 +56,13 @@ public class ConfigureLoggerHandlersPane extends JScrollPane {
 		setPreferredSize(new Dimension(1800,700));
 		contentPane = new JPanel();
 		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
+		
+		// Button to add handler
+		addHandlerButton = new JButton("Add a logger handler");
+		addHandlerButton.setVisible(false);
+		addHandlerButton.addActionListener(new AddHandlerListener());
+		contentPane.add(addHandlerButton);
+		
 		setViewportView(contentPane);
 	}
 	
@@ -58,6 +70,7 @@ public class ConfigureLoggerHandlersPane extends JScrollPane {
 
 		if (logger != null) {
 			
+			addHandlerButton.setVisible(true);
 			// Remove previous handler panes
 			for (ConfigureHandlerPane configureHandlerPane : configureHandlerPanes) {
 				contentPane.remove(configureHandlerPane);
@@ -74,6 +87,18 @@ public class ConfigureLoggerHandlersPane extends JScrollPane {
 					contentPane.add(handlerPane);
 				}
 			}
+			
+			
 		}
+	}
+	
+	private class AddHandlerListener implements ActionListener {
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			JOptionPane.showMessageDialog(null, new AddHandlerPane(loggerToConfigure), "Add a hanler to the logger", JOptionPane.INFORMATION_MESSAGE);
+			
+		}
+		
 	}
 }
