@@ -45,6 +45,7 @@ public class ConfigureLoggerLevelPane extends JPanel {
 	private final JComboBox<Level> loggerLevelChoice;
 	private final JLabel hierarchyLevelLabel;
 	private final ConfigureLoggerHandlersPane configureLoggerHandlersPane;
+	private final JLabel loggerLevelTitle;
 	
 	public ConfigureLoggerLevelPane(ConfigureLoggerHandlersPane configureLoggerHandlersPane) {
 		
@@ -54,14 +55,16 @@ public class ConfigureLoggerLevelPane extends JPanel {
 		
 		Font font = new Font("Verdana", Font.BOLD, 14);
 		
-		JLabel loggerLevelTitle = new JLabel("Logger level");
+		loggerLevelTitle = new JLabel("Logger level");
 		loggerLevelTitle.setFont(font);
+		loggerLevelTitle.setVisible(false);
 		add(loggerLevelTitle);
 		
 		// Combo Box to select logger level
 		loggerLevelChoice = new JComboBox<>(LoggerUtils.LEVELS);
 		loggerLevelChoice.setSelectedItem(null);
 		loggerLevelChoice.addItemListener(new LoggerLevelListener());
+		loggerLevelChoice.setVisible(false);
 		add(loggerLevelChoice);
 		
 		hierarchyLevelLabel = new JLabel();
@@ -73,6 +76,8 @@ public class ConfigureLoggerLevelPane extends JPanel {
 
 		if (logger != null) {
 			loggerToConfigure = logger;
+			loggerLevelTitle.setVisible(true);
+			loggerLevelChoice.setVisible(true);
 			
 			Level loggerLevel = loggerToConfigure.getLevel();
 			loggerLevelChoice.setSelectedItem(loggerLevel);
@@ -82,6 +87,9 @@ public class ConfigureLoggerLevelPane extends JPanel {
 			} else {
 				hierarchyLevelLabel.setText("");
 			}
+		} else {
+			loggerLevelTitle.setVisible(false);
+			loggerLevelChoice.setVisible(false);
 		}
 	}
 	
