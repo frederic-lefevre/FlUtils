@@ -29,12 +29,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.ConsoleHandler;
 import java.util.logging.Handler;
 import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
@@ -45,7 +46,7 @@ public class ConfigureLoggerHandlersPane extends JScrollPane {
 	private Logger loggerToConfigure;
 	private final List<ConfigureHandlerPane> configureHandlerPanes;
 	private final JPanel contentPane;
-	private final JButton addHandlerButton;
+	private final JButton addConsoleHandlerButton;
 	
 	public ConfigureLoggerHandlersPane() {
 		
@@ -57,11 +58,11 @@ public class ConfigureLoggerHandlersPane extends JScrollPane {
 		contentPane = new JPanel();
 		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
 		
-		// Button to add handler
-		addHandlerButton = new JButton("Add a logger handler");
-		addHandlerButton.setVisible(false);
-		addHandlerButton.addActionListener(new AddHandlerListener());
-		contentPane.add(addHandlerButton);
+		// Button to add a console handler
+		addConsoleHandlerButton = new JButton("Add a console handler");
+		addConsoleHandlerButton.setVisible(false);
+		addConsoleHandlerButton.addActionListener(new AddConsoleHandlerListener());
+		contentPane.add(addConsoleHandlerButton);
 		
 		setViewportView(contentPane);
 	}
@@ -70,34 +71,53 @@ public class ConfigureLoggerHandlersPane extends JScrollPane {
 
 		if (logger != null) {
 			
-			addHandlerButton.setVisible(true);
-			// Remove previous handler panes
-			for (ConfigureHandlerPane configureHandlerPane : configureHandlerPanes) {
-				contentPane.remove(configureHandlerPane);
-			}
-			
 			loggerToConfigure = logger;
-			
-			// Add handler to configure
+			refreshHandlers();	
+		}
+	}
+	
+	private void refreshHandlers() {
+
+		// Remove previous handler panes
+		for (ConfigureHandlerPane configureHandlerPane : configureHandlerPanes) {
+			contentPane.remove(configureHandlerPane);
+		}	
+		contentPane.repaint();
+		configureHandlerPanes.clear();
+		
+		// Add handler to configure if logger level is set
+		if (loggerToConfigure.getLevel() != null) {
+			boolean hasNoConsoleHandler = true;
 			Handler[] handlers = loggerToConfigure.getHandlers();
 			if (handlers != null) {
 				for (Handler handler : handlers) {
 					ConfigureHandlerPane handlerPane = new ConfigureHandlerPane(handler);
 					configureHandlerPanes.add(handlerPane);
 					contentPane.add(handlerPane);
+					if (handler instanceof ConsoleHandler) {
+						hasNoConsoleHandler = false;
+					}
 				}
 			}
-			
-			
+			addConsoleHandlerButton.setVisible(hasNoConsoleHandler);
+		} else {
+			addConsoleHandlerButton.setVisible(false);
 		}
 	}
 	
-	private class AddHandlerListener implements ActionListener {
+	private class AddConsoleHandlerListener implements ActionListener {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			JOptionPane.showMessageDialog(null, new AddHandlerPane(loggerToConfigure), "Add a hanler to the logger", JOptionPane.INFORMATION_MESSAGE);
 			
+			if (loggerToConfigure != null) {
+				
+				ConsoleHandler consoleHandler = new ConsoleHandler();
+				consoleHandler.setLevel(loggerToConfigure.getLevel());
+				consoleHandler.setFormatter(new SimpleFormatter());
+				loggerToConfigure.addHandler(consoleHandler);
+				refreshHandlers();
+			}
 		}
 		
 	}

@@ -62,11 +62,10 @@ public class ConfigureLoggerPane extends JPanel {
 		configureLoggerTitlePane.add(loggerNameLabel);
 		add(configureLoggerTitlePane);
 		
-		// Logger Level Configuration
-		configureLoggerLevelPane = new ConfigureLoggerLevelPane();
-		add(configureLoggerLevelPane);
-		
+		// Logger Level and handler Configuration
 		configureLoggerHandlersPane = new ConfigureLoggerHandlersPane();
+		configureLoggerLevelPane = new ConfigureLoggerLevelPane(configureLoggerHandlersPane);
+		add(configureLoggerLevelPane);
 		add(configureLoggerHandlersPane);
 	}
 
