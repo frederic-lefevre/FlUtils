@@ -86,5 +86,7 @@ public class HandlerTableModel extends AbstractTableModel{
 		}
 	}
 
-
+	public Handler getHandlerAt(int rowIndex) {
+		return handlerList.get(rowIndex);
+	}
 }

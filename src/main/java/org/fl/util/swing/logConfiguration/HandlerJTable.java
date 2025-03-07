@@ -24,7 +24,11 @@ SOFTWARE.
 
 package org.fl.util.swing.logConfiguration;
 
+import java.util.logging.Handler;
+
+import javax.swing.DefaultListSelectionModel;
 import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
 
 public class HandlerJTable extends JTable {
 
@@ -40,6 +44,24 @@ public class HandlerJTable extends JTable {
 		getColumnModel().getColumn(HandlerTableModel.LEVEL_COL_IDX).setPreferredWidth(100);
 		getColumnModel().getColumn(HandlerTableModel.FORMATTER_COL_IDX).setPreferredWidth(400);
 		getColumnModel().getColumn(HandlerTableModel.PARAMETERS_COL_IDX).setPreferredWidth(400);
+		
+		// Allow single row selection only
+		ListSelectionModel listSelectionModel = new DefaultListSelectionModel();
+		listSelectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		setSelectionModel(listSelectionModel);
+			
+		addMouseListener(new HandlerMouseAdapter(this));
+		
 		setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+	}
+	
+	public Handler getSelectedHandler() {
+		
+		int[] rowIdxs = getSelectedRows();
+		if (rowIdxs.length == 0) {
+			return null;
+		} else {
+			return ((HandlerTableModel)getModel()).getHandlerAt(convertRowIndexToModel(rowIdxs[0]));
+		}
 	}
 }
