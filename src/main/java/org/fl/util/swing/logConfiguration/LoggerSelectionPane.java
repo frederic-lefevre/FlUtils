@@ -60,7 +60,6 @@ public class LoggerSelectionPane extends JPanel {
 		this.configureLoggerPane = configureLoggerPane;
 		this.selectedLoggerName = selectedLoggerName;
 		
-//		setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
 		setBorder(BorderFactory.createLineBorder(Color.BLACK, 5, true));
 
 		JLabel selectLoggerLabel = new JLabel("Select the logger from the following root:");

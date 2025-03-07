@@ -44,14 +44,15 @@ public class ConfigureLoggerLevelPane extends JPanel {
 	
 	private final JComboBox<Level> loggerLevelChoice;
 	private final JLabel hierarchyLevelLabel;
-	private final ConfigureLoggerHandlersPane configureLoggerHandlersPane;
+//	private final ConfigureLoggerHandlersPane configureLoggerHandlersPane;
 	private final JLabel loggerLevelTitle;
 	
-	public ConfigureLoggerLevelPane(ConfigureLoggerHandlersPane configureLoggerHandlersPane) {
+//	public ConfigureLoggerLevelPane(ConfigureLoggerHandlersPane configureLoggerHandlersPane) {
+	public ConfigureLoggerLevelPane() {
 		
 		super();
 		loggerToConfigure = null;
-		this.configureLoggerHandlersPane = configureLoggerHandlersPane;
+//		this.configureLoggerHandlersPane = configureLoggerHandlersPane;
 		
 		Font font = new Font("Verdana", Font.BOLD, 14);
 		
@@ -101,7 +102,7 @@ public class ConfigureLoggerLevelPane extends JPanel {
 			if ((e.getStateChange() == ItemEvent.SELECTED) && (loggerToConfigure != null)) {
 				
 				loggerToConfigure.setLevel((Level)(loggerLevelChoice.getSelectedItem()));
-				configureLoggerHandlersPane.setLoggerToBeConfigured(loggerToConfigure);
+//				configureLoggerHandlersPane.setLoggerToBeConfigured(loggerToConfigure);
 			}			
 		}		
 	}

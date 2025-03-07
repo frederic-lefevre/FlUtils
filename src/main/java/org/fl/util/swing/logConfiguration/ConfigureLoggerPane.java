@@ -24,12 +24,17 @@ SOFTWARE.
 
 package org.fl.util.swing.logConfiguration;
 
+import java.awt.Dimension;
 import java.awt.Font;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Handler;
 import java.util.logging.Logger;
 
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 
 public class ConfigureLoggerPane extends JPanel {
 
@@ -40,7 +45,8 @@ public class ConfigureLoggerPane extends JPanel {
 	private final JLabel configurationTitleLabel;
 	private final JLabel loggerNameLabel;
 	private final ConfigureLoggerLevelPane configureLoggerLevelPane;
-	private final ConfigureLoggerHandlersPane configureLoggerHandlersPane;
+	private final List<Handler> handlerList;
+	private final HandlerTableModel handlerTableModel;
 	
 	private Logger loggerToConfigure;
 	
@@ -63,14 +69,22 @@ public class ConfigureLoggerPane extends JPanel {
 		add(configureLoggerTitlePane);
 		
 		// Logger Level and handler Configuration
-		configureLoggerHandlersPane = new ConfigureLoggerHandlersPane();
-		configureLoggerLevelPane = new ConfigureLoggerLevelPane(configureLoggerHandlersPane);
+		configureLoggerLevelPane = new ConfigureLoggerLevelPane();
 		add(configureLoggerLevelPane);
-		add(configureLoggerHandlersPane);
+		
+		handlerList = new ArrayList<>();
+		handlerTableModel = new HandlerTableModel(handlerList);
+		HandlerJTable handlerJTable = new HandlerJTable(handlerTableModel);
+		
+		JScrollPane handlersScrollTable = new JScrollPane(handlerJTable);
+		handlersScrollTable.setPreferredSize(new Dimension(1800,700));
+		
+		add(handlersScrollTable);
 	}
 
 	public void setLoggerToBeConfigured(String loggerName) {
 
+		handlerList.clear();
 		if (loggerName != null) {
 
 			loggerNameLabel.setText("\"" + loggerName + "\"");
@@ -78,11 +92,17 @@ public class ConfigureLoggerPane extends JPanel {
 			loggerToConfigure = Logger.getLogger(loggerName);
 
 			configureLoggerLevelPane.setLoggerToBeConfigured(loggerToConfigure);
-			configureLoggerHandlersPane.setLoggerToBeConfigured(loggerToConfigure);
+			
+			if (loggerToConfigure.getLevel() != null) {
+				for (Handler handler : loggerToConfigure.getHandlers()) {
+					handlerList.add(handler);
+				}
+			}
 			
 		} else {
 			loggerNameLabel.setText("");
 		}
+		handlerTableModel.fireTableDataChanged();
 	}
 	
 }
