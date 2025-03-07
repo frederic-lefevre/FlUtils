@@ -30,7 +30,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.logging.Handler;
 
-import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
@@ -38,11 +37,9 @@ import javax.swing.JPopupMenu;
 public class HandlerMouseAdapter extends MouseAdapter {
 
 	private final JPopupMenu localJPopupMenu;
-	private final HandlerJTable handlerJTable;
 
 	public HandlerMouseAdapter(HandlerJTable handlerJTable) {
 		super();
-		this.handlerJTable = handlerJTable;
 
 		localJPopupMenu = new JPopupMenu();
 
@@ -77,7 +74,9 @@ public class HandlerMouseAdapter extends MouseAdapter {
 			
 			Handler handler = handlerJTable.getSelectedHandler();
 			if (handler != null) {
-				JOptionPane.showMessageDialog(null, new JLabel("coucou " + handler.getClass().getName()),"Edit Handler", JOptionPane.INFORMATION_MESSAGE);
+				JOptionPane.showMessageDialog(null, 
+						new ConfigureHandlerPane(handler),"Edit Handler", JOptionPane.INFORMATION_MESSAGE);
+				((HandlerTableModel)handlerJTable.getModel()).fireTableDataChanged();
 			}
 		}
 		
