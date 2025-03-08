@@ -29,6 +29,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.logging.Handler;
+import java.util.logging.Logger;
 
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
@@ -38,30 +39,51 @@ public class HandlerMouseAdapter extends MouseAdapter {
 
 	private final JPopupMenu localJPopupMenu;
 	private final HandlerJTable handlerJTable;
+	private final JMenuItem editMenuItem;
+	private final JMenuItem addConsoleHandlerMenuItem;
+	private Logger loggerToConfigure;
 
 	public HandlerMouseAdapter(HandlerJTable handlerJTable) {
 		super();
 
 		localJPopupMenu = new JPopupMenu();
 		this.handlerJTable = handlerJTable;
+		loggerToConfigure = null;
 
-		JMenuItem localJMenuItem = new JMenuItem("Edit handler");
-		localJMenuItem.addActionListener(new EditHandlerListener());
-		localJPopupMenu.add(localJMenuItem);
+		editMenuItem = addMenuItem("Edit handler", new EditHandlerListener());
+		addConsoleHandlerMenuItem = addMenuItem("Add ConsoleHandler", new CreateConsoleHandlerListener());
 	}
 	
 	@Override
 	public void mousePressed(MouseEvent evt) {
-		if ((evt.isPopupTrigger()) && (handlerJTable.getSelectedHandler() != null)) {
+		if (evt.isPopupTrigger()) {
+			enableMenuItems();
 			localJPopupMenu.show(evt.getComponent(), evt.getX(), evt.getY());
 		}
 	}
 
 	@Override
 	public void mouseReleased(MouseEvent evt) {
-		if ((evt.isPopupTrigger()) && (handlerJTable.getSelectedHandler() != null)) {
+		if (evt.isPopupTrigger()) {
+			enableMenuItems();
 			localJPopupMenu.show(evt.getComponent(), evt.getX(), evt.getY());
 		}
+	}
+	
+	public void setLoggerToConfigure(Logger logger) {
+		loggerToConfigure = logger;
+	}
+	
+	private JMenuItem addMenuItem(String title, ActionListener act) {
+		JMenuItem localJMenuItem = new JMenuItem(title);
+		localJMenuItem.addActionListener(act);
+		localJPopupMenu.add(localJMenuItem);
+		return localJMenuItem;
+	}
+	
+	private void enableMenuItems() {	
+		editMenuItem.setEnabled((handlerJTable.getSelectedHandler() != null));
+		addConsoleHandlerMenuItem.setEnabled(loggerToConfigure != null);
 	}
 	
 	private class EditHandlerListener implements ActionListener {
@@ -75,6 +97,16 @@ public class HandlerMouseAdapter extends MouseAdapter {
 						new ConfigureHandlerPane(handler),"Edit Handler", JOptionPane.INFORMATION_MESSAGE);
 				((HandlerTableModel)handlerJTable.getModel()).fireTableDataChanged();
 			}
+		}
+		
+	}
+	
+	private class CreateConsoleHandlerListener implements ActionListener {
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			// TODO Auto-generated method stub
+			
 		}
 		
 	}

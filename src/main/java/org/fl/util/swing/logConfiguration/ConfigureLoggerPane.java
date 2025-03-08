@@ -47,6 +47,7 @@ public class ConfigureLoggerPane extends JPanel {
 	private final ConfigureLoggerLevelPane configureLoggerLevelPane;
 	private final List<Handler> handlerList;
 	private final HandlerTableModel handlerTableModel;
+	private final HandlerJTable handlerJTable;
 	
 	private Logger loggerToConfigure;
 	
@@ -74,7 +75,7 @@ public class ConfigureLoggerPane extends JPanel {
 		
 		handlerList = new ArrayList<>();
 		handlerTableModel = new HandlerTableModel(handlerList);
-		HandlerJTable handlerJTable = new HandlerJTable(handlerTableModel);
+		handlerJTable = new HandlerJTable(handlerTableModel);
 		
 		JScrollPane handlersScrollTable = new JScrollPane(handlerJTable);
 		handlersScrollTable.setPreferredSize(new Dimension(1800,700));
@@ -92,6 +93,7 @@ public class ConfigureLoggerPane extends JPanel {
 			loggerToConfigure = Logger.getLogger(loggerName);
 
 			configureLoggerLevelPane.setLoggerToBeConfigured(loggerToConfigure);
+			handlerJTable.setLoggerToBeConfigured(loggerToConfigure);
 			
 			if (loggerToConfigure.getLevel() != null) {
 				for (Handler handler : loggerToConfigure.getHandlers()) {

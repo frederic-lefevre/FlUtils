@@ -25,6 +25,7 @@ SOFTWARE.
 package org.fl.util.swing.logConfiguration;
 
 import java.util.logging.Handler;
+import java.util.logging.Logger;
 
 import javax.swing.DefaultListSelectionModel;
 import javax.swing.JTable;
@@ -34,6 +35,8 @@ public class HandlerJTable extends JTable {
 
 	private static final long serialVersionUID = 1L;
 
+	private final HandlerMouseAdapter handlerMouseAdapter;
+	
 	public HandlerJTable(HandlerTableModel handlerTableModel) {
 		super(handlerTableModel);
 		
@@ -51,7 +54,8 @@ public class HandlerJTable extends JTable {
 		listSelectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		setSelectionModel(listSelectionModel);
 			
-		addMouseListener(new HandlerMouseAdapter(this));
+		this.handlerMouseAdapter = new HandlerMouseAdapter(this);
+		addMouseListener(handlerMouseAdapter);
 		
 		setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 	}
@@ -64,5 +68,9 @@ public class HandlerJTable extends JTable {
 		} else {
 			return ((HandlerTableModel)getModel()).getHandlerAt(convertRowIndexToModel(rowIdxs[0]));
 		}
+	}
+	
+	public void setLoggerToBeConfigured(Logger logger) {
+		handlerMouseAdapter.setLoggerToConfigure(logger);
 	}
 }
