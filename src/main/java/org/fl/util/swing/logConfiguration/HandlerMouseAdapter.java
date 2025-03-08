@@ -105,7 +105,9 @@ public class HandlerMouseAdapter extends MouseAdapter {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			// TODO Auto-generated method stub
+			JOptionPane.showMessageDialog(null, 
+					new CreateConsoleHandlerPane(), "Create ConsoleHandler", JOptionPane.INFORMATION_MESSAGE);
+			((HandlerTableModel)handlerJTable.getModel()).fireTableDataChanged();
 			
 		}
 		
