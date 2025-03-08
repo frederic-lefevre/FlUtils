@@ -192,17 +192,17 @@ public class LoggerUtils {
 		}
 	}
 
-	public static Level getLevelFromHierarchy(Logger logger) {
+	public static Logger getLevelFromHierarchy(Logger logger) {
 		
 		if (logger == null) {
 			throw new IllegalArgumentException("Logger parameter must not be null");
 		} else if (logger.getName().equals("")) {
-			return logger.getLevel();
+			return logger;
 		} 
 		
 		Level level = logger.getLevel();
 		if ((logger.getName().equals("")) || (level != null)) {
-			return level;
+			return logger;
 		} else {
 			return getLevelFromHierarchy(logger.getParent());
 		}

@@ -81,7 +81,8 @@ public class ConfigureLoggerLevelPane extends JPanel {
 			loggerLevelChoice.setSelectedItem(loggerLevel);
 
 			if (loggerLevel == null) {
-				hierarchyLevelLabel.setText("Level from logger hierarchy: " + LoggerUtils.getLevelFromHierarchy(loggerToConfigure));
+				Logger loggerWithLevelDefined = LoggerUtils.getLevelFromHierarchy(loggerToConfigure);
+				hierarchyLevelLabel.setText("Level from logger hierarchy: " + loggerWithLevelDefined.getLevel() + " for " + loggerWithLevelDefined.getName());
 			} else {
 				hierarchyLevelLabel.setText("");
 			}

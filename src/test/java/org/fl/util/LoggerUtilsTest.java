@@ -262,7 +262,7 @@ class LoggerUtilsTest {
 	void getLevelFromHierarchyRootLogger() {
 		
 		Logger rootLogger = Logger.getLogger("");
-		assertThat(LoggerUtils.getLevelFromHierarchy(rootLogger)).isEqualTo(rootLogger.getLevel());
+		assertThat(LoggerUtils.getLevelFromHierarchy(rootLogger).getLevel()).isEqualTo(rootLogger.getLevel());
 	}
 	
 	@Test	
@@ -271,7 +271,7 @@ class LoggerUtilsTest {
 		Logger logger = Logger.getLogger("my.logger");
 		logger.setLevel(Level.FINER);
 		
-		assertThat(LoggerUtils.getLevelFromHierarchy(logger)).isEqualTo(Level.FINER);
+		assertThat(LoggerUtils.getLevelFromHierarchy(logger).getLevel()).isEqualTo(Level.FINER);
 	}
 	
 	@Test	
@@ -281,7 +281,7 @@ class LoggerUtilsTest {
 		Logger logger = Logger.getLogger("my.logger");
 		logger.setLevel(Level.FINER);
 		
-		assertThat(LoggerUtils.getLevelFromHierarchy(loggerWithoutLevel)).isEqualTo(Level.FINER);
+		assertThat(LoggerUtils.getLevelFromHierarchy(loggerWithoutLevel).getLevel()).isEqualTo(Level.FINER);
 	}
 	
 	@Test	
@@ -291,6 +291,6 @@ class LoggerUtilsTest {
 		Level rootLoggerLevel = Logger.getLogger("").getLevel();
 
 		
-		assertThat(LoggerUtils.getLevelFromHierarchy(loggerWithoutLevel)).isEqualTo(rootLoggerLevel);
+		assertThat(LoggerUtils.getLevelFromHierarchy(loggerWithoutLevel).getLevel()).isEqualTo(rootLoggerLevel);
 	}
 }
