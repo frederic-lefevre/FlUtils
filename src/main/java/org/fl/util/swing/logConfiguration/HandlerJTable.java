@@ -45,7 +45,6 @@ public class HandlerJTable extends JTable {
 		getColumnModel().getColumn(HandlerTableModel.FORMATTER_COL_IDX).setPreferredWidth(400);
 		getColumnModel().getColumn(HandlerTableModel.ENCODING_COL_IDX).setPreferredWidth(100);
 		getColumnModel().getColumn(HandlerTableModel.FILTER_COL_IDX).setPreferredWidth(400);
-		getColumnModel().getColumn(HandlerTableModel.PARAMETERS_COL_IDX).setPreferredWidth(400);
 		
 		// Allow single row selection only
 		ListSelectionModel listSelectionModel = new DefaultListSelectionModel();

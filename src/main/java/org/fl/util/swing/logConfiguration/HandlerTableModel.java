@@ -26,7 +26,6 @@ package org.fl.util.swing.logConfiguration;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.logging.ConsoleHandler;
 import java.util.logging.Handler;
 
 import javax.swing.table.AbstractTableModel;
@@ -40,9 +39,8 @@ public class HandlerTableModel extends AbstractTableModel{
 	public final static int FORMATTER_COL_IDX = 2;
 	public final static int ENCODING_COL_IDX = 3;
 	public final static int FILTER_COL_IDX = 4;
-	public final static int PARAMETERS_COL_IDX = 5;
 	
-	private final static String[] entetes = {"Handler Class", "Level", "Formatter", "Encoding", "Filter", "Parameters"};
+	private final static String[] entetes = {"Handler Class", "Level", "Formatter", "Encoding", "Filter"};
 	
 	private final List<Handler> handlerList;
 	
@@ -87,7 +85,6 @@ public class HandlerTableModel extends AbstractTableModel{
 				case FILTER_COL_IDX -> Optional.ofNullable(handlerList.get(rowIndex).getFilter())
 				.map(f -> f.getClass().getName())
 				.orElse("No filter");
-				case PARAMETERS_COL_IDX -> getHandlerParameterInfo(handlerList.get(rowIndex));
 				default -> null;
 			};
 		}
@@ -96,16 +93,5 @@ public class HandlerTableModel extends AbstractTableModel{
 	public Handler getHandlerAt(int rowIndex) {
 		return handlerList.get(rowIndex);
 	}
-	
-	private static final String CONSOLE_HANDLER = ConsoleHandler.class.getName();
-	
-	private String getHandlerParameterInfo(Handler handler) {
-		
-		String handlerClassName = handler.getClass().getName();
-		if (handlerClassName.equals(CONSOLE_HANDLER)) {
-			return "";
-		} else {
-			return "not yet";
-		}
-	}
+
 }
