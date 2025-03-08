@@ -34,6 +34,7 @@ import java.util.logging.Level;
 import java.util.logging.SimpleFormatter;
 import java.util.logging.XMLFormatter;
 
+import javax.swing.BoxLayout;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -61,26 +62,39 @@ public class ConfigureHandlerPane extends JPanel {
 		super();
 		handlerToConfigure = handler;
 		
+		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+		
 		JLabel handlerTitle = new JLabel();
 		handlerTitle.setFont(font);		
 		handlerTitle.setText("Handler " + handlerToConfigure.getClass().getName());
+		handlerTitle.setAlignmentX(CENTER_ALIGNMENT);
 		add(handlerTitle);
+		
+		JPanel levelPane = new JPanel();
+		JLabel levelTitle = new JLabel();
+		levelTitle.setFont(font);
+		levelTitle.setText("Level: ");
+		levelPane.add(levelTitle);
 		
 		handlerLevelChoice = new JComboBox<>(LoggerUtils.LEVELS);
 		handlerLevelChoice.setSelectedItem(handler.getLevel());
 		handlerLevelChoice.addItemListener(new HandlerLevelListener());
-		add(handlerLevelChoice);
+		levelPane.add(handlerLevelChoice);
+		levelPane.setAlignmentX(CENTER_ALIGNMENT);
+		add(levelPane);
 		
-		
+		JPanel formatterPane = new JPanel();
 		JLabel formatterTitle = new JLabel();
 		formatterTitle.setFont(font);
 		formatterTitle.setText("Formatter: ");
-		add(formatterTitle);
+		formatterPane.add(formatterTitle);
 		
 		formatterChoice = new JComboBox<>(AVAILABLE_FORMATTER_NAMES);
 		setSelectedFormatterName();
 		formatterChoice.addItemListener(new FormatterListener());
-		add(formatterChoice);
+		formatterPane.add(formatterChoice);
+		formatterPane.setAlignmentX(CENTER_ALIGNMENT);
+		add(formatterPane);
 	}
 
 	private class  HandlerLevelListener implements ItemListener {
