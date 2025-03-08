@@ -47,14 +47,8 @@ public class ConfigureHandlerPane extends JPanel {
 	private static final long serialVersionUID = 1L;
 	private static final Font font = new Font("Verdana", Font.BOLD, 14);
 	
-	private static final String[] AVAILABLE_FORMATTER_NAMES = {
-			SimpleFormatter.class.getName(),
-			XMLFormatter.class.getName(),
-			JsonLogFormatter.class.getName(), 
-			PlainLogFormatter.class.getName()};
-	
 	private final JComboBox<Level> handlerLevelChoice;
-	private final JComboBox<String> formatterChoice;
+	private final FormatterComboBox formatterChoice;
 	private final Handler handlerToConfigure;
 	
 	public ConfigureHandlerPane(Handler handler) {
@@ -89,7 +83,7 @@ public class ConfigureHandlerPane extends JPanel {
 		formatterTitle.setText("Formatter: ");
 		formatterPane.add(formatterTitle);
 		
-		formatterChoice = new JComboBox<>(AVAILABLE_FORMATTER_NAMES);
+		formatterChoice = new FormatterComboBox();
 		setSelectedFormatterName();
 		formatterChoice.addItemListener(new FormatterListener());
 		formatterPane.add(formatterChoice);
@@ -113,7 +107,7 @@ public class ConfigureHandlerPane extends JPanel {
 		Formatter formatter = handlerToConfigure.getFormatter();
 		if (formatter != null) {
 			String formatterName = formatter.getClass().getName();
-			if (! Arrays.stream(AVAILABLE_FORMATTER_NAMES).anyMatch(formatterName::equals)) {
+			if (! Arrays.stream(formatterChoice.getAvailableFormatterNames()).anyMatch(formatterName::equals)) {
 				// Formatter ins not in the available ones
 				formatterChoice.addItem(formatterName);
 			}
