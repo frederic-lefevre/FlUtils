@@ -37,38 +37,35 @@ import javax.swing.JPopupMenu;
 public class HandlerMouseAdapter extends MouseAdapter {
 
 	private final JPopupMenu localJPopupMenu;
+	private final HandlerJTable handlerJTable;
 
 	public HandlerMouseAdapter(HandlerJTable handlerJTable) {
 		super();
 
 		localJPopupMenu = new JPopupMenu();
+		this.handlerJTable = handlerJTable;
 
 		JMenuItem localJMenuItem = new JMenuItem("Edit handler");
-		localJMenuItem.addActionListener(new EditHandlerListener(handlerJTable));
+		localJMenuItem.addActionListener(new EditHandlerListener());
 		localJPopupMenu.add(localJMenuItem);
 	}
 	
 	@Override
 	public void mousePressed(MouseEvent evt) {
-		if (evt.isPopupTrigger()) {
+		if ((evt.isPopupTrigger()) && (handlerJTable.getSelectedHandler() != null)) {
 			localJPopupMenu.show(evt.getComponent(), evt.getX(), evt.getY());
 		}
 	}
 
 	@Override
 	public void mouseReleased(MouseEvent evt) {
-		if (evt.isPopupTrigger()) {
+		if ((evt.isPopupTrigger()) && (handlerJTable.getSelectedHandler() != null)) {
 			localJPopupMenu.show(evt.getComponent(), evt.getX(), evt.getY());
 		}
 	}
 	
 	private class EditHandlerListener implements ActionListener {
 
-		private final HandlerJTable handlerJTable;
-		
-		public EditHandlerListener(HandlerJTable handlerJTable) {
-			this.handlerJTable = handlerJTable;
-		}
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			
