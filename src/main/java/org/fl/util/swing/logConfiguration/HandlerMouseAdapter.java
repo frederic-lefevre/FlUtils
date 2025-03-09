@@ -40,6 +40,8 @@ import javax.swing.JPopupMenu;
 
 public class HandlerMouseAdapter extends MouseAdapter {
 
+	private static final Logger internalLogger = Logger.getLogger(HandlerMouseAdapter.class.getName());
+	
 	private final JPopupMenu localJPopupMenu;
 	private final HandlerJTable handlerJTable;
 	private final HandlerTableModel handlerTableModel;
@@ -117,6 +119,14 @@ public class HandlerMouseAdapter extends MouseAdapter {
 			Formatter formatter = FormatterComboBox.getNewChoosenFormatter(formatterName);
 			if (formatter != null) {
 				handler.setFormatter(formatter);
+			}
+		}
+		String encoding = createPane.getSelectedEncoding();
+		if (encoding != null) {
+			try {
+				handler.setEncoding(encoding);
+			} catch (Exception e) {
+				internalLogger.log(Level.SEVERE, "Exception when setting handler encoding to :" + encoding, e);
 			}
 		}
 	}

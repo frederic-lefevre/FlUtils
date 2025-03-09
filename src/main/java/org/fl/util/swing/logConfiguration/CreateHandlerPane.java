@@ -27,6 +27,7 @@ package org.fl.util.swing.logConfiguration;
 import java.awt.Font;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.nio.charset.Charset;
 import java.util.logging.Level;
 
 import javax.swing.JComboBox;
@@ -40,15 +41,22 @@ public class CreateHandlerPane extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 	
+	private static final String[] SUPPORTED_ENCODING = Charset.availableCharsets().keySet().toArray(new String[0]);
 	private static final Font font = new Font("Verdana", Font.BOLD, 14);
 	
-	protected Level selectedLevel;
-	protected String selectedFormatterName;
+	private Level selectedLevel;
+	private String selectedFormatterName;
+	private String selectedEncoding;
 	private final JComboBox<Level> handlerLevelChoice;
 	private final FormatterComboBox formatterChoice;
+	private final JComboBox<String> encodingChoice;
 	
 	public CreateHandlerPane() {
 		super();
+		
+		selectedLevel = null;
+		selectedFormatterName = null;
+		selectedEncoding = null;
 		
 		JPanel levelPane = new JPanel();
 		JLabel levelTitle = new JLabel();
@@ -72,7 +80,18 @@ public class CreateHandlerPane extends JPanel {
 		formatterChoice.addItemListener(new FormatterListener());
 		formatterPane.add(formatterChoice);
 		formatterPane.setAlignmentX(CENTER_ALIGNMENT);
-		add(formatterPane);		
+		add(formatterPane);
+		
+		JPanel encodingPane = new JPanel();
+		JLabel encodingTitle = new JLabel();
+		encodingTitle.setFont(font);
+		encodingTitle.setText("Encoding: ");
+		encodingPane.add(encodingTitle);
+		encodingChoice = new JComboBox<String>(SUPPORTED_ENCODING);
+		encodingChoice.addItemListener(new EncodingListener());
+		encodingChoice.setSelectedItem(null);
+		encodingPane.add(encodingChoice);
+		add(encodingPane);
 	}
 	
 	public Level getSelectedLevel() {
@@ -81,6 +100,10 @@ public class CreateHandlerPane extends JPanel {
 
 	public String getSelectedFormatterName() {
 		return selectedFormatterName;
+	}
+	
+	public String getSelectedEncoding() {
+		return selectedEncoding;
 	}
 
 	private class  HandlerLevelListener implements ItemListener {
@@ -103,5 +126,15 @@ public class CreateHandlerPane extends JPanel {
 			}
 		}
 	}
+		
+	private class EncodingListener implements ItemListener {
+		
+		@Override
+		public void itemStateChanged(ItemEvent e) {
 			
+			if (e.getStateChange() == ItemEvent.SELECTED) {
+				selectedEncoding = (String)encodingChoice.getSelectedItem();
+			}
+		}
+	}
 }
