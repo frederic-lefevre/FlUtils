@@ -25,6 +25,8 @@ SOFTWARE.
 package org.fl.util.swing.logConfiguration;
 
 import java.awt.Font;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.util.logging.Level;
 
 import javax.swing.JComboBox;
@@ -40,6 +42,11 @@ public class CreateHandlerPane extends JPanel {
 	
 	private static final Font font = new Font("Verdana", Font.BOLD, 14);
 	
+	protected Level selectedLevel;
+	protected String selectedFormatterName;
+	private final JComboBox<Level> handlerLevelChoice;
+	private final FormatterComboBox formatterChoice;
+	
 	public CreateHandlerPane() {
 		super();
 		
@@ -49,8 +56,8 @@ public class CreateHandlerPane extends JPanel {
 		levelTitle.setText("Level: ");
 		levelPane.add(levelTitle);
 		
-		JComboBox<Level> handlerLevelChoice = new JComboBox<>(LoggerUtils.LEVELS);
-//		handlerLevelChoice.addItemListener(new HandlerLevelListener());
+		handlerLevelChoice = new JComboBox<>(LoggerUtils.LEVELS);
+		handlerLevelChoice.addItemListener(new HandlerLevelListener());
 		levelPane.add(handlerLevelChoice);
 		levelPane.setAlignmentX(CENTER_ALIGNMENT);
 		add(levelPane);
@@ -61,12 +68,36 @@ public class CreateHandlerPane extends JPanel {
 		formatterTitle.setText("Formatter: ");
 		formatterPane.add(formatterTitle);
 		
-		JComboBox<String> formatterChoice = new FormatterComboBox();
-//		formatterChoice.addItemListener(new FormatterListener());
+		formatterChoice = new FormatterComboBox();
+		formatterChoice.addItemListener(new FormatterListener());
 		formatterPane.add(formatterChoice);
 		formatterPane.setAlignmentX(CENTER_ALIGNMENT);
-		add(formatterPane);
-		
+		add(formatterPane);		
+	}
+	
+	public Level getSelectedLevel() {
+		return selectedLevel;
 	}
 
+	private class  HandlerLevelListener implements ItemListener {
+
+		@Override
+		public void itemStateChanged(ItemEvent e) {
+			if (e.getStateChange() == ItemEvent.SELECTED) {
+				selectedLevel = (Level)(handlerLevelChoice.getSelectedItem());
+			}	
+		}	
+	}
+	
+	private class FormatterListener implements ItemListener {
+		
+		@Override
+		public void itemStateChanged(ItemEvent e) {
+			
+			if (e.getStateChange() == ItemEvent.SELECTED) {
+				selectedFormatterName = (String)formatterChoice.getSelectedItem();
+			}
+		}
+	}
+			
 }

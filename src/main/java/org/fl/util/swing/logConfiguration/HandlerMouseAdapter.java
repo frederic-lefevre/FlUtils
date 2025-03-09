@@ -29,6 +29,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.logging.Handler;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.JMenuItem;
@@ -101,13 +102,30 @@ public class HandlerMouseAdapter extends MouseAdapter {
 		
 	}
 	
+	private static final int CREATE_HANDLER_OPTION = 0;
+	private static final int CANCEL_OPTION = 1;
+	private static final Object[] options = {"Create Handler", "Cancel"};
+	
 	private class CreateConsoleHandlerListener implements ActionListener {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			JOptionPane.showMessageDialog(null, 
-					new CreateConsoleHandlerPane(), "Create ConsoleHandler", JOptionPane.INFORMATION_MESSAGE);
-			((HandlerTableModel)handlerJTable.getModel()).fireTableDataChanged();
+			
+			CreateHandlerPane createPane = new CreateHandlerPane();
+			int choosen_option = JOptionPane.showOptionDialog(null, 
+					createPane, 
+					"Create ConsoleHandler", 
+					JOptionPane.OK_CANCEL_OPTION,
+					JOptionPane.QUESTION_MESSAGE,
+					null,
+					options,
+					options[CANCEL_OPTION]);
+			
+			if (choosen_option == CREATE_HANDLER_OPTION) {
+				Level level = createPane.getSelectedLevel();
+				System.out.println("Selected level: " + level.getName());
+				((HandlerTableModel)handlerJTable.getModel()).fireTableDataChanged();
+			}
 			
 		}
 		
