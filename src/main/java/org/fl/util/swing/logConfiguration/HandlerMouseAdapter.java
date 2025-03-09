@@ -28,6 +28,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.Formatter;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -40,6 +42,7 @@ public class HandlerMouseAdapter extends MouseAdapter {
 
 	private final JPopupMenu localJPopupMenu;
 	private final HandlerJTable handlerJTable;
+	private final HandlerTableModel handlerTableModel;
 	private final JMenuItem editMenuItem;
 	private final JMenuItem addConsoleHandlerMenuItem;
 	private Logger loggerToConfigure;
@@ -49,6 +52,7 @@ public class HandlerMouseAdapter extends MouseAdapter {
 
 		localJPopupMenu = new JPopupMenu();
 		this.handlerJTable = handlerJTable;
+		this.handlerTableModel = (HandlerTableModel)handlerJTable.getModel();
 		loggerToConfigure = null;
 
 		editMenuItem = addMenuItem("Edit handler", new EditHandlerListener());
@@ -96,10 +100,25 @@ public class HandlerMouseAdapter extends MouseAdapter {
 			if (handler != null) {
 				JOptionPane.showMessageDialog(null, 
 						new ConfigureHandlerPane(handler),"Edit Handler", JOptionPane.INFORMATION_MESSAGE);
-				((HandlerTableModel)handlerJTable.getModel()).fireTableDataChanged();
+				handlerTableModel.fireTableDataChanged();
 			}
 		}
 		
+	}
+	
+	private void setCommonHandlerParameter(Handler handler, CreateHandlerPane createPane) {
+		
+		Level level = createPane.getSelectedLevel();
+		if (level != null) {
+			handler.setLevel(level);
+		}
+		String formatterName = createPane.getSelectedFormatterName();
+		if (formatterName != null) {
+			Formatter formatter = FormatterComboBox.getNewChoosenFormatter(formatterName);
+			if (formatter != null) {
+				handler.setFormatter(formatter);
+			}
+		}
 	}
 	
 	private static final int CREATE_HANDLER_OPTION = 0;
@@ -122,9 +141,11 @@ public class HandlerMouseAdapter extends MouseAdapter {
 					options[CANCEL_OPTION]);
 			
 			if (choosen_option == CREATE_HANDLER_OPTION) {
-				Level level = createPane.getSelectedLevel();
-				System.out.println("Selected level: " + level.getName());
-				((HandlerTableModel)handlerJTable.getModel()).fireTableDataChanged();
+				ConsoleHandler consoleHandler = new ConsoleHandler();
+				setCommonHandlerParameter(consoleHandler, createPane);
+				loggerToConfigure.addHandler(consoleHandler);
+				System.out.println("Logger " + loggerToConfigure.getName() + " => Add consoleHandler");
+				handlerTableModel.fireTableDataChanged();
 			}
 			
 		}

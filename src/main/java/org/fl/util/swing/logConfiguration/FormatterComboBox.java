@@ -24,6 +24,7 @@ SOFTWARE.
 
 package org.fl.util.swing.logConfiguration;
 
+import java.util.logging.Formatter;
 import java.util.logging.SimpleFormatter;
 import java.util.logging.XMLFormatter;
 
@@ -50,5 +51,20 @@ public class FormatterComboBox extends JComboBox<String> {
 	
 	public String[] getAvailableFormatterNames() {
 		return AVAILABLE_FORMATTER_NAMES;
+	}
+	
+	public static Formatter getNewChoosenFormatter(String formatterName) {
+		
+		if (SimpleFormatter.class.getName().equals(formatterName)) {
+			return new SimpleFormatter();
+		} else if (PlainLogFormatter.class.getName().equals(formatterName)) {
+			return new PlainLogFormatter();
+		} else if (JsonLogFormatter.class.getName().equals(formatterName)) {
+			return new JsonLogFormatter();
+		} else if (XMLFormatter.class.getName().equals(formatterName)) {
+			return new XMLFormatter();
+		} else {
+			return null;
+		}
 	}
 }

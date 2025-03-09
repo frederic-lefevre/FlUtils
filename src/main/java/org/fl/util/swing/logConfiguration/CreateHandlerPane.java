@@ -79,6 +79,10 @@ public class CreateHandlerPane extends JPanel {
 		return selectedLevel;
 	}
 
+	public String getSelectedFormatterName() {
+		return selectedFormatterName;
+	}
+
 	private class  HandlerLevelListener implements ItemListener {
 
 		@Override
