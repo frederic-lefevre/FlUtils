@@ -95,10 +95,8 @@ public class ConfigureLoggerPane extends JPanel {
 			configureLoggerLevelPane.setLoggerToBeConfigured(loggerToConfigure);
 			handlerJTable.setLoggerToBeConfigured(loggerToConfigure);
 			
-			if (loggerToConfigure.getLevel() != null) {
-				for (Handler handler : loggerToConfigure.getHandlers()) {
-					handlerList.add(handler);
-				}
+			for (Handler handler : loggerToConfigure.getHandlers()) {
+				handlerList.add(handler);
 			}
 			
 		} else {

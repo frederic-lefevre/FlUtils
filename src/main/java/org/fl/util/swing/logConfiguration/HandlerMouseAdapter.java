@@ -144,7 +144,7 @@ public class HandlerMouseAdapter extends MouseAdapter {
 				ConsoleHandler consoleHandler = new ConsoleHandler();
 				setCommonHandlerParameter(consoleHandler, createPane);
 				loggerToConfigure.addHandler(consoleHandler);
-				System.out.println("Logger " + loggerToConfigure.getName() + " => Add consoleHandler");
+				handlerTableModel.refreshHandlerList(loggerToConfigure);
 				handlerTableModel.fireTableDataChanged();
 			}
 			

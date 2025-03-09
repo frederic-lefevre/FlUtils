@@ -27,6 +27,7 @@ package org.fl.util.swing.logConfiguration;
 import java.util.List;
 import java.util.Optional;
 import java.util.logging.Handler;
+import java.util.logging.Logger;
 
 import javax.swing.table.AbstractTableModel;
 
@@ -47,6 +48,16 @@ public class HandlerTableModel extends AbstractTableModel{
 	public HandlerTableModel(List<Handler> handlerList) {
 		super();
 		this.handlerList = handlerList;
+	}
+	
+	public void refreshHandlerList(Logger logger) {
+		
+		handlerList.clear();
+		if (logger != null) {
+			for (Handler handler : logger.getHandlers()) {
+				handlerList.add(handler);
+			}
+		}
 	}
 	
 	@Override
