@@ -47,6 +47,7 @@ public class HandlerMouseAdapter extends MouseAdapter {
 	private final HandlerTableModel handlerTableModel;
 	private final JMenuItem editMenuItem;
 	private final JMenuItem addConsoleHandlerMenuItem;
+	private final JMenuItem addFileHandlerMenuItem;
 	private Logger loggerToConfigure;
 
 	public HandlerMouseAdapter(HandlerJTable handlerJTable) {
@@ -59,6 +60,7 @@ public class HandlerMouseAdapter extends MouseAdapter {
 
 		editMenuItem = addMenuItem("Edit handler", new EditHandlerListener());
 		addConsoleHandlerMenuItem = addMenuItem("Add ConsoleHandler", new CreateConsoleHandlerListener());
+		addFileHandlerMenuItem = addMenuItem("Add FileHandler", new CreateFileHandlerListener());
 	}
 	
 	@Override
@@ -91,6 +93,7 @@ public class HandlerMouseAdapter extends MouseAdapter {
 	private void enableMenuItems() {	
 		editMenuItem.setEnabled((handlerJTable.getSelectedHandler() != null));
 		addConsoleHandlerMenuItem.setEnabled(loggerToConfigure != null);
+		addFileHandlerMenuItem.setEnabled(loggerToConfigure != null);
 	}
 	
 	private class EditHandlerListener implements ActionListener {
@@ -158,7 +161,26 @@ public class HandlerMouseAdapter extends MouseAdapter {
 				handlerTableModel.fireTableDataChanged();
 			}
 			
+		}	
+	}
+	
+	private class CreateFileHandlerListener implements ActionListener {
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			
+			CreateFileHandlerPane createPane = new CreateFileHandlerPane();
+			int choosen_option = JOptionPane.showOptionDialog(null, 
+					createPane, 
+					"Create FileHandler", 
+					JOptionPane.OK_CANCEL_OPTION,
+					JOptionPane.QUESTION_MESSAGE,
+					null,
+					options,
+					options[CANCEL_OPTION]);
+			if (choosen_option == CREATE_HANDLER_OPTION) {
+				
+			}
 		}
-		
 	}
 }

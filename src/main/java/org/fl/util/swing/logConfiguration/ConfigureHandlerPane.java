@@ -31,17 +31,14 @@ import java.util.Arrays;
 import java.util.logging.Formatter;
 import java.util.logging.Handler;
 import java.util.logging.Level;
-import java.util.logging.SimpleFormatter;
-import java.util.logging.XMLFormatter;
 
 import javax.swing.BoxLayout;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import org.fl.util.JsonLogFormatter;
 import org.fl.util.LoggerUtils;
-import org.fl.util.PlainLogFormatter;
+
 public class ConfigureHandlerPane extends JPanel {
 	
 	private static final long serialVersionUID = 1L;
@@ -122,15 +119,7 @@ public class ConfigureHandlerPane extends JPanel {
 			
 			if ((e.getStateChange() == ItemEvent.SELECTED) && (handlerToConfigure != null)) {
 				String selectedFormatterName = (String)formatterChoice.getSelectedItem();
-				if (SimpleFormatter.class.getName().equals(selectedFormatterName)) {
-					handlerToConfigure.setFormatter(new SimpleFormatter());
-				} else if (PlainLogFormatter.class.getName().equals(selectedFormatterName)) {
-					handlerToConfigure.setFormatter(new PlainLogFormatter());
-				} else if (JsonLogFormatter.class.getName().equals(selectedFormatterName)) {
-					handlerToConfigure.setFormatter(new JsonLogFormatter());
-				} else if (XMLFormatter.class.getName().equals(selectedFormatterName)) {
-					handlerToConfigure.setFormatter(new XMLFormatter());
-				}			
+				handlerToConfigure.setFormatter(FormatterComboBox.getNewChoosenFormatter(selectedFormatterName));			
 			}			
 		}		
 	}

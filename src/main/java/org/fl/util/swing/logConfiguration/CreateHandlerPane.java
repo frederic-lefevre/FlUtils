@@ -30,6 +30,7 @@ import java.awt.event.ItemListener;
 import java.nio.charset.Charset;
 import java.util.logging.Level;
 
+import javax.swing.BoxLayout;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -42,7 +43,7 @@ public class CreateHandlerPane extends JPanel {
 	private static final long serialVersionUID = 1L;
 	
 	private static final String[] SUPPORTED_ENCODING = Charset.availableCharsets().keySet().toArray(new String[0]);
-	private static final Font font = new Font("Verdana", Font.BOLD, 14);
+	protected static final Font font = new Font("Verdana", Font.BOLD, 14);
 	
 	private Level selectedLevel;
 	private String selectedFormatterName;
@@ -57,6 +58,8 @@ public class CreateHandlerPane extends JPanel {
 		selectedLevel = null;
 		selectedFormatterName = null;
 		selectedEncoding = null;
+		
+		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 		
 		JPanel levelPane = new JPanel();
 		JLabel levelTitle = new JLabel();
