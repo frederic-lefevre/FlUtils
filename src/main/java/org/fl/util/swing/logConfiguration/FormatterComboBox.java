@@ -43,10 +43,8 @@ public class FormatterComboBox extends JComboBox<String> {
 			JsonLogFormatter.class.getName(), 
 			PlainLogFormatter.class.getName()};
 	
-	public FormatterComboBox() {
-		
-		super(AVAILABLE_FORMATTER_NAMES);
-		
+	public FormatterComboBox() {	
+		super(AVAILABLE_FORMATTER_NAMES);	
 	}
 	
 	public String[] getAvailableFormatterNames() {

@@ -97,8 +97,7 @@ public class ConfigureLoggerLevelPane extends JPanel {
 		@Override
 		public void itemStateChanged(ItemEvent e) {
 			
-			if ((e.getStateChange() == ItemEvent.SELECTED) && (loggerToConfigure != null)) {
-				
+			if ((e.getStateChange() == ItemEvent.SELECTED) && (loggerToConfigure != null)) {				
 				loggerToConfigure.setLevel((Level)(loggerLevelChoice.getSelectedItem()));
 			}			
 		}		

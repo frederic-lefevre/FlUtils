@@ -124,8 +124,7 @@ public class CreateHandlerPane extends JPanel {
 	private class FormatterListener implements ItemListener {
 		
 		@Override
-		public void itemStateChanged(ItemEvent e) {
-			
+		public void itemStateChanged(ItemEvent e) {			
 			if (e.getStateChange() == ItemEvent.SELECTED) {
 				selectedFormatterName = (String)formatterChoice.getSelectedItem();
 			}
@@ -135,8 +134,7 @@ public class CreateHandlerPane extends JPanel {
 	private class EncodingListener implements ItemListener {
 		
 		@Override
-		public void itemStateChanged(ItemEvent e) {
-			
+		public void itemStateChanged(ItemEvent e) {			
 			if (e.getStateChange() == ItemEvent.SELECTED) {
 				selectedEncoding = (String)encodingChoice.getSelectedItem();
 			}

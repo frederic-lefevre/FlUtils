@@ -109,8 +109,7 @@ public class HandlerMouseAdapter extends MouseAdapter {
 						new ConfigureHandlerPane(handler),"Edit Handler", JOptionPane.INFORMATION_MESSAGE);
 				handlerTableModel.fireTableDataChanged();
 			}
-		}
-		
+		}		
 	}
 	
 	private void setCommonHandlerParameter(Handler handler, CreateHandlerPane createPane) {

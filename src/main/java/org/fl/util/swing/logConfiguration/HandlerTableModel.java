@@ -94,8 +94,8 @@ public class HandlerTableModel extends AbstractTableModel{
 					.orElse("No formatter");
 				case ENCODING_COL_IDX -> handlerList.get(rowIndex).getEncoding();
 				case FILTER_COL_IDX -> Optional.ofNullable(handlerList.get(rowIndex).getFilter())
-				.map(f -> f.getClass().getName())
-				.orElse("No filter");
+					.map(f -> f.getClass().getName())
+					.orElse("No filter");
 				default -> null;
 			};
 		}
