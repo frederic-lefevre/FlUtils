@@ -34,57 +34,63 @@ import javax.swing.event.ChangeListener;
 
 import org.fl.util.AdvancedProperties;
 import org.fl.util.RunningContext;
-
+import org.fl.util.swing.logConfiguration.LogConfigurationPane;
 import org.fl.util.swing.logPane.LogHighLightListener;
 import org.fl.util.swing.logPane.LogsDisplayPane;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 public class ApplicationTabbedPane extends JTabbedPane {
-
-	private static final Logger logger = Logger.getLogger(ApplicationTabbedPane.class.getName());
 			
 	private static final long serialVersionUID = 1L;
 
-	private ApplicationInfoPane appInfoPane ;
-	private LogsDisplayPane		logsDisplayPane ;
-	
-	private Color logTabHighLightColor ;
-	private Color logTabRegularColor ;
-	
+	private final Logger logger;
+	private final ApplicationInfoPane appInfoPane;
+	private final LogsDisplayPane logsDisplayPane;
+	private final LogConfigurationPane logConfigurationPane;
+
+	private final Color logTabRegularColor;
+	private Color logTabHighLightColor;
+
 	public ApplicationTabbedPane(RunningContext runningContext) {
-		super() ;
+		super();
+
+		// Get the root logger for the application
+		logger = Logger.getLogger(runningContext.getName());
 		
 		AdvancedProperties props = runningContext.getProps();
-		int lastNonHighLightedLevel = props.getLevel("appTabbedPane.logging.lastNonHighLighedLevel", Level.INFO).intValue() ;
-		
-		logTabHighLightColor = props.getColor("appTabbedPane.logging.logTabHighLightColor", Color.RED) ;
-		
-		Color recordHighLightColor = props.getColor("appTabbedPane.logging.recordHighLightColor", Color.PINK) ;
-		
+		logTabHighLightColor = props.getColor("appTabbedPane.logging.logTabHighLightColor", Color.RED);
+
 		// Tabbed Panel for application information
-		appInfoPane = new ApplicationInfoPane(runningContext) ;
-		addTab("Informations", appInfoPane) ;
+		appInfoPane = new ApplicationInfoPane(runningContext);
+		addTab("Informations", appInfoPane);
+
+		// Tabbed Panel for application information
+		logConfigurationPane = new LogConfigurationPane(runningContext.getName());
+		addTab("Log Configuration", logConfigurationPane);
 		
 		// Tabbed Panel for logs display
-		logsDisplayPane =  new LogsDisplayPane(props, lastNonHighLightedLevel, recordHighLightColor, runningContext.getName()) ;
-		addTab("Logs display", logsDisplayPane) ;
-		int logTabIdx = indexOfComponent(logsDisplayPane) ;
+		logsDisplayPane = new LogsDisplayPane(runningContext);
+		addTab("Logs display", logsDisplayPane);
+		int logTabIdx = indexOfComponent(logsDisplayPane);
 		if (logTabIdx > -1) {
-			logTabRegularColor = getBackgroundAt(logTabIdx) ;
+			logTabRegularColor = getBackgroundAt(logTabIdx);
+		} else {
+			// should not happen
+			logTabRegularColor = Color.LIGHT_GRAY;
 		}
-		
+
 		addChangeListener(new BackUpTabChangeListener());
-		
-		LogTabColorChanger logTabColorChanger = new LogTabColorChanger() ;
-		logsDisplayPane.addHighLightListener(logTabColorChanger) ;
+
+		LogTabColorChanger logTabColorChanger = new LogTabColorChanger();
+		logsDisplayPane.addHighLightListener(logTabColorChanger);
 	}
 	
 	private class BackUpTabChangeListener implements ChangeListener {
 
 		@Override
 		public void stateChanged(ChangeEvent arg0) {
-			
+
 			if (getSelectedComponent().equals(appInfoPane)) {
 				try {
 					appInfoPane.setInfos();
@@ -92,25 +98,24 @@ public class ApplicationTabbedPane extends JTabbedPane {
 					logger.log(Level.SEVERE, "Exception setting Application info pane", e);
 				}
 			} else if (getSelectedComponent().equals(logsDisplayPane)) {
-				logsDisplayPane.refreshLogRecordCategories() ;
+				logsDisplayPane.refreshLogRecordCategories();
 			}
 		}
 	}
-	
+
 	private class LogTabColorChanger implements LogHighLightListener {
 
 		@Override
 		public void logsHightLighted(boolean highLight) {
-			int logTabIdx = indexOfComponent(logsDisplayPane) ;
+			int logTabIdx = indexOfComponent(logsDisplayPane);
 			if (logTabIdx > -1) {
 				if (highLight) {
-					setBackgroundAt(logTabIdx, logTabHighLightColor) ;
+					setBackgroundAt(logTabIdx, logTabHighLightColor);
 				} else {
-					setBackgroundAt(logTabIdx, logTabRegularColor) ;
+					setBackgroundAt(logTabIdx, logTabRegularColor);
 				}
 			}
 		}
-		
 	}
 
 	public void setLogTabHighLightColor(Color logHighLightColor) {

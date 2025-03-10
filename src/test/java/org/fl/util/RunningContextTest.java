@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 
 import org.fl.util.FilterCounter.LogRecordCounter;
 import org.junit.jupiter.api.Test;
@@ -96,6 +97,8 @@ class RunningContextTest {
 		
 		assertThat(rc.getInitializationDate()).isCloseTo(Instant.now(), within(2, ChronoUnit.SECONDS));
 		
+		assertThat(rc.getCommonLogFormatter()).isInstanceOf(SimpleFormatter.class);
+		
 		assertThat(propertiesStorageLogRecordCounter.getLogRecordCount()).isEqualTo(2);
 		assertThat(propertiesStorageLogRecordCounter.getLogRecordCount(Level.WARNING)).isEqualTo(2);
 		
@@ -132,6 +135,8 @@ class RunningContextTest {
 		assertThat(rc.getInitializationDate()).isCloseTo(Instant.now(), within(2, ChronoUnit.SECONDS));
 
 		assertThat(rc.getBuildInformation()).isNotNull().isNotEmpty().contains("version");
+		
+		assertThat(rc.getCommonLogFormatter()).isInstanceOf(PlainLogFormatter.class);
 	}
 
 	@Test

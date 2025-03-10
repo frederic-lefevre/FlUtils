@@ -22,9 +22,32 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-package org.fl.util.swing.logPane;
+package org.fl.util.swing.logConfiguration;
 
-public interface LogDisplayChanger {
 
-	public LogDisplayComponent changeLogDisplayComponent() ;
+import java.awt.Color;
+import java.awt.Dimension;
+
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
+import javax.swing.JPanel;
+public class LogConfigurationPane extends JPanel {
+	
+	private static final long serialVersionUID = 1L;
+	
+	public LogConfigurationPane(String applicationRootLoggerName) {
+		
+		super();
+
+		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+		setBorder(BorderFactory.createLineBorder(Color.BLACK, 5, true));
+		
+		ConfigureLoggerPane configureLoggerPane = new ConfigureLoggerPane();
+		configureLoggerPane.setPreferredSize(new Dimension(1800,750));
+		
+		LoggerSelectionPane loggerSelectionPane = new LoggerSelectionPane(applicationRootLoggerName, configureLoggerPane);
+		add(loggerSelectionPane);
+		
+		add(configureLoggerPane);
+	}
 }

@@ -39,6 +39,7 @@ import java.util.Enumeration;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.Vector;
+import java.util.logging.Formatter;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -251,6 +252,10 @@ public class RunningContext {
 
 	public AdvancedProperties getProps() {
 		return applicationProperties;
+	}
+	
+	public Formatter getCommonLogFormatter() {
+		return logMgr.getCommonFormatter();
 	}
 	
 	public void addCustomLogHandler(Handler customLogHandler) {
