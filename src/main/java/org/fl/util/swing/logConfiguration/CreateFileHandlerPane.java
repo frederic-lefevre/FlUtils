@@ -24,20 +24,25 @@ SOFTWARE.
 
 package org.fl.util.swing.logConfiguration;
 
+import java.text.NumberFormat;
+
+import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JSpinner;
-import javax.swing.SpinnerModel;
-import javax.swing.SpinnerNumberModel;
+import javax.swing.text.NumberFormatter;
 import javax.swing.JTextField;
 
 public class CreateFileHandlerPane extends CreateHandlerPane {
 
 	private static final long serialVersionUID = 1L;
 
+	private static final String DEFAULT_LOG_FILE_PATTERN = "/tmp/yourApp/app%g.log";
+	private static final Long DEFAULT_LOG_FILE_SIZE = 80000L;
+	private static final Integer DEFAULT_NUMBER_OF_LOG_FILE = 3;
+	
 	private final JTextField logFilePattern;
-	private final JSpinner logFileSize;
-	private final JTextField numberOfLogFile;
+	private final JFormattedTextField logFileSize;
+	private final JFormattedTextField numberOfLogFile;
 	
 	public CreateFileHandlerPane() {
 		super();
@@ -46,6 +51,7 @@ public class CreateFileHandlerPane extends CreateHandlerPane {
 		JLabel logFilePatternTitle = new JLabel("Log file name pattern: ");
 		logFilePatternTitle.setFont(font);
 		logFilePattern = new JTextField(50);
+		logFilePattern.setText(DEFAULT_LOG_FILE_PATTERN);
 		logFilePatternPane.add(logFilePatternTitle);
 		logFilePatternPane.add(logFilePattern);		
 		add(logFilePatternPane);
@@ -53,8 +59,15 @@ public class CreateFileHandlerPane extends CreateHandlerPane {
 		JPanel logFileSizePane = new JPanel();
 		JLabel logFileSizeTitle = new JLabel("Log file maximum bytes number: ");
 		logFileSizeTitle.setFont(font);
-		SpinnerModel logFileSizeModel = new SpinnerNumberModel(80000, 2000, Integer.MAX_VALUE, 1);  
-		logFileSize = new JSpinner(logFileSizeModel);
+
+		NumberFormatter fileSizeFormatter = new NumberFormatter(NumberFormat.getInstance());
+		fileSizeFormatter.setValueClass(Long.class);
+		fileSizeFormatter.setMaximum(Long.MAX_VALUE);
+		fileSizeFormatter.setAllowsInvalid(false);
+		  
+		logFileSize = new JFormattedTextField(fileSizeFormatter);
+		logFileSize.setColumns(15);
+		logFileSize.setValue(DEFAULT_LOG_FILE_SIZE);
 		logFileSizePane.add(logFileSizeTitle);
 		logFileSizePane.add(logFileSize);
 		add(logFileSizePane);
@@ -62,7 +75,15 @@ public class CreateFileHandlerPane extends CreateHandlerPane {
 		JPanel numberOfLogFilePane = new JPanel();
 		JLabel numberOfLogFileTitle = new JLabel("Number of log files: ");
 		numberOfLogFileTitle.setFont(font);
-		numberOfLogFile = new JTextField(8);
+		
+		NumberFormatter numberOfFileFormatter = new NumberFormatter(NumberFormat.getInstance());
+		numberOfFileFormatter.setValueClass(Integer.class);
+		numberOfFileFormatter.setMaximum(Integer.MAX_VALUE);
+		numberOfFileFormatter.setAllowsInvalid(false);
+		
+		numberOfLogFile = new JFormattedTextField(numberOfFileFormatter);
+		numberOfLogFile.setColumns(6);
+		numberOfLogFile.setValue(DEFAULT_NUMBER_OF_LOG_FILE);
 		numberOfLogFilePane.add(numberOfLogFileTitle);
 		numberOfLogFilePane.add(numberOfLogFile);
 		add(numberOfLogFilePane);
@@ -72,14 +93,12 @@ public class CreateFileHandlerPane extends CreateHandlerPane {
 		return logFilePattern.getText();
 	}
 
-	public Integer getSelectedFileSize() {
-		// TODO : allow only number for entry
-		return (Integer)logFileSize.getValue();
+	public Long getSelectedFileSize() {
+		return (Long)logFileSize.getValue();
 	}
 
 	public Integer getSelectedNamberOfFiles() {
-		// TODO : allow only number for entry
-		return Integer.parseInt(numberOfLogFile.getText());
+		return (Integer)numberOfLogFile.getValue();
 	}
 	
 }
