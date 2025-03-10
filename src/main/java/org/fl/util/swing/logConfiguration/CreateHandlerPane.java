@@ -69,6 +69,7 @@ public class CreateHandlerPane extends JPanel {
 		
 		handlerLevelChoice = new JComboBox<>(LoggerUtils.LEVELS);
 		handlerLevelChoice.addItemListener(new HandlerLevelListener());
+		handlerLevelChoice.setSelectedItem(null);
 		levelPane.add(handlerLevelChoice);
 		levelPane.setAlignmentX(CENTER_ALIGNMENT);
 		add(levelPane);
@@ -81,6 +82,7 @@ public class CreateHandlerPane extends JPanel {
 		
 		formatterChoice = new FormatterComboBox();
 		formatterChoice.addItemListener(new FormatterListener());
+		formatterChoice.setSelectedItem(null);
 		formatterPane.add(formatterChoice);
 		formatterPane.setAlignmentX(CENTER_ALIGNMENT);
 		add(formatterPane);

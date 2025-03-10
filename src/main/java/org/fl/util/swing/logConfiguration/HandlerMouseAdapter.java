@@ -28,7 +28,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.IOException;
 import java.util.logging.ConsoleHandler;
+import java.util.logging.FileHandler;
 import java.util.logging.Formatter;
 import java.util.logging.Handler;
 import java.util.logging.Level;
@@ -179,6 +181,19 @@ public class HandlerMouseAdapter extends MouseAdapter {
 					options,
 					options[CANCEL_OPTION]);
 			if (choosen_option == CREATE_HANDLER_OPTION) {
+				try {
+					FileHandler fileHandler = new FileHandler(
+							createPane.getSelectedFilePattern(), 
+							createPane.getSelectedFileSize(),
+							createPane.getSelectedNamberOfFiles(),
+							true);
+					setCommonHandlerParameter(fileHandler, createPane);
+					loggerToConfigure.addHandler(fileHandler);
+					handlerTableModel.refreshHandlerList(loggerToConfigure);
+					handlerTableModel.fireTableDataChanged();
+				} catch (IOException e1) {
+					internalLogger.log(Level.SEVERE, "Exception when creating a file handler", e);
+				}
 				
 			}
 		}

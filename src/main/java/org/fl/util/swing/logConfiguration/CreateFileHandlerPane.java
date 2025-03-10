@@ -36,7 +36,7 @@ public class CreateFileHandlerPane extends CreateHandlerPane {
 
 	private static final long serialVersionUID = 1L;
 
-	private static final String DEFAULT_LOG_FILE_PATTERN = "/tmp/yourApp/app%g.log";
+	private static final String DEFAULT_LOG_FILE_PATTERN = "/tmp/changePathAndFileName%g.log";
 	private static final Long DEFAULT_LOG_FILE_SIZE = 80000L;
 	private static final Integer DEFAULT_NUMBER_OF_LOG_FILE = 3;
 	
