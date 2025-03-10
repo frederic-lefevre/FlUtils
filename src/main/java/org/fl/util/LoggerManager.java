@@ -49,7 +49,7 @@ public class LoggerManager {
 
 	private static final String DEFAULT_LOG_NAME = "org.fl";
 	private static final String DEFAULT_LOG_FILE_DIR = "log";
-	private static final int DEFAULT_LOG_FILE_LENGTH = 8000000;
+	private static final long DEFAULT_LOG_FILE_LENGTH = 8000000;
 	private static final int DEFAULT_LOG_FILE_NUMBER = 3;
 
 	private static final Logger rootLogger = Logger.getLogger("");
@@ -165,7 +165,7 @@ public class LoggerManager {
 			formatter = new SimpleFormatter();
 		}
 
-		int logfileLength = properties.getInt("logging.logfile.length", DEFAULT_LOG_FILE_LENGTH);
+		long logfileLength = properties.getLong("logging.logfile.length", DEFAULT_LOG_FILE_LENGTH);
 		int logfileNumber = properties.getInt("logging.logfile.number", DEFAULT_LOG_FILE_NUMBER);		
 		
 		// Root logger
