@@ -215,8 +215,7 @@ class LoggerManagerTest {
 	@Order(5)
 	void testBufferLogHandler() throws Exception {
 		
-		String loggerName = "org.fl.util.Test2";
-		
+		String loggerName = "org.fl.util.Test2";		
 		assertsForTest2(loggerName);
 	}
 	
@@ -225,28 +224,7 @@ class LoggerManagerTest {
 	void testWithPreviousLoggerCreation() throws Exception {
 		
 		String loggerName = "org.fl.util.Test2";
-		
-		// Get loggers before calling LoggerManager
-		Logger logger = Logger.getLogger(loggerName);
-		Logger rootLogger = Logger.getLogger("");
-		
-		assertThat(logger).isNotNull();
-		assertThat(logger.getLevel()).isNull();
-		assertThat(logger.getHandlers()).isNotNull().isEmpty();
-		
-		assertThat(rootLogger).isNotNull();
-		assertThat(rootLogger.getLevel()).isEqualTo(Level.INFO);
-		assertThat(rootLogger.getHandlers()).singleElement()
-		.satisfies(
-			handler -> {		
-				assertThat(handler).isInstanceOf(ConsoleHandler.class);
-				assertThat(handler.getLevel()).isEqualTo(Level.INFO);
-				assertThat(handler.getFormatter()).isNotNull()
-					.isInstanceOf(SimpleFormatter.class);
-				assertThat(handler.getFilter()).isNull();
-				assertThat(handler.getErrorManager()).isNotNull();}		
-		);
-		
+		assertInitialJVMConfig(loggerName);
 		assertsForTest2(loggerName);
 	}
 	
@@ -346,4 +324,116 @@ class LoggerManagerTest {
 		assertThat(handler.getErrorManager()).isNotNull();
 	}
 	
+	private void assertInitialJVMConfig(String loggerName) {
+		
+		// Get loggers before calling LoggerManager
+		Logger logger = Logger.getLogger(loggerName);
+		Logger rootLogger = Logger.getLogger("");
+		
+		assertThat(logger).isNotNull();
+		assertThat(logger.getLevel()).isNull();
+		assertThat(logger.getHandlers()).isNotNull().isEmpty();
+		
+		assertThat(rootLogger).isNotNull();
+		assertThat(rootLogger.getLevel()).isEqualTo(Level.INFO);
+		assertThat(rootLogger.getHandlers()).singleElement()
+		.satisfies(
+			handler -> {		
+				assertThat(handler).isInstanceOf(ConsoleHandler.class);
+				assertThat(handler.getLevel()).isEqualTo(Level.INFO);
+				assertThat(handler.getFormatter()).isNotNull()
+					.isInstanceOf(SimpleFormatter.class);
+				assertThat(handler.getFilter()).isNull();
+				assertThat(handler.getErrorManager()).isNotNull();}		
+		);
+	}
+	
+	@Test
+	@Order(7)
+	void test3() throws Exception {
+		
+		String loggerName = "org.fl.util.Test3";		
+		assertsForTest3(loggerName);
+	}
+	
+	@Test
+	@Order(8)
+	void test3WithPreviousLoggerCreation() throws Exception {
+		
+		String loggerName = "org.fl.util.Test3";
+		assertInitialJVMConfig(loggerName);
+		assertsForTest3(loggerName);
+	}
+	
+	private void assertsForTest3(String loggerName) throws Exception {
+		
+		String pathString = "C:/FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test3.properties";
+		Path propertyPath = Paths.get(pathString);
+		
+		PropertiesStorage ps = new PropertiesStorage(null, propertyPath);
+		
+		AdvancedProperties props = ps.getAdvanced(null);
+		assertThat(props).isNotNull();
+		
+		LoggerManager logMgr = LoggerManager.builder()
+				.applicationRootLoggerName(loggerName)
+				.properties(props)
+				.build();
+		
+		assertThat(logMgr).isNotNull();
+		
+		Logger logger = Logger.getLogger(loggerName);
+		Logger rootLogger = Logger.getLogger("");
+		
+		assertThat(logger.getLevel()).isEqualTo(Level.CONFIG);
+		assertThat(rootLogger.getLevel()).isEqualTo(Level.WARNING);
+		
+		assertThat(props.get("logging.BufferLogHandler.bufferLength")).isEqualTo("100");
+		assertThat(props.get("logging.BufferLogHandler.level")).isEqualTo("INFO");
+		
+		assertThat(logMgr.getCommonFormatterInstance()).isInstanceOf(PlainLogFormatter.class);
+		
+		Handler[] handlers = logger.getHandlers();
+		
+		assertThat(handlers).hasSize(2)
+			.satisfiesExactlyInAnyOrder(
+				handler -> assertTest3FileHandler(handler),
+				handler -> {
+					assertThat(handler).isInstanceOf(BufferLogHandler.class);
+					assertThat(handler).isInstanceOfSatisfying(BufferLogHandler.class, 
+							bufferLogHandler -> { 
+								assertThat(bufferLogHandler.getName()).isEqualTo("standard bufferLogHandler");
+								assertThat(bufferLogHandler.getMaxMemoryLogRecord()).isEqualTo(100);
+							});
+					assertThat(handler.getLevel()).isEqualTo(Level.INFO);
+				}
+			);
+		
+		Handler[] rootHandlers = rootLogger.getHandlers();
+		
+		assertThat(rootHandlers).singleElement()
+			.satisfies(
+				handler -> assertTest3ConsoleHandler(handler)		
+			);
+	}
+	
+	private void assertTest3ConsoleHandler(Handler handler) {
+
+		assertThat(handler).isInstanceOf(ConsoleHandler.class);
+		assertThat(handler.getLevel()).isEqualTo(Level.FINE);
+		assertThat(handler.getFormatter()).isNotNull()
+			.isInstanceOf(JsonLogFormatter.class);
+		assertThat(handler.getFilter()).isNull();
+		assertThat(handler.getErrorManager()).isNotNull();
+	}
+
+	private void assertTest3FileHandler(Handler handler) {
+
+		assertThat(handler).isInstanceOf(FileHandler.class);
+		assertThat(handler.getLevel()).isEqualTo(Level.FINER);
+		assertThat(handler.getFormatter()).isNotNull()
+			.isInstanceOf(PlainLogFormatter.class);
+		assertThat(handler.getFilter()).isNull();
+		assertThat(handler.getErrorManager()).isNotNull();
+	}
 }
