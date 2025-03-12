@@ -157,16 +157,16 @@ class LoggerManagerTest {
 		
 		assertThat(rootLogger.getLevel()).isEqualTo(Level.INFO);
 		assertThat(rootLogger.getUseParentHandlers()).isTrue();		
-		assertHandlers(rootLogger.getHandlers());
+		assertSamplePropertyHandlers(rootLogger.getHandlers());
 		
 		Logger logger = Logger.getLogger(loggerName);
 		
 		assertThat(logger.getLevel()).isEqualTo(Level.WARNING);		
 		assertThat(logger.getUseParentHandlers()).isFalse();		
-		assertHandlers(logger.getHandlers());	
+		assertSamplePropertyHandlers(logger.getHandlers());	
 	}
 	
-	private void assertHandlers(Handler[] handlers) {
+	private void assertSamplePropertyHandlers(Handler[] handlers) {
 		
 		assertThat(handlers).hasSize(2)
 		.satisfiesExactlyInAnyOrder(
@@ -224,15 +224,9 @@ class LoggerManagerTest {
 		
 		assertThat(handlers).hasSize(3)
 			.satisfiesExactlyInAnyOrder(
+				handler -> assertTest2ConsoleHandler(handler),
+				handler -> assertTest2FileHandler(handler),
 				handler -> {
-					assertThat(handler).isInstanceOf(ConsoleHandler.class); 
-					assertThat(handler.getLevel()).isEqualTo(Level.OFF);
-				},
-				handler -> { 
-					assertThat(handler).isInstanceOf(FileHandler.class); 
-					assertThat(handler.getLevel()).isEqualTo(Level.OFF);
-				},
-				handler -> { 
 					assertThat(handler).isInstanceOf(BufferLogHandler.class);
 					assertThat(handler).isInstanceOfSatisfying(BufferLogHandler.class, 
 							bufferLogHandler -> { 
@@ -265,4 +259,25 @@ class LoggerManagerTest {
 		// Check memory log is empty
 		assertThat(logMgr.getMemoryLogs()).isNotNull().isEmpty();
 	}
+	
+	private void assertTest2ConsoleHandler(Handler handler) {
+
+		assertThat(handler).isInstanceOf(ConsoleHandler.class);
+		assertThat(handler.getLevel()).isEqualTo(Level.OFF);
+		assertThat(handler.getFormatter()).isNotNull()
+			.isInstanceOf(SimpleFormatter.class);
+		assertThat(handler.getFilter()).isNull();
+		assertThat(handler.getErrorManager()).isNotNull();
+	}
+
+	private void assertTest2FileHandler(Handler handler) {
+
+		assertThat(handler).isInstanceOf(FileHandler.class);
+		assertThat(handler.getLevel()).isEqualTo(Level.OFF);
+		assertThat(handler.getFormatter()).isNotNull()
+			.isInstanceOf(PlainLogFormatter.class);
+		assertThat(handler.getFilter()).isNull();
+		assertThat(handler.getErrorManager()).isNotNull();
+	}
+	
 }
