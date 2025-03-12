@@ -266,4 +266,22 @@ class RunningContextTest {
 		
 		logRecordCounter.stopLogCountAndFilter();
 	}
+	
+	@Test
+	void testRunningContextLoggingInfo() throws URISyntaxException, JsonProcessingException {
+		
+		RunningContext rc = new RunningContext(LOGGER_NAME, null, 
+				new URI("file:///C:/FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test1.properties"));
+		
+		JsonNode applicationInfos = rc.getApplicationInfo(false);
+		
+		assertThat(applicationInfos).isNotNull();
+		
+		JsonNode loggingInfos = applicationInfos.get("loggingInformation");
+		assertThat(loggingInfos).isNotNull();
+		
+		assertThat(loggingInfos.get("handlers")).isNotNull();
+		assertThat(loggingInfos.get("handlers").asText())
+			.isEqualTo("java.util.logging.FileHandler,java.util.logging.ConsoleHandler");
+	}
 }

@@ -70,6 +70,8 @@ public class LoggerManager {
 
 	private AdvancedProperties properties;
 
+	private AdvancedProperties loggingProperties;
+	
 	// LoggerManager Builder
     public static Builder builder() {
     	return new Builder();
@@ -113,6 +115,8 @@ public class LoggerManager {
     		properties = props;
     	}
 		
+    	loggingProperties = null;
+    	
     	// Read java.util.logging.LogManager configuration
     	initJavaUtilLogging(logName);
     		
@@ -144,7 +148,7 @@ public class LoggerManager {
     		
     		if (loggingPropertiesUrl != null) {
     			
-    			AdvancedProperties loggingProperties = properties.getPropertiesFromFile(LOGMANAGER_PROPERTY_FILE_PROPERTY);
+    			loggingProperties = properties.getPropertiesFromFile(LOGMANAGER_PROPERTY_FILE_PROPERTY);
     			createFileHandlerPatternNonExistantFolders(loggingProperties);
    			
     			LogManager logManager = LogManager.getLogManager();
@@ -226,6 +230,10 @@ public class LoggerManager {
 		}
 	}
 	
+	public AdvancedProperties getLoggingProperties() {
+		return loggingProperties;
+	}
+
 	// Add a custom handler to the logger
 	public void addCustomHandler(Handler customHandler) {
 

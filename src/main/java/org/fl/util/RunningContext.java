@@ -24,6 +24,7 @@ SOFTWARE.
 
 package org.fl.util;
 
+import java.io.IOException;
 import java.io.StringReader;
 import java.net.URI;
 import java.net.URL;
@@ -82,6 +83,7 @@ public class RunningContext {
 	private Instant initializationDate;
 
 	private ArrayNode buildInformation;
+	private JsonNode loggingPropertiesAsJson;
 	
 	/**
 	 * @param name : normally named, using a hierarchical dot-separated namespace. 
@@ -173,6 +175,9 @@ public class RunningContext {
 		addBuildInformation(name, true);
 		addBuildInformation("org.fl.util", false);
 
+		// Get the java.util.logging properties as Json
+		loggingPropertiesAsJson = getLoggingProperties();
+		
 		boolean logOperatingInfos = applicationProperties.getBoolean("runningContext.operatingInfo.log", false);
 		if (logOperatingInfos) {
 			applicationRootLog.info(getOperatingInfos(true).toString());
@@ -251,6 +256,22 @@ public class RunningContext {
 		}
 	}
 
+	private JsonNode getLoggingProperties() {
+		
+		Properties loggingProperties = logMgr.getLoggingProperties();
+		if (loggingProperties != null) {
+			
+			try {
+				return propsMapper.readPropertiesAs(loggingProperties, JsonNode.class);
+			} catch (IOException e) {
+				applicationRootLog.log(Level.WARNING, "Exception looking for logging properties for " + name, e);
+				return null;
+			}
+		} else {
+			return null;
+		}
+	}
+	
 	public AdvancedProperties getProps() {
 		return applicationProperties;
 	}
@@ -331,6 +352,13 @@ public class RunningContext {
 		} else {
 			applicationInfo.put("buildInformation", "No build information");
 		}
+		
+		if ((loggingPropertiesAsJson != null) && !loggingPropertiesAsJson.isEmpty()) {
+			applicationInfo.set("loggingInformation", loggingPropertiesAsJson);
+		} else {
+			applicationInfo.put("loggingInformation", "No java.util.logging information");
+		}
+		
 		applicationInfo.put("initialisationDate", initDate);
 		applicationInfo.set("applicationProperties", getPropertiesAsJson());
 		applicationInfo.set("operatingContext", operatingContext);

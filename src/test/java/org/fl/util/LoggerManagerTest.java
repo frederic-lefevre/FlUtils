@@ -71,6 +71,7 @@ class LoggerManagerTest {
 		
 		assertThat(handlers).isEmpty();
 		
+		assertThat(logMgr.getLoggingProperties()).isNull();
 		assertThat(logMgr.getCommonFormatterInstance()).isInstanceOf(SimpleFormatter.class);
 	}
 
@@ -93,6 +94,7 @@ class LoggerManagerTest {
 		Handler[] handlers = logger.getHandlers();
 		
 		assertThat(handlers).isEmpty();
+		assertThat(logMgr.getLoggingProperties()).isNull();
 		assertThat(logMgr.getCommonFormatterInstance()).isInstanceOf(SimpleFormatter.class);
 	}
 	
@@ -118,6 +120,8 @@ class LoggerManagerTest {
 				.build();
 		
 		assertThat(logMgr).isNotNull();
+		
+		assertThat(logMgr.getLoggingProperties()).isNotNull();
 		
 		// 2 warnings are logged
 		assertThat(logRecordCounter.getLogRecordCount()).isEqualTo(2);
@@ -172,6 +176,10 @@ class LoggerManagerTest {
 		
 		assertThat(logMgr).isNotNull();
 		assertThat(logMgr.getCommonFormatterInstance()).isInstanceOf(PlainLogFormatter.class);
+		
+		assertThat(logMgr.getLoggingProperties()).isNotNull()
+			.usingRecursiveComparison()
+			.isEqualTo(loggingProps);
 		
 		Logger rootLogger = Logger.getLogger("");
 		
