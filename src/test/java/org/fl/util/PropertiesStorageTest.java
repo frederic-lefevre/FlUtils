@@ -138,7 +138,7 @@ class PropertiesStorageTest {
 		assertThat(props).isNotNull();
 		
 		assertThat(props.get("doesNotExist")).isNull();
-		assertThat(props.get("logging.file.encode")).isEqualTo("UTF-8");
+		assertThat(props.get("logging.CloudantLogHandler.encode")).isEqualTo("UTF-8");
 	}
 	
 	@Test
@@ -157,7 +157,7 @@ class PropertiesStorageTest {
 		assertThat(props).isNotNull();
 		
 		assertThat(props.get("doesNotExist")).isNull();
-		assertThat(props.get("logging.file.encode")).isEqualTo("UTF-8");
+		assertThat(props.get("logging.CloudantLogHandler.encode")).isEqualTo("UTF-8");
 	}
 	
 	private void testPropertiesStorageWithNullParam(PropertiesStorage ps) {
