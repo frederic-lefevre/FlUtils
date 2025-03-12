@@ -121,7 +121,7 @@ class LoggerUtilsTest {
 		assertThat(loggerLevelsJson.get(LoggerUtils.HANDLERS)).isNotNull().isEmpty();
 	}
 	
-	private static final String APPLICATION_NAME = "org.fl.util.test1";
+	private static final String APPLICATION_NAME = "org.fl.util.Test1";
 	private static final String CONSOLE_HANDLER_NAME = "java.util.logging.ConsoleHandler";
 	
 	@Test	
@@ -138,19 +138,20 @@ class LoggerUtilsTest {
 		
 		String fileHandlerName = "java.util.logging.FileHandler";
 		String bufferHandlerName = "org.fl.util.BufferLogHandler";
-		String formatterName = "org.fl.util.PlainLogFormatter";
+		String plainLogFormatterName = "org.fl.util.PlainLogFormatter";
+		String simpleFormatterName = "java.util.logging.SimpleFormatter";
 		assertThat(loggerLevelsJson.get(LoggerUtils.LOG_LEVEL).asText()).isEqualTo(Level.INFO.getName());
 		assertThat(loggerLevelsJson.get(LoggerUtils.HANDLERS)).isNotNull().hasSize(3)
 			.satisfiesExactlyInAnyOrder(
 					jsonHandler -> { 
 						assertThat(jsonHandler.get(LoggerUtils.HANDLER_NAME).asText()).isEqualTo(CONSOLE_HANDLER_NAME);
 						assertThat(jsonHandler.get(LoggerUtils.HANDLER_LEVEL).asText()).isEqualTo(Level.INFO.getName());
-						assertThat(jsonHandler.get(LoggerUtils.FORMATTER).asText()).isEqualTo(formatterName);
+						assertThat(jsonHandler.get(LoggerUtils.FORMATTER).asText()).isEqualTo(simpleFormatterName);
 					},
 					jsonHandler -> { 
 						assertThat(jsonHandler.get(LoggerUtils.HANDLER_NAME).asText()).isEqualTo(fileHandlerName);
 						assertThat(jsonHandler.get(LoggerUtils.HANDLER_LEVEL).asText()).isEqualTo(Level.INFO.getName());
-						assertThat(jsonHandler.get(LoggerUtils.FORMATTER).asText()).isEqualTo(formatterName);
+						assertThat(jsonHandler.get(LoggerUtils.FORMATTER).asText()).isEqualTo(plainLogFormatterName);
 					},
 					jsonHandler -> { 
 						assertThat(jsonHandler.get(LoggerUtils.HANDLER_NAME).asText()).isEqualTo(bufferHandlerName);

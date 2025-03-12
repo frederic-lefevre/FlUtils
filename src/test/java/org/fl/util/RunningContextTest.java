@@ -45,7 +45,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 class RunningContextTest {
 	
-	private static final String LOGGER_NAME = "org.fl.util.test1";
+	private static final String LOGGER_NAME = "org.fl.util.Test1";
 	
 	@Test
 	void testRunningContextWithNullStringParam() throws JsonProcessingException {		
@@ -64,6 +64,9 @@ class RunningContextTest {
 		
 		LogRecordCounter runningContextLogRecordCounter = 
 				FilterCounter.getLogRecordCounter(Logger.getLogger("org.fl"));
+		
+		LogRecordCounter rootLogRecordCounter = 
+				FilterCounter.getLogRecordCounter(Logger.getLogger(""));
 		
 		RunningContext rc = rcSupplier.get();
 		
@@ -102,9 +105,15 @@ class RunningContextTest {
 		assertThat(propertiesStorageLogRecordCounter.getLogRecordCount()).isEqualTo(2);
 		assertThat(propertiesStorageLogRecordCounter.getLogRecordCount(Level.WARNING)).isEqualTo(2);
 		
-		assertThat(runningContextLogRecordCounter.getLogRecordCount()).isEqualTo(4);
-		assertThat(runningContextLogRecordCounter.getLogRecordCount(Level.SEVERE)).isEqualTo(1);
+		assertThat(runningContextLogRecordCounter.getLogRecordCount()).isEqualTo(3);
 		assertThat(runningContextLogRecordCounter.getLogRecordCount(Level.WARNING)).isEqualTo(3);
+		
+		assertThat(rootLogRecordCounter.getLogRecordCount()).isEqualTo(1);
+		assertThat(rootLogRecordCounter.getLogRecordCount(Level.SEVERE)).isEqualTo(1);
+		
+		propertiesStorageLogRecordCounter.stopLogCountAndFilter();
+		runningContextLogRecordCounter.stopLogCountAndFilter();
+		rootLogRecordCounter.stopLogCountAndFilter();
 	}
 	
 	@Test

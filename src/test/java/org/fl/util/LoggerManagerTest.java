@@ -35,6 +35,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
+import org.fl.util.FilterCounter.LogRecordCounter;
 import org.junit.jupiter.api.Test;
 
 class LoggerManagerTest {
@@ -47,14 +48,13 @@ class LoggerManagerTest {
 		
 		Logger defaultLogger = Logger.getLogger("org.fl");
 		
-		assertThat(defaultLogger.getLevel()).isEqualTo(Level.WARNING);
+		assertThat(defaultLogger.getLevel()).isNull();
 		
 		Handler[] handlers = defaultLogger.getHandlers();
 		
-		assertThat(handlers).singleElement()
-			.satisfies(handler -> assertThat(handler).isInstanceOf(ConsoleHandler.class));
+		assertThat(handlers).isEmpty();
 		
-		assertThat(logMgr.getCommonFormatter()).isInstanceOf(SimpleFormatter.class);
+		assertThat(logMgr.getCommonFormatterInstance()).isInstanceOf(SimpleFormatter.class);
 	}
 
 	@Test
@@ -63,25 +63,56 @@ class LoggerManagerTest {
 		String loggerName = LoggerManagerTest.class.getName() + ".1";
 		
 		LoggerManager logMgr = LoggerManager.builder()
-				.logName(loggerName)
+				.applicationRootLoggerName(loggerName)
 				.build();
 		
 		assertThat(logMgr).isNotNull();
 		
 		Logger logger = Logger.getLogger(loggerName);
 		
-		assertThat(logger.getLevel()).isEqualTo(Level.WARNING);
+		assertThat(logger.getLevel()).isNull();
 		
 		Handler[] handlers = logger.getHandlers();
 		
-		assertThat(handlers).singleElement()
-			.satisfies(handler -> assertThat(handler).isInstanceOf(ConsoleHandler.class));
+		assertThat(handlers).isEmpty();
+		assertThat(logMgr.getCommonFormatterInstance()).isInstanceOf(SimpleFormatter.class);
+	}
+	
+	@Test
+	void testNamedLoggerNotPresentInLoggingConfiguration() throws Exception {
+		
+		String loggerName = "org.fl.util.notInConfig";
+		
+		String pathString = "C:/FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/main/java/flUtilsSample.properties";
+		Path propertyPath = Paths.get(pathString);
+		
+		PropertiesStorage ps = new PropertiesStorage(null, propertyPath);
+		
+		AdvancedProperties props = ps.getAdvanced(null);
+		
+		LogRecordCounter logRecordCounter = 
+				FilterCounter.getLogRecordCounter(Logger.getLogger(""));
+				
+		LoggerManager logMgr = LoggerManager.builder()
+				.applicationRootLoggerName(loggerName)
+				.properties(props)
+				.build();
+		
+		assertThat(logMgr).isNotNull();
+		
+		// 2 warnings are logged
+		assertThat(logRecordCounter.getLogRecordCount()).isEqualTo(2);
+		assertThat(logRecordCounter.getLogRecordCount(Level.WARNING)).isEqualTo(2);
+		
+		Logger logger = Logger.getLogger(loggerName);
+		
+		assertThat(logger.getLevel()).isNull();
 	}
 	
 	@Test
 	void testNamedLoggerSampleConfiguration() throws Exception {
 		
-		String loggerName = LoggerManagerTest.class.getName() + ".2";
+		String loggerName = "org.fl.util.SampleApp";
 		
 		String pathString = "C:/FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/main/java/flUtilsSample.properties";
 		Path propertyPath = Paths.get(pathString);
@@ -91,68 +122,79 @@ class LoggerManagerTest {
 		AdvancedProperties props = ps.getAdvanced(null);
 		assertThat(props).isNotNull();
 		
-		assertThat(props.get("logging.directory.name")).isEqualTo("/tmp/myLogDir/");
-		assertThat(props.get("logging.logfile.name")).isEqualTo("journal%g.log");
-		assertThat(props.get("logging.logfile.length")).isEqualTo("80000000");
-		assertThat(props.get("logging.logfile.number")).isEqualTo("3");
-				
-		assertThat(props.get("logging.file.level")).isEqualTo("WARNING");
-		assertThat(props.get("logging.console.level")).isEqualTo("INFO");
-				
-		assertThat(props.get("logging.console.encode")).isEqualTo("UTF-8");
-		assertThat(props.get("logging.file.encode")).isEqualTo("UTF-8");
+		AdvancedProperties loggingProps = props.getPropertiesFromFile(LoggerManager.LOGMANAGER_PROPERTY_FILE_PROPERTY);
 		
-		assertThat(props.get("logging.root.file.level")).isEqualTo("INFO");
-		assertThat(props.get("logging.rootLogfile.name")).isEqualTo("rootApp%g.log");
+		assertThat(loggingProps.get("handlers")).isEqualTo("java.util.logging.FileHandler,java.util.logging.ConsoleHandler");
 		
-		assertThat(props.get("logging.simpleLogFormatter.format")).isEqualTo("%1$tY-%1$tm-%1$td %1$tH:%1$tM:%1$tS.%1$tL %3$S %2$s%n%4$s: %5$s%6$s%n");
+		assertThat(loggingProps.get("java.util.logging.ConsoleHandler.level")).isEqualTo("INFO");
+		assertThat(loggingProps.get("java.util.logging.ConsoleHandler.formatter")).isEqualTo("java.util.logging.SimpleFormatter");
+		assertThat(loggingProps.get("java.util.logging.ConsoleHandler.encoding")).isEqualTo("UTF-8");
+		
+		assertThat(loggingProps.get("java.util.logging.FileHandler.level")).isEqualTo("WARNING");
+		assertThat(loggingProps.get("java.util.logging.FileHandler.formatter")).isEqualTo("org.fl.util.PlainLogFormatter");
+		assertThat(loggingProps.get("java.util.logging.FileHandler.pattern")).isEqualTo("/tmp/myLogDir/app%u_%g.log");
+		assertThat(loggingProps.get("java.util.logging.FileHandler.limit")).isEqualTo("80000000");
+		assertThat(loggingProps.get("java.util.logging.FileHandler.count")).isEqualTo("3");
+		assertThat(loggingProps.get("java.util.logging.FileHandler.encoding")).isEqualTo("UTF-8");
+		assertThat(loggingProps.get("java.util.logging.FileHandler.append")).isEqualTo("true");
+		assertThat(loggingProps.get("java.util.logging.FileHandler.maxLocks")).isEqualTo("100");
+		
+		assertThat(loggingProps.get("java.util.logging.SimpleFormatter.format")).isEqualTo("%1$tY-%1$tm-%1$td %1$tH:%1$tM:%1$tS.%1$tL %3$S %2$s%n%4$s: %5$s%6$s%n");
+		
+		assertThat(loggingProps.get(loggerName + ".handlers")).isEqualTo("java.util.logging.FileHandler,java.util.logging.ConsoleHandler");
+		assertThat(loggingProps.get(loggerName + ".useParentHandlers")).isEqualTo("false");
+		assertThat(loggingProps.get(loggerName + ".level")).isEqualTo("WARNING");
 		
 		LoggerManager logMgr = LoggerManager.builder()
-				.logName(loggerName)
+				.applicationRootLoggerName(loggerName)
 				.properties(props)
 				.build();
 		
 		assertThat(logMgr).isNotNull();
+		assertThat(logMgr.getCommonFormatterInstance()).isInstanceOf(PlainLogFormatter.class);
+		
+		Logger rootLogger = Logger.getLogger("");
+		
+		assertThat(rootLogger.getLevel()).isEqualTo(Level.INFO);
+		assertThat(rootLogger.getUseParentHandlers()).isTrue();		
+		assertHandlers(rootLogger.getHandlers());
 		
 		Logger logger = Logger.getLogger(loggerName);
 		
-		assertThat(logger.getLevel()).isEqualTo(Level.INFO);
-		
-		assertThat(System.getProperty("java.util.logging.SimpleFormatter.format"))
-			.isNotNull()
-			.isEqualTo("%1$tY-%1$tm-%1$td %1$tH:%1$tM:%1$tS.%1$tL %3$S %2$s%n%4$s: %5$s%6$s%n");
-		
-		assertThat(logMgr.getCommonFormatter()).isInstanceOf(SimpleFormatter.class);
-		
-		Handler[] handlers = logger.getHandlers();
+		assertThat(logger.getLevel()).isEqualTo(Level.WARNING);		
+		assertThat(logger.getUseParentHandlers()).isFalse();		
+		assertHandlers(logger.getHandlers());	
+	}
+	
+	private void assertHandlers(Handler[] handlers) {
 		
 		assertThat(handlers).hasSize(2)
-			.satisfiesExactlyInAnyOrder(
-					handler -> { 
-						assertThat(handler).isInstanceOf(ConsoleHandler.class);
-						assertThat(handler.getEncoding()).isEqualTo("UTF-8");
-						assertThat(handler.getLevel()).isEqualTo(Level.INFO);
-						assertThat(handler.getFormatter()).isNotNull()
-							.isInstanceOf(SimpleFormatter.class);
-						assertThat(handler.getFilter()).isNull();
-						assertThat(handler.getErrorManager()).isNotNull();
-					},
-					handler -> { 
-						assertThat(handler).isInstanceOf(FileHandler.class);
-						assertThat(handler.getEncoding()).isEqualTo("UTF-8");
-						assertThat(handler.getLevel()).isEqualTo(Level.WARNING);
-						assertThat(handler.getFormatter()).isNotNull()
-							.isInstanceOf(SimpleFormatter.class);
-						assertThat(handler.getFilter()).isNull();
-						assertThat(handler.getErrorManager()).isNotNull();
-					}
-				);
+		.satisfiesExactlyInAnyOrder(
+				handler -> { 
+					assertThat(handler).isInstanceOf(ConsoleHandler.class);
+					assertThat(handler.getEncoding()).isEqualTo("UTF-8");
+					assertThat(handler.getLevel()).isEqualTo(Level.INFO);
+					assertThat(handler.getFormatter()).isNotNull()
+						.isInstanceOf(SimpleFormatter.class);
+					assertThat(handler.getFilter()).isNull();
+					assertThat(handler.getErrorManager()).isNotNull();
+				},
+				handler -> { 
+					assertThat(handler).isInstanceOf(FileHandler.class);
+					assertThat(handler.getEncoding()).isEqualTo("UTF-8");
+					assertThat(handler.getLevel()).isEqualTo(Level.WARNING);
+					assertThat(handler.getFormatter()).isNotNull()
+						.isInstanceOf(PlainLogFormatter.class);
+					assertThat(handler.getFilter()).isNull();
+					assertThat(handler.getErrorManager()).isNotNull();
+				}
+			);
 	}
 	
 	@Test
 	void testBufferLogHandler() throws Exception {
 		
-		String loggerName = LoggerManagerTest.class.getName()  + ".3";
+		String loggerName = "org.fl.util.Test2";
 		
 		String pathString = "C:/FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test2.properties";
 		Path propertyPath = Paths.get(pathString);
@@ -163,7 +205,7 @@ class LoggerManagerTest {
 		assertThat(props).isNotNull();
 		
 		LoggerManager logMgr = LoggerManager.builder()
-				.logName(loggerName)
+				.applicationRootLoggerName(loggerName)
 				.properties(props)
 				.build();
 		
@@ -176,7 +218,7 @@ class LoggerManagerTest {
 		assertThat(props.get("logging.BufferLogHandler.bufferLength")).isEqualTo("100");
 		assertThat(props.get("logging.BufferLogHandler.level")).isEqualTo("INFO");
 		
-		assertThat(logMgr.getCommonFormatter()).isInstanceOf(PlainLogFormatter.class);
+		assertThat(logMgr.getCommonFormatterInstance()).isInstanceOf(PlainLogFormatter.class);
 		
 		Handler[] handlers = logger.getHandlers();
 		
