@@ -26,21 +26,38 @@ package org.fl.util;
 
 import static org.assertj.core.api.Assertions.*;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.FileHandler;
 import java.util.logging.Handler;
 import java.util.logging.Level;
+import java.util.logging.LogManager;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
 import org.fl.util.FilterCounter.LogRecordCounter;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.MethodOrderer;
 
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class LoggerManagerTest {
 	
+	@BeforeEach
+	void resetLogManagerConfig() throws IOException {
+		
+		// Reset LogManager to initial JVM configuration
+		LogManager logManager = LogManager.getLogManager();
+		logManager.reset();
+		logManager.updateConfiguration(null);
+	}
+	
 	@Test
+	@Order(1)
 	void testDefaultLoggerConfiguration() {
 		
 		LoggerManager logMgr = LoggerManager.builder().build();
@@ -58,6 +75,7 @@ class LoggerManagerTest {
 	}
 
 	@Test
+	@Order(2)
 	void testNamedLoggerBasicConfiguration() {
 		
 		String loggerName = LoggerManagerTest.class.getName() + ".1";
@@ -79,6 +97,7 @@ class LoggerManagerTest {
 	}
 	
 	@Test
+	@Order(3)
 	void testNamedLoggerNotPresentInLoggingConfiguration() throws Exception {
 		
 		String loggerName = "org.fl.util.notInConfig";
@@ -110,6 +129,7 @@ class LoggerManagerTest {
 	}
 	
 	@Test
+	@Order(4)
 	void testNamedLoggerSampleConfiguration() throws Exception {
 		
 		String loggerName = "org.fl.util.SampleApp";
@@ -192,9 +212,45 @@ class LoggerManagerTest {
 	}
 	
 	@Test
+	@Order(5)
 	void testBufferLogHandler() throws Exception {
 		
 		String loggerName = "org.fl.util.Test2";
+		
+		assertsForTest2(loggerName);
+	}
+	
+	@Test
+	@Order(6)
+	void testWithPreviousLoggerCreation() throws Exception {
+		
+		String loggerName = "org.fl.util.Test2";
+		
+		// Get loggers before calling LoggerManager
+		Logger logger = Logger.getLogger(loggerName);
+		Logger rootLogger = Logger.getLogger("");
+		
+		assertThat(logger).isNotNull();
+		assertThat(logger.getLevel()).isNull();
+		assertThat(logger.getHandlers()).isNotNull().isEmpty();
+		
+		assertThat(rootLogger).isNotNull();
+		assertThat(rootLogger.getLevel()).isEqualTo(Level.INFO);
+		assertThat(rootLogger.getHandlers()).singleElement()
+		.satisfies(
+			handler -> {		
+				assertThat(handler).isInstanceOf(ConsoleHandler.class);
+				assertThat(handler.getLevel()).isEqualTo(Level.INFO);
+				assertThat(handler.getFormatter()).isNotNull()
+					.isInstanceOf(SimpleFormatter.class);
+				assertThat(handler.getFilter()).isNull();
+				assertThat(handler.getErrorManager()).isNotNull();}		
+		);
+		
+		assertsForTest2(loggerName);
+	}
+	
+	private void assertsForTest2(String loggerName) throws Exception {
 		
 		String pathString = "C:/FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test2.properties";
 		Path propertyPath = Paths.get(pathString);
@@ -212,8 +268,10 @@ class LoggerManagerTest {
 		assertThat(logMgr).isNotNull();
 		
 		Logger logger = Logger.getLogger(loggerName);
+		Logger rootLogger = Logger.getLogger("");
 		
 		assertThat(logger.getLevel()).isEqualTo(Level.INFO);
+		assertThat(rootLogger.getLevel()).isEqualTo(Level.WARNING);
 		
 		assertThat(props.get("logging.BufferLogHandler.bufferLength")).isEqualTo("100");
 		assertThat(props.get("logging.BufferLogHandler.level")).isEqualTo("INFO");
@@ -235,6 +293,14 @@ class LoggerManagerTest {
 							});
 					assertThat(handler.getLevel()).isEqualTo(Level.INFO);
 				}
+			);
+		
+		Handler[] rootHandlers = rootLogger.getHandlers();
+		
+		assertThat(rootHandlers).hasSize(2)
+			.satisfiesExactlyInAnyOrder(
+				handler -> assertTest2ConsoleHandler(handler),
+				handler -> assertTest2FileHandler(handler)			
 			);
 		
 		// Log a INFO message
