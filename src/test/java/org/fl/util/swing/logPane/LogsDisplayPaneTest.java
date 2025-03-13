@@ -28,10 +28,12 @@ import static org.assertj.core.api.Assertions.*;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 
 import org.fl.util.FilterCounter;
 import org.fl.util.RunningContext;
 import org.fl.util.FilterCounter.LogRecordCounter;
+import org.fl.util.PlainLogFormatter;
 import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -69,5 +71,18 @@ class LogsDisplayPaneTest {
 		// 1 warning is logged
 		assertThat(logRecordCounter.getLogRecordCount()).isEqualTo(1);
 		assertThat(logRecordCounter.getLogRecordCount(Level.WARNING)).isEqualTo(1);
+		
+		assertThat(logger.getHandlers()).singleElement()
+			.satisfies(
+				handler -> { 
+					assertThat(handler).isInstanceOf(TextAreaLogHandler.class);
+					assertThat(handler.getEncoding()).isNull();
+					assertThat(handler.getLevel()).isEqualTo(Level.ALL);
+					assertThat(handler.getFormatter()).isNotNull()
+						.isInstanceOf(PlainLogFormatter.class);
+					assertThat(handler.getFilter()).isNull();
+					assertThat(handler.getErrorManager()).isNotNull();
+				}
+			);
 	}
 }
