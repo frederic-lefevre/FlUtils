@@ -81,10 +81,20 @@ public class LogsDisplayPane  extends JTabbedPane {
 		selectCurrentLogDisplay();
 
 		textAreaLogHandler = new TextAreaLogHandler(currentLogDisplay, new SearchLogDisplayChanger());
-		textAreaLogHandler.setLevel(logger.getLevel());
+		Level level = logger.getLevel();
+		boolean noLevelDefined = level == null;
+		if (noLevelDefined) {
+			// The textAreaLogHandler will display everything 
+			level = Level.ALL;
+		}
+		textAreaLogHandler.setLevel(level);
 		textAreaLogHandler.setLogDisplayMaxLength(logDisplayMaxLength);
 		textAreaLogHandler.setFormatter(runningContext.getCommonLogFormatter());
 		logger.addHandler(textAreaLogHandler);
+		if (noLevelDefined) {
+			// Log the warning after adding the handler so that it gets displayed in GUI
+			logger.warning("The application logger named " + runningContext.getName() + " has no level defined");
+		}
 	}
 
 	public boolean hasHighlight() {

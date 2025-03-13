@@ -159,7 +159,11 @@ public class LoggerManager {
     				rootLogger.log(Level.SEVERE, "IOException when LogManager loads logging properties file " + loggingPropertiesFileName, e);
 				}
     			checkApplicationootLoggerConfig(loggingProperties, applicationRootLoggerName);
+    		} else {
+    			rootLogger.severe("Logging properties file not found " + loggingPropertiesFileName);
     		}
+    	} else {
+    		rootLogger.warning(LOGMANAGER_PROPERTY_FILE_PROPERTY + " property is not found in the application property file");
     	}
     }
     

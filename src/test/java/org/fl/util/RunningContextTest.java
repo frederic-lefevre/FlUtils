@@ -108,8 +108,9 @@ class RunningContextTest {
 		assertThat(runningContextLogRecordCounter.getLogRecordCount()).isEqualTo(3);
 		assertThat(runningContextLogRecordCounter.getLogRecordCount(Level.WARNING)).isEqualTo(3);
 		
-		assertThat(rootLogRecordCounter.getLogRecordCount()).isEqualTo(1);
+		assertThat(rootLogRecordCounter.getLogRecordCount()).isEqualTo(2);
 		assertThat(rootLogRecordCounter.getLogRecordCount(Level.SEVERE)).isEqualTo(1);
+		assertThat(rootLogRecordCounter.getLogRecordCount(Level.WARNING)).isEqualTo(1);
 		
 		propertiesStorageLogRecordCounter.stopLogCountAndFilter();
 		runningContextLogRecordCounter.stopLogCountAndFilter();

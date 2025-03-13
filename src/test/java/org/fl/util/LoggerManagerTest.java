@@ -60,8 +60,17 @@ class LoggerManagerTest {
 	@Order(1)
 	void testDefaultLoggerConfiguration() {
 		
+		LogRecordCounter logRecordCounter = 
+				FilterCounter.getLogRecordCounter(Logger.getLogger(""));
+		
 		LoggerManager logMgr = LoggerManager.builder().build();
 		assertThat(logMgr).isNotNull();
+		
+		// 1 warning is logged
+		assertThat(logRecordCounter.getLogRecordCount()).isEqualTo(1);
+		assertThat(logRecordCounter.getLogRecordCount(Level.WARNING)).isEqualTo(1);
+		
+		logRecordCounter.stopLogCountAndFilter();
 		
 		Logger defaultLogger = Logger.getLogger("org.fl");
 		
@@ -81,11 +90,20 @@ class LoggerManagerTest {
 		
 		String loggerName = LoggerManagerTest.class.getName() + ".1";
 		
+		LogRecordCounter logRecordCounter = 
+				FilterCounter.getLogRecordCounter(Logger.getLogger(""));
+		
 		LoggerManager logMgr = LoggerManager.builder()
 				.applicationRootLoggerName(loggerName)
 				.build();
 		
 		assertThat(logMgr).isNotNull();
+		
+		// 1 warning is logged
+		assertThat(logRecordCounter.getLogRecordCount()).isEqualTo(1);
+		assertThat(logRecordCounter.getLogRecordCount(Level.WARNING)).isEqualTo(1);
+		
+		logRecordCounter.stopLogCountAndFilter();
 		
 		Logger logger = Logger.getLogger(loggerName);
 		
@@ -126,6 +144,7 @@ class LoggerManagerTest {
 		// 2 warnings are logged
 		assertThat(logRecordCounter.getLogRecordCount()).isEqualTo(2);
 		assertThat(logRecordCounter.getLogRecordCount(Level.WARNING)).isEqualTo(2);
+		logRecordCounter.stopLogCountAndFilter();
 		
 		Logger logger = Logger.getLogger(loggerName);
 		
@@ -443,5 +462,67 @@ class LoggerManagerTest {
 			.isInstanceOf(PlainLogFormatter.class);
 		assertThat(handler.getFilter()).isNull();
 		assertThat(handler.getErrorManager()).isNotNull();
+	}
+	
+	@Test
+	@Order(9)
+	void warningWhenLoggingFileNamePropertyNotFound() throws Exception {
+		
+		String loggerName = "org.fl.util.SampleApp";
+		
+		String pathString = "C:/FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test4.properties";		
+		Path propertyPath = Paths.get(pathString);
+		
+		PropertiesStorage ps = new PropertiesStorage(null, propertyPath);
+		
+		AdvancedProperties props = ps.getAdvanced(null);
+		assertThat(props).isNotNull();
+		
+		LogRecordCounter logRecordCounter = 
+				FilterCounter.getLogRecordCounter(Logger.getLogger(""));
+		
+		LoggerManager logMgr = LoggerManager.builder()
+				.applicationRootLoggerName(loggerName)
+				.properties(props)
+				.build();
+		
+		assertThat(logMgr).isNotNull();
+		
+		// 1 warning is logged
+		assertThat(logRecordCounter.getLogRecordCount()).isEqualTo(1);
+		assertThat(logRecordCounter.getLogRecordCount(Level.WARNING)).isEqualTo(1);
+		
+		logRecordCounter.stopLogCountAndFilter();
+	}
+	
+	@Test
+	@Order(10)
+	void severeErrorWhenLoggingPropertyFileNotFound() throws Exception {
+		
+		String loggerName = "org.fl.util.SampleApp";
+		
+		String pathString = "C:/FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test5.properties";		
+		Path propertyPath = Paths.get(pathString);
+		
+		PropertiesStorage ps = new PropertiesStorage(null, propertyPath);
+		
+		AdvancedProperties props = ps.getAdvanced(null);
+		assertThat(props).isNotNull();
+		
+		LogRecordCounter logRecordCounter = 
+				FilterCounter.getLogRecordCounter(Logger.getLogger(""));
+		
+		LoggerManager logMgr = LoggerManager.builder()
+				.applicationRootLoggerName(loggerName)
+				.properties(props)
+				.build();
+		
+		assertThat(logMgr).isNotNull();
+		
+		// 1 warning is logged
+		assertThat(logRecordCounter.getLogRecordCount()).isEqualTo(1);
+		assertThat(logRecordCounter.getLogRecordCount(Level.SEVERE)).isEqualTo(1);
+		
+		logRecordCounter.stopLogCountAndFilter();
 	}
 }
