@@ -160,6 +160,8 @@ public class LoggerManager {
 				}
     			checkApplicationootLoggerConfig(loggingProperties, applicationRootLoggerName);
     		}
+    	} else {
+    		rootLogger.warning(LOGMANAGER_PROPERTY_FILE_PROPERTY + " property is not found in the application property file");
     	}
     }
     
