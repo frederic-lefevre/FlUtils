@@ -494,4 +494,35 @@ class LoggerManagerTest {
 		
 		logRecordCounter.stopLogCountAndFilter();
 	}
+	
+	@Test
+	@Order(10)
+	void severeErrorWhenLoggingPropertyFileNotFound() throws Exception {
+		
+		String loggerName = "org.fl.util.SampleApp";
+		
+		String pathString = "C:/FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test5.properties";		
+		Path propertyPath = Paths.get(pathString);
+		
+		PropertiesStorage ps = new PropertiesStorage(null, propertyPath);
+		
+		AdvancedProperties props = ps.getAdvanced(null);
+		assertThat(props).isNotNull();
+		
+		LogRecordCounter logRecordCounter = 
+				FilterCounter.getLogRecordCounter(Logger.getLogger(""));
+		
+		LoggerManager logMgr = LoggerManager.builder()
+				.applicationRootLoggerName(loggerName)
+				.properties(props)
+				.build();
+		
+		assertThat(logMgr).isNotNull();
+		
+		// 1 warning is logged
+		assertThat(logRecordCounter.getLogRecordCount()).isEqualTo(1);
+		assertThat(logRecordCounter.getLogRecordCount(Level.SEVERE)).isEqualTo(1);
+		
+		logRecordCounter.stopLogCountAndFilter();
+	}
 }
