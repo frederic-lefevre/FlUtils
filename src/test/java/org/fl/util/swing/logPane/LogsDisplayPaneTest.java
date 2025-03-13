@@ -26,10 +26,12 @@ package org.fl.util.swing.logPane;
 
 import static org.assertj.core.api.Assertions.*;
 
+import java.util.logging.ConsoleHandler;
+import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.logging.SimpleFormatter;
 
+import org.fl.util.BufferLogHandler;
 import org.fl.util.FilterCounter;
 import org.fl.util.RunningContext;
 import org.fl.util.FilterCounter.LogRecordCounter;
@@ -40,7 +42,41 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 
 class LogsDisplayPaneTest {
 
-	private static final String LOGGER_NAME = "org.fl.util.test1";
+	private static final String LOGGER_NAME = "org.fl.util.Test1";
+	private static final String LOGGER_NAME2 = "org.fl.util.test2";
+	
+	@Test
+	void testCreatLogsDisplayPane() throws JsonProcessingException {
+		
+		RunningContext rc = new RunningContext(LOGGER_NAME, null, "test1.properties");
+		
+		assertThat(rc).isNotNull();
+		
+		Logger logger = Logger.getLogger(LOGGER_NAME);
+		
+		assertThat(logger).isNotNull();
+		assertThat(logger.getLevel()).isEqualTo(Level.INFO);
+		
+		LogsDisplayPane logsDisplayPane = new LogsDisplayPane(rc);
+		
+		assertThat(logsDisplayPane).isNotNull();
+		
+		assertThat(logger.getHandlers()).hasSize(4)
+			.satisfiesExactlyInAnyOrder(
+				handler ->	assertThat(handler).isInstanceOf(ConsoleHandler.class),
+				handler ->	assertThat(handler).isInstanceOf(FileHandler.class),
+				handler ->	assertThat(handler).isInstanceOf(BufferLogHandler.class),
+				handler -> { 
+					assertThat(handler).isInstanceOf(TextAreaLogHandler.class);
+					assertThat(handler.getEncoding()).isNull();
+					assertThat(handler.getLevel()).isEqualTo(logger.getLevel());
+					assertThat(handler.getFormatter()).isNotNull()
+						.isInstanceOf(PlainLogFormatter.class);
+					assertThat(handler.getFilter()).isNull();
+					assertThat(handler.getErrorManager()).isNotNull();
+				}
+			);
+	}
 	
 	@Test
 	void nullLevelForApplicationLoggerShouldRaiseError() throws JsonProcessingException {
@@ -48,7 +84,7 @@ class LogsDisplayPaneTest {
 		LogRecordCounter rootLogRecordCounter = 
 				FilterCounter.getLogRecordCounter(Logger.getLogger(""));
 		
-		RunningContext rc = new RunningContext(LOGGER_NAME, null, "test6.properties");
+		RunningContext rc = new RunningContext(LOGGER_NAME2, null, "test6.properties");
 		
 		// 1 warning is logged
 		assertThat(rootLogRecordCounter.getLogRecordCount()).isEqualTo(1);
@@ -56,13 +92,13 @@ class LogsDisplayPaneTest {
 		
 		assertThat(rc).isNotNull();
 		
-		Logger logger = Logger.getLogger(LOGGER_NAME);
+		Logger logger = Logger.getLogger(LOGGER_NAME2);
 		
 		assertThat(logger).isNotNull();
 		assertThat(logger.getLevel()).isNull();
 		
 		LogRecordCounter logRecordCounter = 
-				FilterCounter.getLogRecordCounter(Logger.getLogger(LOGGER_NAME));
+				FilterCounter.getLogRecordCounter(Logger.getLogger(LOGGER_NAME2));
 		
 		LogsDisplayPane logsDisplayPane = new LogsDisplayPane(rc);
 		
