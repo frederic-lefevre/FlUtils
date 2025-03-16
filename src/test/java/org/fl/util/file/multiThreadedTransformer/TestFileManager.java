@@ -37,13 +37,13 @@ public class TestFileManager {
 	
 	public static final String ADDED_LINE_PREFIX_LINE_PREFIX = "Line prefix: ";
 	
-	public static final int nbColumn = 10;
+	public static final int NB_COLUMN = 10;
 	
 	protected static String produceLine(int lineNumber) {
 		
 		StringBuilder sb = new StringBuilder();		
 		IntStream.rangeClosed('a', 'z')
-			.limit(nbColumn)
+			.limit(NB_COLUMN)
 			.forEachOrdered(c -> sb.append((char)c).append(lineNumber).append(";"));
 		return sb.toString();
 	}
