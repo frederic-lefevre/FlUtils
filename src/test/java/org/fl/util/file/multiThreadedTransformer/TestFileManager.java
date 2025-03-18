@@ -24,10 +24,24 @@ SOFTWARE.
 
 package org.fl.util.file.multiThreadedTransformer;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.function.Function;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.IntStream;
 
 public class TestFileManager {
 
+	private static final Logger logger = Logger.getLogger(TestFileManager.class.getName());
+	
 	public static final long NUMBER_OF_REGULAR_LINE = 10000L;	
 	public static final long NUMBER_OF_ATYPIC_LINE = 1000L;
 	public static final long NUMBER_OF_WRONG_LINE = 1000L;
@@ -39,7 +53,16 @@ public class TestFileManager {
 	
 	public static final int NB_COLUMN = 10;
 	
-	protected static String produceLine(int lineNumber) {
+	private static final String TEST_DATA_FOLDER = "file:///ForTests/FlUtils/multiThreadedTransformer/";
+	private static final String REGULAR_LINES_FILE_NAME = TEST_DATA_FOLDER + "regularLines.csv";
+	private static final String ATYPIC_LINES_FILE_NAME = TEST_DATA_FOLDER + "atypicLines.csv";
+	private static final String WRONG_LINES_FILE_NAME = TEST_DATA_FOLDER + "wrongLines.csv";
+	
+	private static Path regularLinesFile;
+	private static Path atypicLinesFile;
+	private static Path wrongLinesFile;
+	
+	protected static String produceLine(long lineNumber) {
 		
 		StringBuilder sb = new StringBuilder();		
 		IntStream.rangeClosed('a', 'z')
@@ -48,12 +71,52 @@ public class TestFileManager {
 		return sb.toString();
 	}
 	
-	protected static String produceAtypicLine(int lineNumber) {
+	protected static String produceAtypicLine(long lineNumber) {
 		return ATYPIC_LINE_PREFIX + produceLine(lineNumber);
 	}
 	
 	
-	protected static String produceWrongLine(int lineNumber) {
+	protected static String produceWrongLine(long lineNumber) {
 		return WRONG_LINE_PREFIX + produceLine(lineNumber);
+	}
+	
+	protected static File writeRegularLinesFile() throws URISyntaxException {	
+		regularLinesFile = Paths.get(new URI(REGULAR_LINES_FILE_NAME));
+		return writeTestFile(regularLinesFile, NUMBER_OF_REGULAR_LINE, (l) -> produceLine(l));
+	}
+	
+	protected static File writeAtypicLinesFile() throws URISyntaxException {	
+		atypicLinesFile = Paths.get(new URI(ATYPIC_LINES_FILE_NAME));
+		return writeTestFile(atypicLinesFile, NUMBER_OF_ATYPIC_LINE, (l) -> produceAtypicLine(l));
+	}
+	
+	protected static File writeWrongLinesFile() throws URISyntaxException {	
+		wrongLinesFile = Paths.get(new URI(WRONG_LINES_FILE_NAME));
+		return writeTestFile(wrongLinesFile, NUMBER_OF_WRONG_LINE, (l) -> produceWrongLine(l));
+	}
+	
+	protected static boolean deleteRegularTestFiles() throws IOException {
+		return Files.deleteIfExists(regularLinesFile);
+	}
+	
+	protected static boolean deleteAtypicTestFiles() throws IOException {
+		return Files.deleteIfExists(atypicLinesFile);
+	}
+	
+	protected static boolean deleteWrongTestFiles() throws IOException {
+		return Files.deleteIfExists(wrongLinesFile);
+	}
+	
+	private static File writeTestFile(Path pathName, long numberOfline, Function<Long, String> lineProducer) throws URISyntaxException {
+		
+		try (BufferedWriter outputStream = Files.newBufferedWriter(pathName, StandardCharsets.UTF_8)) {
+			for (long l=0; l < numberOfline; l++) {
+				outputStream.write(lineProducer.apply(l));
+				outputStream.write("\n");
+			}
+		} catch (IOException e) {
+			logger.log(Level.SEVERE, "IOException while writing the file: " + pathName);
+		}
+		return pathName.toFile();
 	}
 }
