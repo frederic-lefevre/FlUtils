@@ -45,12 +45,12 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public abstract class ItemsExtractor {
 
-	private final static int ENTRIES_Q_SIZE_DEFAULT = 100;
-	private final static int OUTPUT_Q_SIZE_DEFAULT = 100;
-	private final static int ELIMINATED_Q_SIZE_DEFAULT = 100;
-	private final static int ATYPIC_Q_SIZE_DEFAULT = 100;
-	private final static int NB_PROCESS_THREAD_DEFAULT = 10;
-	private final static int NB_SUPPLEMENTARY_THREAD = 4;
+	private static final int ENTRIES_Q_SIZE_DEFAULT = 100;
+	private static final int OUTPUT_Q_SIZE_DEFAULT = 100;
+	private static final int ELIMINATED_Q_SIZE_DEFAULT = 100;
+	private static final int ATYPIC_Q_SIZE_DEFAULT = 100;
+	private static final int NB_PROCESS_THREAD_DEFAULT = 10;
+	private static final int NB_SUPPLEMENTARY_THREAD = 4;
 
 	private int entriesQueueSize;
 	private int outputQueueSize;
@@ -80,14 +80,14 @@ public abstract class ItemsExtractor {
 
 	protected Logger logger;
 
-	public ItemsExtractor(Path ip, Charset ics, Path op, Charset ocs, Logger l) {
+	public ItemsExtractor(Path inputFilePath, Charset inputCharset, Path outputFilePath, Charset outputCharset, Logger l) {
 
-		init(ip, ics, op, ocs, null, null, l);
+		init(inputFilePath, inputCharset, outputFilePath, outputCharset, null, null, l);
 	}
 
-	public ItemsExtractor(Path ip, Charset ics, Path op, Charset ocs, Path ep, Path ap, Logger l) {
+	public ItemsExtractor(Path inputFilePath, Charset inputCharset, Path outputFilePath, Charset outputCharset, Path eliminatedEntriesFilePath, Path atypicEntriesFilePath, Logger l) {
 
-		init(ip, ics, op, ocs, ep, ap, l);
+		init(inputFilePath, inputCharset, outputFilePath, outputCharset, eliminatedEntriesFilePath, atypicEntriesFilePath, l);
 	}
 
 	private void init(Path ip, Charset ics, Path op, Charset ocs, Path ep, Path ap, Logger l) {

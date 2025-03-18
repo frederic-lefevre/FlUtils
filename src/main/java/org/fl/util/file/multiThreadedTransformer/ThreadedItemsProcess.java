@@ -35,10 +35,10 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class ThreadedItemsProcess implements Callable<ObjectNode>  {
 
-	private LinkedBlockingQueue<ArrayList<String>> entries;
-	private LinkedBlockingQueue<CharSequence> outPutQ;
+	private final LinkedBlockingQueue<ArrayList<String>> entries;
+	private final LinkedBlockingQueue<CharSequence> outPutQ;
 	private final Logger logger;
-	private ItemProcessor itemProcessor;
+	private final ItemProcessor itemProcessor;
 	
 	public ThreadedItemsProcess(LinkedBlockingQueue<ArrayList<String>> iq, LinkedBlockingQueue<CharSequence> oq,
 			ItemProcessor it, Logger l) {
