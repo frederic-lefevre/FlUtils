@@ -119,7 +119,7 @@ class TestFileManagerTest {
 		
 		Path inputTestPath = testFileManager.writeAllTestsFiles();
 		
-		assertThat(inputTestPath).exists().isRegularFile();
+		assertThat(inputTestPath).exists().isRegularFile().hasSize(719700);
 		
 		assertThat(testFileManager.deleAllTestFiles()).isTrue();
 	}
