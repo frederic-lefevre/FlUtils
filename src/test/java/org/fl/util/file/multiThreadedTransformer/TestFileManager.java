@@ -25,7 +25,6 @@ SOFTWARE.
 package org.fl.util.file.multiThreadedTransformer;
 
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -53,14 +52,15 @@ public class TestFileManager {
 	
 	public static final int NB_COLUMN = 10;
 	
-	private static final String TEST_DATA_FOLDER = "file:///ForTests/FlUtils/multiThreadedTransformer/";
+	protected static final String TEST_DATA_FOLDER = "file:///ForTests/FlUtils/multiThreadedTransformer/";
 	private static final String REGULAR_LINES_FILE_NAME = TEST_DATA_FOLDER + "regularLines.csv";
 	private static final String ATYPIC_LINES_FILE_NAME = TEST_DATA_FOLDER + "atypicLines.csv";
 	private static final String WRONG_LINES_FILE_NAME = TEST_DATA_FOLDER + "wrongLines.csv";
 	
-	private static Path regularLinesFile;
-	private static Path atypicLinesFile;
-	private static Path wrongLinesFile;
+	private static Path regularLinesPath;
+	private static Path atypicLinesPath;
+	private static Path wrongLinesPath;
+	
 	
 	protected static String produceLine(long lineNumber) {
 		
@@ -80,34 +80,19 @@ public class TestFileManager {
 		return WRONG_LINE_PREFIX + produceLine(lineNumber);
 	}
 	
-	protected static File writeRegularLinesFile() throws URISyntaxException {	
-		regularLinesFile = Paths.get(new URI(REGULAR_LINES_FILE_NAME));
-		return writeTestFile(regularLinesFile, NUMBER_OF_REGULAR_LINE, (l) -> produceLine(l));
+	protected static Path writeRegularLinesFile(String pathName) throws URISyntaxException {	
+		return writeTestFile(Paths.get(new URI(pathName)), NUMBER_OF_REGULAR_LINE, (l) -> produceLine(l));
 	}
 	
-	protected static File writeAtypicLinesFile() throws URISyntaxException {	
-		atypicLinesFile = Paths.get(new URI(ATYPIC_LINES_FILE_NAME));
-		return writeTestFile(atypicLinesFile, NUMBER_OF_ATYPIC_LINE, (l) -> produceAtypicLine(l));
+	protected static Path writeAtypicLinesFile(String pathName) throws URISyntaxException {	
+		return writeTestFile(Paths.get(new URI(pathName)), NUMBER_OF_ATYPIC_LINE, (l) -> produceAtypicLine(l));
 	}
 	
-	protected static File writeWrongLinesFile() throws URISyntaxException {	
-		wrongLinesFile = Paths.get(new URI(WRONG_LINES_FILE_NAME));
-		return writeTestFile(wrongLinesFile, NUMBER_OF_WRONG_LINE, (l) -> produceWrongLine(l));
+	protected static Path writeWrongLinesFile(String pathName) throws URISyntaxException {	
+		return writeTestFile(Paths.get(new URI(pathName)), NUMBER_OF_WRONG_LINE, (l) -> produceWrongLine(l));
 	}
 	
-	protected static boolean deleteRegularTestFiles() throws IOException {
-		return Files.deleteIfExists(regularLinesFile);
-	}
-	
-	protected static boolean deleteAtypicTestFiles() throws IOException {
-		return Files.deleteIfExists(atypicLinesFile);
-	}
-	
-	protected static boolean deleteWrongTestFiles() throws IOException {
-		return Files.deleteIfExists(wrongLinesFile);
-	}
-	
-	private static File writeTestFile(Path pathName, long numberOfline, Function<Long, String> lineProducer) throws URISyntaxException {
+	private static Path writeTestFile(Path pathName, long numberOfline, Function<Long, String> lineProducer) throws URISyntaxException {
 		
 		try (BufferedWriter outputStream = Files.newBufferedWriter(pathName, StandardCharsets.UTF_8)) {
 			for (long l=0; l < numberOfline; l++) {
@@ -117,6 +102,19 @@ public class TestFileManager {
 		} catch (IOException e) {
 			logger.log(Level.SEVERE, "IOException while writing the file: " + pathName);
 		}
-		return pathName.toFile();
+		return pathName;
+	}
+	
+	protected static void writeAllTestsFiles() throws URISyntaxException {
+		regularLinesPath = writeRegularLinesFile(REGULAR_LINES_FILE_NAME);
+		atypicLinesPath = writeAtypicLinesFile(ATYPIC_LINES_FILE_NAME);
+		wrongLinesPath = writeWrongLinesFile(WRONG_LINES_FILE_NAME);
+		
+	}
+	
+	protected static boolean deleAllTestFiles() throws IOException {
+		return Files.deleteIfExists(regularLinesPath) &&
+				Files.deleteIfExists(atypicLinesPath) &&
+				Files.deleteIfExists(wrongLinesPath);
 	}
 }
