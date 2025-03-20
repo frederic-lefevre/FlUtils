@@ -103,6 +103,14 @@ class TestFileManagerTest {
 		assertThat(wrongTestFile).doesNotExist();
 	}
 	
+	@Test
+	void produceInputTestFile() throws URISyntaxException {
+		
+		Path inputTestPath = TestFileManager.writeAllTestsFiles();
+		
+		assertThat(inputTestPath).exists().isRegularFile();
+	}
+	
 	private String getFirstLineOfFile(Path path) {
 		try (BufferedReader reader = new BufferedReader(new FileReader(path.toFile()))) {
 			return reader.readLine();

@@ -24,6 +24,7 @@ SOFTWARE.
 
 package org.fl.util.file.multiThreadedTransformer;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.net.URI;
@@ -32,6 +33,8 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
+import java.util.SplittableRandom;
 import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -56,10 +59,12 @@ public class TestFileManager {
 	private static final String REGULAR_LINES_FILE_NAME = TEST_DATA_FOLDER + "regularLines.csv";
 	private static final String ATYPIC_LINES_FILE_NAME = TEST_DATA_FOLDER + "atypicLines.csv";
 	private static final String WRONG_LINES_FILE_NAME = TEST_DATA_FOLDER + "wrongLines.csv";
+	private static final String INPUT_TEST_FILE_NAME = TEST_DATA_FOLDER + "inputTestFile.csv";
 	
 	private static Path regularLinesPath;
 	private static Path atypicLinesPath;
 	private static Path wrongLinesPath;
+	private static Path inputTestPath;
 	
 	
 	protected static String produceLine(long lineNumber) {
@@ -105,16 +110,113 @@ public class TestFileManager {
 		return pathName;
 	}
 	
-	protected static void writeAllTestsFiles() throws URISyntaxException {
+	protected static Path writeAllTestsFiles() throws URISyntaxException {
 		regularLinesPath = writeRegularLinesFile(REGULAR_LINES_FILE_NAME);
 		atypicLinesPath = writeAtypicLinesFile(ATYPIC_LINES_FILE_NAME);
 		wrongLinesPath = writeWrongLinesFile(WRONG_LINES_FILE_NAME);
 		
+		inputTestPath = Paths.get(new URI(INPUT_TEST_FILE_NAME));
+
+		try (BufferedReader regularLinesReader = Files.newBufferedReader(regularLinesPath); 
+			 BufferedReader atypicLinesReader = Files.newBufferedReader(atypicLinesPath); 
+			 BufferedReader wrongLinesReader = Files.newBufferedReader(wrongLinesPath);
+			 BufferedWriter outputStream = Files.newBufferedWriter(inputTestPath, StandardCharsets.UTF_8)) {
+			
+			LineSources lineSources = new LineSources(List.of(		
+					new LineSource(regularLinesReader,NUMBER_OF_REGULAR_LINE),
+					new LineSource(atypicLinesReader,NUMBER_OF_ATYPIC_LINE),
+					new LineSource(wrongLinesReader,NUMBER_OF_WRONG_LINE)					
+					));
+			
+			String line;
+			while((line = lineSources.readLine()) != null) {
+				outputStream.write(line);
+				outputStream.write("\n");
+			}
+		} catch (IOException e) {
+			logger.log(Level.SEVERE, "IOException while writing the file: ");
+		}
+		return inputTestPath;
 	}
 	
 	protected static boolean deleAllTestFiles() throws IOException {
 		return Files.deleteIfExists(regularLinesPath) &&
 				Files.deleteIfExists(atypicLinesPath) &&
 				Files.deleteIfExists(wrongLinesPath);
+	}
+	
+	private static class LineSource {
+		
+		private final BufferedReader reader;
+		private final long nbOfLines;
+		private boolean exhausted;
+		
+		public LineSource(BufferedReader reader, long nbOfLines) {
+			this.reader = reader;
+			this.nbOfLines = nbOfLines;
+			exhausted = nbOfLines < 1;
+		}
+
+		public BufferedReader getReader() {
+			return reader;
+		}
+
+		public long getNbOfLines() {
+			return nbOfLines;
+		}
+
+		public boolean isExhausted() {
+			return exhausted;
+		}
+		
+		public void setExhausted() {
+			exhausted = true;
+		}
+	}
+	
+	private static class LineSources {
+		
+		private static final SplittableRandom random = new SplittableRandom();
+		
+		List<LineSource> lineSources;
+		
+		public LineSources(List<LineSource> lineSources) {
+			this.lineSources = lineSources;
+		}
+		
+		// Pick a random line from the lineSources (random depending on the size of each line source)
+		public String readLine() throws IOException {
+			
+			long linesOfActiveSources = linesOfActiveSources();
+			if (linesOfActiveSources == 0) {
+				// all files have been read
+				return null;
+			}
+			long sourceNum = random.nextLong(0, linesOfActiveSources());
+			long currentSourcesNbLines = 0;
+			for (int i = 0; i < lineSources.size(); i++) {
+				if (! lineSources.get(i).exhausted) {
+					currentSourcesNbLines = currentSourcesNbLines + lineSources.get(i).nbOfLines;
+					if (sourceNum < currentSourcesNbLines) {
+						String lineRead = lineSources.get(i).getReader().readLine();
+						if (lineRead == null) {
+							lineSources.get(i).setExhausted();
+							return readLine();
+						} else {
+							return lineRead;
+						}
+					}
+				}
+			}
+			return null;
+		}
+		
+		public long linesOfActiveSources() {
+			return lineSources.stream()
+					.filter(lineSource -> !lineSource.isExhausted())
+					.map(lineSource -> lineSource.getNbOfLines())
+					.reduce(0L, Long::sum);
+		}
+		
 	}
 }
