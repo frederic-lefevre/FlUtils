@@ -38,31 +38,38 @@ import org.junit.jupiter.api.Test;
 class TestFileManagerTest {
 
 	@Test
-	void produceLineTest() {
+	void produceLineTest() throws URISyntaxException {
+		
+		TestFileManager testFileManager = new TestFileManager();
 		
 		String expectedResult = "a10;b10;c10;d10;e10;f10;g10;h10;i10;j10;";
-		assertThat(TestFileManager.produceLine(10)).isNotNull().isEqualTo(expectedResult);
+		assertThat(testFileManager.produceLine(10)).isNotNull().isEqualTo(expectedResult);
 	}
 	
 	@Test
-	void produceAtypicLineTest() {
+	void produceAtypicLineTest() throws URISyntaxException {
+		
+		TestFileManager testFileManager = new TestFileManager();
 		
 		String expectedResult = "ATYPIC LINEa10;b10;c10;d10;e10;f10;g10;h10;i10;j10;";
-		assertThat(TestFileManager.produceAtypicLine(10)).isNotNull().isEqualTo(expectedResult);
+		assertThat(testFileManager.produceAtypicLine(10)).isNotNull().isEqualTo(expectedResult);
 	}
 	
 	@Test
-	void produceWrongLineTest() {
+	void produceWrongLineTest() throws URISyntaxException {
+		
+		TestFileManager testFileManager = new TestFileManager();
 		
 		String expectedResult = "WRONG LINEa10;b10;c10;d10;e10;f10;g10;h10;i10;j10;";
-		assertThat(TestFileManager.produceWrongLine(10)).isNotNull().isEqualTo(expectedResult);
+		assertThat(testFileManager.produceWrongLine(10)).isNotNull().isEqualTo(expectedResult);
 	}
 	
 	@Test
 	void produceRegularFileTest() throws URISyntaxException, IOException {
 		
-		String fileName = TestFileManager.TEST_DATA_FOLDER + "regularFileNameTest.csv";
-		Path regularTestFile = TestFileManager.writeRegularLinesFile(fileName);
+		TestFileManager testFileManager = new TestFileManager("regularFileNameTest.csv", "atypicFileNameTest.csv", "wrongFileNameTest.csv", "inputTestFileTest.csv");
+
+		Path regularTestFile = testFileManager.writeRegularLinesFile();
 		
 		assertThat(regularTestFile).exists().isRegularFile();
 		
@@ -76,8 +83,9 @@ class TestFileManagerTest {
 	@Test
 	void produceAtypicFileTest() throws URISyntaxException, IOException {
 		
-		String fileName = TestFileManager.TEST_DATA_FOLDER + "atypicFileNameTest.csv";
-		Path atypicTestFile = TestFileManager.writeAtypicLinesFile(fileName);
+		TestFileManager testFileManager = new TestFileManager("regularFileNameTest.csv", "atypicFileNameTest.csv", "wrongFileNameTest.csv", "inputTestFileTest.csv");
+		
+		Path atypicTestFile = testFileManager.writeAtypicLinesFile();
 		
 		assertThat(atypicTestFile).exists().isRegularFile();
 		
@@ -91,8 +99,9 @@ class TestFileManagerTest {
 	@Test
 	void produceWrongFileTest() throws URISyntaxException, IOException {
 		
-		String fileName = TestFileManager.TEST_DATA_FOLDER + "wrongFileNameTest.csv";
-		Path wrongTestFile = TestFileManager.writeWrongLinesFile(fileName);
+		TestFileManager testFileManager = new TestFileManager("regularFileNameTest.csv", "atypicFileNameTest.csv", "wrongFileNameTest.csv", "inputTestFileTest.csv");
+
+		Path wrongTestFile = testFileManager.writeWrongLinesFile();
 		
 		assertThat(wrongTestFile).exists().isRegularFile();
 		
@@ -104,11 +113,15 @@ class TestFileManagerTest {
 	}
 	
 	@Test
-	void produceInputTestFile() throws URISyntaxException {
+	void produceInputTestFile() throws URISyntaxException, IOException {
 		
-		Path inputTestPath = TestFileManager.writeAllTestsFiles();
+		TestFileManager testFileManager = new TestFileManager("regularFileNameTest2.csv", "atypicFileNameTest2.csv", "wrongFileNameTest2.csv", "inputTestFileTest.csv");
+		
+		Path inputTestPath = testFileManager.writeAllTestsFiles();
 		
 		assertThat(inputTestPath).exists().isRegularFile();
+		
+		assertThat(testFileManager.deleAllTestFiles()).isTrue();
 	}
 	
 	private String getFirstLineOfFile(Path path) {
