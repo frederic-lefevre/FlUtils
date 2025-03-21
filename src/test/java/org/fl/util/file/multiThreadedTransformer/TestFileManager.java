@@ -29,6 +29,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -57,21 +58,33 @@ public class TestFileManager {
 	
 	protected static final String TEST_DATA_FOLDER = "file:///ForTests/FlUtils/multiThreadedTransformer/";
 	
+	// Files used for the MultiThreadedTransformerTest
 	private static final String REGULAR_LINES_FILE_NAME = TEST_DATA_FOLDER + "regularLines.csv";
 	private static final String ATYPIC_LINES_FILE_NAME = TEST_DATA_FOLDER + "atypicLines.csv";
 	private static final String WRONG_LINES_FILE_NAME = TEST_DATA_FOLDER + "wrongLines.csv";
 	private static final String INPUT_TEST_FILE_NAME = TEST_DATA_FOLDER + "inputTestFile.csv";
+	private static final String REGULAR_LINES_OUTPUT_FILE_NAME = TEST_DATA_FOLDER + "regularLinesOutput.csv";
+	private static final String ATYPIC_LINES_OUTPUT_FILE_NAME = TEST_DATA_FOLDER + "atypicLinesOutput.csv";
+	private static final String WRONG_LINES_OUTPUT_FILE_NAME = TEST_DATA_FOLDER + "wrongLinesOutput.csv";
 	
 	private final Path regularLinesPath;
 	private final Path atypicLinesPath;
 	private final Path wrongLinesPath;
 	private final Path inputTestPath;
+	private final Path regularLinesOutputPath;
+	private final Path atypicLinesOutputPath;
+	private final Path wrongLinesOutputPath;
+	
+	private final Charset charset = StandardCharsets.UTF_8;
 	
 	public TestFileManager() throws URISyntaxException {
 		regularLinesPath = Paths.get(new URI(REGULAR_LINES_FILE_NAME));
 		atypicLinesPath = Paths.get(new URI(ATYPIC_LINES_FILE_NAME));
 		wrongLinesPath = Paths.get(new URI(WRONG_LINES_FILE_NAME));
 		inputTestPath = Paths.get(new URI(INPUT_TEST_FILE_NAME));
+		regularLinesOutputPath = Paths.get(new URI(REGULAR_LINES_OUTPUT_FILE_NAME));
+		atypicLinesOutputPath = Paths.get(new URI(ATYPIC_LINES_OUTPUT_FILE_NAME));
+		wrongLinesOutputPath = Paths.get(new URI(WRONG_LINES_OUTPUT_FILE_NAME));
 	}
 	
 	public TestFileManager(String regularLinesFileName, String atypicLinesFileName, String wrongLinesFileName, String inputTestFileName) throws URISyntaxException {
@@ -79,8 +92,45 @@ public class TestFileManager {
 		atypicLinesPath = Paths.get(new URI(TEST_DATA_FOLDER + atypicLinesFileName));
 		wrongLinesPath = Paths.get(new URI(TEST_DATA_FOLDER + wrongLinesFileName));
 		inputTestPath = Paths.get(new URI(TEST_DATA_FOLDER + inputTestFileName));
+		
+		// Should not be used
+		regularLinesOutputPath = null;
+		atypicLinesOutputPath = null;
+		wrongLinesOutputPath = null;
 	}
 	
+	public Path getRegularLinesPath() {
+		return regularLinesPath;
+	}
+
+	public Path getAtypicLinesPath() {
+		return atypicLinesPath;
+	}
+
+	public Path getWrongLinesPath() {
+		return wrongLinesPath;
+	}
+
+	public Path getInputTestPath() {
+		return inputTestPath;
+	}
+
+	public Path getRegularLinesOutputPath() {
+		return regularLinesOutputPath;
+	}
+
+	public Path getAtypicLinesOutputPath() {
+		return atypicLinesOutputPath;
+	}
+
+	public Path getWrongLinesOutputPath() {
+		return wrongLinesOutputPath;
+	}
+
+	public Charset getCharset() {
+		return charset;
+	}
+
 	protected String produceLine(long lineNumber) {
 		
 		StringBuilder sb = new StringBuilder();		
@@ -113,7 +163,7 @@ public class TestFileManager {
 	
 	private Path writeTestFile(Path pathName, long numberOfline, Function<Long, String> lineProducer) throws URISyntaxException {
 		
-		try (BufferedWriter outputStream = Files.newBufferedWriter(pathName, StandardCharsets.UTF_8)) {
+		try (BufferedWriter outputStream = Files.newBufferedWriter(pathName, charset)) {
 			for (long l=0; l < numberOfline; l++) {
 				outputStream.write(lineProducer.apply(l));
 				outputStream.write("\n");
@@ -129,10 +179,10 @@ public class TestFileManager {
 		writeAtypicLinesFile();
 		writeWrongLinesFile();
 
-		try (BufferedReader regularLinesReader = Files.newBufferedReader(regularLinesPath); 
-			 BufferedReader atypicLinesReader = Files.newBufferedReader(atypicLinesPath); 
-			 BufferedReader wrongLinesReader = Files.newBufferedReader(wrongLinesPath);
-			 BufferedWriter outputStream = Files.newBufferedWriter(inputTestPath, StandardCharsets.UTF_8)) {
+		try (BufferedReader regularLinesReader = Files.newBufferedReader(regularLinesPath, charset); 
+			 BufferedReader atypicLinesReader = Files.newBufferedReader(atypicLinesPath, charset); 
+			 BufferedReader wrongLinesReader = Files.newBufferedReader(wrongLinesPath, charset);
+			 BufferedWriter outputStream = Files.newBufferedWriter(inputTestPath, charset)) {
 			
 			LineSources lineSources = new LineSources(List.of(		
 					new LineSource(regularLinesReader,NUMBER_OF_REGULAR_LINE),
@@ -151,11 +201,22 @@ public class TestFileManager {
 		return inputTestPath;
 	}
 	
-	protected boolean deleAllTestFiles() throws IOException {
-		return Files.deleteIfExists(regularLinesPath) &&
-				Files.deleteIfExists(atypicLinesPath) &&
-				Files.deleteIfExists(wrongLinesPath) &&
-				Files.deleteIfExists(inputTestPath);
+	protected void deleAllTestFiles() throws IOException {
+		
+		Files.deleteIfExists(regularLinesPath);
+		Files.deleteIfExists(atypicLinesPath);
+		Files.deleteIfExists(wrongLinesPath);
+		Files.deleteIfExists(inputTestPath);
+		
+		deleteIfNotNull(regularLinesOutputPath);
+		deleteIfNotNull(wrongLinesOutputPath);
+		deleteIfNotNull(atypicLinesOutputPath);
+	}
+	
+	private void deleteIfNotNull(Path path) throws IOException {
+		if (path != null) {
+			Files.deleteIfExists(path);
+		}
 	}
 	
 	private static class LineSource {

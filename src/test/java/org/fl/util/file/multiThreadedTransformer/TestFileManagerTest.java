@@ -30,6 +30,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -74,7 +75,7 @@ class TestFileManagerTest {
 		assertThat(regularTestFile).exists().isRegularFile();
 		
 		String expectedFirstLine = "a0;b0;c0;d0;e0;f0;g0;h0;i0;j0;";
-		assertThat(getFirstLineOfFile(regularTestFile)).isNotNull().isEqualTo(expectedFirstLine);
+		assertThat(getFirstLineOfFile(regularTestFile, testFileManager.getCharset())).isNotNull().isEqualTo(expectedFirstLine);
 		
 		assertThat(Files.deleteIfExists(regularTestFile)).isTrue();
 		assertThat(regularTestFile).doesNotExist();
@@ -90,7 +91,7 @@ class TestFileManagerTest {
 		assertThat(atypicTestFile).exists().isRegularFile();
 		
 		String expectedFirstLine = "ATYPIC LINEa0;b0;c0;d0;e0;f0;g0;h0;i0;j0;";
-		assertThat(getFirstLineOfFile(atypicTestFile)).isNotNull().isEqualTo(expectedFirstLine);
+		assertThat(getFirstLineOfFile(atypicTestFile, testFileManager.getCharset())).isNotNull().isEqualTo(expectedFirstLine);
 		
 		assertThat(Files.deleteIfExists(atypicTestFile)).isTrue();
 		assertThat(atypicTestFile).doesNotExist();
@@ -106,7 +107,7 @@ class TestFileManagerTest {
 		assertThat(wrongTestFile).exists().isRegularFile();
 		
 		String expectedFirstLine = "WRONG LINEa0;b0;c0;d0;e0;f0;g0;h0;i0;j0;";
-		assertThat(getFirstLineOfFile(wrongTestFile)).isNotNull().isEqualTo(expectedFirstLine);
+		assertThat(getFirstLineOfFile(wrongTestFile, testFileManager.getCharset())).isNotNull().isEqualTo(expectedFirstLine);
 		
 		assertThat(Files.deleteIfExists(wrongTestFile)).isTrue();
 		assertThat(wrongTestFile).doesNotExist();
@@ -121,11 +122,20 @@ class TestFileManagerTest {
 		
 		assertThat(inputTestPath).exists().isRegularFile().hasSize(719700);
 		
-		assertThat(testFileManager.deleAllTestFiles()).isTrue();
+		assertThat(testFileManager.getRegularLinesPath()).exists().isRegularFile().isNotEmptyFile();
+		assertThat(testFileManager.getWrongLinesPath()).exists().isRegularFile().isNotEmptyFile();
+		assertThat(testFileManager.getAtypicLinesPath()).exists().isRegularFile().isNotEmptyFile();
+		
+		testFileManager.deleAllTestFiles();
+		
+		assertThat(inputTestPath).doesNotExist();		
+		assertThat(testFileManager.getRegularLinesPath()).doesNotExist();
+		assertThat(testFileManager.getWrongLinesPath()).doesNotExist();
+		assertThat(testFileManager.getAtypicLinesPath()).doesNotExist();
 	}
 	
-	private String getFirstLineOfFile(Path path) {
-		try (BufferedReader reader = new BufferedReader(new FileReader(path.toFile()))) {
+	private String getFirstLineOfFile(Path path, Charset charset) {
+		try (BufferedReader reader = new BufferedReader(new FileReader(path.toFile(), charset))) {
 			return reader.readLine();
 		} catch (Exception e) {
 			return null;
