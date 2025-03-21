@@ -79,7 +79,7 @@ public class FilterCounter implements Filter {
 
 		Arrays.stream(Thread.currentThread().getStackTrace())
 				.map(stackTraceElement -> stackTraceElement.getClassName() + "." + stackTraceElement.getMethodName())
-				.forEach(name -> {
+				.forEachOrdered(name -> {
 					Map<Level, Integer> logRecordCountByLevels = logRecordCounts.get(name);
 					if (logRecordCountByLevels != null) {
 						logRecordCountByLevels.put(level,
