@@ -63,6 +63,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -517,14 +518,42 @@ public class FilesUtils {
 		return mountPoint ;
 	}
 	
+	// This solution has been benchmarked against others
 	public static long folderSize(Path folder, Logger logger) {
-		long size = 0;
+		
 		try {
-			size = Files.walk(folder).filter(p -> p.toFile().isFile()).mapToLong(p -> p.toFile().length()).sum();
+			DirectorySizeVisitor directorySizeVisitor = new DirectorySizeVisitor();
+			Files.walkFileTree(folder, directorySizeVisitor);
+			return directorySizeVisitor.getSize();
+			
 		} catch (IOException e) {
 			logger.log(Level.SEVERE, "Exception when calculating folder size of " + folder, e) ;
+			return 0;
 		}
-		return size ;		
+	}
+	
+	private static class DirectorySizeVisitor extends SimpleFileVisitor<Path> {
+
+	    private long size;	    
+	    public DirectorySizeVisitor() {
+	    	super() ;
+	        size = 0;
+	    }
+
+	    @Override
+	    public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+	        return FileVisitResult.CONTINUE;
+	    }
+
+	    @Override
+	    public FileVisitResult visitFile(Path file,	 BasicFileAttributes attrs) throws IOException {
+	    	size = size + attrs.size();
+	    	return FileVisitResult.CONTINUE;
+	    }
+		
+		public long getSize() {
+			return size;
+		}
 	}
 	
 }
