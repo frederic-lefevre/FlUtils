@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.StreamSupport;
 
 import org.fl.util.FilterCounter;
 import org.fl.util.FilterCounter.LogRecordCounter;
@@ -37,6 +38,8 @@ import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
+
+import com.fasterxml.jackson.databind.JsonNode;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class MultiThreadedTransformerTest {
@@ -65,7 +68,10 @@ class MultiThreadedTransformerTest {
 		
 		SampleItemProcessor sampleItemProcessor = new SampleItemProcessor("Line prefix: ");
 		
-		sampleExtractor.extract(sampleItemProcessor);
+		JsonNode result = sampleExtractor.extract(sampleItemProcessor);
+		
+		assertThat(result.get("error")).isNotNull();
+		assertThat(result.get("error").asText()).startsWith("Exception reading file");
 
 		assertThat(logRecordCounter.getLogRecordCount()).isEqualTo(1);
 		assertThat(logRecordCounter.getLogRecordCount(Level.SEVERE)).isEqualTo(1);
@@ -78,6 +84,8 @@ class MultiThreadedTransformerTest {
 		
 		logRecordCounter.stopLogCountAndFilter();
 	}
+	
+	private static final int NB_EXTRACTOR_THREAD = 9;
 	
 	@Test
 	@Order(2)
@@ -97,14 +105,47 @@ class MultiThreadedTransformerTest {
 				testFileManager.getAtypicLinesOutputPath()
 				);
 		
+		sampleExtractor.setNbProcessThreads(NB_EXTRACTOR_THREAD);
+		
 		SampleItemProcessor sampleItemProcessor = new SampleItemProcessor("Line prefix: ");
 		
-		sampleExtractor.extract(sampleItemProcessor);
+		JsonNode result = sampleExtractor.extract(sampleItemProcessor);
 		
 		assertThat(testFileManager.getRegularLinesOutputPath()).exists().isRegularFile().isNotEmptyFile();
 		assertThat(testFileManager.getWrongLinesOutputPath()).exists().isRegularFile().isNotEmptyFile();
 		assertThat(testFileManager.getAtypicLinesOutputPath()).exists().isRegularFile().isNotEmptyFile();
 		
+		assertThat(result).isNotNull();
+		
+		assertThat(result.get("nbLinesEliminated")).isNotNull();
+		assertThat(result.get("nbEliminatedRecordsWritten")).isNotNull();
+		assertThat(result.get("nbEliminatedRecordsWritten").asLong())
+			.isEqualTo(result.get("nbLinesEliminated").asLong())
+			.isEqualTo(TestFileManager.NUMBER_OF_WRONG_LINE);
+		
+		assertThat(result.get("nbAtypicRecordsWritten")).isNotNull();
+		assertThat(result.get("nbAtypicRecordsWritten").asLong()).isEqualTo(TestFileManager.NUMBER_OF_ATYPIC_LINE);
+		
+		assertThat(result.get("nbLinesRead")).isNotNull();
+		assertThat(result.get("nbLinesRead").asLong()).isEqualTo(TestFileManager.NUMBER_OF_REGULAR_LINE + TestFileManager.NUMBER_OF_ATYPIC_LINE + TestFileManager.NUMBER_OF_WRONG_LINE);
+		
+		// Lines are grouped by pair in the sample
+		assertThat(result.get("nbRecordsProcessed")).isNotNull();
+		assertThat(result.get("nbRecordsRead")).isNotNull();
+		assertThat(result.get("nbRecordsWritten")).isNotNull();
+		assertThat(result.get("nbRecordsProcessed").asLong())
+			.isEqualTo(result.get("nbRecordsRead").asLong())
+			.isEqualTo(result.get("nbRecordsWritten").asLong())
+			.isEqualTo((TestFileManager.NUMBER_OF_REGULAR_LINE + TestFileManager.NUMBER_OF_ATYPIC_LINE)/2);
+		
+		assertThat(result.get("nbRecordsProcessedByThreads")).isNotNull().hasSize(NB_EXTRACTOR_THREAD);
+		assertThat(result.get("nbRecordsProcessedByThreads").isArray()).isTrue();
+		
+		long nbRecordsProcessedByThread = StreamSupport.stream(result.get("nbRecordsProcessedByThreads").spliterator(), false)
+			.map(item -> item.get("nbRecordsProcessed").asLong())
+			.reduce(0L, Long::sum);		
+		assertThat(nbRecordsProcessedByThread).isEqualTo(result.get("nbRecordsProcessed").asLong());
+
 		testFileManager.deleAllTestFiles();
 	}
 }

@@ -39,6 +39,7 @@ import java.util.logging.Logger;
 
 import org.fl.util.json.JsonUtils;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -107,7 +108,7 @@ public abstract class ItemsExtractor {
 		nbProcessThreads = NB_PROCESS_THREAD_DEFAULT;
 	}
 	
-	public void extract(ItemProcessor itemProcessor) {
+	public JsonNode extract(ItemProcessor itemProcessor) {
 
 		// init queues
 		entries = new LinkedBlockingQueue<ArrayList<String>>(entriesQueueSize);
@@ -160,6 +161,7 @@ public abstract class ItemsExtractor {
 		long nbLine = 0;
 		long nbElimi = 0;
 		long now = System.currentTimeMillis();
+		ObjectNode globalResult = JsonNodeFactory.instance.objectNode();
 		try (BufferedReader bf = Files.newBufferedReader(inputFilePath, inputCharset)) {
 
 			ArrayList<String> currentEntry = null;
@@ -232,7 +234,6 @@ public abstract class ItemsExtractor {
 
 			// wait responses from expertise extractor threads
 			long nbElemProcessed = 0;
-			ObjectNode globalResult = JsonNodeFactory.instance.objectNode();
 			ArrayNode threadsResults = JsonNodeFactory.instance.arrayNode();
 			
 			for (Future<ObjectNode> oneExtratorRes : futureResponses) {
@@ -268,30 +269,29 @@ public abstract class ItemsExtractor {
 			Level logLevel = null;
 			if ((nbElemProcessed != itemsWriter.getNbElementWritten()) || (nbElemProcessed != nbElemRead)) {
 				logLevel = Level.SEVERE;
-			} else if (logger.isLoggable(Level.INFO)) {
-				logLevel = Level.INFO;
+			} else {
+				logLevel = Level.FINE;
 			}
-			if (logLevel != null) {
 
-				globalResult.put("nbLinesRead", nbLine);
-				globalResult.put("nbLinesEliminated", nbElimi);
-				globalResult.put("nbRecordsRead", nbElemRead);
-				globalResult.put("nbRecordsProcessed", nbElemProcessed);
-				globalResult.put("nbRecordsWritten", itemsWriter.getNbElementWritten());
-				if (atypicWriter != null) {
-					globalResult.put("nbAtypicRecordsWritten", atypicWriter.getNbElementWritten());
-				}
-				if (eliminatedWriter != null) {
-					globalResult.put("nbEliminatedRecordsWritten", eliminatedWriter.getNbElementWritten());
-				}
-
-				logger.log(logLevel, JsonUtils.jsonPrettyPrint(globalResult));
+			globalResult.put("nbLinesRead", nbLine);
+			globalResult.put("nbLinesEliminated", nbElimi);
+			globalResult.put("nbRecordsRead", nbElemRead);
+			globalResult.put("nbRecordsProcessed", nbElemProcessed);
+			globalResult.put("nbRecordsWritten", itemsWriter.getNbElementWritten());
+			if (atypicWriter != null) {
+				globalResult.put("nbAtypicRecordsWritten", atypicWriter.getNbElementWritten());
 			}
+			if (eliminatedWriter != null) {
+				globalResult.put("nbEliminatedRecordsWritten", eliminatedWriter.getNbElementWritten());
+			}
+
+			logger.log(logLevel, JsonUtils.jsonPrettyPrint(globalResult));
+
 
 		} catch (Exception e) {
-			logger.log(Level.SEVERE,
-					"Exception reading file.\n  Line nb=" + nbLine + "\n  Line=" + line + "\n  File=" + inputFilePath,
-					e);
+			String error = "Exception reading file.\n  Line nb=" + nbLine + "\n  Line=" + line + "\n  File=" + inputFilePath;
+			logger.log(Level.SEVERE, error, e);
+			globalResult.put("error", error);
 		}
 
 		long duration = System.currentTimeMillis() - now;
@@ -302,6 +302,7 @@ public abstract class ItemsExtractor {
 		logger.fine("End. Duration=" + duration + "\n Duration per item=" + durationPerItem + "\n Number of items="
 				+ nbElemRead);
 
+		return globalResult;
 	}
 	
 	public void setEntriesQueueSize(int entriesQueueSize) {
