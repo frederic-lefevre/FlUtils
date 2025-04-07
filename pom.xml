@@ -6,7 +6,8 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.fl</groupId>
 	<artifactId>FlUtils</artifactId>
-	<version>7.4.2</version>
+	<version>7.4.3</version>
+	<packaging>jar</packaging>
 
 	<dependencies>
 		<dependency>
@@ -48,6 +49,7 @@
 		<maven.compiler.release>21</maven.compiler.release>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<timestamp>${maven.build.timestamp}</timestamp>
+		<maven.build.timestamp.format>yyyy-MM-dd HH:mm:ss z</maven.build.timestamp.format>
 	</properties>
 
 	<build>
@@ -62,6 +64,10 @@
 			</resource>
 		</resources>
 		<plugins>
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.14.0</version>
+			</plugin>
 			<plugin>
                 <groupId>io.github.git-commit-id</groupId>
 				<artifactId>git-commit-id-maven-plugin</artifactId>
