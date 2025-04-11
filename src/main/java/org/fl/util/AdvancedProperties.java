@@ -423,7 +423,7 @@ public class AdvancedProperties extends Properties {
 		
 			try {
 				PropertiesStorage propsProjectStorage = new PropertiesStorage(URI.create(filePathName));
-				AdvancedProperties propsProject = propsProjectStorage.getAdvancedProperties(log) ; 
+				AdvancedProperties propsProject = propsProjectStorage.getAdvancedProperties() ; 
 				return propsProject ;
 			} catch (Exception e) {
 				log.log(Level.SEVERE,"getPropertiesFromFile: invalid filePath: " + filePathName, e) ;
