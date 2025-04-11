@@ -123,12 +123,13 @@ public class PropertiesStorage {
 				if (propUri.isAbsolute()) {
 					propUrl = propUri.toURL();
 				} else {
-					Path propPath = Paths.get(propUri);
+					
+					String propPath = propUri.toString();
 					propUrl = getUrlFromSystemProperty(USER_DIR_PRPERTY, propPath);
 
 					if (propUrl == null) {
 						// Still not found. Maybe inside the jar. Try class loader
-						propUrl = PropertiesStorage.class.getClassLoader().getResource(propPath.toString());
+						propUrl = PropertiesStorage.class.getClassLoader().getResource(propPath);
 					}
 				}
 			} else {
@@ -145,7 +146,7 @@ public class PropertiesStorage {
 		advancedProperties = getAdvanced(psLogger);
    }
    
-   private URL getUrlFromSystemProperty(String systemProperty, Path relativePath) {
+   private URL getUrlFromSystemProperty(String systemProperty, String relativePath) {
 		String directory = System.getProperty(systemProperty);
 		if (directory != null) {
 			Path propPath = Paths.get(directory);

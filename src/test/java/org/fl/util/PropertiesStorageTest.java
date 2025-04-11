@@ -142,6 +142,24 @@ class PropertiesStorageTest {
 	}
 	
 	@Test
+	void testPropertiesStorageWithRelativeUri() throws URISyntaxException, Exception {
+		
+		URI propertyUri = new URI("test1.properties");
+		
+		PropertiesStorage ps = new PropertiesStorage(null, propertyUri);
+		
+		assertThat(ps).isNotNull();	
+		assertThat(ps.getPropertyLocation()).isNotNull();
+		assertThat(ps.getPropertyLocation().toString()).endsWith(propertyUri.toString());
+		
+		AdvancedProperties props = ps.getAdvanced(null);;
+		assertThat(props).isNotNull();
+		
+		assertThat(props.get("doesNotExist")).isNull();
+		assertThat(props.get("logging.CloudantLogHandler.encode")).isEqualTo("UTF-8");
+	}
+	
+	@Test
 	void testPropertiesStorageWithPath() throws URISyntaxException, Exception {
 		
 		String pathString = "C:/FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test1.properties";
