@@ -422,7 +422,7 @@ public class AdvancedProperties extends Properties {
 		if (filePathName != null) {
 		
 			try {
-				PropertiesStorage propsProjectStorage = new PropertiesStorage(null, URI.create(filePathName));
+				PropertiesStorage propsProjectStorage = new PropertiesStorage(URI.create(filePathName));
 				AdvancedProperties propsProject = propsProjectStorage.getAdvanced(log) ; 
 				return propsProject ;
 			} catch (Exception e) {

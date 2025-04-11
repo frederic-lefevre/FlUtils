@@ -123,7 +123,7 @@ class LoggerManagerTest {
 		
 		String pathString = "file:///C:/FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/main/java/flUtilsSample.properties";
 		
-		PropertiesStorage ps = new PropertiesStorage(null, URI.create(pathString));
+		PropertiesStorage ps = new PropertiesStorage(URI.create(pathString));
 		
 		AdvancedProperties props = ps.getAdvanced(null);
 		
@@ -157,7 +157,7 @@ class LoggerManagerTest {
 		
 		String pathString = "file:///C:/FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/main/java/flUtilsSample.properties";
 		
-		PropertiesStorage ps = new PropertiesStorage(null, URI.create(pathString));
+		PropertiesStorage ps = new PropertiesStorage(URI.create(pathString));
 		
 		AdvancedProperties props = ps.getAdvanced(null);
 		assertThat(props).isNotNull();
@@ -256,7 +256,7 @@ class LoggerManagerTest {
 		
 		String pathString = "file:///C:/FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test2.properties";
 		
-		PropertiesStorage ps = new PropertiesStorage(null, URI.create(pathString));
+		PropertiesStorage ps = new PropertiesStorage(URI.create(pathString));
 		
 		AdvancedProperties props = ps.getAdvanced(null);
 		assertThat(props).isNotNull();
@@ -392,7 +392,7 @@ class LoggerManagerTest {
 		
 		String pathString = "file:///C:/FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test3.properties";
 		
-		PropertiesStorage ps = new PropertiesStorage(null, URI.create(pathString));
+		PropertiesStorage ps = new PropertiesStorage(URI.create(pathString));
 		
 		AdvancedProperties props = ps.getAdvanced(null);
 		assertThat(props).isNotNull();
@@ -467,7 +467,7 @@ class LoggerManagerTest {
 		
 		String pathString = "file:///C:/FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test4.properties";		
 	
-		PropertiesStorage ps = new PropertiesStorage(null, URI.create(pathString));
+		PropertiesStorage ps = new PropertiesStorage(URI.create(pathString));
 		
 		AdvancedProperties props = ps.getAdvanced(null);
 		assertThat(props).isNotNull();
@@ -497,7 +497,7 @@ class LoggerManagerTest {
 		
 		String pathString = "file:///C:/FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test5.properties";		
 		
-		PropertiesStorage ps = new PropertiesStorage(null, URI.create(pathString));
+		PropertiesStorage ps = new PropertiesStorage(URI.create(pathString));
 		
 		AdvancedProperties props = ps.getAdvanced(null);
 		assertThat(props).isNotNull();

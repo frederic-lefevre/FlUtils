@@ -66,43 +66,24 @@ public class PropertiesStorage {
      * Create a properties storage
      * 
  	 * @param systemProperty System property name containing the property file url
-	 * @param defaultPropertyUri Default property file url, if the system property containing the property file uri is null
+	 * @param propertyUri Property file url
 	 *         The property file may denominated by :
-     *  		- a relative path ( for instance "mydir/myProps.properties"). 
-     *    		  In this case, the file is searched in the user.dir (system property)
-     *  		- a well formed URI (for instance "http://my.server.org/myProps.properties" or "file:///my/dir/myProps.properties")
+     *  		- a relative URI ( for instance "mydir/myProps.properties"). 
+     *    		  In this case, the file is searched in the user.dir (system property) or with classloader getResource
+     *  		- a absolute URI (for instance "http://my.server.org/myProps.properties" or "file:///my/dir/myProps.properties")
      * @throws Exception if the URI or file cannot be opened
      */
-	public PropertiesStorage(String systemProperty, URI defaultPropertyUri) throws Exception {
-		initPropertiesStorage(systemProperty, defaultPropertyUri) ;
-	}
-   
-   private void initPropertiesStorage(String systemProperty, URI defaultPropertyUri) throws Exception {
+	public PropertiesStorage(URI propertyUri) throws Exception {
 	   
 		propUrl = null;
 		try {
-			// Get the URI of the properties
-			URI propUri;
-			if (systemProperty != null) {
-				String propUrlName = System.getProperty(systemProperty);
-				if (propUrlName == null) {
-					// if the url name is not found in the system property, take the default
-					propUri = defaultPropertyUri;
-					psLogger.info(() -> "System property " + systemProperty + " not found. Default config will be used instead: " + defaultPropertyUri);
-				} else {
-					propUri = new URI(propUrlName);
-				}
-			} else {
-				// systemProperty is null, take defaultPropertyUrl
-				propUri = defaultPropertyUri;
-			}
-			
-			if (propUri != null) {
-				if (propUri.isAbsolute()) {
-					propUrl = propUri.toURL();
+			// Get the URI of the properties			
+
+				if (propertyUri.isAbsolute()) {
+					propUrl = propertyUri.toURL();
 				} else {
 					
-					String propPath = propUri.toString();
+					String propPath = propertyUri.toString();
 					propUrl = getUrlFromSystemProperty(USER_DIR_PRPERTY, propPath);
 
 					if (propUrl == null) {
@@ -110,13 +91,10 @@ public class PropertiesStorage {
 						propUrl = PropertiesStorage.class.getClassLoader().getResource(propPath);
 					}
 				}
-			} else {
-				psLogger.warning(buildPropErrorMsg("properties url is null", systemProperty, defaultPropertyUri));
-			}
 			
 		} catch (Exception e) {
 			// Trace file load error
-			psLogger.log(Level.SEVERE, buildPropErrorMsg("Exception openning properties url", systemProperty, defaultPropertyUri), e);
+			psLogger.log(Level.SEVERE, buildPropErrorMsg("Exception openning properties url", propertyUri), e);
 			throw e;
 		}
 		
@@ -148,12 +126,11 @@ public class PropertiesStorage {
 		return null;
    }
    
-	private String buildPropErrorMsg(String msg, String systemProperty, Object defaultProperty) {
+	private String buildPropErrorMsg(String msg, URI propertyUti) {
 
 		StringBuilder errorMsg = new StringBuilder();
 		errorMsg.append(msg).append("\n");
-		errorMsg.append("System property: ").append(systemProperty).append("\n");
-		errorMsg.append("defaultProperty: ").append(Objects.toString(defaultProperty)).append("\n");
+		errorMsg.append("property uri: ").append(Objects.toString(propertyUti)).append("\n");
 		errorMsg.append(USER_DIR_PRPERTY).append(": ").append(System.getProperty(USER_DIR_PRPERTY)).append("\n");
 		return errorMsg.toString();
 	}

@@ -53,9 +53,6 @@ class RunningContextTest {
 	}
 	
 	private void testRunningContextWithNullParam(Supplier<RunningContext> rcSupplier) throws JsonProcessingException {
-
-		LogRecordCounter propertiesStorageLogRecordCounter = 
-				FilterCounter.getLogRecordCounter(Logger.getLogger(PropertiesStorage.class.getName()));
 		
 		LogRecordCounter runningContextLogRecordCounter = 
 				FilterCounter.getLogRecordCounter(Logger.getLogger("org.fl"));
@@ -97,9 +94,6 @@ class RunningContextTest {
 		
 		assertThat(rc.getCommonLogFormatter()).isInstanceOf(SimpleFormatter.class);
 		
-		assertThat(propertiesStorageLogRecordCounter.getLogRecordCount()).isEqualTo(2);
-		assertThat(propertiesStorageLogRecordCounter.getLogRecordCount(Level.WARNING)).isEqualTo(2);
-		
 		assertThat(runningContextLogRecordCounter.getLogRecordCount()).isEqualTo(3);
 		assertThat(runningContextLogRecordCounter.getLogRecordCount(Level.WARNING)).isEqualTo(3);
 		
@@ -107,9 +101,9 @@ class RunningContextTest {
 		assertThat(rootLogRecordCounter.getLogRecordCount(Level.SEVERE)).isEqualTo(1);
 		assertThat(rootLogRecordCounter.getLogRecordCount(Level.WARNING)).isEqualTo(1);
 		
-		propertiesStorageLogRecordCounter.stopLogCountAndFilter();
 		runningContextLogRecordCounter.stopLogCountAndFilter();
 		rootLogRecordCounter.stopLogCountAndFilter();
+
 	}
 	
 	@Test
