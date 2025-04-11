@@ -29,8 +29,6 @@ import java.io.StringReader;
 import java.net.URI;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -109,38 +107,6 @@ public class RunningContext {
 			rootLogger.log(Level.SEVERE, "Exception processing property file.  ", e);
 			applicationProperties = new AdvancedProperties(rootLogger) ;			
 		}
-	}
-
-	/**
-	 * @param name : normally named, using a hierarchical dot-separated namespace. 
-	 * That name will be used to configure Logger, so it should normally be based on the application package name
-	 * @param systemProperty : System property name containing the property file url
-	 * @param defaultPropertyPathName : Default property file path, if the system property containing the property file uri is null
-	 *         The property file may denominated by :
-	 *          - an absolute path (for instance on windows "C:/mydir1/mydir2/myProps.properties"
-     *  		- a relative path ( for instance "mydir/myProps.properties"). 
-     *    		  In this case, the file is searched in the user.dir (system property) first, then with the class loader.
-	 */
-	public RunningContext(String name, String systemProperty, String defaultPropertyPathName) {
-
-		if (name == null) {
-			this.name = DEFAULT_APP_NAME;
-			rootLogger.severe("Null application name passed in running context");
-		} else {
-			this.name = name;	
-		}
-		
-		try {
-			if (defaultPropertyPathName != null) {
-				propsStorage = new PropertiesStorage(systemProperty, Paths.get(defaultPropertyPathName));	
-			} else {
-				propsStorage = new PropertiesStorage(systemProperty, (Path)null);
-			}
-			initRunningContext(this.name, systemProperty);
-		} catch (Exception e) {
-			rootLogger.log(Level.SEVERE, "Exception processing property file.  ", e);
-			applicationProperties = new AdvancedProperties(rootLogger);
-		}		
 	}
 	
 	public String getName() {

@@ -76,10 +76,6 @@ public class PropertiesStorage {
 	public PropertiesStorage(String systemProperty, URI defaultPropertyUri) throws Exception {
 		initPropertiesStorage(systemProperty, defaultPropertyUri) ;
 	}
-    
-	public PropertiesStorage(String systemProperty, Path defaultPropertyPath) throws Exception {
-		initPropertiesStorage(systemProperty, defaultPropertyPath) ;
-	}
    
    private void initPropertiesStorage(String systemProperty, URI defaultPropertyUri) throws Exception {
 	   
@@ -150,65 +146,6 @@ public class PropertiesStorage {
 			}
 		}
 		return null;
-   }
-   
-   private void initPropertiesStorage(String systemProperty, Path defaultPropertyPath) throws Exception {
-	   
-		propUrl = null;
-		try {
-			// Get the path of the properties
-			Path propPath ;
-			if (systemProperty != null) {
-				String propPathName = System.getProperty(systemProperty) ;
-				if (propPathName == null) {
-					// if the path is not found in the system property, take the default
-					propPath = defaultPropertyPath ;
-					psLogger.fine(() -> "System property " + systemProperty + " not found. Default config will be used instead: " + defaultPropertyPath) ;
-				} else {
-					propPath = Paths.get(propPathName) ;
-				}
-			} else {
-				// systemProperty is null, take defaultPropertyPath
-				propPath = defaultPropertyPath;
-			}
-			
-			if (propPath != null) {
-	
-				if (! propPath.isAbsolute()) {
-					// It is a relative path
-					// Assume it is relative to user.dir system property
-					
-					String userDir = System.getProperty("user.dir");
-					if (userDir != null) {
-						Path fullPath = Paths.get(userDir, propPath.toString());
-						if (Files.exists(fullPath)) {
-							propUrl = fullPath.toUri().toURL();
-						} 
-					}
-					if (propUrl == null) {
-						// Still not found. Maybe inside the jar. Try class loader
-						propUrl = PropertiesStorage.class.getClassLoader().getResource(propPath.toString());
-					}
-				} else {
-					// path is absolute
-					if (Files.exists(propPath)) {
-						propUrl = propPath.toUri().toURL();
-					}
-				}
-			}
-			
-			if (propUrl == null) {
-				psLogger.warning(buildPropErrorMsg("properties have not been found", systemProperty, defaultPropertyPath));
-			}
-			
-		} catch (Exception e) {
-			// Trace file load error
-			psLogger.log(Level.SEVERE, buildPropErrorMsg("Exception openning properties url", systemProperty, defaultPropertyPath));
-			throw e;
-		}
-		
-		// Finally get the advanced properties
-		advancedProperties = getAdvanced(psLogger);
    }
    
 	private String buildPropErrorMsg(String msg, String systemProperty, Object defaultProperty) {

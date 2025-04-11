@@ -28,8 +28,6 @@ import static org.assertj.core.api.Assertions.*;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -53,20 +51,6 @@ class PropertiesStorageTest {
 	}
 	
 	@Test
-	void testPropertiesStorageWithPathNullParam() throws Exception {
-		
-		LogRecordCounter logRecordCounter = 
-				FilterCounter.getLogRecordCounter(Logger.getLogger(PropertiesStorage.class.getName()));
-		
-		PropertiesStorage ps = new PropertiesStorage(null, (Path)null);
-		
-		testPropertiesStorageWithNullParam(ps);
-		
-		assertThat(logRecordCounter.getLogRecordCount()).isEqualTo(2);
-		assertThat(logRecordCounter.getLogRecordCount(Level.WARNING)).isEqualTo(2);
-	}
-	
-	@Test
 	void testPropertiesStorageWithInvalidSystemProperty() throws Exception {
 		
 		LogRecordCounter logRecordCounter = 
@@ -79,34 +63,6 @@ class PropertiesStorageTest {
 		assertThat(logRecordCounter.getLogRecordCount()).isEqualTo(1);
 		assertThat(logRecordCounter.getLogRecordCount(Level.SEVERE)).isEqualTo(1);
 		
-	}
-	
-	@Test
-	void testPropertiesStorageWithUnexistantSystemProp() throws Exception {
-		
-		LogRecordCounter logRecordCounter = 
-				FilterCounter.getLogRecordCounter(Logger.getLogger(PropertiesStorage.class.getName()));
-		
-		PropertiesStorage ps = new PropertiesStorage("systemPropThatdoesNotExists", (Path)null);
-		
-		testPropertiesStorageWithNullParam(ps);
-		
-		assertThat(logRecordCounter.getLogRecordCount()).isEqualTo(2);
-		assertThat(logRecordCounter.getLogRecordCount(Level.WARNING)).isEqualTo(2);
-	}
-	
-	@Test
-	void testPropertiesStorageWithUnexistantPath() throws Exception {
-		
-		LogRecordCounter logRecordCounter = 
-				FilterCounter.getLogRecordCounter(Logger.getLogger(PropertiesStorage.class.getName()));
-		
-		PropertiesStorage ps = new PropertiesStorage(null, Paths.get("doesNotExists.properties"));
-		
-		testPropertiesStorageWithNullParam(ps);
-		
-		assertThat(logRecordCounter.getLogRecordCount()).isEqualTo(2);
-		assertThat(logRecordCounter.getLogRecordCount(Level.WARNING)).isEqualTo(2);
 	}
 	
 	@Test
@@ -153,25 +109,6 @@ class PropertiesStorageTest {
 		assertThat(ps.getPropertyLocation().toString()).endsWith(propertyUri.toString());
 		
 		AdvancedProperties props = ps.getAdvanced(null);;
-		assertThat(props).isNotNull();
-		
-		assertThat(props.get("doesNotExist")).isNull();
-		assertThat(props.get("logging.CloudantLogHandler.encode")).isEqualTo("UTF-8");
-	}
-	
-	@Test
-	void testPropertiesStorageWithPath() throws URISyntaxException, Exception {
-		
-		String pathString = "C:/FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test1.properties";
-		Path propertyPath = Paths.get(pathString);
-		
-		PropertiesStorage ps = new PropertiesStorage(null, propertyPath);
-		
-		assertThat(ps).isNotNull();	
-		assertThat(ps.getPropertyLocation()).isNotNull();
-		assertThat(ps.getPropertyLocation().toString()).isEqualTo("file:/" + pathString);
-		
-		AdvancedProperties props = ps.getAdvanced(null);
 		assertThat(props).isNotNull();
 		
 		assertThat(props.get("doesNotExist")).isNull();

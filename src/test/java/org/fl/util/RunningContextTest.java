@@ -46,15 +46,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 class RunningContextTest {
 	
 	private static final String LOGGER_NAME = "org.fl.util.Test1";
-	
-	@Test
-	void testRunningContextWithNullStringParam() throws JsonProcessingException {		
-		testRunningContextWithNullParam(() -> new RunningContext(null, null, (String)null));
-	}
 
 	@Test
 	void testRunningContextWithNullUriParam() throws JsonProcessingException {
-		testRunningContextWithNullParam(() -> new RunningContext(null, null, (URI)null));
+		testRunningContextWithNullParam(() -> new RunningContext(null, null, null));
 	}
 	
 	private void testRunningContextWithNullParam(Supplier<RunningContext> rcSupplier) throws JsonProcessingException {
@@ -120,7 +115,7 @@ class RunningContextTest {
 	@Test
 	void testRunningContextWithRelativePath() throws JsonProcessingException {
 		
-		RunningContext rc = new RunningContext(LOGGER_NAME, null, "test1.properties");
+		RunningContext rc = new RunningContext(LOGGER_NAME, null, URI.create("test1.properties"));
 		
 		assertThat(rc).isNotNull();
 		
@@ -153,7 +148,7 @@ class RunningContextTest {
 	void testRunningContextWithAbsolutePath() {
 		
 		RunningContext rc = new RunningContext(LOGGER_NAME, null, 
-				"C:/FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test1.properties");
+				URI.create("file:///C:/FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test1.properties"));
 		
 		assertThat(rc).isNotNull();
 		

@@ -27,8 +27,7 @@ package org.fl.util;
 import static org.assertj.core.api.Assertions.*;
 
 import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.net.URI;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.FileHandler;
 import java.util.logging.Handler;
@@ -122,10 +121,9 @@ class LoggerManagerTest {
 		
 		String loggerName = "org.fl.util.notInConfig";
 		
-		String pathString = "C:/FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/main/java/flUtilsSample.properties";
-		Path propertyPath = Paths.get(pathString);
+		String pathString = "file:///C:/FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/main/java/flUtilsSample.properties";
 		
-		PropertiesStorage ps = new PropertiesStorage(null, propertyPath);
+		PropertiesStorage ps = new PropertiesStorage(null, URI.create(pathString));
 		
 		AdvancedProperties props = ps.getAdvanced(null);
 		
@@ -157,10 +155,9 @@ class LoggerManagerTest {
 		
 		String loggerName = "org.fl.util.SampleApp";
 		
-		String pathString = "C:/FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/main/java/flUtilsSample.properties";
-		Path propertyPath = Paths.get(pathString);
+		String pathString = "file:///C:/FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/main/java/flUtilsSample.properties";
 		
-		PropertiesStorage ps = new PropertiesStorage(null, propertyPath);
+		PropertiesStorage ps = new PropertiesStorage(null, URI.create(pathString));
 		
 		AdvancedProperties props = ps.getAdvanced(null);
 		assertThat(props).isNotNull();
@@ -257,10 +254,9 @@ class LoggerManagerTest {
 	
 	private void assertsForTest2(String loggerName) throws Exception {
 		
-		String pathString = "C:/FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test2.properties";
-		Path propertyPath = Paths.get(pathString);
+		String pathString = "file:///C:/FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test2.properties";
 		
-		PropertiesStorage ps = new PropertiesStorage(null, propertyPath);
+		PropertiesStorage ps = new PropertiesStorage(null, URI.create(pathString));
 		
 		AdvancedProperties props = ps.getAdvanced(null);
 		assertThat(props).isNotNull();
@@ -394,10 +390,9 @@ class LoggerManagerTest {
 	
 	private void assertsForTest3(String loggerName) throws Exception {
 		
-		String pathString = "C:/FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test3.properties";
-		Path propertyPath = Paths.get(pathString);
+		String pathString = "file:///C:/FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test3.properties";
 		
-		PropertiesStorage ps = new PropertiesStorage(null, propertyPath);
+		PropertiesStorage ps = new PropertiesStorage(null, URI.create(pathString));
 		
 		AdvancedProperties props = ps.getAdvanced(null);
 		assertThat(props).isNotNull();
@@ -470,10 +465,9 @@ class LoggerManagerTest {
 		
 		String loggerName = "org.fl.util.SampleApp";
 		
-		String pathString = "C:/FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test4.properties";		
-		Path propertyPath = Paths.get(pathString);
-		
-		PropertiesStorage ps = new PropertiesStorage(null, propertyPath);
+		String pathString = "file:///C:/FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test4.properties";		
+	
+		PropertiesStorage ps = new PropertiesStorage(null, URI.create(pathString));
 		
 		AdvancedProperties props = ps.getAdvanced(null);
 		assertThat(props).isNotNull();
@@ -501,10 +495,9 @@ class LoggerManagerTest {
 		
 		String loggerName = "org.fl.util.SampleApp";
 		
-		String pathString = "C:/FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test5.properties";		
-		Path propertyPath = Paths.get(pathString);
+		String pathString = "file:///C:/FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test5.properties";		
 		
-		PropertiesStorage ps = new PropertiesStorage(null, propertyPath);
+		PropertiesStorage ps = new PropertiesStorage(null, URI.create(pathString));
 		
 		AdvancedProperties props = ps.getAdvanced(null);
 		assertThat(props).isNotNull();
