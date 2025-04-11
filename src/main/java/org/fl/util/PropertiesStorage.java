@@ -31,6 +31,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -52,6 +53,8 @@ import org.fl.util.PropertiesStorage;
 public class PropertiesStorage {
 
 	private static final Logger psLogger = Logger.getLogger(PropertiesStorage.class.getName());
+	
+	private static final String USER_DIR_PRPERTY = "user.dir";
 	
     // URL of storage
     private URL propUrl;
@@ -116,8 +119,18 @@ public class PropertiesStorage {
 				propUri = defaultPropertyUri;
 			}
 			
-			if (propUri != null) {	
-				propUrl = propUri.toURL();	
+			if (propUri != null) {
+				if (propUri.isAbsolute()) {
+					propUrl = propUri.toURL();
+				} else {
+					Path propPath = Paths.get(propUri);
+					propUrl = getUrlFromSystemProperty(USER_DIR_PRPERTY, propPath);
+
+					if (propUrl == null) {
+						// Still not found. Maybe inside the jar. Try class loader
+						propUrl = PropertiesStorage.class.getClassLoader().getResource(propPath.toString());
+					}
+				}
 			} else {
 				psLogger.warning(buildPropErrorMsg("properties url is null", systemProperty, defaultPropertyUri));
 			}
@@ -130,6 +143,30 @@ public class PropertiesStorage {
 		
 		// Finally get the advanced properties
 		advancedProperties = getAdvanced(psLogger);
+   }
+   
+   private URL getUrlFromSystemProperty(String systemProperty, Path relativePath) {
+		String directory = System.getProperty(systemProperty);
+		if (directory != null) {
+			Path propPath = Paths.get(directory);
+			
+			if (Files.exists(propPath)) {
+				Path fullPath;
+				if (Files.isDirectory(propPath)) {
+					fullPath =  propPath.resolve(relativePath);
+				} else {
+					fullPath = propPath.getParent().resolve(relativePath);
+				}
+				if (Files.exists(fullPath)) {
+					try {
+						return fullPath.toUri().toURL();
+					} catch (MalformedURLException e) {
+						psLogger.log(Level.SEVERE, "MalformedURLException with systemProperty " + systemProperty + " and relative path " +  Objects.toString(relativePath), e);
+					}
+				} 
+			}
+		}
+		return null;
    }
    
    private void initPropertiesStorage(String systemProperty, Path defaultPropertyPath) throws Exception {
@@ -197,7 +234,7 @@ public class PropertiesStorage {
 		errorMsg.append(msg).append("\n");
 		errorMsg.append("System property: ").append(systemProperty).append("\n");
 		errorMsg.append("defaultProperty: ").append(Objects.toString(defaultProperty)).append("\n");
-		errorMsg.append("user.dir: ").append(System.getProperty("user.dir")).append("\n");
+		errorMsg.append(USER_DIR_PRPERTY).append(": ").append(System.getProperty(USER_DIR_PRPERTY)).append("\n");
 		return errorMsg.toString();
 	}
 	
@@ -225,7 +262,7 @@ public class PropertiesStorage {
 					propUrl = null;
 				}
 			} else {
-				localLog.warning("Properties url is null");
+				localLog.warning("GetAdvanced properties while properties url is null");
 			}
 		}
 		return advancedProperties;
