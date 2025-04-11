@@ -66,7 +66,7 @@ public class PropertiesStorage {
      * Create a properties storage
      * 
  	 * @param systemProperty System property name containing the property file url
-	 * @param defaultPropertyUrlName Default property file url, if the system property containing the property file uri is null
+	 * @param defaultPropertyUri Default property file url, if the system property containing the property file uri is null
 	 *         The property file may denominated by :
      *  		- a relative path ( for instance "mydir/myProps.properties"). 
      *    		  In this case, the file is searched in the user.dir (system property)
@@ -91,9 +91,6 @@ public class PropertiesStorage {
      *  		- a well formed URI (for instance "http://my.server.org/myProps.properties" or "file:///my/dir/myProps.properties")
      * @throws Exception if the URI or file cannot be opened
      */
-   public PropertiesStorage(URI propertyUri) throws Exception {
-	   initPropertiesStorage(null, propertyUri) ;		
-	}
    
    public PropertiesStorage(Path propertyPath) throws Exception {
 	   initPropertiesStorage(null, propertyPath) ;		
