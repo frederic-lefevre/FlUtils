@@ -99,7 +99,20 @@ public class PropertiesStorage {
 		}
 		
 		// Finally get the advanced properties
-		advancedProperties = getAdvanced(psLogger);
+		// load property from the property file		
+		advancedProperties = new AdvancedProperties(psLogger);
+
+		if (propUrl != null) {
+			try (InputStreamReader reader = new InputStreamReader(propUrl.openStream(), StandardCharsets.UTF_8)) {
+				advancedProperties.load(reader);
+			} catch (Exception e) {
+				psLogger.log(Level.SEVERE, "Property file loading error for " + propUrl, e);
+				// Invalid url
+				propUrl = null;
+			}
+		} else {
+			psLogger.warning("GetAdvanced properties while properties url is null");
+		}
    }
    
    private URL getUrlFromSystemProperty(String systemProperty, String relativePath) {
@@ -136,32 +149,6 @@ public class PropertiesStorage {
 	}
 	
 	public AdvancedProperties getAdvanced(Logger log) {
-		
-		if (advancedProperties == null) {
-			
-			Logger localLog;
-			if (log == null) {
-				localLog = psLogger;
-				psLogger.severe("Null logger. It will be replaced by a default logger");
-			} else {
-				localLog = log;
-			}
-
-			// load property from the property file		
-			advancedProperties = new AdvancedProperties(localLog);
-
-			if (propUrl != null) {
-				try (InputStreamReader reader = new InputStreamReader(propUrl.openStream(), StandardCharsets.UTF_8)) {
-					advancedProperties.load(reader);
-				} catch (Exception e) {
-					localLog.log(Level.SEVERE, "Property file loading error for " + propUrl, e);
-					// Invalid url
-					propUrl = null;
-				}
-			} else {
-				localLog.warning("GetAdvanced properties while properties url is null");
-			}
-		}
 		return advancedProperties;
 	}
 	
