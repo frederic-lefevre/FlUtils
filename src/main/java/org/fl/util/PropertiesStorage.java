@@ -79,18 +79,18 @@ public class PropertiesStorage {
 		try {
 			// Get the URI of the properties			
 
-				if (propertyUri.isAbsolute()) {
-					propUrl = propertyUri.toURL();
-				} else {
-					
-					String propPath = propertyUri.toString();
-					propUrl = getUrlFromSystemProperty(USER_DIR_PRPERTY, propPath);
+			if (propertyUri.isAbsolute()) {
+				propUrl = propertyUri.toURL();
+			} else {
 
-					if (propUrl == null) {
-						// Still not found. Maybe inside the jar. Try class loader
-						propUrl = PropertiesStorage.class.getClassLoader().getResource(propPath);
-					}
+				String propPath = propertyUri.toString();
+				propUrl = getUrlFromSystemProperty(USER_DIR_PRPERTY, propPath);
+
+				if (propUrl == null) {
+					// Still not found. Maybe inside the jar. Try class loader
+					propUrl = PropertiesStorage.class.getClassLoader().getResource(propPath);
 				}
+			}
 			
 		} catch (Exception e) {
 			// Trace file load error
