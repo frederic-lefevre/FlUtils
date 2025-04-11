@@ -87,11 +87,11 @@ public class RunningContext {
 	 * @param name : normally named, using a hierarchical dot-separated namespace. 
 	 * That name will be used to configure Logger, so it should normally be based on the application package name
 	 * @param systemProperty : System property name containing the property file url
-	 * @param defaultPropertyUri : Default property file url, if the system property containing the property file uri is null
+	 * @param propertyUri : Default property file url, if the system property containing the property file uri is null
 	 *         The property file may denominated by :
      *  		- a well formed URI (for instance "http://my.server.org/myProps.properties" or "file:///my/dir/myProps.properties")
 	 */
-	public RunningContext(String name, String systemProperty, URI defaultPropertyUri) {
+	public RunningContext(String name, String systemProperty, URI propertyUri) {
 		
 		if (name == null) {
 			this.name = DEFAULT_APP_NAME;
@@ -101,8 +101,8 @@ public class RunningContext {
 		}	
 		
 		try {
-			if (defaultPropertyUri != null) {
-				propsStorage = new PropertiesStorage(defaultPropertyUri);
+			if (propertyUri != null) {
+				propsStorage = new PropertiesStorage(propertyUri);
 				applicationProperties = propsStorage.getAdvanced(rootLogger); 
 			} else {
 				applicationProperties = new AdvancedProperties(rootLogger);
