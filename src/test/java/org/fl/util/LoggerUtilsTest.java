@@ -128,7 +128,7 @@ class LoggerUtilsTest {
 	@Test	
 	void getLoggerLevels() throws JsonProcessingException {
 		
-		RunningContext rc = new RunningContext(APPLICATION_NAME, null, 
+		RunningContext rc = new RunningContext(APPLICATION_NAME,
 				URI.create("file:///C:/FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test1.properties"));
 		assertThat(rc.getName()).isNotNull().isEqualTo(APPLICATION_NAME);
 		
@@ -213,7 +213,7 @@ class LoggerUtilsTest {
 	@Test	
 	void setLoggerAndHandlerLevels() throws JsonProcessingException {
 		
-		RunningContext rc = new RunningContext(APPLICATION_NAME, null, 
+		RunningContext rc = new RunningContext(APPLICATION_NAME,
 				URI.create("file:///C:/FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test1.properties"));
 		assertThat(rc.getName()).isNotNull().isEqualTo(APPLICATION_NAME);
 		

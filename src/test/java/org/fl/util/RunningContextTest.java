@@ -49,7 +49,7 @@ class RunningContextTest {
 
 	@Test
 	void testRunningContextWithNullUriParam() throws JsonProcessingException {
-		testRunningContextWithNullParam(() -> new RunningContext(null, null, null));
+		testRunningContextWithNullParam(() -> new RunningContext(null, null));
 	}
 	
 	private void testRunningContextWithNullParam(Supplier<RunningContext> rcSupplier) throws JsonProcessingException {
@@ -109,7 +109,7 @@ class RunningContextTest {
 	@Test
 	void testRunningContextWithRelativePath() throws JsonProcessingException {
 		
-		RunningContext rc = new RunningContext(LOGGER_NAME, null, URI.create("test1.properties"));
+		RunningContext rc = new RunningContext(LOGGER_NAME, URI.create("test1.properties"));
 		
 		assertThat(rc).isNotNull();
 		
@@ -141,7 +141,7 @@ class RunningContextTest {
 	@Test
 	void testRunningContextWithAbsolutePath() {
 		
-		RunningContext rc = new RunningContext(LOGGER_NAME, null, 
+		RunningContext rc = new RunningContext(LOGGER_NAME, 
 				URI.create("file:///C:/FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test1.properties"));
 		
 		assertThat(rc).isNotNull();
@@ -166,7 +166,7 @@ class RunningContextTest {
 	@Test
 	void testBasicRunningContextWithURI() throws URISyntaxException {
 		
-		RunningContext rc = new RunningContext(LOGGER_NAME, null, 
+		RunningContext rc = new RunningContext(LOGGER_NAME,
 				new URI("file:///C:/FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test1.properties"));
 		
 		assertThat(rc).isNotNull();
@@ -191,7 +191,7 @@ class RunningContextTest {
 	@Test
 	void testRunningContextBuildInfo() throws URISyntaxException, JsonProcessingException {
 		
-		RunningContext rc = new RunningContext(LOGGER_NAME, null, 
+		RunningContext rc = new RunningContext(LOGGER_NAME,
 				new URI("file:///C:/FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test1.properties"));
 		
 		assertThat(rc).isNotNull();
@@ -218,7 +218,7 @@ class RunningContextTest {
 	@Test
 	void testRunningContextBuildInfo2() throws URISyntaxException, JsonProcessingException {
 							
-		RunningContext rc = new RunningContext(LOGGER_NAME, null, 
+		RunningContext rc = new RunningContext(LOGGER_NAME,
 				new URI("file:///C:/FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test1.properties"));
 		
 		LogRecordCounter logRecordCounter = 
@@ -260,7 +260,7 @@ class RunningContextTest {
 	@Test
 	void testRunningContextLoggingInfo() throws URISyntaxException, JsonProcessingException {
 		
-		RunningContext rc = new RunningContext(LOGGER_NAME, null, 
+		RunningContext rc = new RunningContext(LOGGER_NAME,
 				new URI("file:///C:/FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test1.properties"));
 		
 		JsonNode applicationInfos = rc.getApplicationInfo(false);

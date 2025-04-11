@@ -49,7 +49,7 @@ class LogsDisplayPaneTest {
 	@Test
 	void testCreatLogsDisplayPane() throws JsonProcessingException {
 		
-		RunningContext rc = new RunningContext(LOGGER_NAME, null, URI.create("test1.properties"));
+		RunningContext rc = new RunningContext(LOGGER_NAME, URI.create("test1.properties"));
 		
 		assertThat(rc).isNotNull();
 		
@@ -85,7 +85,7 @@ class LogsDisplayPaneTest {
 		LogRecordCounter rootLogRecordCounter = 
 				FilterCounter.getLogRecordCounter(Logger.getLogger(""));
 		
-		RunningContext rc = new RunningContext(LOGGER_NAME2, null, URI.create("test6.properties"));
+		RunningContext rc = new RunningContext(LOGGER_NAME2, URI.create("test6.properties"));
 		
 		// 1 warning is logged
 		assertThat(rootLogRecordCounter.getLogRecordCount()).isEqualTo(1);
