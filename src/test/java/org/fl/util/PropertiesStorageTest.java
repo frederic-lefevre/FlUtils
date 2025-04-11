@@ -73,7 +73,7 @@ class PropertiesStorageTest {
 		assertThat(ps.getPropertyLocation()).isNotNull();
 		assertThat(ps.getPropertyLocation().toString()).isEqualTo(propertyUri.toURL().toString());
 		
-		AdvancedProperties props = ps.getAdvanced(null);;
+		AdvancedProperties props = ps.getAdvancedProperties(null);;
 		assertThat(props).isNotNull();
 		
 		assertThat(props.get("doesNotExist")).isNull();
@@ -91,7 +91,7 @@ class PropertiesStorageTest {
 		assertThat(ps.getPropertyLocation()).isNotNull();
 		assertThat(ps.getPropertyLocation().toString()).endsWith(propertyUri.toString());
 		
-		AdvancedProperties props = ps.getAdvanced(null);;
+		AdvancedProperties props = ps.getAdvancedProperties(null);;
 		assertThat(props).isNotNull();
 		
 		assertThat(props.get("doesNotExist")).isNull();
@@ -103,7 +103,7 @@ class PropertiesStorageTest {
 		assertThat(ps).isNotNull();	
 		assertThat(ps.getPropertyLocation()).isNull();
 		
-		AdvancedProperties props = ps.getAdvanced(null);
+		AdvancedProperties props = ps.getAdvancedProperties(null);
 		assertThat(props).isNotNull().isEmpty();
 	}
 	

@@ -148,7 +148,7 @@ public class PropertiesStorage {
 		return errorMsg.toString();
 	}
 	
-	public AdvancedProperties getAdvanced(Logger log) {
+	public AdvancedProperties getAdvancedProperties(Logger log) {
 		return advancedProperties;
 	}
 	

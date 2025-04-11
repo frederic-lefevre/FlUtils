@@ -125,7 +125,7 @@ class LoggerManagerTest {
 		
 		PropertiesStorage ps = new PropertiesStorage(URI.create(pathString));
 		
-		AdvancedProperties props = ps.getAdvanced(null);
+		AdvancedProperties props = ps.getAdvancedProperties(null);
 		
 		LogRecordCounter logRecordCounter = 
 				FilterCounter.getLogRecordCounter(Logger.getLogger(""));
@@ -159,7 +159,7 @@ class LoggerManagerTest {
 		
 		PropertiesStorage ps = new PropertiesStorage(URI.create(pathString));
 		
-		AdvancedProperties props = ps.getAdvanced(null);
+		AdvancedProperties props = ps.getAdvancedProperties(null);
 		assertThat(props).isNotNull();
 		
 		AdvancedProperties loggingProps = props.getPropertiesFromFile(LoggerManager.LOGMANAGER_PROPERTY_FILE_PROPERTY);
@@ -258,7 +258,7 @@ class LoggerManagerTest {
 		
 		PropertiesStorage ps = new PropertiesStorage(URI.create(pathString));
 		
-		AdvancedProperties props = ps.getAdvanced(null);
+		AdvancedProperties props = ps.getAdvancedProperties(null);
 		assertThat(props).isNotNull();
 		
 		LoggerManager logMgr = LoggerManager.builder()
@@ -394,7 +394,7 @@ class LoggerManagerTest {
 		
 		PropertiesStorage ps = new PropertiesStorage(URI.create(pathString));
 		
-		AdvancedProperties props = ps.getAdvanced(null);
+		AdvancedProperties props = ps.getAdvancedProperties(null);
 		assertThat(props).isNotNull();
 		
 		LoggerManager logMgr = LoggerManager.builder()
@@ -469,7 +469,7 @@ class LoggerManagerTest {
 	
 		PropertiesStorage ps = new PropertiesStorage(URI.create(pathString));
 		
-		AdvancedProperties props = ps.getAdvanced(null);
+		AdvancedProperties props = ps.getAdvancedProperties(null);
 		assertThat(props).isNotNull();
 		
 		LogRecordCounter logRecordCounter = 
@@ -499,7 +499,7 @@ class LoggerManagerTest {
 		
 		PropertiesStorage ps = new PropertiesStorage(URI.create(pathString));
 		
-		AdvancedProperties props = ps.getAdvanced(null);
+		AdvancedProperties props = ps.getAdvancedProperties(null);
 		assertThat(props).isNotNull();
 		
 		LogRecordCounter logRecordCounter = 

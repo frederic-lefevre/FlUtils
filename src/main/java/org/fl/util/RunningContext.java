@@ -102,7 +102,7 @@ public class RunningContext {
 		try {
 			if (propertyUri != null) {
 				propsStorage = new PropertiesStorage(propertyUri);
-				applicationProperties = propsStorage.getAdvanced(rootLogger); 
+				applicationProperties = propsStorage.getAdvancedProperties(rootLogger); 
 			} else {
 				applicationProperties = new AdvancedProperties(rootLogger);
 			}
