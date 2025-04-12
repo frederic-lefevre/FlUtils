@@ -73,7 +73,7 @@ public class NetworkUtils {
 						InetAddress current_addr = addresses.nextElement();
 						if (!current_addr.isLoopbackAddress()) {
 							if (withLookup) {
-								currAddrHost.put("Hostname", Optional.ofNullable(current_addr.getHostName()).orElse(""));
+								currAddrHost.put("hostname", Optional.ofNullable(current_addr.getHostName()).orElse(""));
 							}
 							
 							String addr = current_addr.getHostAddress() ;							
@@ -100,7 +100,7 @@ public class NetworkUtils {
 						"networkInterfaces", networkInterfaces,
 						"IPv4addresses", IPv4,
 						"IPv6addresses", IPv6,
-						"Otheraddresses", otherAddresses
+						"otherAddresses", otherAddresses
 						));
 	}
 	
