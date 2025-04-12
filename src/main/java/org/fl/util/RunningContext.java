@@ -78,7 +78,7 @@ public class RunningContext {
 	private AdvancedProperties applicationProperties;
 	private PropertiesStorage propsStorage;
 	private LoggerManager logMgr;
-	private Instant initializationDate;
+	private final Instant initializationDate;
 
 	private ArrayNode buildInformation;
 	private JsonNode loggingPropertiesAsJson;
@@ -91,6 +91,8 @@ public class RunningContext {
      *  		- a well formed URI (for instance "http://my.server.org/myProps.properties" or "file:///my/dir/myProps.properties")
 	 */
 	public RunningContext(String name, URI propertyUri) {
+		
+		initializationDate = Instant.now();
 		
 		if (name == null) {
 			this.name = DEFAULT_APP_NAME;
@@ -107,8 +109,6 @@ public class RunningContext {
 				applicationProperties = new AdvancedProperties(rootLogger);
 			}
 			
-			initializationDate = Instant.now();
-
 			// Initialize logger
 			logMgr = LoggerManager.builder()
 					.applicationRootLoggerName(this.name)
