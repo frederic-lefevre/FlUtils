@@ -43,24 +43,15 @@ public class OperatingInfo {
 
 	public static JsonNode getInfo(boolean withIpLookup) {
 
-		ObjectNode opInfoJson = JsonNodeFactory.instance.objectNode();
-
-		opInfoJson.set("runtimeInformation", getRuntimeInformation());
-		opInfoJson.set("systemProperties", getSystemProperties());
-		opInfoJson.set("systemEnvironment", getSystemEnv());
-		opInfoJson.set("newLine", getNewLineInformation());
-		opInfoJson.put("defaultCharset", Charset.defaultCharset().name());
-		opInfoJson.set("availableCharset", getAvailableCharSets());
-
-		NetworkUtils nu = new NetworkUtils(withIpLookup);
-		opInfoJson.set("networkInterfaces", nu.getNetworkInterfaces());
-		opInfoJson.set("IPv4addresses", nu.getIPv4());
-		opInfoJson.set("IPv6addresses", nu.getIPv6());
-		opInfoJson.set("Otheraddresses", nu.getOtherAddresses());
-
-		opInfoJson.put("machineName", nu.getMachineName());
-
-		return opInfoJson;
+		return JsonNodeFactory.instance.objectNode()
+				.put("defaultCharset", Charset.defaultCharset().name())
+				.setAll(Map.of(
+					"runtimeInformation", getRuntimeInformation(),
+					"systemProperties", getSystemProperties(),
+					"systemEnvironment", getSystemEnv(),
+					"newLine", getNewLineInformation(),
+					"availableCharset", getAvailableCharSets(),
+					"networkInformation", NetworkUtils.getNetworkInformation(withIpLookup)));
 	}
 
 	private static ArrayNode getRuntimeInformation() {
