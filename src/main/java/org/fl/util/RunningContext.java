@@ -295,7 +295,7 @@ public class RunningContext {
 	}
 	
 	public JsonNode getOperatingInfos(boolean withIpLookup) {
-		return (new OperatingInfo()).getInfo(withIpLookup);
+		return OperatingInfo.getInfo(withIpLookup);
 	}
 
 	public JsonNode getApplicationInfo(boolean withIpLookup) {

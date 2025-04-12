@@ -38,10 +38,10 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class OperatingInfo {
 	
-	public OperatingInfo() {
+	private OperatingInfo() {
 	}
 
-	public JsonNode getInfo(boolean withIpLookup) {
+	public static JsonNode getInfo(boolean withIpLookup) {
 
 		ObjectNode opInfoJson = JsonNodeFactory.instance.objectNode();
 
