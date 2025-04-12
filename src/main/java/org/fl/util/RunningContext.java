@@ -64,7 +64,7 @@ public class RunningContext {
 
 	private static final String DEFAULT_APP_NAME = "org.fl";
 	
-	private static final String projectBuildPropertyFile = "project.properties";
+	private static final String BUILD_PROPERTY_FILE_SUFFIX = "project.properties";
 
 	private static final String DATE_PATTERN = "uuuu-MM-dd HH:mm:ss.SSS VV";
 
@@ -196,14 +196,14 @@ public class RunningContext {
 	private String findProjectProperties(String name) {
 		
 		try {
-			String projectPropRelativeName = name + "_" + projectBuildPropertyFile;
+			String projectPropRelativeName = name + "_" + BUILD_PROPERTY_FILE_SUFFIX;
 			
 			URL projectPropUrl = Optional
 					.ofNullable(RunningContext.class.getClassLoader().getResource(projectPropRelativeName))
 					.orElseGet(() -> {
 						applicationRootLog.warning("Specific project property file not found: " + projectPropRelativeName);
-						applicationRootLog.warning("Project property file fallback: " + projectBuildPropertyFile);
-						return RunningContext.class.getClassLoader().getResource(projectBuildPropertyFile);
+						applicationRootLog.warning("Project property file fallback: " + BUILD_PROPERTY_FILE_SUFFIX);
+						return RunningContext.class.getClassLoader().getResource(BUILD_PROPERTY_FILE_SUFFIX);
 					});
 
 			if (projectPropUrl != null) {
