@@ -71,6 +71,9 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class FilesUtils {
 
+	private FilesUtils() {
+	}
+	
 	// Copy a directory tree
 	public static boolean copyDirectoryTree(Path source, Path target, Logger log) throws IOException {
 		
