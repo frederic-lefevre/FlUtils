@@ -146,6 +146,9 @@ class RunningContextTest {
 		
 		assertThat(rc).isNotNull();
 		
+		JsonNode applicationInfo = rc.getApplicationInfo(false);
+		assertThat(applicationInfo).isNotNull();
+		
 		Logger logger = Logger.getLogger(LOGGER_NAME);
 		
 		assertThat(logger).isNotNull();
