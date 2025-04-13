@@ -30,12 +30,21 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.stream.Stream;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
 class OperatingInfoTest {
 
+	private static final String PROPERTY_KEY = "testPropertyKey";
+	private static final String PROPERTY_VALUE = "testPropertyValue";
+	
+	@BeforeEach
+	void setProp() {
+		System.setProperty(PROPERTY_KEY, PROPERTY_VALUE);
+	}
+	
 	@Test
 	void testOperatingInfoWithLookup() {
 		
@@ -64,6 +73,10 @@ class OperatingInfoTest {
 		
 		assertThat(operatingInfo.get("defaultCharset").asText()).isEqualTo(Charset.defaultCharset().name());
 		
+		JsonNode systemEnvironment = operatingInfo.get("systemEnvironment");
+		assertThat(systemEnvironment.isObject()).isTrue();
+		assertThat(systemEnvironment.isArray()).isFalse();
+		
 		JsonNode availableCharset = operatingInfo.get("availableCharset");
 		assertThat(availableCharset.isArray()).isTrue();
 		Stream.of(StandardCharsets.class.getDeclaredFields())
@@ -84,6 +97,8 @@ class OperatingInfoTest {
 		assertThat(systemProperties.has("java.class.path")).isTrue();
 		assertThat(systemProperties.has("user.dir")).isTrue();
 		assertThat(systemProperties.has("file.separator")).isTrue();
+		assertThat(systemProperties.has(PROPERTY_KEY)).isTrue();
+		assertThat(systemProperties.get(PROPERTY_KEY).asText()).isEqualTo(PROPERTY_VALUE);
 		
 		JsonNode networkInformation = operatingInfo.get("networkInformation");
 		assertThat(networkInformation.has("machineName")).isTrue();
