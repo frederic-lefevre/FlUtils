@@ -27,6 +27,7 @@ package org.fl.util.os;
 import static org.assertj.core.api.Assertions.*;
 
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Test;
@@ -63,6 +64,21 @@ class OperatingInfoTest {
 		
 		assertThat(operatingInfo.get("defaultCharset").asText()).isEqualTo(Charset.defaultCharset().name());
 		
+		JsonNode availableCharset = operatingInfo.get("availableCharset");
+		assertThat(availableCharset.isArray()).isTrue();
+		Stream.of(StandardCharsets.class.getDeclaredFields())
+			.forEach(field -> {
+				try {
+					if (field.get(null) instanceof Charset charset) {
+						assertThat(availableCharset.elements()).toIterable().map(element -> element.asText()).contains(charset.name());
+					} else {
+						fail("A field of StandardCharsets is not a Charset ...");
+					}
+				} catch (Exception e) {
+					fail("Exception on getting StandardCharsets field corresponding object", e);
+				}
+			});
+				
 		JsonNode systemProperties = operatingInfo.get("systemProperties");
 		assertThat(systemProperties.has("java.specification.version")).isTrue();
 		assertThat(systemProperties.has("java.class.path")).isTrue();
@@ -76,7 +92,6 @@ class OperatingInfoTest {
 		assertThat(networkInformation.has("otherAddresses")).isTrue();
 		assertThat(networkInformation.has("networkInterfaces")).isTrue();
 		assertThat(networkInformation.size()).isEqualTo(5);
-
 		assertThat(
 			Stream.of("IPv4addresses", "IPv6addresses", "otherAddresses")
 				.map(fieldName -> networkInformation.get(fieldName))
