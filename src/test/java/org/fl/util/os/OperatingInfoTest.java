@@ -26,6 +26,9 @@ package org.fl.util.os;
 
 import static org.assertj.core.api.Assertions.*;
 
+import java.nio.charset.Charset;
+import java.util.stream.Stream;
+
 import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -33,7 +36,14 @@ import com.fasterxml.jackson.databind.JsonNode;
 class OperatingInfoTest {
 
 	@Test
-	void testOperatingInfo() {
+	void testOperatingInfoWithLookup() {
+		
+		JsonNode operatingInfo = OperatingInfo.getInfo(true);
+		assertOperatingInfo(operatingInfo, true);
+	}
+	
+	@Test
+	void testOperatingInfoWithoutLookup() {
 		
 		JsonNode operatingInfo = OperatingInfo.getInfo(false);
 		assertOperatingInfo(operatingInfo, false);
@@ -49,5 +59,36 @@ class OperatingInfoTest {
 		assertThat(operatingInfo.has("availableCharset")).isTrue();
 		assertThat(operatingInfo.has("systemProperties")).isTrue();
 		assertThat(operatingInfo.has("fileSystemsInformation")).isTrue();
+		assertThat(operatingInfo.size()).isEqualTo(8);
+		
+		assertThat(operatingInfo.get("defaultCharset").asText()).isEqualTo(Charset.defaultCharset().name());
+		
+		JsonNode systemProperties = operatingInfo.get("systemProperties");
+		assertThat(systemProperties.has("java.specification.version")).isTrue();
+		assertThat(systemProperties.has("java.class.path")).isTrue();
+		assertThat(systemProperties.has("user.dir")).isTrue();
+		assertThat(systemProperties.has("file.separator")).isTrue();
+		
+		JsonNode networkInformation = operatingInfo.get("networkInformation");
+		assertThat(networkInformation.has("machineName")).isTrue();
+		assertThat(networkInformation.has("IPv4addresses")).isTrue();
+		assertThat(networkInformation.has("IPv6addresses")).isTrue();
+		assertThat(networkInformation.has("otherAddresses")).isTrue();
+		assertThat(networkInformation.has("networkInterfaces")).isTrue();
+		assertThat(networkInformation.size()).isEqualTo(5);
+
+		assertThat(
+			Stream.of("IPv4addresses", "IPv6addresses", "otherAddresses")
+				.map(fieldName -> networkInformation.get(fieldName))
+				.filter(ipAddresses -> {
+					assertThat(ipAddresses.isArray()).isTrue();
+					return (ipAddresses.size() > 0);
+				})
+				.map(ipAddresses -> ipAddresses.get(0))
+				.map(ipAddress -> ipAddress.has("IPaddress") && (ipAddress.has("hostname") == withLookup))
+				.reduce(Boolean::logicalAnd).orElse(false))
+			.isTrue();
+
 	}
+
 }
