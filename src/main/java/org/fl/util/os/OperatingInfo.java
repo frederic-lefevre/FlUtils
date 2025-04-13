@@ -112,10 +112,10 @@ public class OperatingInfo {
 		return res;
 	}
 	
-	private static ObjectNode getAvailableCharSets() {
+	private static ArrayNode getAvailableCharSets() {
 		
-		ObjectNode charSetJson = JsonNodeFactory.instance.objectNode();
-		Charset.availableCharsets().entrySet().forEach(entry -> charSetJson.put(entry.getKey(), entry.getValue().name()));
+		ArrayNode charSetJson = JsonNodeFactory.instance.arrayNode();
+		Charset.availableCharsets().keySet().forEach(key -> charSetJson.add(key));
 		return charSetJson;
 	}
 }
