@@ -142,8 +142,8 @@ public class FilterCounter implements Filter {
 			filterCounter = new FilterCounter();
 			filterCounter.addLogRecordCounters(name);
 			logger.setFilter(filterCounter);
-		} else if (filter instanceof FilterCounter){
-			filterCounter = (FilterCounter)filter;
+		} else if (filter instanceof FilterCounter fc){
+			filterCounter = fc;
 			filterCounter.addLogRecordCounters(name);
 		}
 		return filterCounter;
