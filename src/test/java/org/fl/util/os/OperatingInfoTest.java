@@ -48,6 +48,6 @@ class OperatingInfoTest {
 		assertThat(operatingInfo.has("newLine")).isTrue();
 		assertThat(operatingInfo.has("availableCharset")).isTrue();
 		assertThat(operatingInfo.has("systemProperties")).isTrue();
-//		assertThat(operatingInfo.has("fileSystemsInformation")).isTrue();
+		assertThat(operatingInfo.has("fileSystemsInformation")).isTrue();
 	}
 }

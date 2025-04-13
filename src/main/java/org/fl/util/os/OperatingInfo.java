@@ -28,8 +28,11 @@ import java.nio.charset.Charset;
 import java.util.Map;
 import java.util.Properties;
 import java.util.function.IntFunction;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+
+import org.fl.util.file.FilesUtils;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -37,6 +40,8 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class OperatingInfo {
+	
+	private static final Logger logger = Logger.getLogger(OperatingInfo.class.getName());
 	
 	private OperatingInfo() {
 	}
@@ -51,7 +56,9 @@ public class OperatingInfo {
 					"systemEnvironment", getSystemEnv(),
 					"newLine", getNewLineInformation(),
 					"availableCharset", getAvailableCharSets(),
-					"networkInformation", NetworkUtils.getNetworkInformation(withIpLookup)));
+					"networkInformation", NetworkUtils.getNetworkInformation(withIpLookup),
+					"fileSystemsInformation", FilesUtils.getFileSystemsInformation(logger)
+					));
 	}
 
 	private static ArrayNode getRuntimeInformation() {

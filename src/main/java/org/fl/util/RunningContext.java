@@ -43,7 +43,6 @@ import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.fl.util.file.FilesUtils;
 import org.fl.util.json.JsonUtils;
 import org.fl.util.os.OperatingInfo;
 
@@ -325,7 +324,6 @@ public class RunningContext {
 		applicationInfo.put("initialisationDate", initDate);
 		applicationInfo.set("applicationProperties", getPropertiesAsJson());
 		applicationInfo.set("operatingContext", operatingContext);
-		applicationInfo.set("fileSystemsInformation", FilesUtils.getFileSystemsInformation(applicationRootLog));
 
 		return applicationInfo;
 	}
