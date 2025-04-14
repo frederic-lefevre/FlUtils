@@ -73,6 +73,14 @@ class OperatingInfoTest {
 		
 		assertThat(operatingInfo.get("defaultCharset").asText()).isEqualTo(Charset.defaultCharset().name());
 		
+		JsonNode newLine = operatingInfo.get("newLine");
+		assertThat(newLine.isArray()).isTrue();
+		assertThat(newLine.elements()).toIterable().hasSize(2).map(element -> element.asText())
+			.satisfiesExactlyInAnyOrder(
+					stringElement -> assertThat(stringElement).startsWith("Newline unicode code point sequence:"),
+					stringElement -> assertThat(stringElement).startsWith("Newline as default charset byte sequence:"));
+		
+		
 		JsonNode systemEnvironment = operatingInfo.get("systemEnvironment");
 		assertThat(systemEnvironment.isObject()).isTrue();
 		assertThat(systemEnvironment.isArray()).isFalse();
