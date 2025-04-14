@@ -104,7 +104,7 @@ public class NetworkUtils {
 						));
 	}
 	
-	public List<String> getIPv4List() {
+	public static List<String> getIPv4List() {
 		getNetworkInformation(false);
 		return IPv4List ;
 	}
