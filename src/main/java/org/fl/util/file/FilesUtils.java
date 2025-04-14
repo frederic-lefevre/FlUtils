@@ -229,7 +229,7 @@ public class FilesUtils {
 	};
 	
 	// Get informations about the filestore and return them in a JsonNode
-	public static JsonNode getFileStoreInformation(FileStore fileStore, Logger logger) {
+	private static JsonNode getFileStoreInformation(FileStore fileStore, Logger logger) {
 
 		ObjectNode fsInfos = JsonNodeFactory.instance.objectNode();
 		fsInfos.put("name", fileStore.name());
