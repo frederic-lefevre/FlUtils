@@ -108,8 +108,8 @@ public class LoggerUtils {
 					handlerJson.put(FORMATTER, 	formatterName);
 				}
 				
-				if (handler instanceof BufferLogHandler) {
-					handlerJson.put(MEMORY_BUF_SZ, ((BufferLogHandler) handler).getMaxMemoryLogRecord()) ;
+				if (handler instanceof BufferLogHandler bufferLogHandler) {
+					handlerJson.put(MEMORY_BUF_SZ, bufferLogHandler.getMaxMemoryLogRecord()) ;
 				}
 				handlerJsonArray.add(handlerJson);
 			}

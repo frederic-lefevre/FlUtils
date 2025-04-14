@@ -28,8 +28,6 @@ import static org.assertj.core.api.Assertions.*;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -44,69 +42,10 @@ class PropertiesStorageTest {
 		LogRecordCounter logRecordCounter = 
 				FilterCounter.getLogRecordCounter(Logger.getLogger(PropertiesStorage.class.getName()));
 		
-		PropertiesStorage ps = new PropertiesStorage(null, (URI)null);
-		
-		testPropertiesStorageWithNullParam(ps);
-		
-		assertThat(logRecordCounter.getLogRecordCount()).isEqualTo(2);
-		assertThat(logRecordCounter.getLogRecordCount(Level.WARNING)).isEqualTo(2);
-	}
-	
-	@Test
-	void testPropertiesStorageWithPathNullParam() throws Exception {
-		
-		LogRecordCounter logRecordCounter = 
-				FilterCounter.getLogRecordCounter(Logger.getLogger(PropertiesStorage.class.getName()));
-		
-		PropertiesStorage ps = new PropertiesStorage(null, (Path)null);
-		
-		testPropertiesStorageWithNullParam(ps);
-		
-		assertThat(logRecordCounter.getLogRecordCount()).isEqualTo(2);
-		assertThat(logRecordCounter.getLogRecordCount(Level.WARNING)).isEqualTo(2);
-	}
-	
-	@Test
-	void testPropertiesStorageWithInvalidSystemProperty() throws Exception {
-		
-		LogRecordCounter logRecordCounter = 
-				FilterCounter.getLogRecordCounter(Logger.getLogger(PropertiesStorage.class.getName()));
-		
-		assertThatExceptionOfType(URISyntaxException.class)
-			.isThrownBy(() ->
-				 new PropertiesStorage( "os.name", (URI)null));
+		assertThatNullPointerException().isThrownBy(() -> new PropertiesStorage(null));
 		
 		assertThat(logRecordCounter.getLogRecordCount()).isEqualTo(1);
 		assertThat(logRecordCounter.getLogRecordCount(Level.SEVERE)).isEqualTo(1);
-		
-	}
-	
-	@Test
-	void testPropertiesStorageWithUnexistantSystemProp() throws Exception {
-		
-		LogRecordCounter logRecordCounter = 
-				FilterCounter.getLogRecordCounter(Logger.getLogger(PropertiesStorage.class.getName()));
-		
-		PropertiesStorage ps = new PropertiesStorage("systemPropThatdoesNotExists", (Path)null);
-		
-		testPropertiesStorageWithNullParam(ps);
-		
-		assertThat(logRecordCounter.getLogRecordCount()).isEqualTo(2);
-		assertThat(logRecordCounter.getLogRecordCount(Level.WARNING)).isEqualTo(2);
-	}
-	
-	@Test
-	void testPropertiesStorageWithUnexistantPath() throws Exception {
-		
-		LogRecordCounter logRecordCounter = 
-				FilterCounter.getLogRecordCounter(Logger.getLogger(PropertiesStorage.class.getName()));
-		
-		PropertiesStorage ps = new PropertiesStorage(null, Paths.get("doesNotExists.properties"));
-		
-		testPropertiesStorageWithNullParam(ps);
-		
-		assertThat(logRecordCounter.getLogRecordCount()).isEqualTo(2);
-		assertThat(logRecordCounter.getLogRecordCount(Level.WARNING)).isEqualTo(2);
 	}
 	
 	@Test
@@ -115,7 +54,7 @@ class PropertiesStorageTest {
 		LogRecordCounter logRecordCounter = 
 				FilterCounter.getLogRecordCounter(Logger.getLogger(PropertiesStorage.class.getName()));
 		
-		PropertiesStorage ps = new PropertiesStorage(null, new URI("file:///C:/tmp/doesNotExists.properties"));
+		PropertiesStorage ps = new PropertiesStorage(new URI("file:///C:/tmp/doesNotExists.properties"));
 		
 		testPropertiesStorageWithNullParam(ps);
 		
@@ -128,13 +67,13 @@ class PropertiesStorageTest {
 		
 		URI propertyUri = new URI("file:///C:/FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test1.properties");
 		
-		PropertiesStorage ps = new PropertiesStorage(null, propertyUri);
+		PropertiesStorage ps = new PropertiesStorage(propertyUri);
 		
 		assertThat(ps).isNotNull();	
 		assertThat(ps.getPropertyLocation()).isNotNull();
 		assertThat(ps.getPropertyLocation().toString()).isEqualTo(propertyUri.toURL().toString());
 		
-		AdvancedProperties props = ps.getAdvanced(null);;
+		AdvancedProperties props = ps.getAdvancedProperties();
 		assertThat(props).isNotNull();
 		
 		assertThat(props.get("doesNotExist")).isNull();
@@ -142,18 +81,17 @@ class PropertiesStorageTest {
 	}
 	
 	@Test
-	void testPropertiesStorageWithPath() throws URISyntaxException, Exception {
+	void testPropertiesStorageWithRelativeUri() throws URISyntaxException, Exception {
 		
-		String pathString = "C:/FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test1.properties";
-		Path propertyPath = Paths.get(pathString);
+		URI propertyUri = new URI("test1.properties");
 		
-		PropertiesStorage ps = new PropertiesStorage(null, propertyPath);
+		PropertiesStorage ps = new PropertiesStorage(propertyUri);
 		
 		assertThat(ps).isNotNull();	
 		assertThat(ps.getPropertyLocation()).isNotNull();
-		assertThat(ps.getPropertyLocation().toString()).isEqualTo("file:/" + pathString);
+		assertThat(ps.getPropertyLocation().toString()).endsWith(propertyUri.toString());
 		
-		AdvancedProperties props = ps.getAdvanced(null);
+		AdvancedProperties props = ps.getAdvancedProperties();
 		assertThat(props).isNotNull();
 		
 		assertThat(props.get("doesNotExist")).isNull();
@@ -165,7 +103,7 @@ class PropertiesStorageTest {
 		assertThat(ps).isNotNull();	
 		assertThat(ps.getPropertyLocation()).isNull();
 		
-		AdvancedProperties props = ps.getAdvanced(null);
+		AdvancedProperties props = ps.getAdvancedProperties();
 		assertThat(props).isNotNull().isEmpty();
 	}
 	

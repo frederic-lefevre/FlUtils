@@ -32,20 +32,32 @@ import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class NetworkUtils {
 	
-	private ArrayNode IPv4 = JsonNodeFactory.instance.arrayNode();
-	private ArrayNode IPv6 = JsonNodeFactory.instance.arrayNode();
-	private ArrayNode otherAddresses = JsonNodeFactory.instance.arrayNode();
-	private ArrayNode networkInterfaces = JsonNodeFactory.instance.arrayNode();
-	private List<String> IPv4List = new ArrayList<String>();
+	private static final Logger logger = Logger.getLogger(NetworkUtils.class.getName());
 	
-	public NetworkUtils(boolean withLookup) {
+	private NetworkUtils() {
+	}
+	
+	private static List<String> IPv4List;
+	
+	public static JsonNode getNetworkInformation(boolean withLookup) {
+		
+		ArrayNode IPv4 = JsonNodeFactory.instance.arrayNode();
+		ArrayNode IPv6 = JsonNodeFactory.instance.arrayNode();
+		ArrayNode otherAddresses = JsonNodeFactory.instance.arrayNode();
+		ArrayNode networkInterfaces = JsonNodeFactory.instance.arrayNode();
+		IPv4List = new ArrayList<String>();
 		
 		Enumeration<NetworkInterface> interfaces;
 		try {
@@ -61,11 +73,7 @@ public class NetworkUtils {
 						InetAddress current_addr = addresses.nextElement();
 						if (!current_addr.isLoopbackAddress()) {
 							if (withLookup) {
-								String hostName = current_addr.getHostName() ;
-								if (hostName == null) {
-									hostName = "" ;
-								}
-								currAddrHost.put("Hostname", hostName);
+								currAddrHost.put("hostname", Optional.ofNullable(current_addr.getHostName()).orElse(""));
 							}
 							
 							String addr = current_addr.getHostAddress() ;							
@@ -81,34 +89,27 @@ public class NetworkUtils {
 						}
 					}
 				}
-			}
-		} catch (SocketException e) {
-			
-			e.printStackTrace();
+			}	
+		} catch (SocketException e) {			
+			logger.log(Level.SEVERE, "Socket Exception while getting network interface information", e);
 		}
-	}
-
-	public ArrayNode getIPv6() {
-		return IPv6;
-	}
-
-	public ArrayNode getNetworkInterfaces() {
-		return networkInterfaces;
-	}
-
-	public ArrayNode getIPv4() {
-		return IPv4;
+		
+		return JsonNodeFactory.instance.objectNode()
+				.put("machineName", getMachineName())
+				.setAll(Map.of(
+						"networkInterfaces", networkInterfaces,
+						"IPv4addresses", IPv4,
+						"IPv6addresses", IPv6,
+						"otherAddresses", otherAddresses
+						));
 	}
 	
-	public ArrayNode getOtherAddresses() {
-		return otherAddresses;
-	}
-
-	public List<String> getIPv4List() {
+	public static List<String> getIPv4List() {
+		getNetworkInformation(false);
 		return IPv4List ;
 	}
 	
-	public String getMachineName() {
+	public static String getMachineName() {
 		String mn1 = System.getenv("COMPUTERNAME") ;
 		if ((mn1 != null) && (! mn1.isEmpty())) {
 			return mn1 ;

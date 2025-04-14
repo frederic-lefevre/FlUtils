@@ -359,8 +359,8 @@ public class LoggerManager {
 		Handler[] handlers = applicationRootLogger.getHandlers();
 		if (handlers != null) {
 			for (Handler handler : handlers) {
-				if (handler instanceof BufferLogHandler) {
-					result.add((BufferLogHandler) handler);
+				if (handler instanceof BufferLogHandler bufferLogHandler) {
+					result.add(bufferLogHandler);
 				}
 			}
 			if (!result.isEmpty()) {

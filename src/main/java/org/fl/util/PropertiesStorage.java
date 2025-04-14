@@ -31,6 +31,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -53,6 +54,8 @@ public class PropertiesStorage {
 
 	private static final Logger psLogger = Logger.getLogger(PropertiesStorage.class.getName());
 	
+	private static final String USER_DIR_PRPERTY = "user.dir";
+	
     // URL of storage
     private URL propUrl;
     
@@ -63,171 +66,89 @@ public class PropertiesStorage {
      * Create a properties storage
      * 
  	 * @param systemProperty System property name containing the property file url
-	 * @param defaultPropertyUrlName Default property file url, if the system property containing the property file uri is null
+	 * @param propertyUri Property file url
 	 *         The property file may denominated by :
-     *  		- a relative path ( for instance "mydir/myProps.properties"). 
-     *    		  In this case, the file is searched in the user.dir (system property)
-     *  		- a well formed URI (for instance "http://my.server.org/myProps.properties" or "file:///my/dir/myProps.properties")
+     *  		- a relative URI ( for instance "mydir/myProps.properties"). 
+     *    		  In this case, the file is searched in the user.dir (system property) or with classloader getResource
+     *  		- a absolute URI (for instance "http://my.server.org/myProps.properties" or "file:///my/dir/myProps.properties")
      * @throws Exception if the URI or file cannot be opened
      */
-	public PropertiesStorage(String systemProperty, URI defaultPropertyUri) throws Exception {
-		initPropertiesStorage(systemProperty, defaultPropertyUri) ;
-	}
-    
-	public PropertiesStorage(String systemProperty, Path defaultPropertyPath) throws Exception {
-		initPropertiesStorage(systemProperty, defaultPropertyPath) ;
-	}
-	
-    /**
-     * Create a properties storage
-     * 
-		 * @param propertyUrlName Property file url
-	 *         The property file may denominated by :
-     *  		- a relative path ( for instance "mydir/myProps.properties"). 
-     *    		  In this case, the file is searched in the user.dir (system property)
-     *  		- a well formed URI (for instance "http://my.server.org/myProps.properties" or "file:///my/dir/myProps.properties")
-     * @throws Exception if the URI or file cannot be opened
-     */
-   public PropertiesStorage(URI propertyUri) throws Exception {
-	   initPropertiesStorage(null, propertyUri) ;		
-	}
-   
-   public PropertiesStorage(Path propertyPath) throws Exception {
-	   initPropertiesStorage(null, propertyPath) ;		
-	}
-   
-   private void initPropertiesStorage(String systemProperty, URI defaultPropertyUri) throws Exception {
+	public PropertiesStorage(URI propertyUri) throws Exception {
 	   
 		propUrl = null;
 		try {
-			// Get the URI of the properties
-			URI propUri;
-			if (systemProperty != null) {
-				String propUrlName = System.getProperty(systemProperty);
-				if (propUrlName == null) {
-					// if the url name is not found in the system property, take the default
-					propUri = defaultPropertyUri;
-					psLogger.info(() -> "System property " + systemProperty + " not found. Default config will be used instead: " + defaultPropertyUri);
-				} else {
-					propUri = new URI(propUrlName);
+			// Get the URI of the properties			
+
+			if (propertyUri.isAbsolute()) {
+				propUrl = propertyUri.toURL();
+			} else {
+
+				String propPath = propertyUri.toString();
+				propUrl = getUrlFromSystemProperty(USER_DIR_PRPERTY, propPath);
+
+				if (propUrl == null) {
+					// Still not found. Maybe inside the jar. Try class loader
+					propUrl = PropertiesStorage.class.getClassLoader().getResource(propPath);
 				}
-			} else {
-				// systemProperty is null, take defaultPropertyUrl
-				propUri = defaultPropertyUri;
-			}
-			
-			if (propUri != null) {	
-				propUrl = propUri.toURL();	
-			} else {
-				psLogger.warning(buildPropErrorMsg("properties url is null", systemProperty, defaultPropertyUri));
 			}
 			
 		} catch (Exception e) {
 			// Trace file load error
-			psLogger.log(Level.SEVERE, buildPropErrorMsg("Exception openning properties url", systemProperty, defaultPropertyUri), e);
+			psLogger.log(Level.SEVERE, buildPropErrorMsg("Exception openning properties url", propertyUri), e);
 			throw e;
 		}
 		
 		// Finally get the advanced properties
-		advancedProperties = getAdvanced(psLogger);
-   }
-   
-   private void initPropertiesStorage(String systemProperty, Path defaultPropertyPath) throws Exception {
-	   
-		propUrl = null;
-		try {
-			// Get the path of the properties
-			Path propPath ;
-			if (systemProperty != null) {
-				String propPathName = System.getProperty(systemProperty) ;
-				if (propPathName == null) {
-					// if the path is not found in the system property, take the default
-					propPath = defaultPropertyPath ;
-					psLogger.fine(() -> "System property " + systemProperty + " not found. Default config will be used instead: " + defaultPropertyPath) ;
-				} else {
-					propPath = Paths.get(propPathName) ;
-				}
-			} else {
-				// systemProperty is null, take defaultPropertyPath
-				propPath = defaultPropertyPath;
+		// load property from the property file		
+		advancedProperties = new AdvancedProperties(psLogger);
+
+		if (propUrl != null) {
+			try (InputStreamReader reader = new InputStreamReader(propUrl.openStream(), StandardCharsets.UTF_8)) {
+				advancedProperties.load(reader);
+			} catch (Exception e) {
+				psLogger.log(Level.SEVERE, "Property file loading error for " + propUrl, e);
+				// Invalid url
+				propUrl = null;
 			}
-			
-			if (propPath != null) {
-	
-				if (! propPath.isAbsolute()) {
-					// It is a relative path
-					// Assume it is relative to user.dir system property
-					
-					String userDir = System.getProperty("user.dir");
-					if (userDir != null) {
-						Path fullPath = Paths.get(userDir, propPath.toString());
-						if (Files.exists(fullPath)) {
-							propUrl = fullPath.toUri().toURL();
-						} 
-					}
-					if (propUrl == null) {
-						// Still not found. Maybe inside the jar. Try class loader
-						propUrl = PropertiesStorage.class.getClassLoader().getResource(propPath.toString());
-					}
-				} else {
-					// path is absolute
-					if (Files.exists(propPath)) {
-						propUrl = propPath.toUri().toURL();
-					}
-				}
-			}
-			
-			if (propUrl == null) {
-				psLogger.warning(buildPropErrorMsg("properties have not been found", systemProperty, defaultPropertyPath));
-			}
-			
-		} catch (Exception e) {
-			// Trace file load error
-			psLogger.log(Level.SEVERE, buildPropErrorMsg("Exception openning properties url", systemProperty, defaultPropertyPath));
-			throw e;
+		} else {
+			psLogger.warning("GetAdvanced properties while properties url is null");
 		}
-		
-		// Finally get the advanced properties
-		advancedProperties = getAdvanced(psLogger);
    }
    
-	private String buildPropErrorMsg(String msg, String systemProperty, Object defaultProperty) {
+   private URL getUrlFromSystemProperty(String systemProperty, String relativePath) {
+		String directory = System.getProperty(systemProperty);
+		if (directory != null) {
+			Path propPath = Paths.get(directory);
+			
+			if (Files.exists(propPath)) {
+				Path fullPath;
+				if (Files.isDirectory(propPath)) {
+					fullPath =  propPath.resolve(relativePath);
+				} else {
+					fullPath = propPath.getParent().resolve(relativePath);
+				}
+				if (Files.exists(fullPath)) {
+					try {
+						return fullPath.toUri().toURL();
+					} catch (MalformedURLException e) {
+						psLogger.log(Level.SEVERE, "MalformedURLException with systemProperty " + systemProperty + " and relative path " +  Objects.toString(relativePath), e);
+					}
+				} 
+			}
+		}
+		return null;
+   }
+   
+	private String buildPropErrorMsg(String msg, URI propertyUti) {
 
 		StringBuilder errorMsg = new StringBuilder();
 		errorMsg.append(msg).append("\n");
-		errorMsg.append("System property: ").append(systemProperty).append("\n");
-		errorMsg.append("defaultProperty: ").append(Objects.toString(defaultProperty)).append("\n");
-		errorMsg.append("user.dir: ").append(System.getProperty("user.dir")).append("\n");
+		errorMsg.append("property uri: ").append(Objects.toString(propertyUti)).append("\n");
+		errorMsg.append(USER_DIR_PRPERTY).append(": ").append(System.getProperty(USER_DIR_PRPERTY)).append("\n");
 		return errorMsg.toString();
 	}
 	
-	public AdvancedProperties getAdvanced(Logger log) {
-		
-		if (advancedProperties == null) {
-			
-			Logger localLog;
-			if (log == null) {
-				localLog = psLogger;
-				psLogger.severe("Null logger. It will be replaced by a default logger");
-			} else {
-				localLog = log;
-			}
-
-			// load property from the property file		
-			advancedProperties = new AdvancedProperties(localLog);
-
-			if (propUrl != null) {
-				try (InputStreamReader reader = new InputStreamReader(propUrl.openStream(), StandardCharsets.UTF_8)) {
-					advancedProperties.load(reader);
-				} catch (Exception e) {
-					localLog.log(Level.SEVERE, "Property file loading error for " + propUrl, e);
-					// Invalid url
-					propUrl = null;
-				}
-			} else {
-				localLog.warning("Properties url is null");
-			}
-		}
+	public AdvancedProperties getAdvancedProperties() {
 		return advancedProperties;
 	}
 	

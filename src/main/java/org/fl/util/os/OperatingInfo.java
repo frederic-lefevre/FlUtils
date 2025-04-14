@@ -27,6 +27,12 @@ package org.fl.util.os;
 import java.nio.charset.Charset;
 import java.util.Map;
 import java.util.Properties;
+import java.util.function.IntFunction;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
+import org.fl.util.file.FilesUtils;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -35,94 +41,81 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class OperatingInfo {
 	
-	public OperatingInfo() {
-		
+	private static final Logger logger = Logger.getLogger(OperatingInfo.class.getName());
+	
+	private OperatingInfo() {
 	}
 
-	public JsonNode getInfo(boolean withIpLookup) {
+	public static JsonNode getInfo(boolean withIpLookup) {
 
-		StringBuilder info = new StringBuilder();
-		Map<String, String> sysEnv = System.getenv();
-		Properties sysProp = System.getProperties();
+		return JsonNodeFactory.instance.objectNode()
+				.put("defaultCharset", Charset.defaultCharset().name())
+				.setAll(Map.of(
+					"runtimeInformation", getRuntimeInformation(),
+					"systemProperties", getSystemProperties(),
+					"systemEnvironment", getSystemEnv(),
+					"newLine", getNewLineInformation(),
+					"availableCharset", getAvailableCharSets(),
+					"networkInformation", NetworkUtils.getNetworkInformation(withIpLookup),
+					"fileSystemsInformation", FilesUtils.getFileSystemsInformation(logger)
+					));
+	}
+
+	private static ArrayNode getRuntimeInformation() {
+		
+		Runtime rt = Runtime.getRuntime();
+		
+		return JsonNodeFactory.instance.arrayNode()
+			.add("Free Memory usable for objects=" + rt.freeMemory() + " bytes")
+			.add("Maximum Memory available for the JVM=" + rt.maxMemory() + " bytes")
+			.add("Total Memory usable for objects=" + rt.totalMemory() + " bytes")
+			.add("Number of processors=" + rt.availableProcessors())
+			.add("Runtime version=" + Runtime.version());
+	}
+	
+	private static final String HEX_PREFIX = "Ox";
+	private static IntFunction<String> intToHexaString = i -> HEX_PREFIX.concat(Integer.toHexString(i).toUpperCase());
+	
+	private static ArrayNode getNewLineInformation() {
+		
 		String newLine = System.getProperty("line.separator");
 		byte[] newLineBytes = newLine.getBytes();
-		StringBuilder newLineCodePoint = new StringBuilder();
-		for (int i = 0; i < newLine.length(); i++) {
-			newLineCodePoint.append(Integer.toHexString(newLine.codePointAt(i)).toUpperCase()).append(" ");
-		}
-		StringBuilder newLineBytesString = new StringBuilder();
-		for (byte b : newLineBytes) {
-			newLineBytesString.append(b).append(" ");
-		}
 
-		Runtime rt = Runtime.getRuntime();
-
-		long freeMem = rt.freeMemory();
-		long maxMem = rt.maxMemory();
-		long totalMem = rt.totalMemory();
-		int nbAvailProc = rt.availableProcessors();
-
-		ObjectNode opInfoJson = JsonNodeFactory.instance.objectNode();
-
-		ArrayNode rtInfos = JsonNodeFactory.instance.arrayNode();
-		info.append("Free Memory usable for objects=").append(freeMem).append(" bytes");
-		rtInfos.add(info.toString());
-		info.setLength(0);
-		info.append("Maximum Memory available for the JVM=").append(maxMem).append(" bytes");
-		rtInfos.add(info.toString());
-		info.setLength(0);
-		info.append("Total Memory usable for objects=").append(totalMem).append(" bytes");
-		rtInfos.add(info.toString());
-		info.setLength(0);
-		info.append("Number of processors=").append(nbAvailProc);
-		rtInfos.add(info.toString());
-		info.setLength(0);
-		opInfoJson.set("runtimeInformation", rtInfos);
-
-		opInfoJson.set("systemProperties", printProp(sysProp));
-		opInfoJson.set("systemEnvironment", printSysenv(sysEnv));
-
-		ArrayNode nlInfos = JsonNodeFactory.instance.arrayNode();
-		info.append("Newline unicode code point sequence:").append(newLineCodePoint);
-		nlInfos.add(info.toString());
-		info.setLength(0);
-		info.append("Newline as byte sequence:").append(newLineBytesString);
-		nlInfos.add(info.toString());
-		info.setLength(0);
-		opInfoJson.set("newLine", nlInfos);
-
-		opInfoJson.put("defaultCharset", Charset.defaultCharset().name());
-		opInfoJson.set("availableCharset", printCharSet());
-
-		NetworkUtils nu = new NetworkUtils(withIpLookup);
-		opInfoJson.set("networkInterfaces", nu.getNetworkInterfaces());
-		opInfoJson.set("IPv4addresses", nu.getIPv4());
-		opInfoJson.set("IPv6addresses", nu.getIPv6());
-		opInfoJson.set("Otheraddresses", nu.getOtherAddresses());
-
-		opInfoJson.put("machineName", nu.getMachineName());
-
-		return opInfoJson;
+		return JsonNodeFactory.instance.arrayNode()
+			.add("Newline unicode code point sequence:"
+				.concat(
+					newLine
+						.codePoints()
+						.mapToObj(intToHexaString)
+						.collect(Collectors.joining(", "))))
+			.add("Newline as default charset byte sequence:"
+				.concat(
+					IntStream.range(0, newLineBytes.length)
+						.map(i -> newLineBytes[i])
+						.mapToObj(intToHexaString)
+						.collect(Collectors.joining(" "))));
 	}
+	
+	private static ObjectNode getSystemProperties() {
 
-	private ObjectNode printProp(Properties prop) {
-
+		Properties systemProperties = System.getProperties();
 		ObjectNode res = JsonNodeFactory.instance.objectNode();
-		prop.stringPropertyNames().forEach(key -> res.put(key, prop.getProperty(key)));
+		systemProperties.stringPropertyNames().forEach(key -> res.put(key, systemProperties.getProperty(key)));
 		return res;
 	}
 	
-	private ObjectNode printSysenv(Map <String,String> sysenv) {
+	private static ObjectNode getSystemEnv() {
 	
+		Map<String, String> sysEnv = System.getenv();
 		ObjectNode res = JsonNodeFactory.instance.objectNode();
-		sysenv.keySet().forEach(key -> res.put(key, sysenv.get(key)));
+		sysEnv.keySet().forEach(key -> res.put(key, sysEnv.get(key)));
 		return res;
 	}
 	
-	private ObjectNode printCharSet() {
+	private static ArrayNode getAvailableCharSets() {
 		
-		ObjectNode charSetJson = JsonNodeFactory.instance.objectNode();
-		Charset.availableCharsets().entrySet().forEach(entry -> charSetJson.put(entry.getKey(), entry.getValue().name()));
+		ArrayNode charSetJson = JsonNodeFactory.instance.arrayNode();
+		Charset.availableCharsets().keySet().forEach(key -> charSetJson.add(key));
 		return charSetJson;
 	}
 }
