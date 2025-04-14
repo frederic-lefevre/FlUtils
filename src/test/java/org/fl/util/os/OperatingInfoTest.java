@@ -74,11 +74,15 @@ class OperatingInfoTest {
 		assertThat(operatingInfo.get("defaultCharset").asText()).isEqualTo(Charset.defaultCharset().name());
 		
 		JsonNode fileSystemsInformation = operatingInfo.get("fileSystemsInformation");
-		assertThat(fileSystemsInformation.isObject()).isTrue();
-		assertThat(fileSystemsInformation.isArray()).isFalse();
-		assertThat(fileSystemsInformation.size()).isEqualTo(2);
-		assertThat(fileSystemsInformation.has("fileSystemProviderSchemes")).isTrue();
-		assertThat(fileSystemsInformation.has("defaultFileSystemInfos")).isTrue();
+		assertThat(fileSystemsInformation.isArray()).isTrue();
+		assertThat(fileSystemsInformation.elements()).toIterable()
+			.allMatch(element -> element.has("fileSystemProviderScheme") && element.has("fileSystemProviderClass"))
+			.anySatisfy(element -> {
+				assertThat(element.has("fileSystemProviderScheme")).isTrue();
+				assertThat(element.get("fileSystemProviderScheme").asText()).isEqualTo("file");
+				assertThat(element.has("isDefaultFileSystem")).isTrue();
+				assertThat(element.get("isDefaultFileSystem").asBoolean()).isTrue();
+			});
 		
 		JsonNode runtimeInformation = operatingInfo.get("runtimeInformation");
 		assertThat(runtimeInformation.isArray()).isTrue();

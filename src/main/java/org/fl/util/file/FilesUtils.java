@@ -25,6 +25,7 @@ SOFTWARE.
 package org.fl.util.file;
 
 import java.io.IOException;
+import java.net.URI;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.file.AccessDeniedException;
@@ -58,11 +59,12 @@ import java.nio.file.spi.FileSystemProvider;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
+import java.util.stream.Stream;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -211,91 +213,124 @@ public class FilesUtils {
 			return success ;
 		}
 	}
-	
-	
-	// Get informations about the filestore of a given path and return them in a
-	// JsonObject
-	public static JsonNode getFileStoreInformation(Path path, Logger logger) {
 
-		try {
-			return getFileStoreInformation(Files.getFileStore(path), logger);
-		} catch (Exception e) {
-			logger.log(Level.FINE, "Exception when getting FileStore informations for file " + path, e);
-			return JsonNodeFactory.instance.objectNode().put("error", "No fileStore associated to the path " + path);
+	private static enum FileStoreProperties { 
+		TOTAL_SPACE("totalSpace"), 
+		UNALLOCATED_SPACE("unallocatedSpace"),
+		USABLE_SPACE("usableSpace"),
+		BLOCK_SIZE("blockSize");
+		private String name;
+		FileStoreProperties(String name) {
+			this.name = name;
 		}
-	}
-
+		String getName() {
+			return name;
+		}
+	};
+	
 	// Get informations about the filestore and return them in a JsonNode
 	public static JsonNode getFileStoreInformation(FileStore fileStore, Logger logger) {
 
 		ObjectNode fsInfos = JsonNodeFactory.instance.objectNode();
-
 		fsInfos.put("name", fileStore.name());
 		fsInfos.put("type", fileStore.type());
 		fsInfos.put("isReadOnly", fileStore.isReadOnly());
-		try {
-			fsInfos.put("totalSpace", fileStore.getTotalSpace());
-			fsInfos.put("unallocatedSpace", fileStore.getUnallocatedSpace());
-			fsInfos.put("usablSpace", fileStore.getUsableSpace());
 
-		} catch (Exception e) {
-			fsInfos.put("error", "Unaccessible filestore");
-			logger.log(Level.FINE, "Exception when getting FileStore informations", e);
-		}
+		Stream.of(FileStoreProperties.values()).forEach((fileStoreProperty) -> {
+			try {
+				fsInfos.put(fileStoreProperty.getName(), 
+						switch (fileStoreProperty) {
+							case TOTAL_SPACE -> fileStore.getTotalSpace();
+							case UNALLOCATED_SPACE -> fileStore.getUnallocatedSpace();
+							case USABLE_SPACE -> fileStore.getUsableSpace();
+							case BLOCK_SIZE -> fileStore.getBlockSize();
+						});
+			} catch (java.lang.UnsupportedOperationException e) {
+				logger.log(Level.FINE, "UnsupportedOperationException when getting FileStore " + fileStoreProperty, e);
+			} catch (Exception e) {
+				fsInfos.put("errorFor" + fileStoreProperty, "Exception accessing filestore " + fileStoreProperty);
+				logger.log(Level.WARNING, "Exception when getting FileStore " + fileStoreProperty, e);
+			}
+		});
 		return fsInfos;
 	}
 	
 	// Get informations about the FilesSystems and FileSystemProviders and return them in a JsonObject
 	public static JsonNode getFileSystemsInformation(Logger logger) {
 		
-		ObjectNode fssInfos = JsonNodeFactory.instance.objectNode();
-		
 		// FileSystemProviders infos
+		List<FileSystemProvider> installedProviders = FileSystemProvider.installedProviders();
+		
+		FileSystem defaultFileSystem = FileSystems.getDefault() ;
+		
 		ArrayNode fpInfosArray = JsonNodeFactory.instance.arrayNode();
-		FileSystemProvider.installedProviders().forEach(fsProvider -> fpInfosArray.add(fsProvider.getScheme()));
+		installedProviders.forEach(fsProvider -> fpInfosArray.add(getFileSystemProviderInformation(fsProvider, defaultFileSystem, logger)));
 		
-		fssInfos.set("fileSystemProviderSchemes", fpInfosArray);
-		
-		// default file system infos
-		FileSystem fs = FileSystems.getDefault() ;
-		
-		ObjectNode defaultFsInfos = JsonNodeFactory.instance.objectNode();
-		defaultFsInfos.put("defaultSeparator", fs.getSeparator()) ;	
-		FileSystemProvider defaultProvider = fs.provider() ;
-		String defaultScheme ;
-		if (defaultProvider == null) {
-			defaultScheme = "no provider found for default file system" ;
-		} else {
-			defaultScheme = defaultProvider.getScheme() ;
-		}
-		defaultFsInfos.put("providerScheme", defaultScheme) ;
+		return fpInfosArray ;
+	}
+	
+	private static JsonNode getFileSystemProviderInformation(FileSystemProvider fileSystemProvider, FileSystem defaultFileSystem, Logger logger) {
 
-		ArrayNode attViewsArray = JsonNodeFactory.instance.arrayNode();
-		Set<String> attViews = fs.supportedFileAttributeViews() ;
-		for (String attView : attViews) {
-			attViewsArray.add(attView) ;
+		ObjectNode fileSystemProvidersInfos = JsonNodeFactory.instance.objectNode();
+
+		String scheme = fileSystemProvider.getScheme();
+		fileSystemProvidersInfos.put("fileSystemProviderScheme", scheme);
+		fileSystemProvidersInfos.put("fileSystemProviderClass", fileSystemProvider.getClass().getName());
+
+		if ((scheme != null) && !scheme.isBlank() && !scheme.equals("jar")) {
+
+			try {
+				URI rootUri = URI.create(scheme + ":/");
+				FileSystem filesystem = fileSystemProvider.getFileSystem(rootUri);
+
+				fileSystemProvidersInfos.put("isDefaultFileSystem", filesystem == defaultFileSystem);
+				
+				fileSystemProvidersInfos.put("pathSeparator", filesystem.getSeparator());
+				fileSystemProvidersInfos.put("isOpen", filesystem.isOpen());
+				fileSystemProvidersInfos.put("isReadOnly", filesystem.isReadOnly());
+
+				ArrayNode attViewsArray = JsonNodeFactory.instance.arrayNode();
+				Set<String> attViews = filesystem.supportedFileAttributeViews();
+				for (String attView : attViews) {
+					attViewsArray.add(attView);
+				}
+				fileSystemProvidersInfos.set("supportedFileAttributesViews", attViewsArray);
+
+				ArrayNode rpInfosArray = JsonNodeFactory.instance.arrayNode();
+				Iterable<Path> rootPaths = filesystem.getRootDirectories();
+				List<FileStore> fileStoresFromRootPaths = new ArrayList<>();
+				
+				for (Path rootPath : rootPaths) {
+					ObjectNode fileStoreInfos = JsonNodeFactory.instance.objectNode();
+					fileStoreInfos.put("fileSystemRootPath", rootPath.toString());
+					try {
+						FileStore fileStore = Files.getFileStore(rootPath);
+						fileStoresFromRootPaths.add(fileStore);
+						fileStoreInfos.set("fileStoreInfos", getFileStoreInformation(fileStore, logger));
+					} catch (Exception e) {
+						logger.log(Level.WARNING, "Exception when getting FileStore for path " + rootPath, e);
+						fileStoreInfos.put("error", "Cannot access fileStore associated to the path " + rootPath);
+					}
+					
+					rpInfosArray.add(fileStoreInfos);
+				}
+				fileSystemProvidersInfos.set("fileSystemStoresFromRootDirectories", rpInfosArray);
+
+				ArrayNode fsInfosArray = JsonNodeFactory.instance.arrayNode();
+				Iterable<FileStore> fileStores = filesystem.getFileStores();
+				for (FileStore fileStore : fileStores) {
+					if (! fileStoresFromRootPaths.contains(fileStore)) {
+						fsInfosArray.add(getFileStoreInformation(fileStore, logger));
+					}
+				}
+				fileSystemProvidersInfos.set("OtherFileStores", fsInfosArray);
+				
+			} catch (Exception e) {
+				logger.log(Level.SEVERE, "Exception getting file system with scheme " + scheme, e);
+			}
 		}
-		defaultFsInfos.set("supportedFileAttributesViews", attViewsArray);
-		
-		ArrayNode fsInfosArray = JsonNodeFactory.instance.arrayNode();
-		Iterable<FileStore> fileStores = fs.getFileStores() ;
-		for (FileStore fileStore : fileStores) {
-			fsInfosArray.add(getFileStoreInformation(fileStore, logger));
-		}
-		defaultFsInfos.set("FileStoresInfos", fsInfosArray) ;
-		
-		ArrayNode rpInfosArray = JsonNodeFactory.instance.arrayNode();
-		Iterable<Path> rootPaths = fs.getRootDirectories() ;
-		for (Path rootPath : rootPaths) {
-			ObjectNode fsInfos = JsonNodeFactory.instance.objectNode();
-			fsInfos.put("fileSystemRootPath", rootPath.toString());
-			fsInfos.set("fileStoreInfos", getFileStoreInformation(rootPath, logger)) ;
-			rpInfosArray.add(fsInfos);
-		}
-		defaultFsInfos.set("rootDirectoriesInfos", rpInfosArray) ;
-		
-		fssInfos.set("defaultFileSystemInfos", defaultFsInfos);
-		return fssInfos ;
+
+		return fileSystemProvidersInfos;
 	}
 	
  	public static BasicFileAttributes appendFileInformations(Path path, StringBuilder infos, Logger logger) {
