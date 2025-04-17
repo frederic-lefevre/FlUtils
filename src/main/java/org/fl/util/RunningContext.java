@@ -125,8 +125,19 @@ public class RunningContext {
 			loggingPropertiesAsJson = getLoggingProperties();
 			
 			boolean logOperatingInfos = applicationProperties.getBoolean("runningContext.operatingInfo.log", false);
-			if (logOperatingInfos) {
-				applicationRootLog.info(getOperatingInfos(true).toString());
+			boolean logApplicationInfos = applicationProperties.getBoolean("runningContext.applicationInfo.log", false);
+			if (logApplicationInfos) {
+				Level logLevel = applicationProperties.getLevel("runningContext.applicationInfo.logLevel", Level.FINE);
+				applicationRootLog.log(logLevel, () -> {
+					try {
+						return JsonUtils.jsonPrettyPrint(getApplicationInfo(true));
+					} catch (JsonProcessingException e) {
+						applicationRootLog.log(Level.SEVERE, "Exception logging application info", e);
+						return "Exception logging application info" + e.getMessage();
+					}
+				}) ;
+			} else if (logOperatingInfos) {
+				applicationRootLog.fine(() -> getOperatingInfos(true).toString());
 			}
 
 		} catch (Exception e) {

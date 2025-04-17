@@ -46,6 +46,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 class RunningContextTest {
 	
 	private static final String LOGGER_NAME = "org.fl.util.Test1";
+	private static final String LOGGER_NAME2 = "org.fl.util.Test7";
 
 	@Test
 	void testRunningContextWithNullUriParam() throws JsonProcessingException {
@@ -286,5 +287,21 @@ class RunningContextTest {
 		assertThat(loggingInfos.get("handlers")).isNotNull();
 		assertThat(loggingInfos.get("handlers").asText())
 			.isEqualTo("java.util.logging.FileHandler,java.util.logging.ConsoleHandler");
+	}
+	
+	@Test
+	void testRunningContextApplicationInfoLog() throws URISyntaxException, JsonProcessingException {
+		
+		LogRecordCounter logRecordCounter = 
+				FilterCounter.getLogRecordCounter(Logger.getLogger(LOGGER_NAME2));
+		
+		RunningContext rc = new RunningContext(LOGGER_NAME2,
+				new URI("file:///C:/FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test7.properties"));
+		
+		JsonNode applicationInfos = rc.getApplicationInfo(false);	
+		assertThat(applicationInfos).isNotNull();
+		
+		assertThat(logRecordCounter.getLogRecordCount()).isEqualTo(1);
+		assertThat(logRecordCounter.getLogRecordCount(Level.INFO)).isEqualTo(1);
 	}
 }
