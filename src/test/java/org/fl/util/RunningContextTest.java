@@ -46,6 +46,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 class RunningContextTest {
 	
 	private static final String LOGGER_NAME = "org.fl.util.Test1";
+	private static final String LOGGER_NAME2 = "org.fl.util.Test7";
 
 	@Test
 	void testRunningContextWithNullUriParam() throws JsonProcessingException {
@@ -207,15 +208,25 @@ class RunningContextTest {
 		
 		assertThat(buildInformation).isNotEmpty().hasSize(2)
 			.satisfiesExactlyInAnyOrder(
-					buildInfo -> { 
-						assertThat(buildInfo.get("moduleName")).isNotNull();
-						assertThat(buildInfo.get("moduleName").asText()).isEqualTo(LOGGER_NAME);
-					},
-					buildInfo -> { 
-						assertThat(buildInfo.get("moduleName")).isNotNull();
-						assertThat(buildInfo.get("moduleName").asText()).isEqualTo("org.fl.util");
-					}
-					);
+					buildInfo -> assertModuleBuildInfo(buildInfo, LOGGER_NAME),
+					buildInfo -> assertModuleBuildInfo(buildInfo, "org.fl.util")
+				);
+	}
+	
+	private void assertModuleBuildInfo(JsonNode buildInfo, String moduleName) {
+		assertThat(buildInfo).hasSize(11);
+		assertThat(buildInfo.get("moduleName")).isNotNull();
+		assertThat(buildInfo.get("moduleName").asText()).isEqualTo(moduleName);
+		assertThat(buildInfo.has("version")).isTrue();
+		assertThat(buildInfo.has("buildtime")).isTrue();
+		assertThat(buildInfo.has("builder")).isTrue();
+		assertThat(buildInfo.has("buildhost")).isTrue();
+		assertThat(buildInfo.has("buildOs")).isTrue();
+		assertThat(buildInfo.has("gitBranch")).isTrue();
+		assertThat(buildInfo.has("gitCommitId")).isTrue();
+		assertThat(buildInfo.has("gitCommitUrl")).isTrue();
+		assertThat(buildInfo.has("gitCommitTime")).isTrue();
+		assertThat(buildInfo.has("gitDirty")).isTrue();
 	}
 	
 	@Test
@@ -276,5 +287,21 @@ class RunningContextTest {
 		assertThat(loggingInfos.get("handlers")).isNotNull();
 		assertThat(loggingInfos.get("handlers").asText())
 			.isEqualTo("java.util.logging.FileHandler,java.util.logging.ConsoleHandler");
+	}
+	
+	@Test
+	void testRunningContextApplicationInfoLog() throws URISyntaxException, JsonProcessingException {
+		
+		LogRecordCounter logRecordCounter = 
+				FilterCounter.getLogRecordCounter(Logger.getLogger(LOGGER_NAME2));
+		
+		RunningContext rc = new RunningContext(LOGGER_NAME2,
+				new URI("file:///C:/FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test7.properties"));
+		
+		JsonNode applicationInfos = rc.getApplicationInfo(false);	
+		assertThat(applicationInfos).isNotNull();
+		
+		assertThat(logRecordCounter.getLogRecordCount()).isEqualTo(1);
+		assertThat(logRecordCounter.getLogRecordCount(Level.INFO)).isEqualTo(1);
 	}
 }

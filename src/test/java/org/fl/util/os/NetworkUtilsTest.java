@@ -24,7 +24,7 @@ SOFTWARE.
 
 package org.fl.util.os;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -34,7 +34,6 @@ import org.junit.jupiter.api.Test;
 import com.fasterxml.jackson.databind.JsonNode;
 
 class NetworkUtilsTest {
-
 	
 	@Test
 	void testGetNetworkInformationWithoutLookup() {
