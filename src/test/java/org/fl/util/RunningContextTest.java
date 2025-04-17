@@ -207,15 +207,25 @@ class RunningContextTest {
 		
 		assertThat(buildInformation).isNotEmpty().hasSize(2)
 			.satisfiesExactlyInAnyOrder(
-					buildInfo -> { 
-						assertThat(buildInfo.get("moduleName")).isNotNull();
-						assertThat(buildInfo.get("moduleName").asText()).isEqualTo(LOGGER_NAME);
-					},
-					buildInfo -> { 
-						assertThat(buildInfo.get("moduleName")).isNotNull();
-						assertThat(buildInfo.get("moduleName").asText()).isEqualTo("org.fl.util");
-					}
-					);
+					buildInfo -> assertModuleBuildInfo(buildInfo, LOGGER_NAME),
+					buildInfo -> assertModuleBuildInfo(buildInfo, "org.fl.util")
+				);
+	}
+	
+	private void assertModuleBuildInfo(JsonNode buildInfo, String moduleName) {
+		assertThat(buildInfo).hasSize(11);
+		assertThat(buildInfo.get("moduleName")).isNotNull();
+		assertThat(buildInfo.get("moduleName").asText()).isEqualTo(moduleName);
+		assertThat(buildInfo.has("version")).isTrue();
+		assertThat(buildInfo.has("buildtime")).isTrue();
+		assertThat(buildInfo.has("builder")).isTrue();
+		assertThat(buildInfo.has("buildhost")).isTrue();
+		assertThat(buildInfo.has("buildOs")).isTrue();
+		assertThat(buildInfo.has("gitBranch")).isTrue();
+		assertThat(buildInfo.has("gitCommitId")).isTrue();
+		assertThat(buildInfo.has("gitCommitUrl")).isTrue();
+		assertThat(buildInfo.has("gitCommitTime")).isTrue();
+		assertThat(buildInfo.has("gitDirty")).isTrue();
 	}
 	
 	@Test
