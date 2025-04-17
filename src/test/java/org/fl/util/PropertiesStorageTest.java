@@ -28,6 +28,8 @@ import static org.assertj.core.api.Assertions.*;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -96,6 +98,34 @@ class PropertiesStorageTest {
 		
 		assertThat(props.get("doesNotExist")).isNull();
 		assertThat(props.get("logging.CloudantLogHandler.encode")).isEqualTo("UTF-8");
+	}
+	
+	@Test
+	void testPropertiesStorageSave() throws URISyntaxException, Exception {
+		
+		// Source properties
+		URI propertyUri = new URI("file:///C:/FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test1.properties");
+		PropertiesStorage propertySource = new PropertiesStorage(propertyUri);
+		
+		// Save property to another location
+		URI propertyCopyUri = new URI("file:///C:/ForTests/FlUtils/test1.properties");
+		propertySource.save(propertyCopyUri);
+		
+		// Read back saved properties
+		PropertiesStorage propertyCopied = new PropertiesStorage(propertyCopyUri);
+		
+		assertThat(propertyCopied).isNotNull();	
+		assertThat(propertyCopied.getPropertyLocation()).isNotNull();
+		assertThat(propertyCopied.getPropertyLocation().toString()).isEqualTo(propertyCopyUri.toURL().toString());
+		
+		AdvancedProperties props = propertyCopied.getAdvancedProperties();
+		assertThat(props).isNotNull();
+		
+		assertThat(props.get("doesNotExist")).isNull();
+		assertThat(props.get("logging.CloudantLogHandler.encode")).isEqualTo("UTF-8");
+		
+		// Delete copied properties
+		Files.delete(Paths.get(propertyCopyUri));
 	}
 	
 	private void testPropertiesStorageWithNullParam(PropertiesStorage ps) {

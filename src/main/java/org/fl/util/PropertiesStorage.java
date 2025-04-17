@@ -24,26 +24,20 @@ SOFTWARE.
 
 package org.fl.util;
 
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Objects;
-import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import org.fl.util.PropertiesStorage;
 
 /**
  * @author Frédéric Lefèvre
@@ -152,48 +146,25 @@ public class PropertiesStorage {
 		return advancedProperties;
 	}
 	
+	public void save() throws IOException, URISyntaxException {
+		save(propUrl.toURI());
+	}
+	
 	/**
-	 * Store a properties object in the storage
-	 * @param props properties to store
+	 * Store the properties object in the storage
 	 * @throws IOException if properties cannot be stored
+	 * @throws URISyntaxException 
 	 */
-	public void save(Properties props) throws IOException {
+	public void save(URI propertyUri) throws IOException, URISyntaxException {
 
-		if (propUrl != null) {
-		    File outFile = new File(propUrl.getPath());
-		    if ((outFile != null) && (!outFile.exists() || (outFile.canWrite() && outFile.delete()))) {
-		        OutputStream outStream = getOutputFromUrl() ;
-		        props.store(outStream, "");
-		        outStream.flush();
-		        outStream.close();
-		    } else {
-		        throw new IOException("Cannot write property file") ;
-		    }
+		if (propertyUri != null) {
+			
+			try (BufferedWriter propertyWriter = Files.newBufferedWriter(Paths.get(propertyUri), StandardCharsets.UTF_8)) {
+				advancedProperties.store(propertyWriter, "");
+			} catch (Exception e) {
+				psLogger.log(Level.SEVERE, "Property file writing error for " + propertyUri, e);
+			}
 		}
-	}
-	
-	
-	/**
-	 * Is this properties storage writable
-	 * @return true if this properties storage writable, false otherwise
-	 */
-	public boolean isWritable() {
-		return ((propUrl != null) &&
-				propUrl.getProtocol().equals("file"));
-	}
-	
-	/**
-	 * Get an output file and Stream from an Url
-	 * @return the outputStream 
-	 * @throws FileNotFoundException
-	 */
-	private OutputStream getOutputFromUrl() throws FileNotFoundException {
-	    
-	    if (isWritable()) {
-	       return new BufferedOutputStream(new FileOutputStream(new File(propUrl.getPath()))) ;
-	    } else {
-	        return null;
-	    }
 	}
 	
 	public URL getPropertyLocation() {
