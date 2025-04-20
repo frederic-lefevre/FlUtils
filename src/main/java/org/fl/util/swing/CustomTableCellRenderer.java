@@ -27,25 +27,23 @@ package org.fl.util.swing;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
-import java.util.function.Consumer;
 
 import javax.swing.JTable;
 import javax.swing.UIManager;
 import javax.swing.table.DefaultTableCellRenderer;
 
-public class CustomTableCellRenderer extends DefaultTableCellRenderer {
+public abstract class CustomTableCellRenderer extends DefaultTableCellRenderer {
 
 	private static final long serialVersionUID = 1L;
-
-	private final Consumer<Object> valueProcess;
 	
-	public CustomTableCellRenderer(Consumer<Object> valueProcess, Font font, int horizontalAlignment) {
+	public CustomTableCellRenderer(Font font, int horizontalAlignment) {
 		
 		super();
-		this.valueProcess = valueProcess;
 		setFont(font);
 		setHorizontalAlignment(horizontalAlignment);
 	}
+	
+	public abstract void valueProcessor(Object value);
 	
 	@Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
@@ -69,7 +67,7 @@ public class CustomTableCellRenderer extends DefaultTableCellRenderer {
 		}
 		
 		// Responsible of setting text of JLabel, optionally setting background, foreground
-		valueProcess.accept(value);
+		valueProcessor(value);
 		
 		return this;
 	}
