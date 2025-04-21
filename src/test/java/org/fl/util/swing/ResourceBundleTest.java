@@ -36,7 +36,7 @@ class ResourceBundleTest {
 	@Test
 	void testLoadingFrenchResource() {
 		
-		ResourceBundle resource = ResourceBundle.getBundle("ApplicationTabPane", Locale.FRENCH);
+		ResourceBundle resource = ResourceBundle.getBundle("ApplicationTabPane", Locale.FRANCE);
 		
 		assertThat(resource).isNotNull();
 		assertThat(resource.getString("appTabbedPane.logConfiguration.tabTitle")).isEqualTo("Configuration des logs");
