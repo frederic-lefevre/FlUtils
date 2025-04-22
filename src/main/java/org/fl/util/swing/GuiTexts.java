@@ -38,6 +38,16 @@ public class GuiTexts {
 		instance = new GuiTexts(locale);
 	}
 	
+	static void init(String language, String country) {
+		if (language == null) {
+			instance = new GuiTexts();
+		} else if (country == null) {
+			instance = new GuiTexts(Locale.of(language));
+		} else {
+			instance = new GuiTexts(Locale.of(language, country));
+		}
+	}
+	
 	static void reset() {
 		instance = null;
 	}

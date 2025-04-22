@@ -76,6 +76,24 @@ class GuiTextsTest {
 	}
 	
 	@Test
+	void testFrenchBelgiumText() {
+
+		GuiTexts.init("fr", "BE");
+		
+		assertThat(GuiTexts.getText("appTabbedPane.information.tabTitle")).isEqualTo("Informations");
+		assertThat(GuiTexts.getText("appTabbedPane.information.IPlookUp")).isEqualTo("Recherche du nom correspondant aux adresses IP (peut être lent)");
+		
+		assertThat(GuiTexts.getText("appTabbedPane.logConfiguration.tabTitle")).isEqualTo("Configuration des logs");
+		assertThat(GuiTexts.getText("appTabbedPane.logConfiguration.selectLogger")).isEqualTo("Sélectionner le logger depuis la racine:");
+		assertThat(GuiTexts.getText("appTabbedPane.logConfiguration.configureLogger")).isEqualTo("Configurer le logger");
+		
+		assertThat(GuiTexts.getText("appTabbedPane.logDisplay.tabTitle")).isEqualTo("Affichage du log");
+		assertThat(GuiTexts.getText("appTabbedPane.logDisplay.ignoreAccentsCheckBox")).isEqualTo("Ignorer les accents");
+		assertThat(GuiTexts.getText("appTabbedPane.logDisplay.ignoreFormattingCheckBox")).isEqualTo("Ignorer le formatage");
+		assertThat(GuiTexts.getText("appTabbedPane.logDisplay.showCategoriesButton")).isEqualTo("Montrer les categories");
+	}
+	
+	@Test
 	void testUSText() {
 		
 		GuiTexts.init(Locale.US);
