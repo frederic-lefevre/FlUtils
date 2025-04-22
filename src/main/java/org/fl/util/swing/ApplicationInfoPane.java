@@ -65,7 +65,7 @@ public class ApplicationInfoPane extends JPanel {
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 		setBorder(BorderFactory.createLineBorder(Color.BLACK, 5, true));
 
-		doIpLookUp = new JCheckBox("Do lookup on IP addresses (may be slow)");
+		doIpLookUp = new JCheckBox(GuiTexts.getText("appTabbedPane.information.IPlookUp"));
 		doIpLookUp.setSelected(false);
 		doIpLookUp.addActionListener(new SetLookUpListener());
 
@@ -99,7 +99,7 @@ public class ApplicationInfoPane extends JPanel {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			if (doIpLookUp.isSelected()) {
-				infosText.setText("Updating...");
+				infosText.setText(GuiTexts.getText("appTabbedPane.information.updating"));
 				try {
 					setInfos(true);
 				} catch (JsonProcessingException e1) {
