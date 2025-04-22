@@ -33,7 +33,7 @@ import org.junit.jupiter.api.Test;
 class GuiTextsTest {
 
 	@Test
-	void testFrenchText() {
+	void testFranceText() {
 		
 		GuiTexts.init(Locale.FRANCE);
 		
@@ -48,6 +48,15 @@ class GuiTextsTest {
 		assertThat(GuiTexts.getText("appTabbedPane.logDisplay.ignoreAccentsCheckBox")).isEqualTo("Ignorer les accents");
 		assertThat(GuiTexts.getText("appTabbedPane.logDisplay.ignoreFormattingCheckBox")).isEqualTo("Ignorer le formatage");
 		assertThat(GuiTexts.getText("appTabbedPane.logDisplay.showCategoriesButton")).isEqualTo("Montrer les categories");
+	}
+	
+	@Test
+	void testFrenchText() {
+		
+		// Only fr_FR (Locale.FRANCE) has a file
+		GuiTexts.init(Locale.FRENCH);
+		
+		assertThat(GuiTexts.getText("appTabbedPane.logConfiguration.tabTitle")).isEqualTo("Log configuration");
 	}
 	
 	@Test
