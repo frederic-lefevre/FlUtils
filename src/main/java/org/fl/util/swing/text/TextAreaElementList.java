@@ -117,70 +117,70 @@ public class TextAreaElementList {
 	}
 	
 	public void diplayFirstElement() {
-		removeCurrentElementHighLight() ;
+		removeCurrentElementHighLight();
 		if ((textElements != null) && (textElements.size() > 0)) {
-			currentTextElement = 0 ;
-			TextAreaElement firstElement = textElements.get(0) ;
-			firstElement.goToElement() ;
-			currentElementHighLight = addHighLightToTextElement(firstElement, currentElementPainter) ;
+			currentTextElement = 0;
+			TextAreaElement firstElement = textElements.get(0);
+			firstElement.goToElement();
+			currentElementHighLight = addHighLightToTextElement(firstElement, currentElementPainter);
 		}
 	}
-	
+
 	// Return the number of the displayed element, starting at 1
 	public int displayNextElement() {
-		removeCurrentElementHighLight() ;
+		removeCurrentElementHighLight();
 		if ((textElements != null) && (textElements.size() > 0)) {
 			if (currentTextElement < -1) {
-				currentTextElement = textElements.size() - 1 ;
+				currentTextElement = textElements.size() - 1;
 			} else {
-				currentTextElement = (currentTextElement + 1)% textElements.size() ;
+				currentTextElement = (currentTextElement + 1)% textElements.size();
 			}
-			textElements.get(currentTextElement).goToElement() ;
-			currentElementHighLight = addHighLightToTextElement(textElements.get(currentTextElement), currentElementPainter) ;
+			textElements.get(currentTextElement).goToElement();
+			currentElementHighLight = addHighLightToTextElement(textElements.get(currentTextElement), currentElementPainter);
 		}
-		return currentTextElement + 1 ;
+		return currentTextElement + 1;
 	}
 	
 	// Return the number of the displayed element, starting at 1
 	public int displayPreviousElement() {
-		removeCurrentElementHighLight() ;
+		removeCurrentElementHighLight();
 		if ((textElements != null) && (textElements.size() > 0)) {		
 			if (currentTextElement < 1) {
-				currentTextElement = textElements.size() - 1 ;
+				currentTextElement = textElements.size() - 1;
 			} else {
-				currentTextElement-- ;
+				currentTextElement--;
 			}
-			textElements.get(currentTextElement).goToElement() ;
-			currentElementHighLight = addHighLightToTextElement(textElements.get(currentTextElement), currentElementPainter) ;
+			textElements.get(currentTextElement).goToElement();
+			currentElementHighLight = addHighLightToTextElement(textElements.get(currentTextElement), currentElementPainter);
 		}
-		return currentTextElement + 1 ;
+		return currentTextElement + 1;
 	}
 	
 	private void removeCurrentElementHighLight() {
 		if ((highLighter != null) && (currentElementHighLight != null)) {
-			highLighter.removeHighlight(currentElementHighLight) ;
-			currentElementHighLight = null ;
+			highLighter.removeHighlight(currentElementHighLight);
+			currentElementHighLight = null;
 		}
 	}
 	
 	private Object addHighLightToTextElement(TextAreaElement element,  HighlightPainter elementPainter) {
 		if (elementPainter != null) {
 			try {
-				return highLighter.addHighlight(element.getBegin(), element.getEnd(), elementPainter) ;
+				return highLighter.addHighlight(element.getBegin(), element.getEnd(), elementPainter);
 			} catch (BadLocationException e) {
 				lLog.log(Level.WARNING, "Bad location exception when highlightning position x=" + element.getBegin() + " y=" + element.getEnd(), e);
-				return null ;
+				return null;
 			}
 		} else {
-			return null ;
+			return null;
 		}
 	}
-	
+
 	public int getNbElements() {
 		if (textElements != null) {
-			return textElements.size() ;
+			return textElements.size();
 		} else {
-			return 0 ;
+			return 0;
 		}
 	}
 
