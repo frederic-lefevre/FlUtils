@@ -67,15 +67,15 @@ public class ApplicationTabbedPane extends JTabbedPane {
 
 		// Tabbed Panel for application information
 		appInfoPane = new ApplicationInfoPane(runningContext);
-		addTab("Informations", appInfoPane);
+		addTab(GuiTexts.getText("appTabbedPane.information.tabTitle"), appInfoPane);
 
 		// Tabbed Panel for application information
 		logConfigurationPane = new LogConfigurationPane(runningContext.getName());
-		addTab("Log Configuration", logConfigurationPane);
+		addTab(GuiTexts.getText("appTabbedPane.logConfiguration.tabTitle"), logConfigurationPane);
 		
 		// Tabbed Panel for logs display
 		logsDisplayPane = new LogsDisplayPane(runningContext);
-		addTab("Logs display", logsDisplayPane);
+		addTab(GuiTexts.getText("appTabbedPane.logDisplay.tabTitle"), logsDisplayPane);
 		int logTabIdx = indexOfComponent(logsDisplayPane);
 		if (logTabIdx > -1) {
 			logTabRegularColor = getBackgroundAt(logTabIdx);
