@@ -50,4 +50,27 @@ class ResourceBundleTest {
 		assertThat(resource).isNotNull();
 		assertThat(resource.getString("appTabbedPane.logConfiguration.tabTitle")).isEqualTo("Log configuration");
 	}
+	
+	@Test
+	void testBundlePresence() {
+		
+		ResourceBundle resourceFr = ResourceBundle.getBundle("ApplicationTabPane", Locale.FRANCE);
+		assertThat(resourceFr.getLocale()).isEqualTo(Locale.FRANCE);
+		
+		ResourceBundle resourceUs = ResourceBundle.getBundle("ApplicationTabPane", Locale.US);
+		assertThat(resourceUs.getLocale()).isEqualTo(Locale.US);
+		
+		ResourceBundle resourceDe = ResourceBundle.getBundle("ApplicationTabPane", Locale.GERMANY);
+		assertThat(resourceDe.getLocale()).isNotEqualTo(Locale.GERMANY);
+	}
+	
+	@Test
+	void testKeysPresence() {
+		
+		ResourceBundle resourceFr = ResourceBundle.getBundle("ApplicationTabPane", Locale.FRANCE);		
+		ResourceBundle resourceUs = ResourceBundle.getBundle("ApplicationTabPane", Locale.US);
+		
+		resourceFr.getKeys().asIterator().forEachRemaining(key -> assertThat(resourceUs.containsKey(key)).isTrue());
+		resourceUs.getKeys().asIterator().forEachRemaining(key -> assertThat(resourceFr.containsKey(key)).isTrue());
+	}
 }
