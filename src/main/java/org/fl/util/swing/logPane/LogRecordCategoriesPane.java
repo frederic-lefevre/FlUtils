@@ -34,41 +34,42 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
+import org.fl.util.swing.GuiTexts;
 import org.fl.util.swing.text.TextAreaNavigation;
 
 public class LogRecordCategoriesPane extends JPanel  {
 
 	private static final long serialVersionUID = 1L;
 	
-	private final JButton 			 showCategories ;
-	private final JButton 			 resetHighLight ;
-	private final LogRecordAreas 	 logRecordAreas ;
-	private final TextAreaNavigation resultPane ;
+	private final JButton showCategories;
+	private final JButton resetHighLight;
+	private final LogRecordAreas logRecordAreas;
+	private final TextAreaNavigation resultPane;
 	
 	public LogRecordCategoriesPane(LogRecordAreas lra) {
-		super() ;
-		logRecordAreas = lra ;
+		super();
+		logRecordAreas = lra;
 		
-		setLayout(new BoxLayout(this,  BoxLayout.Y_AXIS)) ;
+		setLayout(new BoxLayout(this,  BoxLayout.Y_AXIS));
 		setBorder(BorderFactory.createLineBorder(Color.BLACK,1));
-		JPanel ctrl = new JPanel() ;
-		showCategories = new JButton("Show categories") ;
-		resetHighLight = new JButton("Reset highlight") ;
-		ctrl.add(showCategories) ;
-		ctrl.add(resetHighLight) ;
-		add(ctrl) ;
+		JPanel ctrl = new JPanel();
+		showCategories = new JButton(GuiTexts.getText("appTabbedPane.logDisplay.showCategoriesButton"));
+		resetHighLight = new JButton(GuiTexts.getText("appTabbedPane.logDisplay.resetHighlightButton"));
+		ctrl.add(showCategories);
+		ctrl.add(resetHighLight);
+		add(ctrl);
 		
-		resultPane = new TextAreaNavigation() ;
-		add(resultPane) ;
+		resultPane = new TextAreaNavigation();
+		add(resultPane);
 		
 		showCategories.addActionListener(new refreshListener());
 		resetHighLight.addActionListener(new resetHighLightListener());
 	}
 
 	public void displayPane() {		
-		resultPane.removeAll() ;
+		resultPane.removeAll();
 		for (Level level : logRecordAreas.getRecordLevels()) {
-			resultPane.addNavigation(logRecordAreas.getLogRecordsForThisLevel(level), false) ;
+			resultPane.addNavigation(logRecordAreas.getLogRecordsForThisLevel(level), false);
 		}
 		validate();
 		repaint();
@@ -76,14 +77,14 @@ public class LogRecordCategoriesPane extends JPanel  {
 	}
 	
 	public void clear() {
-		resultPane.removeAll() ;
+		resultPane.removeAll();
 	}
 	
 	private class refreshListener implements ActionListener {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			displayPane() ;			
+			displayPane();			
 		}		
 	}
 	
@@ -91,7 +92,7 @@ public class LogRecordCategoriesPane extends JPanel  {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			logRecordAreas.removeHighLight() ;			
+			logRecordAreas.removeHighLight();			
 		}		
 	}
 }

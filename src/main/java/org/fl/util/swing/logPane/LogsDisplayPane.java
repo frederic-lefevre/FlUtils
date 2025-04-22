@@ -33,8 +33,9 @@ import javax.swing.JTabbedPane;
 
 import org.fl.util.AdvancedProperties;
 import org.fl.util.RunningContext;
+import org.fl.util.swing.GuiTexts;
 
-public class LogsDisplayPane  extends JTabbedPane {
+public class LogsDisplayPane extends JTabbedPane {
 
 	private static final long serialVersionUID = 1L;
 
@@ -115,7 +116,7 @@ public class LogsDisplayPane  extends JTabbedPane {
 		setSelectedIndex(currentLogDisplayIndex);
 		int logTabIdx = indexOfComponent(currentLogDisplay.getPanel());
 		setBackgroundAt(logTabIdx, logTabSelectedColor);
-		setTitleAt(logTabIdx, "current");
+		setTitleAt(logTabIdx, GuiTexts.getText("appTabbedPane.logDisplay.currentTabName"));
 	}
 	
 	private class SearchLogDisplayChanger implements LogDisplayChanger {
