@@ -29,7 +29,7 @@ import java.util.ResourceBundle;
 
 public class GuiTexts {
 	
-	private static final Locale DEFAULT_LOCALE = Locale.US;
+	private static final Locale DEFAULT_LOCALE = Locale.ENGLISH;
 	
 	private static GuiTexts instance;
 	private final ResourceBundle textResource;
@@ -52,10 +52,13 @@ public class GuiTexts {
 	
 	private GuiTexts(Locale locale) {
 		ResourceBundle localTextResource = ResourceBundle.getBundle("ApplicationTabPane", locale);
-		if (localTextResource.getLocale().equals(locale)) {
-			textResource = localTextResource;
+		if (!localTextResource.getLocale().getLanguage().equals(locale.getLanguage()) &&
+				(!localTextResource.getLocale().getLanguage().equals(DEFAULT_LOCALE.getLanguage()))) {
+			// The language of the returned bundle is neither the one requested nor the DEFAULT_LOCALE one
+			// (it is surely the Locale.getDefault() language)
+			textResource = ResourceBundle.getBundle("ApplicationTabPane", DEFAULT_LOCALE);			
 		} else {
-			textResource = ResourceBundle.getBundle("ApplicationTabPane", DEFAULT_LOCALE);
+			textResource = localTextResource;
 		}
 	}
 	

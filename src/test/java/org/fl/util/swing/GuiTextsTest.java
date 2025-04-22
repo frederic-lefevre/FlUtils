@@ -27,11 +27,18 @@ package org.fl.util.swing;
 import static org.assertj.core.api.Assertions.*;
 
 import java.util.Locale;
+import java.util.ResourceBundle;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class GuiTextsTest {
 
+	@BeforeEach
+	void clearCache() {
+		ResourceBundle.clearCache();
+	}
+	
 	@Test
 	void testFranceText() {
 		
@@ -52,11 +59,20 @@ class GuiTextsTest {
 	
 	@Test
 	void testFrenchText() {
-		
-		// Only fr_FR (Locale.FRANCE) has a file
+
 		GuiTexts.init(Locale.FRENCH);
 		
-		assertThat(GuiTexts.getText("appTabbedPane.logConfiguration.tabTitle")).isEqualTo("Log configuration");
+		assertThat(GuiTexts.getText("appTabbedPane.information.tabTitle")).isEqualTo("Informations");
+		assertThat(GuiTexts.getText("appTabbedPane.information.IPlookUp")).isEqualTo("Recherche du nom correspondant aux adresses IP (peut être lent)");
+		
+		assertThat(GuiTexts.getText("appTabbedPane.logConfiguration.tabTitle")).isEqualTo("Configuration des logs");
+		assertThat(GuiTexts.getText("appTabbedPane.logConfiguration.selectLogger")).isEqualTo("Sélectionner le logger depuis la racine:");
+		assertThat(GuiTexts.getText("appTabbedPane.logConfiguration.configureLogger")).isEqualTo("Configurer le logger");
+		
+		assertThat(GuiTexts.getText("appTabbedPane.logDisplay.tabTitle")).isEqualTo("Affichage du log");
+		assertThat(GuiTexts.getText("appTabbedPane.logDisplay.ignoreAccentsCheckBox")).isEqualTo("Ignorer les accents");
+		assertThat(GuiTexts.getText("appTabbedPane.logDisplay.ignoreFormattingCheckBox")).isEqualTo("Ignorer le formatage");
+		assertThat(GuiTexts.getText("appTabbedPane.logDisplay.showCategoriesButton")).isEqualTo("Montrer les categories");
 	}
 	
 	@Test
@@ -80,7 +96,7 @@ class GuiTextsTest {
 	@Test
 	void testDefaultLocale() {
 		// Default is Local.US, not the default Locale
-		assertThat(GuiTexts.getDefaultLocale()).isEqualTo(Locale.US);
+		assertThat(GuiTexts.getDefaultLocale()).isEqualTo(Locale.ENGLISH);
 	}
 	
 	@Test
@@ -90,7 +106,7 @@ class GuiTextsTest {
 		String textKey = "appTabbedPane.logConfiguration.tabTitle";
 		String defaultText = GuiTexts.getText(textKey);
 		
-		GuiTexts.init(GuiTexts.getDefaultLocale());		
+		GuiTexts.init(Locale.ENGLISH);		
 		assertThat(GuiTexts.getText(textKey)).isEqualTo(defaultText);
 	}
 	

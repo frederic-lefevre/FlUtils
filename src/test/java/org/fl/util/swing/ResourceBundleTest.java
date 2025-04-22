@@ -36,10 +36,37 @@ class ResourceBundleTest {
 	@Test
 	void testLoadingFrenchResource() {
 		
+		ResourceBundle resource = ResourceBundle.getBundle("ApplicationTabPane", Locale.FRENCH);
+		
+		assertThat(resource).isNotNull();
+		assertThat(resource.getString("appTabbedPane.logConfiguration.tabTitle")).isEqualTo("Configuration des logs");
+	}
+	
+	@Test
+	void testLoadingFranceResource() {
+		
 		ResourceBundle resource = ResourceBundle.getBundle("ApplicationTabPane", Locale.FRANCE);
 		
 		assertThat(resource).isNotNull();
 		assertThat(resource.getString("appTabbedPane.logConfiguration.tabTitle")).isEqualTo("Configuration des logs");
+	}
+	
+	@Test
+	void testLoadingUKResource() {
+		
+		ResourceBundle resource = ResourceBundle.getBundle("ApplicationTabPane", Locale.UK);
+		
+		assertThat(resource).isNotNull();
+		assertThat(resource.getString("appTabbedPane.logConfiguration.tabTitle")).isEqualTo("Log configuration");
+	}
+	
+	@Test
+	void testLoadingEnglishResource() {
+		
+		ResourceBundle resource = ResourceBundle.getBundle("ApplicationTabPane", Locale.ENGLISH);
+		
+		assertThat(resource).isNotNull();
+		assertThat(resource.getString("appTabbedPane.logConfiguration.tabTitle")).isEqualTo("Log configuration");
 	}
 	
 	@Test
@@ -54,11 +81,11 @@ class ResourceBundleTest {
 	@Test
 	void testBundlePresence() {
 		
-		ResourceBundle resourceFr = ResourceBundle.getBundle("ApplicationTabPane", Locale.FRANCE);
-		assertThat(resourceFr.getLocale()).isEqualTo(Locale.FRANCE);
+		ResourceBundle resourceFr = ResourceBundle.getBundle("ApplicationTabPane", Locale.FRENCH);
+		assertThat(resourceFr.getLocale()).isEqualTo(Locale.FRENCH);
 		
-		ResourceBundle resourceUs = ResourceBundle.getBundle("ApplicationTabPane", Locale.US);
-		assertThat(resourceUs.getLocale()).isEqualTo(Locale.US);
+		ResourceBundle resourceUs = ResourceBundle.getBundle("ApplicationTabPane", Locale.ENGLISH);
+		assertThat(resourceUs.getLocale()).isEqualTo(Locale.ENGLISH);
 		
 		ResourceBundle resourceDe = ResourceBundle.getBundle("ApplicationTabPane", Locale.GERMANY);
 		assertThat(resourceDe.getLocale()).isNotEqualTo(Locale.GERMANY);
@@ -67,8 +94,8 @@ class ResourceBundleTest {
 	@Test
 	void testKeysPresence() {
 		
-		ResourceBundle resourceFr = ResourceBundle.getBundle("ApplicationTabPane", Locale.FRANCE);		
-		ResourceBundle resourceUs = ResourceBundle.getBundle("ApplicationTabPane", Locale.US);
+		ResourceBundle resourceFr = ResourceBundle.getBundle("ApplicationTabPane", Locale.FRENCH);		
+		ResourceBundle resourceUs = ResourceBundle.getBundle("ApplicationTabPane", Locale.ENGLISH);
 		
 		resourceFr.getKeys().asIterator().forEachRemaining(key -> assertThat(resourceUs.containsKey(key)).isTrue());
 		resourceUs.getKeys().asIterator().forEachRemaining(key -> assertThat(resourceFr.containsKey(key)).isTrue());
