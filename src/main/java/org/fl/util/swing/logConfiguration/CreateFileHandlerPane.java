@@ -30,13 +30,16 @@ import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.text.NumberFormatter;
+
+import org.fl.util.swing.GuiTexts;
+
 import javax.swing.JTextField;
 
 public class CreateFileHandlerPane extends CreateHandlerPane {
 
 	private static final long serialVersionUID = 1L;
 
-	private static final String DEFAULT_LOG_FILE_PATTERN = "/tmp/changePathAndFileName%g.log";
+	private static final String DEFAULT_LOG_FILE_PATTERN = GuiTexts.getText("appTabbedPane.logConfiguration.defaultFileNamePattern");
 	private static final Long DEFAULT_LOG_FILE_SIZE = 80000L;
 	private static final Integer DEFAULT_NUMBER_OF_LOG_FILE = 3;
 	
@@ -48,7 +51,7 @@ public class CreateFileHandlerPane extends CreateHandlerPane {
 		super();
 		
 		JPanel logFilePatternPane = new JPanel();
-		JLabel logFilePatternTitle = new JLabel("Log file name pattern: ");
+		JLabel logFilePatternTitle = new JLabel(GuiTexts.getText("appTabbedPane.logConfiguration.logFileNamePattern") + ": ");
 		logFilePatternTitle.setFont(font);
 		logFilePattern = new JTextField(50);
 		logFilePattern.setText(DEFAULT_LOG_FILE_PATTERN);
@@ -57,7 +60,7 @@ public class CreateFileHandlerPane extends CreateHandlerPane {
 		add(logFilePatternPane);
 		
 		JPanel logFileSizePane = new JPanel();
-		JLabel logFileSizeTitle = new JLabel("Log file maximum bytes number: ");
+		JLabel logFileSizeTitle = new JLabel(GuiTexts.getText("appTabbedPane.logConfiguration.logFileMaxLength") + ": ");
 		logFileSizeTitle.setFont(font);
 
 		NumberFormatter fileSizeFormatter = new NumberFormatter(NumberFormat.getInstance());
@@ -73,7 +76,7 @@ public class CreateFileHandlerPane extends CreateHandlerPane {
 		add(logFileSizePane);
 		
 		JPanel numberOfLogFilePane = new JPanel();
-		JLabel numberOfLogFileTitle = new JLabel("Number of log files: ");
+		JLabel numberOfLogFileTitle = new JLabel(GuiTexts.getText("appTabbedPane.logConfiguration.logFileNumber") + ": ");
 		numberOfLogFileTitle.setFont(font);
 		
 		NumberFormatter numberOfFileFormatter = new NumberFormatter(NumberFormat.getInstance());

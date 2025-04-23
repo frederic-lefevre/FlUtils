@@ -37,8 +37,7 @@ import javax.swing.JPanel;
 
 import org.fl.util.LoggerUtils;
 
-
-public class CreateHandlerPane extends JPanel {
+public class CreateHandlerPane extends JPanel implements HandlerParameterSelector {
 
 	private static final long serialVersionUID = 1L;
 	
@@ -99,14 +98,17 @@ public class CreateHandlerPane extends JPanel {
 		add(encodingPane);
 	}
 	
+	@Override
 	public Level getSelectedLevel() {
 		return selectedLevel;
 	}
 
+	@Override
 	public String getSelectedFormatterName() {
 		return selectedFormatterName;
 	}
 	
+	@Override
 	public String getSelectedEncoding() {
 		return selectedEncoding;
 	}

@@ -22,26 +22,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-package org.fl.util.swing.logPane;
+package org.fl.util.swing.logConfiguration;
 
 import java.util.logging.Level;
 
-import javax.swing.text.JTextComponent;
+public interface HandlerParameterSelector {
 
-public interface LogDisplayComponent {
-
-	// Append a string to the log text
-	public void appendToText(String s);
-	
-	// Return the length in character of the log text
-	public int textLength();
-	
-	// Add a reference to a logged record with its level, the start and end index in the log text
-	public void addLogRecord(Level level, int start, int end);
-	
-	// Get the underlying JTextComponent that contain the log text
-	public JTextComponent getTextComponent();
-	
-	// Clear the component (clear text, log records...)
-	public void clear();
+	public Level getSelectedLevel();
+	public String getSelectedFormatterName();
+	public String getSelectedEncoding();
 }

@@ -43,6 +43,7 @@ import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 
 import org.fl.util.LoggerUtils;
+import org.fl.util.swing.GuiTexts;
 
 public class LoggerSelectionPane extends JPanel {
 
@@ -62,7 +63,7 @@ public class LoggerSelectionPane extends JPanel {
 		
 		setBorder(BorderFactory.createLineBorder(Color.BLACK, 5, true));
 
-		JLabel selectLoggerLabel = new JLabel("Select the logger from the following root:");
+		JLabel selectLoggerLabel = new JLabel(GuiTexts.getText("appTabbedPane.logConfiguration.selectLogger"));
 		Font labelFont = new Font("Verdana", Font.BOLD, 16);
 		selectLoggerLabel.setFont(labelFont);
 		add(selectLoggerLabel);

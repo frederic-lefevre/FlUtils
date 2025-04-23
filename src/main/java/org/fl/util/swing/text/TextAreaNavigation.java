@@ -36,101 +36,106 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import org.fl.util.swing.GuiTexts;
+
 public class TextAreaNavigation extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 
-	private List<TextAreaElementList> textAreaElementLists ;
+	private List<TextAreaElementList> textAreaElementLists;
 	
 	public TextAreaNavigation() {
-		
-		textAreaElementLists = new ArrayList<>() ;
-		
-		setLayout(new GridBagLayout()) ;
+
+		textAreaElementLists = new ArrayList<>();
+
+		setLayout(new GridBagLayout());
 	}
-	
+
 	public TextAreaNavigation(List<TextAreaElementList> tal) {
-		
-		textAreaElementLists = tal ;
-		
-		setLayout(new GridBagLayout()) ;
-		
+
+		textAreaElementLists = tal;
+
+		setLayout(new GridBagLayout());
+
 		for (TextAreaElementList elementList : textAreaElementLists) {
-			addNavigation(elementList, false) ;
+			addNavigation(elementList, false);
 		}
 	}
 
 	public void addNavigation(TextAreaElementList elementList, boolean displayFirst) {
-		GridBagConstraints c = new GridBagConstraints() ;
-		textAreaElementLists.add(elementList) ;
-
-		int rowNum = textAreaElementLists.size() - 1 ;
 		
-		JLabel searchedStringLbl = new JLabel(elementList.getName() + " ") ;
-		JButton next 	 = new JButton("next") ;
-		JButton previous = new JButton("previous") ;
-		String occLbl ;
+		GridBagConstraints c = new GridBagConstraints();
+		textAreaElementLists.add(elementList);
+
+		int rowNum = textAreaElementLists.size() - 1;
+
+		JLabel searchedStringLbl = new JLabel(elementList.getName() + " ");
+		JButton next = new JButton(GuiTexts.getText("appTabbedPane.logDisplay.nextButton"));
+		JButton previous = new JButton(GuiTexts.getText("appTabbedPane.logDisplay.previousButton"));
+		String occLbl;
 		if (elementList.getNbElements() > 0) {
 			if (displayFirst) {
-				elementList.diplayFirstElement() ;
-				occLbl = "occurence 1 of " + elementList.getNbElements() ;
+				elementList.diplayFirstElement();
+				occLbl = GuiTexts.getText("appTabbedPane.logDisplay.occurence") + " 1 " 
+						+ GuiTexts.getText("appTabbedPane.logDisplay.of") + " " + elementList.getNbElements();
 			} else {
-				occLbl = elementList.getNbElements() + " occurences" ;
+				occLbl = elementList.getNbElements() + " " + GuiTexts.getText("appTabbedPane.logDisplay.occurences");
 			}
 		} else {
-			occLbl = "no occurence" ;
-			next.setEnabled(false) ;
+			occLbl = GuiTexts.getText("appTabbedPane.logDisplay.nooccurence");
+			next.setEnabled(false);
 			previous.setEnabled(false);
 		}
-		JLabel occurences = new JLabel(occLbl) ;
+		JLabel occurences = new JLabel(occLbl);
 		previous.setBackground(elementList.getHightLightColor());
 		next.setBackground(elementList.getHightLightColor());
 		previous.addActionListener(new OcccurenceButtonListener(elementList, occurences, false));
 		next.addActionListener(new OcccurenceButtonListener(elementList, occurences, true));
-		
-		c.gridy = rowNum ;
-		c.fill = GridBagConstraints.HORIZONTAL ;
-		c.insets = new Insets(3,3,3,3) ;
-		
-		c.gridx = 0 ;
-		add(searchedStringLbl, c) ;
-		c.gridx = 1 ;
-		add(previous, c) ;
-		c.gridx = 2 ;
-		add(next, c) ;
-		c.gridx = 3 ;
-		add(occurences, c) ;
+
+		c.gridy = rowNum;
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.insets = new Insets(3, 3, 3, 3);
+
+		c.gridx = 0;
+		add(searchedStringLbl, c);
+		c.gridx = 1;
+		add(previous, c);
+		c.gridx = 2;
+		add(next, c);
+		c.gridx = 3;
+		add(occurences, c);
 	}
 	
 	@Override
 	public void removeAll() {
 		super.removeAll();
-		textAreaElementLists = new ArrayList<>() ;
+		textAreaElementLists = new ArrayList<>();
 	}
-	
+
 	private class OcccurenceButtonListener implements ActionListener {
 
-		private TextAreaElementList elementList ;
-		private JLabel 		  		occurences ;
-		private boolean		  		forward ;
+		private TextAreaElementList elementList;
+		private JLabel occurences;
+		private boolean forward;
+
 		public OcccurenceButtonListener(TextAreaElementList elementList, JLabel occurences, boolean forward) {
 			super();
 			this.elementList = elementList;
-			this.occurences  = occurences ;
-			this.forward	 = forward ;
+			this.occurences = occurences;
+			this.forward = forward;
 		}
-	
+
 		// Go to the next occurence or previous occurence
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			
-			int occurenceNum ;
+
+			int occurenceNum;
 			if (forward) {
-				occurenceNum = elementList.displayNextElement() ;
+				occurenceNum = elementList.displayNextElement();
 			} else {
-				occurenceNum = elementList.displayPreviousElement() ;
+				occurenceNum = elementList.displayPreviousElement();
 			}
 			occurences.setText("occurence " + occurenceNum + " of " + elementList.getNbElements());
-		}		
+		}
 	}
 }

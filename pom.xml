@@ -6,7 +6,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.fl</groupId>
 	<artifactId>FlUtils</artifactId>
-	<version>8.2.0</version>
+	<version>8.3.0</version>
 	<packaging>jar</packaging>
 
 	<dependencies>
@@ -61,6 +61,9 @@
 					<exclude>**/*.java</exclude>
 				</excludes>
 				<filtering>true</filtering>
+			</resource>
+			<resource>
+				<directory>src/main/resources</directory>
 			</resource>
 		</resources>
 		<plugins>

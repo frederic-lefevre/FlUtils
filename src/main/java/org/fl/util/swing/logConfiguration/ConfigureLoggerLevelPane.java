@@ -35,6 +35,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import org.fl.util.LoggerUtils;
+import org.fl.util.swing.GuiTexts;
 
 public class ConfigureLoggerLevelPane extends JPanel {
 
@@ -53,7 +54,7 @@ public class ConfigureLoggerLevelPane extends JPanel {
 		
 		Font font = new Font("Verdana", Font.BOLD, 14);
 		
-		loggerLevelTitle = new JLabel("Logger level");
+		loggerLevelTitle = new JLabel(GuiTexts.getText("appTabbedPane.logConfiguration.loggerLevel"));
 		loggerLevelTitle.setFont(font);
 		loggerLevelTitle.setVisible(false);
 		add(loggerLevelTitle);
@@ -82,7 +83,8 @@ public class ConfigureLoggerLevelPane extends JPanel {
 
 			if (loggerLevel == null) {
 				Logger loggerWithLevelDefined = LoggerUtils.getLevelFromHierarchy(loggerToConfigure);
-				hierarchyLevelLabel.setText("Level from logger hierarchy: " + loggerWithLevelDefined.getLevel() + " for " + loggerWithLevelDefined.getName());
+				hierarchyLevelLabel.setText(GuiTexts.getText("appTabbedPane.logConfiguration.loggerLevelFromHierarchy") + ": " 
+						+ loggerWithLevelDefined.getLevel() + " (\"" + loggerWithLevelDefined.getName() + "\")");
 			} else {
 				hierarchyLevelLabel.setText("");
 			}

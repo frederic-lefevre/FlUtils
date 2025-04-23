@@ -35,7 +35,7 @@ import javax.swing.text.DefaultHighlighter.DefaultHighlightPainter;
 
 public class MultiHighLightPainter implements Highlighter.HighlightPainter {
 
-	private final DefaultHighlightPainter defaultPainter ;
+	private final DefaultHighlightPainter defaultPainter;
 	
 	public MultiHighLightPainter(Color color) {
 		defaultPainter = new DefaultHighlighter.DefaultHighlightPainter(color);

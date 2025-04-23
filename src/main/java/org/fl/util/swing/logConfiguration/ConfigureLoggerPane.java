@@ -36,11 +36,13 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
+import org.fl.util.swing.GuiTexts;
+
 public class ConfigureLoggerPane extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 	
-	private static final String TITLE_PREFIX = "Configure logger ";
+	private static final String TITLE_PREFIX = GuiTexts.getText("appTabbedPane.logConfiguration.configureLogger") + " ";
 	
 	private final JLabel configurationTitleLabel;
 	private final JLabel loggerNameLabel;

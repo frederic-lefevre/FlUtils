@@ -24,13 +24,14 @@ SOFTWARE.
 
 package org.fl.util.swing.logConfiguration;
 
-
 import java.awt.Color;
+
 import java.awt.Dimension;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
+
 public class LogConfigurationPane extends JPanel {
 	
 	private static final long serialVersionUID = 1L;

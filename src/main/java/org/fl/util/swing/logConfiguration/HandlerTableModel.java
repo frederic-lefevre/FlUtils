@@ -31,6 +31,8 @@ import java.util.logging.Logger;
 
 import javax.swing.table.AbstractTableModel;
 
+import org.fl.util.swing.GuiTexts;
+
 public class HandlerTableModel extends AbstractTableModel{
 
 	private static final long serialVersionUID = 1L;
@@ -91,11 +93,11 @@ public class HandlerTableModel extends AbstractTableModel{
 				case LEVEL_COL_IDX -> handlerList.get(rowIndex).getLevel();
 				case FORMATTER_COL_IDX -> Optional.ofNullable(handlerList.get(rowIndex).getFormatter())
 					.map(f -> f.getClass().getName())
-					.orElse("No formatter");
+					.orElseGet(() -> GuiTexts.getText("appTabbedPane.logConfiguration.noFormatter"));
 				case ENCODING_COL_IDX -> handlerList.get(rowIndex).getEncoding();
 				case FILTER_COL_IDX -> Optional.ofNullable(handlerList.get(rowIndex).getFilter())
 					.map(f -> f.getClass().getName())
-					.orElse("No filter");
+					.orElseGet(() -> GuiTexts.getText("appTabbedPane.logConfiguration.noFilter"));
 				default -> null;
 			};
 		}
