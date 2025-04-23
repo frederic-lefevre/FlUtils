@@ -39,11 +39,13 @@ import javax.swing.JPanel;
 
 import org.fl.util.LoggerUtils;
 
-public class ConfigureHandlerPane extends JPanel {
+public class ConfigureHandlerPane extends JPanel implements HandlerParameterSelector {
 	
 	private static final long serialVersionUID = 1L;
 	private static final Font font = new Font("Verdana", Font.BOLD, 14);
 	
+	private Level selectedLevel;
+	private String selectedFormatterName;
 	private final JComboBox<Level> handlerLevelChoice;
 	private final FormatterComboBox formatterChoice;
 	private final Handler handlerToConfigure;
@@ -51,6 +53,9 @@ public class ConfigureHandlerPane extends JPanel {
 	public ConfigureHandlerPane(Handler handler) {
 		
 		super();
+		
+		selectedLevel = null;
+		selectedFormatterName = null;
 		handlerToConfigure = handler;
 		
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
@@ -88,13 +93,29 @@ public class ConfigureHandlerPane extends JPanel {
 		add(formatterPane);
 	}
 
+	@Override
+	public Level getSelectedLevel() {
+		return selectedLevel;
+	}
+
+	@Override
+	public String getSelectedFormatterName() {
+		return selectedFormatterName;
+	}
+	
+	@Override
+	public String getSelectedEncoding() {
+		// Encoding not modifiable (it would expose to a single file with different char encoding)
+		return null;
+	}
+	
 	private class  HandlerLevelListener implements ItemListener {
 		
 		@Override
 		public void itemStateChanged(ItemEvent e) {
 			
-			if ((e.getStateChange() == ItemEvent.SELECTED) && (handlerToConfigure != null)) {				
-				handlerToConfigure.setLevel((Level)(handlerLevelChoice.getSelectedItem()));			
+			if ((e.getStateChange() == ItemEvent.SELECTED) && (handlerToConfigure != null)) {
+				selectedLevel = (Level)(handlerLevelChoice.getSelectedItem());	
 			}			
 		}		
 	}
@@ -118,8 +139,7 @@ public class ConfigureHandlerPane extends JPanel {
 		public void itemStateChanged(ItemEvent e) {
 			
 			if ((e.getStateChange() == ItemEvent.SELECTED) && (handlerToConfigure != null)) {
-				String selectedFormatterName = (String)formatterChoice.getSelectedItem();
-				handlerToConfigure.setFormatter(FormatterComboBox.getNewChoosenFormatter(selectedFormatterName));			
+				selectedFormatterName = (String)formatterChoice.getSelectedItem();		
 			}			
 		}		
 	}

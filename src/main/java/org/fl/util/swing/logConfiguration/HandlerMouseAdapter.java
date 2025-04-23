@@ -100,6 +100,12 @@ public class HandlerMouseAdapter extends MouseAdapter {
 		addFileHandlerMenuItem.setEnabled(loggerToConfigure != null);
 	}
 	
+	private static final int OK_OPTION = 0;
+	private static final int CANCEL_OPTION = 1;
+	private static final Object[] editHandlerOptions = {
+			GuiTexts.getText("appTabbedPane.logConfiguration.saveHandler"), 
+			GuiTexts.getText("appTabbedPane.cancel")};
+	
 	private class EditHandlerListener implements ActionListener {
 
 		@Override
@@ -107,41 +113,26 @@ public class HandlerMouseAdapter extends MouseAdapter {
 			
 			Handler handler = handlerJTable.getSelectedHandler();
 			if (handler != null) {
-				JOptionPane.showMessageDialog(null, 
-						new ConfigureHandlerPane(handler),
+				
+				ConfigureHandlerPane configureHandlerPane = new ConfigureHandlerPane(handler);
+				int choosen_option = JOptionPane.showOptionDialog(null, 
+						configureHandlerPane, 
 						GuiTexts.getText("appTabbedPane.logConfiguration.editHandler"), 
-						JOptionPane.INFORMATION_MESSAGE);
-				handlerTableModel.fireTableDataChanged();
+						JOptionPane.OK_CANCEL_OPTION,
+						JOptionPane.QUESTION_MESSAGE,
+						null,
+						editHandlerOptions,
+						editHandlerOptions[CANCEL_OPTION]);
+				
+				if (choosen_option == OK_OPTION) {
+					setCommonHandlerParameter(handler, configureHandlerPane);
+					handlerTableModel.fireTableDataChanged();
+				}
 			}
 		}		
 	}
 	
-	private void setCommonHandlerParameter(Handler handler, CreateHandlerPane createPane) {
-		
-		Level level = createPane.getSelectedLevel();
-		if (level != null) {
-			handler.setLevel(level);
-		}
-		String formatterName = createPane.getSelectedFormatterName();
-		if (formatterName != null) {
-			Formatter formatter = FormatterComboBox.getNewChoosenFormatter(formatterName);
-			if (formatter != null) {
-				handler.setFormatter(formatter);
-			}
-		}
-		String encoding = createPane.getSelectedEncoding();
-		if (encoding != null) {
-			try {
-				handler.setEncoding(encoding);
-			} catch (Exception e) {
-				internalLogger.log(Level.SEVERE, "Exception when setting handler encoding to :" + encoding, e);
-			}
-		}
-	}
-	
-	private static final int CREATE_HANDLER_OPTION = 0;
-	private static final int CANCEL_OPTION = 1;
-	private static final Object[] options = {
+	private static final Object[] createHandlerOptions = {
 			GuiTexts.getText("appTabbedPane.logConfiguration.createHandler"), 
 			GuiTexts.getText("appTabbedPane.cancel")};
 	
@@ -157,10 +148,10 @@ public class HandlerMouseAdapter extends MouseAdapter {
 					JOptionPane.OK_CANCEL_OPTION,
 					JOptionPane.QUESTION_MESSAGE,
 					null,
-					options,
-					options[CANCEL_OPTION]);
+					createHandlerOptions,
+					createHandlerOptions[CANCEL_OPTION]);
 			
-			if (choosen_option == CREATE_HANDLER_OPTION) {
+			if (choosen_option == OK_OPTION) {
 				ConsoleHandler consoleHandler = new ConsoleHandler();
 				setCommonHandlerParameter(consoleHandler, createPane);
 				loggerToConfigure.addHandler(consoleHandler);
@@ -183,9 +174,9 @@ public class HandlerMouseAdapter extends MouseAdapter {
 					JOptionPane.OK_CANCEL_OPTION,
 					JOptionPane.QUESTION_MESSAGE,
 					null,
-					options,
-					options[CANCEL_OPTION]);
-			if (choosen_option == CREATE_HANDLER_OPTION) {
+					createHandlerOptions,
+					createHandlerOptions[CANCEL_OPTION]);
+			if (choosen_option == OK_OPTION) {
 				try {
 					FileHandler fileHandler = new FileHandler(
 							createPane.getSelectedFilePattern(), 
@@ -200,6 +191,29 @@ public class HandlerMouseAdapter extends MouseAdapter {
 					internalLogger.log(Level.SEVERE, "Exception when creating a file handler", e);
 				}
 				
+			}
+		}
+	}
+	
+	private void setCommonHandlerParameter(Handler handler, HandlerParameterSelector handlerCreateOrModifyPane) {
+		
+		Level level = handlerCreateOrModifyPane.getSelectedLevel();
+		if (level != null) {
+			handler.setLevel(level);
+		}
+		String formatterName = handlerCreateOrModifyPane.getSelectedFormatterName();
+		if (formatterName != null) {
+			Formatter formatter = FormatterComboBox.getNewChoosenFormatter(formatterName);
+			if (formatter != null) {
+				handler.setFormatter(formatter);
+			}
+		}
+		String encoding = handlerCreateOrModifyPane.getSelectedEncoding();
+		if (encoding != null) {
+			try {
+				handler.setEncoding(encoding);
+			} catch (Exception e) {
+				internalLogger.log(Level.SEVERE, "Exception when setting handler encoding to :" + encoding, e);
 			}
 		}
 	}
