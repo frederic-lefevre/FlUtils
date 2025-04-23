@@ -61,16 +61,16 @@ public class SearchableTextPane extends JPanel  {
 
 	private final SearcherHighLighter searcherHighLighter;
 
-	private List<TextAreaElementList> currentSearches;
+	private final List<TextAreaElementList> currentSearches;
 	
-	public SearchableTextPane(JTextArea ta, Color[] highLightColors, Logger logger) {
+	public SearchableTextPane(JTextArea textArea, Color[] highLightColors, Logger logger) {
 		
-		currentSearches   = new ArrayList<>();
+		currentSearches = new ArrayList<>();
 		
 		setLayout(new BoxLayout(this,  BoxLayout.X_AXIS));
 		
 		// Text area panel to search from
-		textArea = ta;
+		this.textArea = textArea;
 		textArea.setHighlighter(new DefaultHighlighter());
 		scrollTextPane = new JScrollPane(textArea);
 		
