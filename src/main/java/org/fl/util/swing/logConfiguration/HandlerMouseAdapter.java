@@ -40,6 +40,8 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 
+import org.fl.util.swing.GuiTexts;
+
 public class HandlerMouseAdapter extends MouseAdapter {
 
 	private static final Logger internalLogger = Logger.getLogger(HandlerMouseAdapter.class.getName());
@@ -60,9 +62,9 @@ public class HandlerMouseAdapter extends MouseAdapter {
 		this.handlerTableModel = (HandlerTableModel)handlerJTable.getModel();
 		loggerToConfigure = null;
 
-		editMenuItem = addMenuItem("Edit handler", new EditHandlerListener());
-		addConsoleHandlerMenuItem = addMenuItem("Add ConsoleHandler", new CreateConsoleHandlerListener());
-		addFileHandlerMenuItem = addMenuItem("Add FileHandler", new CreateFileHandlerListener());
+		editMenuItem = addMenuItem(GuiTexts.getText("appTabbedPane.logConfiguration.editHandler"), new EditHandlerListener());
+		addConsoleHandlerMenuItem = addMenuItem(GuiTexts.getText("appTabbedPane.logConfiguration.addConsoleHandler"), new CreateConsoleHandlerListener());
+		addFileHandlerMenuItem = addMenuItem(GuiTexts.getText("appTabbedPane.logConfiguration.addFileHandler"), new CreateFileHandlerListener());
 	}
 	
 	@Override
@@ -106,7 +108,9 @@ public class HandlerMouseAdapter extends MouseAdapter {
 			Handler handler = handlerJTable.getSelectedHandler();
 			if (handler != null) {
 				JOptionPane.showMessageDialog(null, 
-						new ConfigureHandlerPane(handler),"Edit Handler", JOptionPane.INFORMATION_MESSAGE);
+						new ConfigureHandlerPane(handler),
+						GuiTexts.getText("appTabbedPane.logConfiguration.editHandler"), 
+						JOptionPane.INFORMATION_MESSAGE);
 				handlerTableModel.fireTableDataChanged();
 			}
 		}		
@@ -137,7 +141,9 @@ public class HandlerMouseAdapter extends MouseAdapter {
 	
 	private static final int CREATE_HANDLER_OPTION = 0;
 	private static final int CANCEL_OPTION = 1;
-	private static final Object[] options = {"Create Handler", "Cancel"};
+	private static final Object[] options = {
+			GuiTexts.getText("appTabbedPane.logConfiguration.createHandler"), 
+			GuiTexts.getText("appTabbedPane.cancel")};
 	
 	private class CreateConsoleHandlerListener implements ActionListener {
 
@@ -147,7 +153,7 @@ public class HandlerMouseAdapter extends MouseAdapter {
 			CreateHandlerPane createPane = new CreateHandlerPane();
 			int choosen_option = JOptionPane.showOptionDialog(null, 
 					createPane, 
-					"Create ConsoleHandler", 
+					GuiTexts.getText("appTabbedPane.logConfiguration.createConsoleHandler"), 
 					JOptionPane.OK_CANCEL_OPTION,
 					JOptionPane.QUESTION_MESSAGE,
 					null,
@@ -173,7 +179,7 @@ public class HandlerMouseAdapter extends MouseAdapter {
 			CreateFileHandlerPane createPane = new CreateFileHandlerPane();
 			int choosen_option = JOptionPane.showOptionDialog(null, 
 					createPane, 
-					"Create FileHandler", 
+					GuiTexts.getText("appTabbedPane.logConfiguration.createFileHandler"), 
 					JOptionPane.OK_CANCEL_OPTION,
 					JOptionPane.QUESTION_MESSAGE,
 					null,

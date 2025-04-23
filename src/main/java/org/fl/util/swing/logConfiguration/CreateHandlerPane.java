@@ -37,7 +37,6 @@ import javax.swing.JPanel;
 
 import org.fl.util.LoggerUtils;
 
-
 public class CreateHandlerPane extends JPanel {
 
 	private static final long serialVersionUID = 1L;
