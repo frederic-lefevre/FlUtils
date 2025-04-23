@@ -40,8 +40,10 @@ import javax.swing.JTextArea;
 import javax.swing.JViewport;
 import javax.swing.text.DefaultCaret;
 
+import org.fl.util.AdvancedProperties;
 import org.fl.util.RunningContext;
 import org.fl.util.json.JsonUtils;
+import org.fl.util.swing.text.SearchableTextPane;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -52,11 +54,13 @@ public class ApplicationInfoPane extends JPanel {
 			
 	private static final long serialVersionUID = 1L;
 
+	private static final Color[] DEFAULT_SEARCH_HIGHLIGHTCOLORS = { Color.CYAN, Color.YELLOW, Color.MAGENTA };
+	
 	private final RunningContext runningContext;
 
 	private final JTextArea infosText;
-	private final JScrollPane scrollInfos;
 	private final JCheckBox doIpLookUp;
+	private final SearchableTextPane searchableTextArea;
 
 	public ApplicationInfoPane(RunningContext rc) {
 		super();
@@ -69,16 +73,18 @@ public class ApplicationInfoPane extends JPanel {
 		doIpLookUp.setSelected(false);
 		doIpLookUp.addActionListener(new SetLookUpListener());
 
-		infosText = new JTextArea();
+		infosText = new JTextArea(50, 120);
 
 		// to always be on the top of the scrollPane
 		DefaultCaret caret = (DefaultCaret) infosText.getCaret();
 		caret.setUpdatePolicy(DefaultCaret.NEVER_UPDATE);
 
-		scrollInfos = new JScrollPane(infosText);
-
+		AdvancedProperties props = runningContext.getProps();
+		Color[] searchHighLightColors = props.getColors("appTabbedPane.logging.searchHighLightColors", DEFAULT_SEARCH_HIGHLIGHTCOLORS);
+		searchableTextArea = new SearchableTextPane(infosText, searchHighLightColors, logger);
+		
 		add(doIpLookUp);
-		add(scrollInfos);
+		add(searchableTextArea);
 	}
 
 	public void setInfos() throws JsonProcessingException {
@@ -86,12 +92,14 @@ public class ApplicationInfoPane extends JPanel {
 	}
 
 	private void setInfos(boolean withLookUp) throws JsonProcessingException {
+		
 		JsonNode infosJson = runningContext.getApplicationInfo(withLookUp);
 		infosText.setText(JsonUtils.jsonPrettyPrint(infosJson));
 
+		JScrollPane scrollInfos = searchableTextArea.getScrollTextPane();
 		scrollInfos.getVerticalScrollBar().setValue(0);
-		JViewport vp = scrollInfos.getViewport();
-		vp.setViewPosition(new Point(0, 0));
+		JViewport viewPort = scrollInfos.getViewport();
+		viewPort.setViewPosition(new Point(0, 0));
 	}
 
 	private class SetLookUpListener implements ActionListener {

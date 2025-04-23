@@ -46,7 +46,7 @@ public class LogsDisplayPane extends JTabbedPane {
 	private int currentLogDisplayIndex;
 	private SearchableLogDisplay currentLogDisplay;
 
-	private final static Color[] DEFAULT_SEARCH_HIGHLIGHTCOLORS = { Color.CYAN, Color.YELLOW, Color.MAGENTA };
+	private static final Color[] DEFAULT_SEARCH_HIGHLIGHTCOLORS = { Color.CYAN, Color.YELLOW, Color.MAGENTA };
 
 	private final Color logTabSelectedColor;
 	private final Color logTabRegularColor;

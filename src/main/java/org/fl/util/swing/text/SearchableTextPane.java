@@ -48,7 +48,7 @@ public class SearchableTextPane extends JPanel  {
 
 	private static final long serialVersionUID = 1L;
 
-	private final JScrollPane scrollInfos;
+	private final JScrollPane scrollTextPane;
 	private final JTextArea textArea;
 
 	// Component and text field for search
@@ -72,9 +72,9 @@ public class SearchableTextPane extends JPanel  {
 		// Text area panel to search from
 		textArea = ta;
 		textArea.setHighlighter(new DefaultHighlighter());
-		scrollInfos = new JScrollPane(textArea);
+		scrollTextPane = new JScrollPane(textArea);
 		
-		add(scrollInfos);
+		add(scrollTextPane);
 		
 		// Command panel
 		commandPanel = new JPanel();
@@ -118,6 +118,10 @@ public class SearchableTextPane extends JPanel  {
 		resetHighLightButton.addActionListener(new resetHighLightListener());
 
 		searcherHighLighter = new SearcherHighLighter(textArea, highLightColors, logger);
+	}
+
+	public JScrollPane getScrollTextPane() {
+		return scrollTextPane;
 	}
 
 	public JPanel getCommandPanel() {
