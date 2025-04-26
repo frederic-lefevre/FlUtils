@@ -556,6 +556,21 @@ public class FilesUtils {
 		return mountPoint;
 	}
 	
+	public static Path findMountPoint(Path path, Logger logger) {
+		
+		if (Files.exists(path)) {
+			return getMountPoint(path, logger);
+		} else {
+			Path parentPath = path.getParent();
+			if (parentPath == null) {
+				logger.warning("No FileStore found for the path " + path);
+				return null;
+			} else {
+				return findMountPoint(parentPath, logger);
+			}
+		}
+	}
+	
 	public static FileStore findFileStore(Path path, Logger logger) throws IOException {
 		
 		if (Files.exists(path)) {

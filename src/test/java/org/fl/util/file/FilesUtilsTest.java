@@ -55,4 +55,21 @@ class FilesUtilsTest {
 			.isEqualTo(fileStoreOfExistantPath)
 			.isEqualTo(Files.getFileStore(existantPath));
 	}
+	
+	@Test
+	void testshouldFindMountPoint() {
+		
+		Path unexistantPath = Path.of(URI.create("file:///C:/ForTests/FlUtils/does/not/exists"));
+		Path existantPath = Path.of(URI.create("file:///C:/ForTests/FlUtils"));
+		
+		assertThat(unexistantPath).doesNotExist();
+		assertThat(existantPath).exists();
+		
+		Path mountPointOfUnexistantPath = FilesUtils.findMountPoint(unexistantPath, logger);
+		Path mountPointOfExistantPath = FilesUtils.findMountPoint(existantPath, logger);
+		
+		assertThat(mountPointOfUnexistantPath).isNotNull()
+			.isEqualTo(mountPointOfExistantPath)
+			.isEqualTo(Path.of(URI.create("file:///C:/")));
+	}
 }
