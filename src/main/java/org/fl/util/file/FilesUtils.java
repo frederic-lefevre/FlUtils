@@ -534,26 +534,41 @@ public class FilesUtils {
 	
 	public static Path getMountPoint(Path path, Logger logger) {
 		
-		Path mountPoint = path ;
+		Path mountPoint = path;
 		
 		try {
-			FileStore fileStore = Files.getFileStore(path) ;
+			FileStore fileStore = Files.getFileStore(path);
 
-			Path parent = path ;
-			FileStore parentFileStore = null ;
+			Path parent = path;
+			FileStore parentFileStore = null;
 			do {
-				parent = parent.getParent() ;
+				parent = parent.getParent();
 				if (parent != null) {
 					parentFileStore = Files.getFileStore(mountPoint) ;
 					mountPoint = parent ;
 				}
-			} while ((parent != null) && (fileStore.equals(parentFileStore))) ;
+			} while ((parent != null) && (fileStore.equals(parentFileStore)));
 			
 		} catch (Exception e) {
-			logger.log(Level.SEVERE, "Exception when searching mount point for file " + path, e) ;
+			logger.log(Level.SEVERE, "Exception when searching mount point for file " + path, e);
 		}
 		
-		return mountPoint ;
+		return mountPoint;
+	}
+	
+	public static FileStore findFileStore(Path path, Logger logger) throws IOException {
+		
+		if (Files.exists(path)) {
+			return Files.getFileStore(path);
+		} else {
+			Path parentPath = path.getParent();
+			if (parentPath == null) {
+				logger.warning("No FileStore found for the path " + path);
+				return null;
+			} else {
+				return findFileStore(parentPath, logger);
+			}
+		}
 	}
 	
 	// This solution has been benchmarked against others
