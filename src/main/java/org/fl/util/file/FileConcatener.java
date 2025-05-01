@@ -76,11 +76,13 @@ public class FileConcatener {
 		}
 		
 		
-		try (FileChannel out = new FileOutputStream(destinationFile, true).getChannel()) {		
+		try (FileOutputStream fOutputStream = new FileOutputStream(destinationFile, true); 
+				FileChannel out = fOutputStream.getChannel()) {		
 
 			for (File originFile : originFiles) {
 				
-				try (FileChannel in = new FileInputStream(originFile).getChannel()) {
+				try (FileInputStream fInputStream = new FileInputStream(originFile); 
+						FileChannel in = fInputStream.getChannel()) {
 					
 					long totalSizeToAppend = in.size() ;
 					long sizeToAppend = totalSizeToAppend ;
