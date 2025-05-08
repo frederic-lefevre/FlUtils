@@ -26,6 +26,7 @@ package org.fl.util.file;
 
 import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.file.AccessDeniedException;
@@ -624,4 +625,17 @@ public class FilesUtils {
 		}
 	}
 	
+	private static final String FILE_SCHEME = "file";
+	
+	// Return the absolute path corresponding to a URI String
+	// This allows to use the same URIs on Windows and Linux as long as they belong to the default FileSore (so C:\ on Windows)
+	public static Path uriStringToAbsolutePath(String uriString) throws URISyntaxException {
+		
+		// use URI constructor (not URI.create) to have the precise exception in case of URI syntax exception
+		URI uri = new URI(uriString);
+		if (! FILE_SCHEME.equalsIgnoreCase(uri.getScheme())) {
+			throw new IllegalArgumentException("The uri string parameter must have a " + FILE_SCHEME + " scheme: " + uriString);
+		}	
+		return Path.of(uri).toAbsolutePath();
+	}
 }

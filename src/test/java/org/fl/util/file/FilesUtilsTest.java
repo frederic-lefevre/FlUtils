@@ -72,4 +72,93 @@ class FilesUtilsTest {
 			.isEqualTo(mountPointOfExistantPath)
 			.isEqualTo(Path.of(URI.create("file:///C:/")));
 	}
+	
+	@Test
+	void shouldGetAbsolutePathFromUriWithWindowsDrive() throws Exception {
+		
+		String srcPath = "file:///C:/FredericPersonnel/photos/";
+		
+		Path path = FilesUtils.uriStringToAbsolutePath(srcPath);
+		
+		assertThat(path).isNotNull().isAbsolute().exists();
+	}
+	
+	@Test
+	void shouldGetAbsolutePathFromUriWithoutWindowsDrive() throws Exception {
+		
+		String srcPath = "file:///FredericPersonnel/photos/";
+		
+		Path path = FilesUtils.uriStringToAbsolutePath(srcPath);
+		
+		assertThat(path)
+			.isNotNull()
+			.isAbsolute()
+			.exists()
+			.isEqualTo(FilesUtils.uriStringToAbsolutePath("file:///C:/FredericPersonnel/photos/"))
+			.isEqualTo(Path.of("C:\\FredericPersonnel\\photos"))
+			.isNotEqualTo(Path.of("\\FredericPersonnel\\photos"));
+	}
+	
+	@Test
+	void shouldGetAbsolutePathFromUriWithUpperCaseScheme() throws Exception {
+		
+		String srcPath = "FILE:///FredericPersonnel/photos/";
+		
+		Path path = FilesUtils.uriStringToAbsolutePath(srcPath);
+		
+		assertThat(path)
+			.isNotNull()
+			.isAbsolute()
+			.exists()
+			.isEqualTo(FilesUtils.uriStringToAbsolutePath("file:///C:/FredericPersonnel/photos/"))
+			.isEqualTo(Path.of("C:\\FredericPersonnel\\photos"));
+	}
+	
+	@Test
+	void shouldGetAbsolutePathFromUriUnexistantFile() throws Exception {
+		
+		String srcPath = "file:///FredericPersonnel/photos/doesNotExists";
+		
+		Path path = FilesUtils.uriStringToAbsolutePath(srcPath);
+		
+		assertThat(path)
+			.isNotNull()
+			.isAbsolute()
+			.doesNotExist()
+			.isEqualTo(FilesUtils.uriStringToAbsolutePath("file:///C:/FredericPersonnel/photos/doesNotExists"))
+			.isEqualTo(Path.of("C:\\FredericPersonnel\\photos\\doesNotExists"));
+	}
+	
+	@Test
+	void shouldThrowExceptionForUriWithoutScheme() throws Exception {
+		
+		String srcPath = "/FredericPersonnel/photos/";		
+		assertThatIllegalArgumentException().isThrownBy(() -> FilesUtils.uriStringToAbsolutePath(srcPath));
+	}
+	
+	@Test
+	void shouldThrowExceptionForUriWithNonFileSchemeScheme() throws Exception {
+		
+		String srcPath = "http:///somewhere.org/FredericPersonnel/photos/";		
+		assertThatIllegalArgumentException().isThrownBy(() -> FilesUtils.uriStringToAbsolutePath(srcPath));
+	}
+	
+	@Test
+	void shouldThrowExceptionForNonHierarchicalUri() throws Exception {
+		
+		String srcPath = "file:FredericPersonnel/photos/";		
+		assertThatIllegalArgumentException().isThrownBy(() -> FilesUtils.uriStringToAbsolutePath(srcPath));
+	}
+	
+	@Test
+	void nullParameterShouldThrowException() throws Exception {
+		
+		assertThatNullPointerException().isThrownBy(() -> FilesUtils.uriStringToAbsolutePath(null));
+	}
+	
+	@Test
+	void emptyParameterShouldThrowException() throws Exception {
+		
+		assertThatIllegalArgumentException().isThrownBy(() -> FilesUtils.uriStringToAbsolutePath(""));
+	}
 }
