@@ -121,7 +121,7 @@ class LoggerManagerTest {
 		
 		String loggerName = "org.fl.util.notInConfig";
 		
-		String pathString = "file:///C:/FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/main/java/flUtilsSample.properties";
+		String pathString = "file:///FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/main/java/flUtilsSample.properties";
 		
 		PropertiesStorage ps = new PropertiesStorage(URI.create(pathString));
 		
@@ -155,7 +155,7 @@ class LoggerManagerTest {
 		
 		String loggerName = "org.fl.util.SampleApp";
 		
-		String pathString = "file:///C:/FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/main/java/flUtilsSample.properties";
+		String pathString = "file:///FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/main/java/flUtilsSample.properties";
 		
 		PropertiesStorage ps = new PropertiesStorage(URI.create(pathString));
 		
@@ -172,7 +172,7 @@ class LoggerManagerTest {
 		
 		assertThat(loggingProps.get("java.util.logging.FileHandler.level")).isEqualTo("WARNING");
 		assertThat(loggingProps.get("java.util.logging.FileHandler.formatter")).isEqualTo("org.fl.util.PlainLogFormatter");
-		assertThat(loggingProps.get("java.util.logging.FileHandler.pattern")).isEqualTo("/tmp/myLogDir/app%u_%g.log");
+		assertThat(loggingProps.get("java.util.logging.FileHandler.pattern")).isEqualTo("/ForTests/FlUtils/myLogDir/app%u_%g.log");
 		assertThat(loggingProps.get("java.util.logging.FileHandler.limit")).isEqualTo("80000000");
 		assertThat(loggingProps.get("java.util.logging.FileHandler.count")).isEqualTo("3");
 		assertThat(loggingProps.get("java.util.logging.FileHandler.encoding")).isEqualTo("UTF-8");
@@ -254,7 +254,7 @@ class LoggerManagerTest {
 	
 	private void assertsForTest2(String loggerName) throws Exception {
 		
-		String pathString = "file:///C:/FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test2.properties";
+		String pathString = "file:///FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test2.properties";
 		
 		PropertiesStorage ps = new PropertiesStorage(URI.create(pathString));
 		
@@ -390,7 +390,7 @@ class LoggerManagerTest {
 	
 	private void assertsForTest3(String loggerName) throws Exception {
 		
-		String pathString = "file:///C:/FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test3.properties";
+		String pathString = "file:///FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test3.properties";
 		
 		PropertiesStorage ps = new PropertiesStorage(URI.create(pathString));
 		
@@ -465,7 +465,7 @@ class LoggerManagerTest {
 		
 		String loggerName = "org.fl.util.SampleApp";
 		
-		String pathString = "file:///C:/FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test4.properties";		
+		String pathString = "file:///FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test4.properties";		
 	
 		PropertiesStorage ps = new PropertiesStorage(URI.create(pathString));
 		
@@ -495,7 +495,7 @@ class LoggerManagerTest {
 		
 		String loggerName = "org.fl.util.SampleApp";
 		
-		String pathString = "file:///C:/FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test5.properties";		
+		String pathString = "file:///FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test5.properties";		
 		
 		PropertiesStorage ps = new PropertiesStorage(URI.create(pathString));
 		
