@@ -143,7 +143,7 @@ class RunningContextTest {
 	void testRunningContextWithAbsolutePath() {
 		
 		RunningContext rc = new RunningContext(LOGGER_NAME, 
-				URI.create("file:///C:/FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test1.properties"));
+				URI.create("file:///FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test1.properties"));
 		
 		assertThat(rc).isNotNull();
 		
@@ -171,7 +171,7 @@ class RunningContextTest {
 	void testBasicRunningContextWithURI() throws URISyntaxException {
 		
 		RunningContext rc = new RunningContext(LOGGER_NAME,
-				new URI("file:///C:/FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test1.properties"));
+				new URI("file:///FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test1.properties"));
 		
 		assertThat(rc).isNotNull();
 		
@@ -196,7 +196,7 @@ class RunningContextTest {
 	void testRunningContextBuildInfo() throws URISyntaxException, JsonProcessingException {
 		
 		RunningContext rc = new RunningContext(LOGGER_NAME,
-				new URI("file:///C:/FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test1.properties"));
+				new URI("file:///FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test1.properties"));
 		
 		assertThat(rc).isNotNull();
 		
@@ -233,7 +233,7 @@ class RunningContextTest {
 	void testRunningContextBuildInfo2() throws URISyntaxException, JsonProcessingException {
 							
 		RunningContext rc = new RunningContext(LOGGER_NAME,
-				new URI("file:///C:/FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test1.properties"));
+				new URI("file:///FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test1.properties"));
 		
 		LogRecordCounter logRecordCounter = 
 				FilterCounter.getLogRecordCounter(Logger.getLogger(LOGGER_NAME));
@@ -275,7 +275,7 @@ class RunningContextTest {
 	void testRunningContextLoggingInfo() throws URISyntaxException, JsonProcessingException {
 		
 		RunningContext rc = new RunningContext(LOGGER_NAME,
-				new URI("file:///C:/FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test1.properties"));
+				new URI("file:///FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test1.properties"));
 		
 		JsonNode applicationInfos = rc.getApplicationInfo(false);
 		
@@ -296,7 +296,7 @@ class RunningContextTest {
 				FilterCounter.getLogRecordCounter(Logger.getLogger(LOGGER_NAME2));
 		
 		RunningContext rc = new RunningContext(LOGGER_NAME2,
-				new URI("file:///C:/FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test7.properties"));
+				new URI("file:///FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test7.properties"));
 		
 		JsonNode applicationInfos = rc.getApplicationInfo(false);	
 		assertThat(applicationInfos).isNotNull();

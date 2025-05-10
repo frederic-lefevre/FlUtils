@@ -28,6 +28,7 @@ import static org.assertj.core.api.Assertions.*;
 
 import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.FileStore;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -42,8 +43,8 @@ class FilesUtilsTest {
 	@Test
 	void testshouldFindFileStore() throws IOException {
 		
-		Path unexistantPath = Path.of(URI.create("file:///C:/ForTests/FlUtils/does/not/exists"));
-		Path existantPath = Path.of(URI.create("file:///C:/ForTests/FlUtils"));
+		Path unexistantPath = Path.of(URI.create("file:///ForTests/FlUtils/does/not/exists"));
+		Path existantPath = Path.of(URI.create("file:///ForTests/FlUtils"));
 		
 		assertThat(unexistantPath).doesNotExist();
 		assertThat(existantPath).exists();
@@ -57,10 +58,10 @@ class FilesUtilsTest {
 	}
 	
 	@Test
-	void testshouldFindMountPoint() {
+	void testshouldFindMountPoint() throws URISyntaxException {
 		
-		Path unexistantPath = Path.of(URI.create("file:///C:/ForTests/FlUtils/does/not/exists"));
-		Path existantPath = Path.of(URI.create("file:///C:/ForTests/FlUtils"));
+		Path unexistantPath = FilesUtils.uriStringToAbsolutePath("file:///ForTests/FlUtils/does/not/exists");
+		Path existantPath = FilesUtils.uriStringToAbsolutePath("file:///ForTests/FlUtils");
 		
 		assertThat(unexistantPath).doesNotExist();
 		assertThat(existantPath).exists();
@@ -70,7 +71,7 @@ class FilesUtilsTest {
 		
 		assertThat(mountPointOfUnexistantPath).isNotNull()
 			.isEqualTo(mountPointOfExistantPath)
-			.isEqualTo(Path.of(URI.create("file:///C:/")));
+			.isEqualTo(FilesUtils.uriStringToAbsolutePath("file:///"));
 	}
 	
 	@Test

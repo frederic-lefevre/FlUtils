@@ -56,7 +56,7 @@ class PropertiesStorageTest {
 		LogRecordCounter logRecordCounter = 
 				FilterCounter.getLogRecordCounter(Logger.getLogger(PropertiesStorage.class.getName()));
 		
-		PropertiesStorage ps = new PropertiesStorage(new URI("file:///C:/tmp/doesNotExists.properties"));
+		PropertiesStorage ps = new PropertiesStorage(new URI("file:///tmp/doesNotExists.properties"));
 		
 		testPropertiesStorageWithNullParam(ps);
 		
@@ -67,7 +67,7 @@ class PropertiesStorageTest {
 	@Test
 	void testPropertiesStorageWithUri() throws URISyntaxException, Exception {
 		
-		URI propertyUri = new URI("file:///C:/FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test1.properties");
+		URI propertyUri = new URI("file:///FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test1.properties");
 		
 		PropertiesStorage ps = new PropertiesStorage(propertyUri);
 		
@@ -104,11 +104,11 @@ class PropertiesStorageTest {
 	void testPropertiesStorageSave() throws URISyntaxException, Exception {
 		
 		// Source properties
-		URI propertyUri = new URI("file:///C:/FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test1.properties");
+		URI propertyUri = new URI("file:///FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test1.properties");
 		PropertiesStorage propertySource = new PropertiesStorage(propertyUri);
 		
 		// Save property to another location
-		URI propertyCopyUri = new URI("file:///C:/ForTests/FlUtils/test1.properties");
+		URI propertyCopyUri = new URI("file:///ForTests/FlUtils/test1.properties");
 		propertySource.save(propertyCopyUri);
 		
 		// Read back saved properties
