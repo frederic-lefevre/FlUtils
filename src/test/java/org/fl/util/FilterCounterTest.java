@@ -41,8 +41,8 @@ class FilterCounterTest {
 		
 		private static final Logger logger = Logger.getLogger(ForTest.class.getName());
 		
-		public static void logAnError() {
-			logger.severe("Severe error");
+		public static void logAnError(String message) {
+			logger.severe(message);
 		}
 		
 		public static void logAnErrorAfterRecursiveCall(int nbCall) {
@@ -82,12 +82,18 @@ class FilterCounterTest {
 		LogRecordCounter logRecordCounter = 
 				FilterCounter.getLogRecordCounter(Logger.getLogger(ForTest.class.getName()));
 		
-		ForTest.logAnError();
+		String errorMessage = "The error message";
+		ForTest.logAnError(errorMessage);
 		
 		assertThat(logRecordCounter.getLogRecordCount()).isEqualTo(1);
 		assertThat(logRecordCounter.getLogRecordCount(Level.SEVERE)).isEqualTo(1);
 		assertThat(logRecordCounter.getLogRecordCount(Level.WARNING)).isZero();
 		
+		assertThat(logRecordCounter.getLogRecords()).isNotNull().singleElement()
+			.satisfies(logRecord -> {
+				assertThat(logRecord.getLevel()).isEqualTo(Level.SEVERE);
+				assertThat(logRecord.getMessage()).isEqualTo(errorMessage);
+			});
 		logRecordCounter.stopLogCountAndFilter();
 	}
 	
