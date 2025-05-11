@@ -24,6 +24,7 @@ SOFTWARE.
 
 package org.fl.util;
 
+import java.util.Collection;
 import java.util.logging.Handler;
 import java.util.logging.LogRecord;
 
@@ -31,8 +32,8 @@ import java.util.logging.LogRecord;
 // So log records which are not picked on time are lost
 public class BufferLogHandler extends Handler {
 
-	private LogRecordMemoryBuffer logRecordBuffer;
-	private String name;
+	private final LogRecordMemoryBuffer logRecordBuffer;
+	private final String name;
 
 	public BufferLogHandler(String n, int nbRecords) {
 
@@ -71,6 +72,10 @@ public class BufferLogHandler extends Handler {
 		return logRecordBuffer.getAndDeleteFormattedRecords();
 	}
 
+	public Collection<LogRecord> getLogRecords() {
+		return logRecordBuffer.getLogRecords();
+	}
+	
 	// Delete all the logs in memory
 	public int deleteMemoryLogs() {
 

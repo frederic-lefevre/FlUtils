@@ -26,6 +26,7 @@ package org.fl.util;
 
 import java.lang.StackWalker.Option;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -41,12 +42,16 @@ public class FilterCounter implements Filter {
 		private final String name;
 		private final FilterCounter filterCounter;
 		private final Logger logger;
+		private final LogRecordMemoryBuffer logRecordBuffer;
+		private final int nbLogRecordKept;
 		
-		public LogRecordCounter(String name, FilterCounter filterCounter, Logger logger) {
+		private LogRecordCounter(String name, FilterCounter filterCounter, Logger logger, int nbLogRecordKept) {
 			super();
 			this.name = name;
 			this.filterCounter = filterCounter;
 			this.logger = logger;
+			this.nbLogRecordKept = nbLogRecordKept;
+			logRecordBuffer = new LogRecordMemoryBuffer(nbLogRecordKept);
 		}
 
 		public int getLogRecordCount() {
@@ -64,6 +69,18 @@ public class FilterCounter implements Filter {
 		public void stopLogCountAndFilter() {
 			filterCounter.removeLogRecordCounters(name, logger);
 		}
+		
+		public Collection<LogRecord> getLogRecords() {
+			return logRecordBuffer.getLogRecords();
+		}
+		
+		public int getMaxLogRecordKept() {
+			return nbLogRecordKept;
+		}
+		
+		private void addLogRecord(LogRecord logrecord) {
+			logRecordBuffer.addLogRecord(logrecord);
+		}
 	}
 	
 	// Keys are fully qualified method names
@@ -71,6 +88,7 @@ public class FilterCounter implements Filter {
 	// Typically, it may be a test method : we want to count the log record triggered for this specific test
 	// Tests may be run in parallel, so this split between methods is mandatory
 	private Map<String, Map<Level, Integer>> logRecordCounts = new HashMap<>();
+	private Map<String, LogRecordCounter> logRecordCountersMap = new HashMap<>();
 	
 	@Override
 	public synchronized boolean isLoggable(LogRecord record) {
@@ -85,6 +103,10 @@ public class FilterCounter implements Filter {
 						logRecordCountByLevels.put(level,
 								Optional.ofNullable(logRecordCountByLevels.get(level)).orElse(0) + 1);
 					}
+					LogRecordCounter logRecordCounter = logRecordCountersMap.get(name);
+					if (logRecordCounter != null) {
+						logRecordCounter.addLogRecord(record);
+					}
 				});
 		return false;
 	}
@@ -93,7 +115,7 @@ public class FilterCounter implements Filter {
 		logRecordCounts.clear();
 	}
 
-	public synchronized void addLogRecordCounters(String name) {
+	protected synchronized void addLogRecordCounters(String name) {
 		
 		Map<Level, Integer> logRecordCountByLevels = logRecordCounts.get(name);
 		if (logRecordCountByLevels != null) {
@@ -142,18 +164,30 @@ public class FilterCounter implements Filter {
 			filterCounter = new FilterCounter();
 			filterCounter.addLogRecordCounters(name);
 			logger.setFilter(filterCounter);
-		} else if (filter instanceof FilterCounter fc){
+		} else if (filter instanceof FilterCounter fc) {
 			filterCounter = fc;
 			filterCounter.addLogRecordCounters(name);
 		}
 		return filterCounter;
 	}
 
-	public static synchronized LogRecordCounter getLogRecordCounter(Logger logger) {
+	private static final int DEFAULT_LOG_RECORD_NUMBER = 10;
+	
+	public static synchronized LogRecordCounter getLogRecordCounter(Logger logger) {	
+		return getLogRecordCounter(getCallerFullyQualifiedMethodName(), logger, DEFAULT_LOG_RECORD_NUMBER);
+	}
+	
+	public static synchronized LogRecordCounter getLogRecordCounter(Logger logger, int nbLogRecordKept) {
+		return getLogRecordCounter(getCallerFullyQualifiedMethodName(), logger, nbLogRecordKept);
+	}
+	
+	private static LogRecordCounter getLogRecordCounter(String name, Logger logger, int nbLogRecordKept) {
 		
-		String name = getCallerFullyQualifiedMethodName();
+		FilterCounter filterCounter = setFilterCounter(name, logger);
+		LogRecordCounter logRecordCounter = new LogRecordCounter(name, filterCounter, logger, nbLogRecordKept);
+		filterCounter.logRecordCountersMap.put(name, logRecordCounter);
 		
-		return new LogRecordCounter(name, setFilterCounter(name, logger), logger);
+		return logRecordCounter;
 	}
 	
 	private static String getCallerFullyQualifiedMethodName() {

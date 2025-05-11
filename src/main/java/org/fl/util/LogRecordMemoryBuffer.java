@@ -24,6 +24,7 @@ SOFTWARE.
 
 package org.fl.util;
 
+import java.util.Collection;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.LogRecord;
 
@@ -53,6 +54,10 @@ public class LogRecordMemoryBuffer {
 			logRecordBuffer.poll();
 		}
 
+	}
+	
+	public Collection<LogRecord> getLogRecords() {
+		return logRecordBuffer;
 	}
 	
 	public StringBuilder getFormattedRecords() {

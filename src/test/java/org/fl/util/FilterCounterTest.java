@@ -41,8 +41,14 @@ class FilterCounterTest {
 		
 		private static final Logger logger = Logger.getLogger(ForTest.class.getName());
 		
-		public static void logAnError() {
-			logger.severe("Severe error");
+		public static void logAnError(String message) {
+			logger.severe(message);
+		}
+		
+		public static void logErrors(String message, int nbError) {
+			for (int i = 0; i < nbError; i++) {
+				logger.severe(message + i);
+			}
 		}
 		
 		public static void logAnErrorAfterRecursiveCall(int nbCall) {
@@ -82,11 +88,56 @@ class FilterCounterTest {
 		LogRecordCounter logRecordCounter = 
 				FilterCounter.getLogRecordCounter(Logger.getLogger(ForTest.class.getName()));
 		
-		ForTest.logAnError();
+		String errorMessage = "The error message";
+		ForTest.logAnError(errorMessage);
 		
 		assertThat(logRecordCounter.getLogRecordCount()).isEqualTo(1);
 		assertThat(logRecordCounter.getLogRecordCount(Level.SEVERE)).isEqualTo(1);
 		assertThat(logRecordCounter.getLogRecordCount(Level.WARNING)).isZero();
+		
+		assertThat(logRecordCounter.getLogRecords()).isNotNull().singleElement()
+			.satisfies(logRecord -> {
+				assertThat(logRecord.getLevel()).isEqualTo(Level.SEVERE);
+				assertThat(logRecord.getMessage()).isEqualTo(errorMessage);
+			});
+		logRecordCounter.stopLogCountAndFilter();
+	}
+	
+	
+	@Test
+	void filterCounterErrorLogTestMultipleError() {
+		
+		LogRecordCounter logRecordCounter = 
+				FilterCounter.getLogRecordCounter(Logger.getLogger(ForTest.class.getName()));
+		
+		ForTest.logErrors("The error message", logRecordCounter.getMaxLogRecordKept());
+		
+		assertThat(logRecordCounter.getLogRecords()).isNotNull().hasSize(logRecordCounter.getMaxLogRecordKept());
+		
+		ForTest.logAnError("last error");
+		assertThat(logRecordCounter.getLogRecords())
+			.isNotNull()
+			.hasSize(logRecordCounter.getMaxLogRecordKept())
+			.satisfiesOnlyOnce(logRecord -> assertThat(logRecord.getMessage()).isEqualTo("last error"));
+		
+		logRecordCounter.stopLogCountAndFilter();
+	}
+	
+	@Test
+	void filterCounterErrorLogTestMultipleError2() {
+		
+		int nbErrorKept = 5;
+		
+		LogRecordCounter logRecordCounter = 
+				FilterCounter.getLogRecordCounter(Logger.getLogger(ForTest.class.getName()), nbErrorKept);
+		
+		assertThat(logRecordCounter.getMaxLogRecordKept()).isEqualTo(nbErrorKept);
+		
+		ForTest.logErrors("The error message", nbErrorKept*200);
+		
+		assertThat(logRecordCounter.getLogRecords()).isNotNull().hasSize(nbErrorKept)
+			.satisfiesOnlyOnce(logRecord -> 
+				assertThat(logRecord.getMessage()).isEqualTo("The error message" + Integer.toString(nbErrorKept*200 - 1)));
 		
 		logRecordCounter.stopLogCountAndFilter();
 	}
