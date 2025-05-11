@@ -100,6 +100,29 @@ class BufferLogHandlerTest {
 	}
 	
 	@Test
+	void testGetLogRecords() {
+		
+		final String name = "Regular Buffer log handler";
+		final int capacity = 10;
+		BufferLogHandler bufferLogHandler = new BufferLogHandler(name, capacity);
+		
+		assertThat(bufferLogHandler.getLogRecords()).isNotNull().isEmpty();
+		
+		// Publish 5 logRecord
+		IntFunction<LogRecord> logRecordSupplier = recordNumber -> new LogRecord(Level.WARNING, "Record log " + recordNumber);
+		int nbLoggedRecords = 5;
+		List<LogRecord> logRecords = IntStream.rangeClosed(1, nbLoggedRecords)
+				.mapToObj(logRecordSupplier)
+				.collect(Collectors.toList());
+		
+		logRecords.forEach(lr -> bufferLogHandler.publish(lr));
+		
+		assertThat(bufferLogHandler.getLogRecords())
+			.hasSize(nbLoggedRecords)
+			.hasSameElementsAs(logRecords);
+	}
+	
+	@Test
 	void testBufferLogHandlerWithGetAndDelete() {
 		
 		final String name = "Regular Buffer log handler";

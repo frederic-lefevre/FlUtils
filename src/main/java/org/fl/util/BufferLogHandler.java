@@ -24,6 +24,7 @@ SOFTWARE.
 
 package org.fl.util;
 
+import java.util.Collection;
 import java.util.logging.Handler;
 import java.util.logging.LogRecord;
 
@@ -71,6 +72,10 @@ public class BufferLogHandler extends Handler {
 		return logRecordBuffer.getAndDeleteFormattedRecords();
 	}
 
+	public Collection<LogRecord> getLogRecords() {
+		return logRecordBuffer.getLogRecords();
+	}
+	
 	// Delete all the logs in memory
 	public int deleteMemoryLogs() {
 
