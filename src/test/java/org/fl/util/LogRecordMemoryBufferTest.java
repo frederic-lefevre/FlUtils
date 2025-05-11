@@ -31,6 +31,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+import java.util.Collection;
 import java.util.List;
 import java.util.function.IntFunction;
 import java.util.logging.Level;
@@ -112,6 +113,38 @@ class LogRecordMemoryBufferTest {
 			.contains(sourceMethod)
 			.contains(Long.toString(dummySequenceNumber))
 			.contains(logRecordExpectedDateTime);
+	}
+	
+	@Test
+	void testGetLogRecordst() {
+		
+		int bufferSize = 3;
+		LogRecordMemoryBuffer logMemoryBuffer = new LogRecordMemoryBuffer(bufferSize);
+
+		assertThat(logMemoryBuffer.getLogRecords()).isNotNull().isEmpty();
+		
+		String loggerName = "org.fl.util.DummyLoggerName";
+		String recordMessage = "A record log message";
+		LogRecord logRecord = new LogRecord(Level.WARNING, recordMessage);
+		String sourceMethod = "testLogErrorContent";
+		long dummySequenceNumber = System.currentTimeMillis() - 1234;
+
+		logRecord.setLoggerName(loggerName);
+		logRecord.setSourceClassName(LogRecordMemoryBufferTest.class.getName());
+		logRecord.setSourceMethodName(sourceMethod);
+		logRecord.setSequenceNumber(dummySequenceNumber);
+		logMemoryBuffer.addLogRecord(logRecord);
+		
+		Collection<LogRecord> logRecords = logMemoryBuffer.getLogRecords();
+		
+		assertThat(logRecords).isNotNull().singleElement()
+			.isEqualTo(logRecord)
+			.satisfies(lr -> {
+				assertThat(lr.getLevel()).isEqualTo(Level.WARNING);
+				assertThat(lr.getLoggerName()).isEqualTo(loggerName);
+				assertThat(lr.getMessage()).isEqualTo(recordMessage);
+				assertThat(lr.getSequenceNumber()).isEqualTo(dummySequenceNumber);
+			});
 	}
 	
 	@Test
