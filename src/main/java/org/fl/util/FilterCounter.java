@@ -39,18 +39,19 @@ public class FilterCounter implements Filter {
 
 	public static class LogRecordCounter {
 		
-		private static final int DEFAULT_LOG_RECORD_NUMBER = 10;
 		private final String name;
 		private final FilterCounter filterCounter;
 		private final Logger logger;
 		private final LogRecordMemoryBuffer logRecordBuffer;
+		private final int nbLogRecordKept;
 		
-		private LogRecordCounter(String name, FilterCounter filterCounter, Logger logger) {
+		private LogRecordCounter(String name, FilterCounter filterCounter, Logger logger, int nbLogRecordKept) {
 			super();
 			this.name = name;
 			this.filterCounter = filterCounter;
 			this.logger = logger;
-			logRecordBuffer = new LogRecordMemoryBuffer(DEFAULT_LOG_RECORD_NUMBER);
+			this.nbLogRecordKept = nbLogRecordKept;
+			logRecordBuffer = new LogRecordMemoryBuffer(nbLogRecordKept);
 		}
 
 		public int getLogRecordCount() {
@@ -71,6 +72,10 @@ public class FilterCounter implements Filter {
 		
 		public Collection<LogRecord> getLogRecords() {
 			return logRecordBuffer.getLogRecords();
+		}
+		
+		public int getMaxLogRecordKept() {
+			return nbLogRecordKept;
 		}
 		
 		private void addLogRecord(LogRecord logrecord) {
@@ -166,12 +171,20 @@ public class FilterCounter implements Filter {
 		return filterCounter;
 	}
 
-	public static synchronized LogRecordCounter getLogRecordCounter(Logger logger) {
-		
-		String name = getCallerFullyQualifiedMethodName();
+	private static final int DEFAULT_LOG_RECORD_NUMBER = 10;
+	
+	public static synchronized LogRecordCounter getLogRecordCounter(Logger logger) {	
+		return getLogRecordCounter(getCallerFullyQualifiedMethodName(), logger, DEFAULT_LOG_RECORD_NUMBER);
+	}
+	
+	public static synchronized LogRecordCounter getLogRecordCounter(Logger logger, int nbLogRecordKept) {
+		return getLogRecordCounter(getCallerFullyQualifiedMethodName(), logger, nbLogRecordKept);
+	}
+	
+	private static LogRecordCounter getLogRecordCounter(String name, Logger logger, int nbLogRecordKept) {
 		
 		FilterCounter filterCounter = setFilterCounter(name, logger);
-		LogRecordCounter logRecordCounter = new LogRecordCounter(name, filterCounter, logger);
+		LogRecordCounter logRecordCounter = new LogRecordCounter(name, filterCounter, logger, nbLogRecordKept);
 		filterCounter.logRecordCountersMap.put(name, logRecordCounter);
 		
 		return logRecordCounter;

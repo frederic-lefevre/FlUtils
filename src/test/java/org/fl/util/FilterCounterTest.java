@@ -45,6 +45,12 @@ class FilterCounterTest {
 			logger.severe(message);
 		}
 		
+		public static void logErrors(String message, int nbError) {
+			for (int i = 0; i < nbError; i++) {
+				logger.severe(message + i);
+			}
+		}
+		
 		public static void logAnErrorAfterRecursiveCall(int nbCall) {
 			
 			if (nbCall < 0) {
@@ -94,6 +100,45 @@ class FilterCounterTest {
 				assertThat(logRecord.getLevel()).isEqualTo(Level.SEVERE);
 				assertThat(logRecord.getMessage()).isEqualTo(errorMessage);
 			});
+		logRecordCounter.stopLogCountAndFilter();
+	}
+	
+	
+	@Test
+	void filterCounterErrorLogTestMultipleError() {
+		
+		LogRecordCounter logRecordCounter = 
+				FilterCounter.getLogRecordCounter(Logger.getLogger(ForTest.class.getName()));
+		
+		ForTest.logErrors("The error message", logRecordCounter.getMaxLogRecordKept());
+		
+		assertThat(logRecordCounter.getLogRecords()).isNotNull().hasSize(logRecordCounter.getMaxLogRecordKept());
+		
+		ForTest.logAnError("last error");
+		assertThat(logRecordCounter.getLogRecords())
+			.isNotNull()
+			.hasSize(logRecordCounter.getMaxLogRecordKept())
+			.satisfiesOnlyOnce(logRecord -> assertThat(logRecord.getMessage()).isEqualTo("last error"));
+		
+		logRecordCounter.stopLogCountAndFilter();
+	}
+	
+	@Test
+	void filterCounterErrorLogTestMultipleError2() {
+		
+		int nbErrorKept = 5;
+		
+		LogRecordCounter logRecordCounter = 
+				FilterCounter.getLogRecordCounter(Logger.getLogger(ForTest.class.getName()), nbErrorKept);
+		
+		assertThat(logRecordCounter.getMaxLogRecordKept()).isEqualTo(nbErrorKept);
+		
+		ForTest.logErrors("The error message", nbErrorKept*200);
+		
+		assertThat(logRecordCounter.getLogRecords()).isNotNull().hasSize(nbErrorKept)
+			.satisfiesOnlyOnce(logRecord -> 
+				assertThat(logRecord.getMessage()).isEqualTo("The error message" + Integer.toString(nbErrorKept*200 - 1)));
+		
 		logRecordCounter.stopLogCountAndFilter();
 	}
 	
