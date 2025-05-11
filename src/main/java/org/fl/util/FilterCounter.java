@@ -42,7 +42,7 @@ public class FilterCounter implements Filter {
 		private final FilterCounter filterCounter;
 		private final Logger logger;
 		
-		public LogRecordCounter(String name, FilterCounter filterCounter, Logger logger) {
+		private LogRecordCounter(String name, FilterCounter filterCounter, Logger logger) {
 			super();
 			this.name = name;
 			this.filterCounter = filterCounter;
