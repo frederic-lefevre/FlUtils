@@ -31,8 +31,8 @@ import java.util.logging.LogRecord;
 // So log records which are not picked on time are lost
 public class BufferLogHandler extends Handler {
 
-	private LogRecordMemoryBuffer logRecordBuffer;
-	private String name;
+	private final LogRecordMemoryBuffer logRecordBuffer;
+	private final String name;
 
 	public BufferLogHandler(String n, int nbRecords) {
 
