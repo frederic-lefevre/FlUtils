@@ -272,6 +272,76 @@ class RunningContextTest {
 	}
 	
 	@Test
+	void testRunningContextBuildInfo3() throws URISyntaxException, JsonProcessingException {
+							
+		RunningContext rc = new RunningContext(LOGGER_NAME,
+				new URI("file:///FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test1.properties"));
+		
+		String addedModule = "org.fl.util.test2";
+		rc.addBuildInformation(addedModule);
+		
+		JsonNode buildInformation = rc.getBuildInformationAsJson();
+		assertThat(buildInformation).isNotNull();
+		
+		assertThat(buildInformation).isNotEmpty().hasSize(3)
+			.satisfiesExactlyInAnyOrder(
+					buildInfo -> { 
+						assertThat(buildInfo.get("moduleName")).isNotNull();
+						assertThat(buildInfo.get("moduleName").asText()).isEqualTo(LOGGER_NAME);
+						assertThat(buildInfo.get("version")).isNotNull();
+						assertThat(buildInfo.get("version").asText()).isNotEmpty();
+					},
+					buildInfo -> { 
+						assertThat(buildInfo.get("moduleName")).isNotNull();
+						assertThat(buildInfo.get("moduleName").asText()).isEqualTo("org.fl.util");
+						assertThat(buildInfo.get("version")).isNotNull();
+						assertThat(buildInfo.get("version").asText()).isNotEmpty();
+					},
+					buildInfo -> { 
+						assertThat(buildInfo.get("moduleName")).isNotNull();
+						assertThat(buildInfo.get("moduleName").asText()).isEqualTo(addedModule);
+						assertThat(buildInfo.get("version")).isNotNull();
+						assertThat(buildInfo.get("version").asText()).isNotEmpty();
+					}
+					);
+	}
+	
+	@Test
+	void testRunningContextBuildInfoWithSpecificClassLoader() throws URISyntaxException, JsonProcessingException {
+							
+		RunningContext rc = new RunningContext(LOGGER_NAME,
+				new URI("file:///FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test1.properties"));
+		
+		String addedModule = "org.fl.util.test2";
+		rc.addBuildInformation(addedModule, JsonLogFormatter.class.getClassLoader());
+		
+		JsonNode buildInformation = rc.getBuildInformationAsJson();
+		assertThat(buildInformation).isNotNull();
+		
+		assertThat(buildInformation).isNotEmpty().hasSize(3)
+			.satisfiesExactlyInAnyOrder(
+					buildInfo -> { 
+						assertThat(buildInfo.get("moduleName")).isNotNull();
+						assertThat(buildInfo.get("moduleName").asText()).isEqualTo(LOGGER_NAME);
+						assertThat(buildInfo.get("version")).isNotNull();
+						assertThat(buildInfo.get("version").asText()).isNotEmpty();
+					},
+					buildInfo -> { 
+						assertThat(buildInfo.get("moduleName")).isNotNull();
+						assertThat(buildInfo.get("moduleName").asText()).isEqualTo("org.fl.util");
+						assertThat(buildInfo.get("version")).isNotNull();
+						assertThat(buildInfo.get("version").asText()).isNotEmpty();
+					},
+					buildInfo -> { 
+						assertThat(buildInfo.get("moduleName")).isNotNull();
+						assertThat(buildInfo.get("moduleName").asText()).isEqualTo(addedModule);
+						assertThat(buildInfo.get("version")).isNotNull();
+						assertThat(buildInfo.get("version").asText()).isNotEmpty();
+					}
+					);
+	}
+	
+	@Test
 	void testRunningContextLoggingInfo() throws URISyntaxException, JsonProcessingException {
 		
 		RunningContext rc = new RunningContext(LOGGER_NAME,
