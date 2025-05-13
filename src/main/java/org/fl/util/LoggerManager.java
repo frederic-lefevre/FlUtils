@@ -56,7 +56,7 @@ public class LoggerManager {
 
 	protected static final String LOGMANAGER_PROPERTY_FILE_PROPERTY = "logManager.properties.file";
 	protected static final String BUFFERLOGHANDLER_BASE_PROPERTY = "logging.BufferLogHandler";
-	protected static final String BUFFERLOGHANDLER_FOR_INIT_BASE_PROPERTY = "logging.BufferLogHandler";
+	protected static final String BUFFERLOGHANDLER_FOR_INIT_BASE_PROPERTY = "logging.BufferLogHandlerForInit";
 	private static final String FILE_HANDLER_PATTERN_PROPERTY = "java.util.logging.FileHandler.pattern";
 	
 	// Root logger

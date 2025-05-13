@@ -259,7 +259,7 @@ class LoggerManagerTest {
 					assertThat(handler).isInstanceOfSatisfying(BufferLogHandler.class, 
 							bufferLogHandler -> { 
 								assertThat(bufferLogHandler.getName()).isEqualTo(LoggerManager.BUFFERLOGHANDLER_FOR_INIT_BASE_PROPERTY);
-								assertThat(bufferLogHandler.getMaxMemoryLogRecord()).isEqualTo(50);
+								assertThat(bufferLogHandler.getMaxMemoryLogRecord()).isEqualTo(40);
 							});
 				}
 			);
