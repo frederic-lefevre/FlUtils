@@ -94,7 +94,7 @@ public class PropertiesStorage {
 		
 		// Finally get the advanced properties
 		// load property from the property file		
-		advancedProperties = new AdvancedProperties(psLogger);
+		advancedProperties = new AdvancedProperties(null);
 
 		if (propUrl != null) {
 			try (InputStreamReader reader = new InputStreamReader(propUrl.openStream(), StandardCharsets.UTF_8)) {

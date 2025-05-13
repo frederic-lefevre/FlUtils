@@ -110,7 +110,7 @@ public class LoggerManager {
     private LoggerManager(String logName, AdvancedProperties props) {
    		
     	if (props == null) {
-    		properties = new AdvancedProperties(loggerManagertLogger);
+    		properties = new AdvancedProperties(null);
     	} else {
     		properties = props;
     	}

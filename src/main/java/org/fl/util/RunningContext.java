@@ -105,7 +105,7 @@ public class RunningContext {
 				propsStorage = new PropertiesStorage(propertyUri);
 				applicationProperties = propsStorage.getAdvancedProperties(); 
 			} else {
-				applicationProperties = new AdvancedProperties(runningContextLogger);
+				applicationProperties = new AdvancedProperties(null);
 			}
 			
 			// Initialize logger
@@ -142,7 +142,7 @@ public class RunningContext {
 
 		} catch (Exception e) {
 			runningContextLogger.log(Level.SEVERE, "Exception processing property file.  ", e);
-			applicationProperties = new AdvancedProperties(runningContextLogger);			
+			applicationProperties = new AdvancedProperties(null);			
 		}
 	}
 	
