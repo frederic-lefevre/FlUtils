@@ -28,6 +28,8 @@ import static org.assertj.core.api.Assertions.*;
 
 import java.io.IOException;
 import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.FileHandler;
 import java.util.logging.Handler;
@@ -37,9 +39,11 @@ import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
 import org.fl.util.FilterCounter.LogRecordCounter;
+import org.fl.util.file.FilesUtils;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.MethodOrderer;
 
@@ -518,4 +522,37 @@ class LoggerManagerTest {
 		
 		logRecordCounter.stopLogCountAndFilter();
 	}
+	
+	private static final Path test8Path = Path.of("/ForTests/FlUtils/logTest8/").toAbsolutePath();
+	
+	@Test
+	@Order(11)
+	void shouldCreateUnexistantLoggingFolders() throws Exception {
+		
+		if (Files.exists(test8Path)) {
+			// The directory tree cannot be deleted at the end of the test or in a "@AfterAll": It is locked by the process
+			FilesUtils.deleteDirectoryTree(test8Path, true, Logger.getLogger(LoggerManagerTest.class.getName()));
+		}
+		assertThat(test8Path).doesNotExist();
+		
+		String loggerName = "org.fl.util.Test8";
+		String pathString = "file:///FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test8.properties";
+		
+		PropertiesStorage ps = new PropertiesStorage(URI.create(pathString));
+		
+		AdvancedProperties props = ps.getAdvancedProperties();
+		assertThat(props).isNotNull();
+		
+		Path fileHandlerDestinationPath = test8Path.resolve("does/not/exists/");
+		assertThat(fileHandlerDestinationPath).doesNotExist();
+		
+		LoggerManager.builder()
+				.applicationRootLoggerName(loggerName)
+				.properties(props)
+				.build();
+		
+		assertThat(fileHandlerDestinationPath).exists();
+	}
+
+	
 }

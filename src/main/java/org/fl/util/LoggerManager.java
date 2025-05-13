@@ -68,7 +68,12 @@ public class LoggerManager {
 	// in memory logging handler
 	private BufferLogHandler bufferLogHandler;
 
-	private AdvancedProperties properties;
+	// in memory logging handler reserved for application initialization
+	// Used before the GUI setup
+	// Once the GUI is set up, the eventual log records will be displayed in the Log Display tab
+	private BufferLogHandler bufferLogHandlerForInit;
+	
+	private final AdvancedProperties properties;
 
 	private AdvancedProperties loggingProperties;
 	
@@ -101,11 +106,6 @@ public class LoggerManager {
     		return new LoggerManager(applicationRootLoggerName, props);
     	}
     }
-    
-	private LoggerManager() {
-		applicationRootLogger = null;
-		formatterName = null;
-	}
   
     private LoggerManager(String logName, AdvancedProperties props) {
    		
@@ -186,12 +186,10 @@ public class LoggerManager {
 		if ((filePathPattern != null) && !filePathPattern.startsWith("%t") && !filePathPattern.startsWith("%h")) {
 			
 			try {
-				Path logFilePattern = Paths.get(filePathPattern);
-				if (logFilePattern.isAbsolute()) {
-					Path logFileFolderPath = logFilePattern.getParent();
-					if (Files.notExists(logFileFolderPath)) {
-						Files.createDirectories(logFileFolderPath);
-					}
+
+				Path logFileFolderPath = Path.of(filePathPattern).toAbsolutePath().getParent();
+				if (Files.notExists(logFileFolderPath)) {
+					Files.createDirectories(logFileFolderPath);
 				}
 			} catch (InvalidPathException e) {
 				loggerManagertLogger.log(Level.SEVERE, "InvalidPathException converting log file pattern " + filePathPattern, e);
@@ -212,8 +210,7 @@ public class LoggerManager {
 			applicationRootLogger.addHandler(bufferLogHandler);
 		} else {
 			bufferLogHandler = null;
-		}
-      
+		}      
     }
     
 	public Formatter getCommonFormatterInstance() {
@@ -259,22 +256,12 @@ public class LoggerManager {
 				// Custom handler level
 				customHandler.setLevel(properties.getLevel("logging." + customHandlerName + ".level", Level.OFF));
 
-				if ((customHandler instanceof BufferLogHandler) && (bufferLogHandler != null)) {
-					// if the custom handler has an (inherited) in-memory logging, there is no need
-					// to have
-					// the standard in-memory logging of this class, so suppress it if it was
-					// enabled
-					applicationRootLogger.removeHandler(bufferLogHandler);
-					bufferLogHandler.close();
-					bufferLogHandler = null;
-				}
 			} catch (SecurityException | UnsupportedEncodingException e) {
 				loggerManagertLogger.log(Level.SEVERE, "Unable to set encoding for the custom log handler", e);
 			}
 		}
 	}
 
-	
 	// Get the logger level and the levels, formatter of all handlers
 	public JsonNode getLoggerLevels() {
 		return LoggerUtils.getLoggerLevels(applicationRootLogger);
