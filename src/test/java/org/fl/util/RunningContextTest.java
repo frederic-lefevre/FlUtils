@@ -99,6 +99,8 @@ class RunningContextTest {
 		
 		assertThat(orgFlLogRecordCounter.getLogRecordCount()).isEqualTo(3);
 		assertThat(orgFlLogRecordCounter.getLogRecordCount(Level.WARNING)).isEqualTo(3);
+		assertThat(orgFlLogRecordCounter.getLogRecords()).hasSize(3)
+			.anySatisfy(logRecord -> assertThat(logRecord.getMessage()).isEqualTo("No project properties (build information) found"));
 		
 		assertThat(runningContextLogRecordCounter.getLogRecordCount()).isEqualTo(1);
 		assertThat(runningContextLogRecordCounter.getLogRecordCount(Level.SEVERE)).isEqualTo(1);
