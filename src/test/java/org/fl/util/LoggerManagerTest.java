@@ -204,18 +204,7 @@ class LoggerManagerTest {
 		
 		assertThat(rootLogger.getLevel()).isEqualTo(Level.INFO);
 		assertThat(rootLogger.getUseParentHandlers()).isTrue();		
-		assertSamplePropertyHandlers(rootLogger.getHandlers());
-		
-		Logger logger = Logger.getLogger(loggerName);
-		
-		assertThat(logger.getLevel()).isEqualTo(Level.WARNING);		
-		assertThat(logger.getUseParentHandlers()).isFalse();		
-		assertSamplePropertyHandlers(logger.getHandlers());	
-	}
-	
-	private void assertSamplePropertyHandlers(Handler[] handlers) {
-		
-		assertThat(handlers).hasSize(2)
+		assertThat(rootLogger.getHandlers()).hasSize(2)
 		.satisfiesExactlyInAnyOrder(
 				handler -> { 
 					assertThat(handler).isInstanceOf(ConsoleHandler.class);
@@ -236,6 +225,45 @@ class LoggerManagerTest {
 					assertThat(handler.getErrorManager()).isNotNull();
 				}
 			);
+		
+		Logger logger = Logger.getLogger(loggerName);
+		
+		assertThat(logger.getLevel()).isEqualTo(Level.WARNING);		
+		assertThat(logger.getUseParentHandlers()).isFalse();		
+		assertThat(logger.getHandlers()).hasSize(3)
+		.satisfiesExactlyInAnyOrder(
+				handler -> { 
+					assertThat(handler).isInstanceOf(ConsoleHandler.class);
+					assertThat(handler.getEncoding()).isEqualTo("UTF-8");
+					assertThat(handler.getLevel()).isEqualTo(Level.INFO);
+					assertThat(handler.getFormatter()).isNotNull()
+						.isInstanceOf(SimpleFormatter.class);
+					assertThat(handler.getFilter()).isNull();
+					assertThat(handler.getErrorManager()).isNotNull();
+				},
+				handler -> { 
+					assertThat(handler).isInstanceOf(FileHandler.class);
+					assertThat(handler.getEncoding()).isEqualTo("UTF-8");
+					assertThat(handler.getLevel()).isEqualTo(Level.WARNING);
+					assertThat(handler.getFormatter()).isNotNull()
+						.isInstanceOf(PlainLogFormatter.class);
+					assertThat(handler.getFilter()).isNull();
+					assertThat(handler.getErrorManager()).isNotNull();
+				},
+				handler -> { 
+					assertThat(handler).isInstanceOf(BufferLogHandler.class);
+					assertThat(handler.getLevel()).isEqualTo(Level.INFO);
+					assertThat(handler.getFormatter()).isNull();
+					assertThat(handler.getFilter()).isNull();
+					assertThat(handler.getErrorManager()).isNotNull();
+					assertThat(handler).isInstanceOfSatisfying(BufferLogHandler.class, 
+							bufferLogHandler -> { 
+								assertThat(bufferLogHandler.getName()).isEqualTo(LoggerManager.BUFFERLOGHANDLER_FOR_INIT_BASE_PROPERTY);
+								assertThat(bufferLogHandler.getMaxMemoryLogRecord()).isEqualTo(50);
+							});
+				}
+			);
+		
 	}
 	
 	@Test

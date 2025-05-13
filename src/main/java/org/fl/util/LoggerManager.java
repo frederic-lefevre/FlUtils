@@ -46,6 +46,8 @@ import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 import java.util.logging.XMLFormatter;
 
+import org.fl.util.swing.logPane.LogsDisplayPane;
+
 import com.fasterxml.jackson.databind.JsonNode;
 
 public class LoggerManager {
@@ -53,8 +55,9 @@ public class LoggerManager {
 	private static final String DEFAULT_LOG_NAME = "org.fl";
 
 	protected static final String LOGMANAGER_PROPERTY_FILE_PROPERTY = "logManager.properties.file";
-	private static final String FILE_HANDLER_PATTERN_PROPERTY = "java.util.logging.FileHandler.pattern";
 	protected static final String BUFFERLOGHANDLER_BASE_PROPERTY = "logging.BufferLogHandler";
+	protected static final String BUFFERLOGHANDLER_FOR_INIT_BASE_PROPERTY = "logging.BufferLogHandler";
+	private static final String FILE_HANDLER_PATTERN_PROPERTY = "java.util.logging.FileHandler.pattern";
 	
 	// Root logger
 	private static final Logger loggerManagertLogger = Logger.getLogger(LoggerManager.class.getName());
@@ -71,7 +74,7 @@ public class LoggerManager {
 	// in memory logging handler reserved for application initialization
 	// Used before the GUI setup
 	// Once the GUI is set up, the eventual log records will be displayed in the Log Display tab
-	private BufferLogHandler bufferLogHandlerForInit;
+	private final BufferLogHandler bufferLogHandlerForInit;
 	
 	private final AdvancedProperties properties;
 
@@ -125,6 +128,12 @@ public class LoggerManager {
 		formatterName = properties.getProperty("logging.formatter");
 		
 		bufferLogHandler = initBufferedLogHandler(BUFFERLOGHANDLER_BASE_PROPERTY, 0, Level.OFF);
+		
+		if (LogsDisplayPane.hasLogsDisplayPaneProperty(properties)) {
+			bufferLogHandlerForInit = initBufferedLogHandler(BUFFERLOGHANDLER_FOR_INIT_BASE_PROPERTY, 50, Level.INFO);
+		} else {
+			bufferLogHandlerForInit = null;
+		}
 
     }
     
@@ -228,6 +237,10 @@ public class LoggerManager {
 	
 	public AdvancedProperties getLoggingProperties() {
 		return loggingProperties;
+	}
+
+	public BufferLogHandler getBufferLogHandlerForInit() {
+		return bufferLogHandlerForInit;
 	}
 
 	// Add a custom handler to the logger
