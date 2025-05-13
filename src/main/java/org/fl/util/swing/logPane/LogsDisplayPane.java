@@ -26,6 +26,7 @@ package org.fl.util.swing.logPane;
 
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -39,6 +40,13 @@ public class LogsDisplayPane extends JTabbedPane {
 
 	private static final long serialVersionUID = 1L;
 
+	private static final String LAST_NON_HIGHLIGHTED_PROPERTY_NAME = "appTabbedPane.logging.lastNonHighLighedLevel";
+	private static final String RECORD_HIGHLIGHT_COLOR_PROPERTY_NAME = "appTabbedPane.logging.recordHighLightColor";
+	private static final String SUB_TAB_NUMBER_PROPERTY_NAME = "appTabbedPane.logging.subTabNumber";
+	private static final String LOG_DISPLAY_MAX_LENGTH_PROPERTY_NAME = "appTabbedPane.logging.logDisplayMaxLength";
+	private static final String LOG_TAB_SELECTED_COLOR_PROPERTY_NAME = "appTabbedPane.logging.logTabSelectedColor";
+	private static final String SEARCH_HIGHLIGHT_COLORS_PROPERTY_NAME = "appTabbedPane.logging.searchHighLightColors";
+	
 	private final ArrayList<SearchableLogDisplay> searchableLogDisplays;
 	private final TextAreaLogHandler textAreaLogHandler;
 
@@ -59,13 +67,13 @@ public class LogsDisplayPane extends JTabbedPane {
 		super();
 		
 		AdvancedProperties props = runningContext.getProps();
-		Level lastNonHighLightedLevel = props.getLevel("appTabbedPane.logging.lastNonHighLighedLevel", Level.INFO);
-		Color recordHighLightColor = props.getColor("appTabbedPane.logging.recordHighLightColor", Color.PINK) ;
-		logDisplaySubTabNumber = props.getInt("appTabbedPane.logging.subTabNumber", 3);
-		logDisplayMaxLength = props.getInt("appTabbedPane.logging.logDisplayMaxLength", 100000);
-		logTabSelectedColor = props.getColor("appTabbedPane.logging.logTabSelectedColor", Color.GREEN);
+		Level lastNonHighLightedLevel = props.getLevel(LAST_NON_HIGHLIGHTED_PROPERTY_NAME, Level.INFO);
+		Color recordHighLightColor = props.getColor(RECORD_HIGHLIGHT_COLOR_PROPERTY_NAME, Color.PINK) ;
+		logDisplaySubTabNumber = props.getInt(SUB_TAB_NUMBER_PROPERTY_NAME, 3);
+		logDisplayMaxLength = props.getInt(LOG_DISPLAY_MAX_LENGTH_PROPERTY_NAME, 100000);
+		logTabSelectedColor = props.getColor(LOG_TAB_SELECTED_COLOR_PROPERTY_NAME, Color.GREEN);
 		
-		Color[] searchHighLightColors = props.getColors("appTabbedPane.logging.searchHighLightColors", DEFAULT_SEARCH_HIGHLIGHTCOLORS);
+		Color[] searchHighLightColors = props.getColors(SEARCH_HIGHLIGHT_COLORS_PROPERTY_NAME, DEFAULT_SEARCH_HIGHLIGHTCOLORS);
 		
 		Logger logger = Logger.getLogger(runningContext.getName());
 		searchableLogDisplays = new ArrayList<SearchableLogDisplay>();
@@ -112,6 +120,15 @@ public class LogsDisplayPane extends JTabbedPane {
 		currentLogDisplay.refreshLogRecordCategories();
 	}
 
+	public static boolean hasLogsDisplayPaneProperty(Properties properties) {
+		return properties.containsKey(LAST_NON_HIGHLIGHTED_PROPERTY_NAME) ||
+				properties.containsKey(LOG_DISPLAY_MAX_LENGTH_PROPERTY_NAME) ||
+				properties.containsKey(LOG_TAB_SELECTED_COLOR_PROPERTY_NAME) ||
+				properties.containsKey(RECORD_HIGHLIGHT_COLOR_PROPERTY_NAME) ||
+				properties.containsKey(SEARCH_HIGHLIGHT_COLORS_PROPERTY_NAME) ||
+				properties.containsKey(SUB_TAB_NUMBER_PROPERTY_NAME);
+	}
+	
 	private void selectCurrentLogDisplay() {
 		setSelectedIndex(currentLogDisplayIndex);
 		int logTabIdx = indexOfComponent(currentLogDisplay.getPanel());

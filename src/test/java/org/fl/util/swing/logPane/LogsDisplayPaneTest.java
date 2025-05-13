@@ -38,6 +38,7 @@ import org.fl.util.LoggerManager;
 import org.fl.util.RunningContext;
 import org.fl.util.FilterCounter.LogRecordCounter;
 import org.fl.util.PlainLogFormatter;
+import org.fl.util.PropertiesStorage;
 import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -122,5 +123,19 @@ class LogsDisplayPaneTest {
 					assertThat(handler.getErrorManager()).isNotNull();
 				}
 			);
+	}
+	
+	@Test
+	void testHasNoLogsDisplayPaneProperty() throws JsonProcessingException {
+		
+		RunningContext rc = new RunningContext(LOGGER_NAME, URI.create("test1.properties"));		
+		assertThat(LogsDisplayPane.hasLogsDisplayPaneProperty(rc.getProps())).isFalse();		
+	}
+	
+	@Test
+	void testHasLogsDisplayPaneProperty() throws Exception {
+		
+		PropertiesStorage ps = new PropertiesStorage(URI.create("flUtilsSample.properties"));		
+		assertThat(LogsDisplayPane.hasLogsDisplayPaneProperty(ps.getAdvancedProperties())).isTrue();		
 	}
 }
