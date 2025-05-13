@@ -43,7 +43,6 @@ import org.fl.util.file.FilesUtils;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.MethodOrderer;
 
@@ -293,7 +292,7 @@ class LoggerManagerTest {
 					assertThat(handler).isInstanceOf(BufferLogHandler.class);
 					assertThat(handler).isInstanceOfSatisfying(BufferLogHandler.class, 
 							bufferLogHandler -> { 
-								assertThat(bufferLogHandler.getName()).isEqualTo("standard bufferLogHandler");
+								assertThat(bufferLogHandler.getName()).isEqualTo(LoggerManager.BUFFERLOGHANDLER_BASE_PROPERTY);
 								assertThat(bufferLogHandler.getMaxMemoryLogRecord()).isEqualTo(100);
 							});
 					assertThat(handler.getLevel()).isEqualTo(Level.INFO);
@@ -428,7 +427,7 @@ class LoggerManagerTest {
 					assertThat(handler).isInstanceOf(BufferLogHandler.class);
 					assertThat(handler).isInstanceOfSatisfying(BufferLogHandler.class, 
 							bufferLogHandler -> { 
-								assertThat(bufferLogHandler.getName()).isEqualTo("standard bufferLogHandler");
+								assertThat(bufferLogHandler.getName()).isEqualTo(LoggerManager.BUFFERLOGHANDLER_BASE_PROPERTY);
 								assertThat(bufferLogHandler.getMaxMemoryLogRecord()).isEqualTo(100);
 							});
 					assertThat(handler.getLevel()).isEqualTo(Level.INFO);

@@ -32,7 +32,6 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -55,6 +54,7 @@ public class LoggerManager {
 
 	protected static final String LOGMANAGER_PROPERTY_FILE_PROPERTY = "logManager.properties.file";
 	private static final String FILE_HANDLER_PATTERN_PROPERTY = "java.util.logging.FileHandler.pattern";
+	protected static final String BUFFERLOGHANDLER_BASE_PROPERTY = "logging.BufferLogHandler";
 	
 	// Root logger
 	private static final Logger loggerManagertLogger = Logger.getLogger(LoggerManager.class.getName());
@@ -66,7 +66,7 @@ public class LoggerManager {
 	private final String formatterName;
 
 	// in memory logging handler
-	private BufferLogHandler bufferLogHandler;
+	private final BufferLogHandler bufferLogHandler;
 
 	// in memory logging handler reserved for application initialization
 	// Used before the GUI setup
@@ -124,13 +124,8 @@ public class LoggerManager {
 		// Set the formatter name for specific handlers
 		formatterName = properties.getProperty("logging.formatter");
 		
-		try {	
-			initBufferedLogHandler();
-		} catch (SecurityException e) {
-			loggerManagertLogger.log(Level.SEVERE, "Security exception in LoggerManager init", e);
-		} catch (Exception e) {
-			loggerManagertLogger.log(Level.SEVERE, "Security exception in intialisation, LoggerManager", e);
-		}
+		bufferLogHandler = initBufferedLogHandler(BUFFERLOGHANDLER_BASE_PROPERTY, 0, Level.OFF);
+
     }
     
     // Remapper for logging properties.
@@ -199,18 +194,18 @@ public class LoggerManager {
 		}
     }
     
-    private void initBufferedLogHandler() {
+    private BufferLogHandler initBufferedLogHandler(String baseProperty, int defaultBufferSize, Level defaultLevel) {
 
 		// Memory handler
-		int bufferSize = properties.getInt("logging.BufferLogHandler.bufferLength", 0);
+    	BufferLogHandler bufferLogHandler = null;
+		int bufferSize = properties.getInt(baseProperty + ".bufferLength", defaultBufferSize);
 		if (bufferSize > 0) {
 
-			bufferLogHandler = new BufferLogHandler("standard bufferLogHandler", bufferSize);
-			bufferLogHandler.setLevel(properties.getLevel("logging.BufferLogHandler.level", Level.OFF));
+			bufferLogHandler = new BufferLogHandler(baseProperty, bufferSize);
+			bufferLogHandler.setLevel(properties.getLevel(baseProperty  + ".level", defaultLevel));
 			applicationRootLogger.addHandler(bufferLogHandler);
-		} else {
-			bufferLogHandler = null;
-		}      
+		} 
+		return bufferLogHandler;
     }
     
 	public Formatter getCommonFormatterInstance() {
