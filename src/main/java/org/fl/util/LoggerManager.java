@@ -75,7 +75,7 @@ public class LoggerManager {
 	
 	private final AdvancedProperties properties;
 
-	private AdvancedProperties loggingProperties;
+	private final AdvancedProperties loggingProperties;
 	
 	// LoggerManager Builder
     public static Builder builder() {
@@ -114,11 +114,9 @@ public class LoggerManager {
     	} else {
     		properties = props;
     	}
-		
-    	loggingProperties = null;
     	
     	// Read java.util.logging.LogManager configuration
-    	initJavaUtilLogging(logName);
+    	loggingProperties = initJavaUtilLogging(logName);
     		
     	// get or create the logger
    		applicationRootLogger = Logger.getLogger(logName);
@@ -139,8 +137,9 @@ public class LoggerManager {
     // For all property key k, if the new property exists, take it, else keep the old one
     private Function<String, BiFunction<String,String,String>> loggingPrpertyRemapper = (k) -> ((o, n) -> n == null ? o : n);
     
-    private void initJavaUtilLogging(String applicationRootLoggerName) {
+    private AdvancedProperties initJavaUtilLogging(String applicationRootLoggerName) {
     	
+    	AdvancedProperties loggingProperties = null;
     	String loggingPropertiesFileName = properties.getProperty(LOGMANAGER_PROPERTY_FILE_PROPERTY);
     	if ((loggingPropertiesFileName != null) && !loggingPropertiesFileName.isEmpty()) {
     				
@@ -165,6 +164,7 @@ public class LoggerManager {
     	} else {
     		loggerManagertLogger.warning(LOGMANAGER_PROPERTY_FILE_PROPERTY + " property is not found in the application property file");
     	}
+    	return loggingProperties;
     }
     
     private void checkApplicationootLoggerConfig(AdvancedProperties loggingProperties, String applicationRootLoggerName) {
