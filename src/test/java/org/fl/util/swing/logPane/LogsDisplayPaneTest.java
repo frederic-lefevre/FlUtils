@@ -34,6 +34,7 @@ import java.util.logging.Logger;
 
 import org.fl.util.BufferLogHandler;
 import org.fl.util.FilterCounter;
+import org.fl.util.LoggerManager;
 import org.fl.util.RunningContext;
 import org.fl.util.FilterCounter.LogRecordCounter;
 import org.fl.util.PlainLogFormatter;
@@ -83,7 +84,7 @@ class LogsDisplayPaneTest {
 	void nullLevelForApplicationLoggerShouldRaiseError() throws JsonProcessingException {
 		
 		LogRecordCounter rootLogRecordCounter = 
-				FilterCounter.getLogRecordCounter(Logger.getLogger(""));
+				FilterCounter.getLogRecordCounter(Logger.getLogger(LoggerManager.class.getName()));
 		
 		RunningContext rc = new RunningContext(LOGGER_NAME2, URI.create("test6.properties"));
 		

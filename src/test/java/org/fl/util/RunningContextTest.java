@@ -61,8 +61,8 @@ class RunningContextTest {
 		LogRecordCounter orgFlLogRecordCounter = 
 				FilterCounter.getLogRecordCounter(Logger.getLogger("org.fl"));
 		
-		LogRecordCounter rootLogRecordCounter = 
-				FilterCounter.getLogRecordCounter(Logger.getLogger(""));
+		LogRecordCounter loggerManagerLogRecordCounter = 
+				FilterCounter.getLogRecordCounter(Logger.getLogger(LoggerManager.class.getName()));
 		
 		RunningContext rc = rcSupplier.get();
 		
@@ -91,8 +91,7 @@ class RunningContextTest {
 					assertThat(buildInfo.get("moduleName").asText()).isEqualTo("org.fl.util");
 					assertThat(buildInfo.get("version")).isNotNull();
 					assertThat(buildInfo.get("version").asText()).isNotEmpty();
-				}
-				);
+				});
 		
 		assertThat(rc.getInitializationDate()).isCloseTo(Instant.now(), within(2, ChronoUnit.SECONDS));
 		
@@ -103,12 +102,17 @@ class RunningContextTest {
 		
 		assertThat(runningContextLogRecordCounter.getLogRecordCount()).isEqualTo(1);
 		assertThat(runningContextLogRecordCounter.getLogRecordCount(Level.SEVERE)).isEqualTo(1);
+		assertThat(runningContextLogRecordCounter.getLogRecords()).singleElement()
+			.satisfies(logRecord -> assertThat(logRecord.getMessage()).isEqualTo("Null application name passed in running context"));
 		
-		assertThat(rootLogRecordCounter.getLogRecordCount()).isEqualTo(1);
-		assertThat(rootLogRecordCounter.getLogRecordCount(Level.WARNING)).isEqualTo(1);
+		assertThat(loggerManagerLogRecordCounter.getLogRecordCount()).isEqualTo(1);
+		assertThat(loggerManagerLogRecordCounter.getLogRecordCount(Level.WARNING)).isEqualTo(1);
+		assertThat(loggerManagerLogRecordCounter.getLogRecords()).singleElement()
+			.satisfies(logRecord -> assertThat(logRecord.getMessage()).isEqualTo("logManager.properties.file property is not found in the application property file"));
 		
 		orgFlLogRecordCounter.stopLogCountAndFilter();
-		rootLogRecordCounter.stopLogCountAndFilter();
+		runningContextLogRecordCounter.stopLogCountAndFilter();
+		loggerManagerLogRecordCounter.stopLogCountAndFilter();
 
 	}
 	

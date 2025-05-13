@@ -60,7 +60,7 @@ class LoggerManagerTest {
 	void testDefaultLoggerConfiguration() {
 		
 		LogRecordCounter logRecordCounter = 
-				FilterCounter.getLogRecordCounter(Logger.getLogger(""));
+				FilterCounter.getLogRecordCounter(Logger.getLogger(LoggerManager.class.getName()));
 		
 		LoggerManager logMgr = LoggerManager.builder().build();
 		assertThat(logMgr).isNotNull();
@@ -90,7 +90,7 @@ class LoggerManagerTest {
 		String loggerName = LoggerManagerTest.class.getName() + ".1";
 		
 		LogRecordCounter logRecordCounter = 
-				FilterCounter.getLogRecordCounter(Logger.getLogger(""));
+				FilterCounter.getLogRecordCounter(Logger.getLogger(LoggerManager.class.getName()));
 		
 		LoggerManager logMgr = LoggerManager.builder()
 				.applicationRootLoggerName(loggerName)
@@ -128,7 +128,7 @@ class LoggerManagerTest {
 		AdvancedProperties props = ps.getAdvancedProperties();
 		
 		LogRecordCounter logRecordCounter = 
-				FilterCounter.getLogRecordCounter(Logger.getLogger(""));
+				FilterCounter.getLogRecordCounter(Logger.getLogger(LoggerManager.class.getName()));
 				
 		LoggerManager logMgr = LoggerManager.builder()
 				.applicationRootLoggerName(loggerName)
@@ -473,7 +473,7 @@ class LoggerManagerTest {
 		assertThat(props).isNotNull();
 		
 		LogRecordCounter logRecordCounter = 
-				FilterCounter.getLogRecordCounter(Logger.getLogger(""));
+				FilterCounter.getLogRecordCounter(Logger.getLogger(LoggerManager.class.getName()));
 		
 		LoggerManager logMgr = LoggerManager.builder()
 				.applicationRootLoggerName(loggerName)
@@ -503,7 +503,7 @@ class LoggerManagerTest {
 		assertThat(props).isNotNull();
 		
 		LogRecordCounter logRecordCounter = 
-				FilterCounter.getLogRecordCounter(Logger.getLogger(""));
+				FilterCounter.getLogRecordCounter(Logger.getLogger(LoggerManager.class.getName()));
 		
 		LoggerManager logMgr = LoggerManager.builder()
 				.applicationRootLoggerName(loggerName)
