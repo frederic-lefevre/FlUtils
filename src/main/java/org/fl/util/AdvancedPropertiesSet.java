@@ -24,11 +24,11 @@ SOFTWARE.
 
 package org.fl.util;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -38,30 +38,21 @@ import java.util.logging.Logger;
 //
 public class AdvancedPropertiesSet {
 
-	private List<AdvancedProperties> apList ;
+	private final List<AdvancedProperties> apList;
 
 	public AdvancedPropertiesSet(FileSet fs, Logger log) {
-		super();
-		
-		apList = new ArrayList<>() ;
-		if (fs != null) {
-			
-			List<Path> fpList = fs.getFileList() ;
-			
-			if (fpList != null) {
-				
-				try {
-					for (Path p : fpList) {
-						Properties prop = new Properties() ;
-						prop.load(Files.newBufferedReader(p));
-						apList.add(new AdvancedProperties(prop, log)) ;
-					}
+
+		apList = fs.getFileList().stream()
+			.map(path -> {
+				Properties prop = new Properties();
+				try (BufferedReader reader = Files.newBufferedReader(path)) {			
+					prop.load(reader);
 				} catch (IOException e) {
-					log.log(Level.SEVERE, "IO Exception when loading properties files", e);					
+					log.log(Level.SEVERE, "IO Exception when loading properties file " + Objects.toString(path), e);
 				}
-			}
-		}
-		
+				return new AdvancedProperties(prop, log);
+			})
+			.toList();	
 	}
 
 	public List<AdvancedProperties> getApList() {
