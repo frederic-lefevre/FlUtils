@@ -56,6 +56,9 @@ class RunningContextTest {
 	private void testRunningContextWithNullParam(Supplier<RunningContext> rcSupplier) throws JsonProcessingException {
 		
 		LogRecordCounter runningContextLogRecordCounter = 
+				FilterCounter.getLogRecordCounter(Logger.getLogger(RunningContext.class.getName()));
+		
+		LogRecordCounter orgFlLogRecordCounter = 
 				FilterCounter.getLogRecordCounter(Logger.getLogger("org.fl"));
 		
 		LogRecordCounter rootLogRecordCounter = 
@@ -95,14 +98,16 @@ class RunningContextTest {
 		
 		assertThat(rc.getCommonLogFormatter()).isInstanceOf(SimpleFormatter.class);
 		
-		assertThat(runningContextLogRecordCounter.getLogRecordCount()).isEqualTo(3);
-		assertThat(runningContextLogRecordCounter.getLogRecordCount(Level.WARNING)).isEqualTo(3);
+		assertThat(orgFlLogRecordCounter.getLogRecordCount()).isEqualTo(3);
+		assertThat(orgFlLogRecordCounter.getLogRecordCount(Level.WARNING)).isEqualTo(3);
 		
-		assertThat(rootLogRecordCounter.getLogRecordCount()).isEqualTo(2);
-		assertThat(rootLogRecordCounter.getLogRecordCount(Level.SEVERE)).isEqualTo(1);
+		assertThat(runningContextLogRecordCounter.getLogRecordCount()).isEqualTo(1);
+		assertThat(runningContextLogRecordCounter.getLogRecordCount(Level.SEVERE)).isEqualTo(1);
+		
+		assertThat(rootLogRecordCounter.getLogRecordCount()).isEqualTo(1);
 		assertThat(rootLogRecordCounter.getLogRecordCount(Level.WARNING)).isEqualTo(1);
 		
-		runningContextLogRecordCounter.stopLogCountAndFilter();
+		orgFlLogRecordCounter.stopLogCountAndFilter();
 		rootLogRecordCounter.stopLogCountAndFilter();
 
 	}

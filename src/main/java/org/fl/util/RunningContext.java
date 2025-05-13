@@ -68,7 +68,7 @@ public class RunningContext {
 	private static final String DATE_PATTERN = "uuuu-MM-dd HH:mm:ss.SSS VV";
 
 	// Root logger
-	private static final Logger rootLogger = Logger.getLogger("");
+	private static final Logger runningContextLogger = Logger.getLogger(RunningContext.class.getName());
 	
 	private static final JavaPropsMapper propsMapper = new JavaPropsMapper();
 
@@ -95,7 +95,7 @@ public class RunningContext {
 		
 		if (name == null) {
 			this.name = DEFAULT_APP_NAME;
-			rootLogger.severe("Null application name passed in running context");
+			runningContextLogger.severe("Null application name passed in running context");
 		} else {
 			this.name = name;		
 		}	
@@ -105,7 +105,7 @@ public class RunningContext {
 				propsStorage = new PropertiesStorage(propertyUri);
 				applicationProperties = propsStorage.getAdvancedProperties(); 
 			} else {
-				applicationProperties = new AdvancedProperties(rootLogger);
+				applicationProperties = new AdvancedProperties(runningContextLogger);
 			}
 			
 			// Initialize logger
@@ -141,8 +141,8 @@ public class RunningContext {
 			}
 
 		} catch (Exception e) {
-			rootLogger.log(Level.SEVERE, "Exception processing property file.  ", e);
-			applicationProperties = new AdvancedProperties(rootLogger);			
+			runningContextLogger.log(Level.SEVERE, "Exception processing property file.  ", e);
+			applicationProperties = new AdvancedProperties(runningContextLogger);			
 		}
 	}
 	
