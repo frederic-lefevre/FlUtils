@@ -582,5 +582,32 @@ class LoggerManagerTest {
 		assertThat(fileHandlerDestinationPath).exists();
 	}
 
-	
+	@Test
+	@Order(12)
+	void testLogErrorWithBufferLogForInit() throws Exception {
+		
+		String loggerName = "org.fl.util.Test9";
+		
+		String pathString = "file:///FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test9.properties";
+		
+		PropertiesStorage ps = new PropertiesStorage(URI.create(pathString));
+		
+		AdvancedProperties props = ps.getAdvancedProperties();
+		assertThat(props).isNotNull();
+		
+		LoggerManager logMgr = LoggerManager.builder()
+				.applicationRootLoggerName(loggerName)
+				.properties(props)
+				.createBufferLogHandlerForInit(true)
+				.build();
+		
+		BufferLogHandler bufferLogHandlerForInit = logMgr.getBufferLogHandlerForInit();
+		assertThat(bufferLogHandlerForInit).isNotNull();
+		Logger logger = Logger.getLogger(loggerName);
+		String infoMessage = "un message à l'init";
+		logger.info(infoMessage);
+		
+		assertThat(bufferLogHandlerForInit.getLogRecords()).isNotNull().singleElement()
+			.satisfies(logRecord -> assertThat(logRecord.getMessage()).isEqualTo(infoMessage));
+	}
 }
