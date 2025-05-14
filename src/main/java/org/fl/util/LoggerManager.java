@@ -46,8 +46,6 @@ import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 import java.util.logging.XMLFormatter;
 
-import org.fl.util.swing.logPane.LogsDisplayPane;
-
 import com.fasterxml.jackson.databind.JsonNode;
 
 public class LoggerManager {
@@ -89,10 +87,12 @@ public class LoggerManager {
     	
     	private String applicationRootLoggerName;
     	private AdvancedProperties props;
+    	private boolean createBufferLogHandlerForInit;
     	
     	private Builder() {
     		applicationRootLoggerName = DEFAULT_LOG_NAME;
     		props = null;
+    		createBufferLogHandlerForInit = false;
     	}
     	
     	public Builder applicationRootLoggerName(String logName) {
@@ -105,12 +105,17 @@ public class LoggerManager {
     		return this;
     	}
     	
+    	public Builder createBufferLogHandlerForInit(boolean createBufferLogHandlerForInit) {
+    		this.createBufferLogHandlerForInit = createBufferLogHandlerForInit;
+    		return this;
+    	}
+    	
     	public LoggerManager build() {
-    		return new LoggerManager(applicationRootLoggerName, props);
+    		return new LoggerManager(applicationRootLoggerName, props, createBufferLogHandlerForInit);
     	}
     }
   
-    private LoggerManager(String logName, AdvancedProperties props) {
+    private LoggerManager(String logName, AdvancedProperties props, boolean createBufferLogHandlerForInit) {
    		
     	if (props == null) {
     		properties = new AdvancedProperties(null);
@@ -129,7 +134,7 @@ public class LoggerManager {
 		
 		bufferLogHandler = initBufferedLogHandler(BUFFERLOGHANDLER_BASE_PROPERTY, 0, Level.OFF);
 		
-		if (LogsDisplayPane.hasLogsDisplayPaneProperty(properties)) {
+		if (createBufferLogHandlerForInit) {
 			bufferLogHandlerForInit = initBufferedLogHandler(BUFFERLOGHANDLER_FOR_INIT_BASE_PROPERTY, 50, Level.INFO);
 		} else {
 			bufferLogHandlerForInit = null;

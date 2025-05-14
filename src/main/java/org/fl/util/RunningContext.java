@@ -45,6 +45,7 @@ import java.util.logging.Logger;
 
 import org.fl.util.json.JsonUtils;
 import org.fl.util.os.OperatingInfo;
+import org.fl.util.swing.logPane.LogsDisplayPane;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -112,6 +113,7 @@ public class RunningContext {
 			logMgr = LoggerManager.builder()
 					.applicationRootLoggerName(this.name)
 					.properties(applicationProperties)
+					.createBufferLogHandlerForInit(LogsDisplayPane.hasLogsDisplayPaneProperty(applicationProperties))
 					.build();
 
 			applicationRootLog = Logger.getLogger(this.name);

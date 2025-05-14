@@ -191,6 +191,7 @@ class LoggerManagerTest {
 		LoggerManager logMgr = LoggerManager.builder()
 				.applicationRootLoggerName(loggerName)
 				.properties(props)
+				.createBufferLogHandlerForInit(true)
 				.build();
 		
 		assertThat(logMgr).isNotNull();
