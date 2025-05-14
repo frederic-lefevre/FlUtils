@@ -385,4 +385,22 @@ class RunningContextTest {
 		assertThat(logRecordCounter.getLogRecordCount()).isEqualTo(1);
 		assertThat(logRecordCounter.getLogRecordCount(Level.INFO)).isEqualTo(1);
 	}
+	
+	@Test
+	void testBufferLogHandlerForInit() throws URISyntaxException {
+		
+		String loggerName = "org.fl.util.Test9";
+		
+		RunningContext rc = new RunningContext(loggerName,
+				new URI("file:///FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test9.properties"));
+		
+		BufferLogHandler bufferLogHandlerForInit = rc.getBufferLogHandlerForInit();
+		assertThat(bufferLogHandlerForInit).isNotNull();
+		Logger logger = Logger.getLogger(loggerName);
+		String infoMessage = "un message à l'init";
+		logger.info(infoMessage);
+		
+		assertThat(bufferLogHandlerForInit.getLogRecords()).isNotNull().singleElement()
+			.satisfies(logRecord -> assertThat(logRecord.getMessage()).isEqualTo(infoMessage));
+	}
 }

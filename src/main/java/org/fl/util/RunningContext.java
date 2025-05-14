@@ -358,5 +358,9 @@ public class RunningContext {
 
 		return applicationPropsNode;
 	}
+	
+	public BufferLogHandler getBufferLogHandlerForInit() {
+		return logMgr.getBufferLogHandlerForInit();
+	}
 
 }
