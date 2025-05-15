@@ -26,8 +26,10 @@ package org.fl.util.swing.logPane;
 
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
+import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
 import javax.swing.JTabbedPane;
@@ -61,6 +63,8 @@ public class LogsDisplayPane extends JTabbedPane {
 
 	private final int logDisplaySubTabNumber;
 	private final int logDisplayMaxLength;
+	
+	private final int initialLogRecordsNumber;
 	
 	public LogsDisplayPane(RunningContext runningContext) {
 		
@@ -103,6 +107,14 @@ public class LogsDisplayPane extends JTabbedPane {
 		if (noLevelDefined) {
 			// Log the warning after adding the handler so that it gets displayed in GUI
 			logger.warning("The application logger named " + runningContext.getName() + " has no level defined");
+		}
+		
+		// Publish the log records that were logged before
+		List<LogRecord> initLogRecords = runningContext.removeInitBufferLogHandlerAndDrainLogRecordsTo(textAreaLogHandler);
+		if (initLogRecords == null) {
+			initialLogRecordsNumber = 0;
+		} else {
+			initialLogRecordsNumber = initLogRecords.size();
 		}
 	}
 
@@ -151,5 +163,9 @@ public class LogsDisplayPane extends JTabbedPane {
 			return currentLogDisplay;
 		}
 
+	}
+
+	public int getInitialLogRecordsNumber() {
+		return initialLogRecordsNumber;
 	}
 }

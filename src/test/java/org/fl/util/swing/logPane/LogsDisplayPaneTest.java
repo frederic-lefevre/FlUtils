@@ -27,6 +27,7 @@ package org.fl.util.swing.logPane;
 import static org.assertj.core.api.Assertions.*;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
@@ -64,6 +65,8 @@ class LogsDisplayPaneTest {
 		
 		assertThat(logsDisplayPane).isNotNull();
 		
+		assertThat(logsDisplayPane.getInitialLogRecordsNumber()).isZero();
+		
 		assertThat(logger.getHandlers()).hasSize(4)
 			.satisfiesExactlyInAnyOrder(
 				handler ->	assertThat(handler).isInstanceOf(ConsoleHandler.class),
@@ -79,6 +82,23 @@ class LogsDisplayPaneTest {
 					assertThat(handler.getErrorManager()).isNotNull();
 				}
 			);
+	}
+	
+	
+	@Test
+	void publishInitLogRecordsTest() throws URISyntaxException {
+		
+		String loggerName = "org.fl.util.Test9";
+		
+		RunningContext rc = new RunningContext(loggerName,
+				new URI("file:///FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test9.properties"));
+		
+		Logger logger = Logger.getLogger(loggerName);
+		String infoMessage = "un message à l'init";
+		logger.info(infoMessage);
+		
+		LogsDisplayPane logsDisplayPane = new LogsDisplayPane(rc);
+		assertThat(logsDisplayPane.getInitialLogRecordsNumber()).isEqualTo(1);
 	}
 	
 	@Test
