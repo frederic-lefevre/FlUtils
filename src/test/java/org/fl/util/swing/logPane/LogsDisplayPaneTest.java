@@ -27,6 +27,7 @@ package org.fl.util.swing.logPane;
 import static org.assertj.core.api.Assertions.*;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
@@ -34,9 +35,11 @@ import java.util.logging.Logger;
 
 import org.fl.util.BufferLogHandler;
 import org.fl.util.FilterCounter;
+import org.fl.util.LoggerManager;
 import org.fl.util.RunningContext;
 import org.fl.util.FilterCounter.LogRecordCounter;
 import org.fl.util.PlainLogFormatter;
+import org.fl.util.PropertiesStorage;
 import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -62,6 +65,8 @@ class LogsDisplayPaneTest {
 		
 		assertThat(logsDisplayPane).isNotNull();
 		
+		assertThat(logsDisplayPane.getInitialLogRecordsNumber()).isZero();
+		
 		assertThat(logger.getHandlers()).hasSize(4)
 			.satisfiesExactlyInAnyOrder(
 				handler ->	assertThat(handler).isInstanceOf(ConsoleHandler.class),
@@ -79,11 +84,28 @@ class LogsDisplayPaneTest {
 			);
 	}
 	
+	
+	@Test
+	void publishInitLogRecordsTest() throws URISyntaxException {
+		
+		String loggerName = "org.fl.util.Test9";
+		
+		RunningContext rc = new RunningContext(loggerName,
+				new URI("file:///FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test9.properties"));
+		
+		Logger logger = Logger.getLogger(loggerName);
+		String infoMessage = "un message à l'init";
+		logger.info(infoMessage);
+		
+		LogsDisplayPane logsDisplayPane = new LogsDisplayPane(rc);
+		assertThat(logsDisplayPane.getInitialLogRecordsNumber()).isEqualTo(1);
+	}
+	
 	@Test
 	void nullLevelForApplicationLoggerShouldRaiseError() throws JsonProcessingException {
 		
 		LogRecordCounter rootLogRecordCounter = 
-				FilterCounter.getLogRecordCounter(Logger.getLogger(""));
+				FilterCounter.getLogRecordCounter(Logger.getLogger(LoggerManager.class.getName()));
 		
 		RunningContext rc = new RunningContext(LOGGER_NAME2, URI.create("test6.properties"));
 		
@@ -121,5 +143,19 @@ class LogsDisplayPaneTest {
 					assertThat(handler.getErrorManager()).isNotNull();
 				}
 			);
+	}
+	
+	@Test
+	void testHasNoLogsDisplayPaneProperty() throws JsonProcessingException {
+		
+		RunningContext rc = new RunningContext(LOGGER_NAME, URI.create("test1.properties"));		
+		assertThat(LogsDisplayPane.hasLogsDisplayPaneProperty(rc.getProps())).isFalse();		
+	}
+	
+	@Test
+	void testHasLogsDisplayPaneProperty() throws Exception {
+		
+		PropertiesStorage ps = new PropertiesStorage(URI.create("flUtilsSample.properties"));		
+		assertThat(LogsDisplayPane.hasLogsDisplayPaneProperty(ps.getAdvancedProperties())).isTrue();		
 	}
 }

@@ -28,15 +28,21 @@ import static org.assertj.core.api.Assertions.*;
 
 import java.io.IOException;
 import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Collection;
+import java.util.List;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.FileHandler;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
+import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
 import org.fl.util.FilterCounter.LogRecordCounter;
+import org.fl.util.file.FilesUtils;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
@@ -60,7 +66,7 @@ class LoggerManagerTest {
 	void testDefaultLoggerConfiguration() {
 		
 		LogRecordCounter logRecordCounter = 
-				FilterCounter.getLogRecordCounter(Logger.getLogger(""));
+				FilterCounter.getLogRecordCounter(Logger.getLogger(LoggerManager.class.getName()));
 		
 		LoggerManager logMgr = LoggerManager.builder().build();
 		assertThat(logMgr).isNotNull();
@@ -90,7 +96,7 @@ class LoggerManagerTest {
 		String loggerName = LoggerManagerTest.class.getName() + ".1";
 		
 		LogRecordCounter logRecordCounter = 
-				FilterCounter.getLogRecordCounter(Logger.getLogger(""));
+				FilterCounter.getLogRecordCounter(Logger.getLogger(LoggerManager.class.getName()));
 		
 		LoggerManager logMgr = LoggerManager.builder()
 				.applicationRootLoggerName(loggerName)
@@ -128,7 +134,7 @@ class LoggerManagerTest {
 		AdvancedProperties props = ps.getAdvancedProperties();
 		
 		LogRecordCounter logRecordCounter = 
-				FilterCounter.getLogRecordCounter(Logger.getLogger(""));
+				FilterCounter.getLogRecordCounter(Logger.getLogger(LoggerManager.class.getName()));
 				
 		LoggerManager logMgr = LoggerManager.builder()
 				.applicationRootLoggerName(loggerName)
@@ -188,6 +194,7 @@ class LoggerManagerTest {
 		LoggerManager logMgr = LoggerManager.builder()
 				.applicationRootLoggerName(loggerName)
 				.properties(props)
+				.createBufferLogHandlerForInit(true)
 				.build();
 		
 		assertThat(logMgr).isNotNull();
@@ -201,18 +208,7 @@ class LoggerManagerTest {
 		
 		assertThat(rootLogger.getLevel()).isEqualTo(Level.INFO);
 		assertThat(rootLogger.getUseParentHandlers()).isTrue();		
-		assertSamplePropertyHandlers(rootLogger.getHandlers());
-		
-		Logger logger = Logger.getLogger(loggerName);
-		
-		assertThat(logger.getLevel()).isEqualTo(Level.WARNING);		
-		assertThat(logger.getUseParentHandlers()).isFalse();		
-		assertSamplePropertyHandlers(logger.getHandlers());	
-	}
-	
-	private void assertSamplePropertyHandlers(Handler[] handlers) {
-		
-		assertThat(handlers).hasSize(2)
+		assertThat(rootLogger.getHandlers()).hasSize(2)
 		.satisfiesExactlyInAnyOrder(
 				handler -> { 
 					assertThat(handler).isInstanceOf(ConsoleHandler.class);
@@ -233,6 +229,45 @@ class LoggerManagerTest {
 					assertThat(handler.getErrorManager()).isNotNull();
 				}
 			);
+		
+		Logger logger = Logger.getLogger(loggerName);
+		
+		assertThat(logger.getLevel()).isEqualTo(Level.WARNING);		
+		assertThat(logger.getUseParentHandlers()).isFalse();		
+		assertThat(logger.getHandlers()).hasSize(3)
+		.satisfiesExactlyInAnyOrder(
+				handler -> { 
+					assertThat(handler).isInstanceOf(ConsoleHandler.class);
+					assertThat(handler.getEncoding()).isEqualTo("UTF-8");
+					assertThat(handler.getLevel()).isEqualTo(Level.INFO);
+					assertThat(handler.getFormatter()).isNotNull()
+						.isInstanceOf(SimpleFormatter.class);
+					assertThat(handler.getFilter()).isNull();
+					assertThat(handler.getErrorManager()).isNotNull();
+				},
+				handler -> { 
+					assertThat(handler).isInstanceOf(FileHandler.class);
+					assertThat(handler.getEncoding()).isEqualTo("UTF-8");
+					assertThat(handler.getLevel()).isEqualTo(Level.WARNING);
+					assertThat(handler.getFormatter()).isNotNull()
+						.isInstanceOf(PlainLogFormatter.class);
+					assertThat(handler.getFilter()).isNull();
+					assertThat(handler.getErrorManager()).isNotNull();
+				},
+				handler -> { 
+					assertThat(handler).isInstanceOf(BufferLogHandler.class);
+					assertThat(handler.getLevel()).isEqualTo(Level.INFO);
+					assertThat(handler.getFormatter()).isNull();
+					assertThat(handler.getFilter()).isNull();
+					assertThat(handler.getErrorManager()).isNotNull();
+					assertThat(handler).isInstanceOfSatisfying(BufferLogHandler.class, 
+							bufferLogHandler -> { 
+								assertThat(bufferLogHandler.getName()).isEqualTo(LoggerManager.BUFFERLOGHANDLER_FOR_INIT_BASE_PROPERTY);
+								assertThat(bufferLogHandler.getMaxMemoryLogRecord()).isEqualTo(40);
+							});
+				}
+			);
+		
 	}
 	
 	@Test
@@ -289,7 +324,7 @@ class LoggerManagerTest {
 					assertThat(handler).isInstanceOf(BufferLogHandler.class);
 					assertThat(handler).isInstanceOfSatisfying(BufferLogHandler.class, 
 							bufferLogHandler -> { 
-								assertThat(bufferLogHandler.getName()).isEqualTo("standard bufferLogHandler");
+								assertThat(bufferLogHandler.getName()).isEqualTo(LoggerManager.BUFFERLOGHANDLER_BASE_PROPERTY);
 								assertThat(bufferLogHandler.getMaxMemoryLogRecord()).isEqualTo(100);
 							});
 					assertThat(handler.getLevel()).isEqualTo(Level.INFO);
@@ -424,7 +459,7 @@ class LoggerManagerTest {
 					assertThat(handler).isInstanceOf(BufferLogHandler.class);
 					assertThat(handler).isInstanceOfSatisfying(BufferLogHandler.class, 
 							bufferLogHandler -> { 
-								assertThat(bufferLogHandler.getName()).isEqualTo("standard bufferLogHandler");
+								assertThat(bufferLogHandler.getName()).isEqualTo(LoggerManager.BUFFERLOGHANDLER_BASE_PROPERTY);
 								assertThat(bufferLogHandler.getMaxMemoryLogRecord()).isEqualTo(100);
 							});
 					assertThat(handler.getLevel()).isEqualTo(Level.INFO);
@@ -473,7 +508,7 @@ class LoggerManagerTest {
 		assertThat(props).isNotNull();
 		
 		LogRecordCounter logRecordCounter = 
-				FilterCounter.getLogRecordCounter(Logger.getLogger(""));
+				FilterCounter.getLogRecordCounter(Logger.getLogger(LoggerManager.class.getName()));
 		
 		LoggerManager logMgr = LoggerManager.builder()
 				.applicationRootLoggerName(loggerName)
@@ -503,7 +538,7 @@ class LoggerManagerTest {
 		assertThat(props).isNotNull();
 		
 		LogRecordCounter logRecordCounter = 
-				FilterCounter.getLogRecordCounter(Logger.getLogger(""));
+				FilterCounter.getLogRecordCounter(Logger.getLogger(LoggerManager.class.getName()));
 		
 		LoggerManager logMgr = LoggerManager.builder()
 				.applicationRootLoggerName(loggerName)
@@ -517,5 +552,153 @@ class LoggerManagerTest {
 		assertThat(logRecordCounter.getLogRecordCount(Level.SEVERE)).isEqualTo(1);
 		
 		logRecordCounter.stopLogCountAndFilter();
+	}
+	
+	private static final Path test8Path = Path.of("/ForTests/FlUtils/logTest8/").toAbsolutePath();
+	
+	@Test
+	@Order(11)
+	void shouldCreateUnexistantLoggingFolders() throws Exception {
+		
+		if (Files.exists(test8Path)) {
+			// The directory tree cannot be deleted at the end of the test or in a "@AfterAll": It is locked by the process
+			FilesUtils.deleteDirectoryTree(test8Path, true, Logger.getLogger(LoggerManagerTest.class.getName()));
+		}
+		assertThat(test8Path).doesNotExist();
+		
+		String loggerName = "org.fl.util.Test8";
+		String pathString = "file:///FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test8.properties";
+		
+		PropertiesStorage ps = new PropertiesStorage(URI.create(pathString));
+		
+		AdvancedProperties props = ps.getAdvancedProperties();
+		assertThat(props).isNotNull();
+		
+		Path fileHandlerDestinationPath = test8Path.resolve("does/not/exists/");
+		assertThat(fileHandlerDestinationPath).doesNotExist();
+		
+		LoggerManager.builder()
+				.applicationRootLoggerName(loggerName)
+				.properties(props)
+				.build();
+		
+		assertThat(fileHandlerDestinationPath).exists();
+	}
+
+	@Test
+	@Order(12)
+	void testLogErrorWithBufferLogForInit() throws Exception {
+		
+		String loggerName = "org.fl.util.Test9";
+		
+		String pathString = "file:///FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test9.properties";
+		
+		PropertiesStorage ps = new PropertiesStorage(URI.create(pathString));
+		
+		AdvancedProperties props = ps.getAdvancedProperties();
+		assertThat(props).isNotNull();
+		
+		LoggerManager logMgr = LoggerManager.builder()
+				.applicationRootLoggerName(loggerName)
+				.properties(props)
+				.createBufferLogHandlerForInit(true)
+				.build();
+		
+		BufferLogHandler bufferLogHandlerForInit = logMgr.getBufferLogHandlerForInit();
+		assertThat(bufferLogHandlerForInit).isNotNull();
+		assertThat(bufferLogHandlerForInit.getLogRecords()).isNotNull().isEmpty();
+		
+		Logger logger = Logger.getLogger(loggerName);
+		String infoMessage = "un message à l'init";
+		logger.info(infoMessage);
+		
+		assertThat(bufferLogHandlerForInit.getLogRecords()).isNotNull().singleElement()
+			.satisfies(logRecord -> assertThat(logRecord.getMessage()).isEqualTo(infoMessage));
+	}
+	
+	@Test
+	@Order(13)
+	void testLoggerManagerWithoutBufferLogForInit() throws Exception {
+		
+		String loggerName = "org.fl.util.Test9";		
+		String pathString = "file:///FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test9.properties";
+
+		LoggerManager logMgr = LoggerManager.builder()
+				.applicationRootLoggerName(loggerName)
+				.properties(new PropertiesStorage(URI.create(pathString)).getAdvancedProperties())
+				.createBufferLogHandlerForInit(false)
+				.build();
+		
+		assertThat(logMgr.getBufferLogHandlerForInit()).isNull();
+	}
+	
+	@Test
+	@Order(14)
+	void testRemoveBufferLogForInit() throws Exception {
+		
+		String loggerName = "org.fl.util.Test9";		
+		String pathString = "file:///FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test9.properties";
+		
+		LoggerManager logMgr = LoggerManager.builder()
+				.applicationRootLoggerName(loggerName)
+				.properties(new PropertiesStorage(URI.create(pathString)).getAdvancedProperties())
+				.createBufferLogHandlerForInit(true)
+				.build();
+		
+		Logger logger = Logger.getLogger(loggerName);
+		String infoMessage = "un message à l'init";
+		logger.info(infoMessage);
+
+		Collection<LogRecord> initLogRecords = logMgr.getBufferLogHandlerForInit().getLogRecords();
+		assertThat(initLogRecords).singleElement()
+			.satisfies(logRecord -> assertThat(logRecord.getMessage()).isEqualTo(infoMessage));
+		
+		BufferLogHandler bufferLogHandler = new BufferLogHandler("test handler", 10);
+		List<LogRecord> removedInitLogRecords = logMgr.removeInitBufferLogHandlerAndDrainLogRecordsTo(bufferLogHandler);
+		Collection<LogRecord> drainedLogRecords = bufferLogHandler.getLogRecords();
+		
+		assertThat(initLogRecords).isEmpty();
+		
+		assertThat(removedInitLogRecords).isNotNull()
+			.hasSameElementsAs(drainedLogRecords)
+			.singleElement()
+			.satisfies(logRecord -> assertThat(logRecord.getMessage()).isEqualTo(infoMessage));
+		
+		assertThat(logMgr.removeInitBufferLogHandlerAndDrainLogRecordsTo( new BufferLogHandler("test handler", 10))).isNull();
+	}
+	
+	@Test
+	@Order(15)
+	void testRemoveWithoutBufferLogForInit() throws Exception {
+		
+		String loggerName = "org.fl.util.Test9";		
+		String pathString = "file:///FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test9.properties";
+
+		LoggerManager logMgr = LoggerManager.builder()
+				.applicationRootLoggerName(loggerName)
+				.properties(new PropertiesStorage(URI.create(pathString)).getAdvancedProperties())
+				.createBufferLogHandlerForInit(false)
+				.build();
+		
+		assertThat(logMgr.removeInitBufferLogHandlerAndDrainLogRecordsTo(new BufferLogHandler("test handler", 10))).isNull();
+	}
+	
+	
+	@Test
+	@Order(16)
+	void drainingToNullHandlerShouldThrowNPE() throws Exception {
+		
+		String loggerName = "org.fl.util.Test9";		
+		String pathString = "file:///FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test9.properties";
+		
+		LoggerManager logMgr = LoggerManager.builder()
+				.applicationRootLoggerName(loggerName)
+				.properties(new PropertiesStorage(URI.create(pathString)).getAdvancedProperties())
+				.createBufferLogHandlerForInit(true)
+				.build();
+		
+		 Logger.getLogger(loggerName).info("un message à l'init");
+		
+		assertThatNullPointerException().isThrownBy(() -> logMgr.removeInitBufferLogHandlerAndDrainLogRecordsTo(null));
 	}
 }

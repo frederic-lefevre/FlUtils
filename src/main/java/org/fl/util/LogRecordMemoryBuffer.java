@@ -24,7 +24,9 @@ SOFTWARE.
 
 package org.fl.util;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.LogRecord;
 
@@ -58,6 +60,14 @@ public class LogRecordMemoryBuffer {
 	
 	public Collection<LogRecord> getLogRecords() {
 		return logRecordBuffer;
+	}
+	
+	public List<LogRecord> getAndDeleteLogRecords() {
+		List<LogRecord> logRecords = new ArrayList<LogRecord>();
+		synchronized (logRecordBuffer) {
+			logRecordBuffer.drainTo(logRecords);
+		}
+		return logRecords;
 	}
 	
 	public StringBuilder getFormattedRecords() {

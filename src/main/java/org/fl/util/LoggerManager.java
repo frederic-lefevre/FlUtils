@@ -32,7 +32,6 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -43,6 +42,7 @@ import java.util.logging.Formatter;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
+import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 import java.util.logging.XMLFormatter;
@@ -54,10 +54,12 @@ public class LoggerManager {
 	private static final String DEFAULT_LOG_NAME = "org.fl";
 
 	protected static final String LOGMANAGER_PROPERTY_FILE_PROPERTY = "logManager.properties.file";
+	protected static final String BUFFERLOGHANDLER_BASE_PROPERTY = "logging.BufferLogHandler";
+	protected static final String BUFFERLOGHANDLER_FOR_INIT_BASE_PROPERTY = "logging.BufferLogHandlerForInit";
 	private static final String FILE_HANDLER_PATTERN_PROPERTY = "java.util.logging.FileHandler.pattern";
 	
 	// Root logger
-	private static final Logger rootLogger = Logger.getLogger("");
+	private static final Logger loggerManagertLogger = Logger.getLogger(LoggerManager.class.getName());
 			
 	// root Logger of the application
 	private final Logger applicationRootLogger;
@@ -66,11 +68,16 @@ public class LoggerManager {
 	private final String formatterName;
 
 	// in memory logging handler
-	private BufferLogHandler bufferLogHandler;
+	private final BufferLogHandler bufferLogHandler;
 
-	private AdvancedProperties properties;
+	// in memory logging handler reserved for application initialization
+	// Used before the GUI setup
+	// Once the GUI is set up, the eventual log records will be displayed in the Log Display tab
+	private BufferLogHandler bufferLogHandlerForInit;
+	
+	private final AdvancedProperties properties;
 
-	private AdvancedProperties loggingProperties;
+	private final AdvancedProperties loggingProperties;
 	
 	// LoggerManager Builder
     public static Builder builder() {
@@ -81,10 +88,12 @@ public class LoggerManager {
     	
     	private String applicationRootLoggerName;
     	private AdvancedProperties props;
+    	private boolean createBufferLogHandlerForInit;
     	
     	private Builder() {
     		applicationRootLoggerName = DEFAULT_LOG_NAME;
     		props = null;
+    		createBufferLogHandlerForInit = false;
     	}
     	
     	public Builder applicationRootLoggerName(String logName) {
@@ -97,28 +106,26 @@ public class LoggerManager {
     		return this;
     	}
     	
+    	public Builder createBufferLogHandlerForInit(boolean createBufferLogHandlerForInit) {
+    		this.createBufferLogHandlerForInit = createBufferLogHandlerForInit;
+    		return this;
+    	}
+    	
     	public LoggerManager build() {
-    		return new LoggerManager(applicationRootLoggerName, props);
+    		return new LoggerManager(applicationRootLoggerName, props, createBufferLogHandlerForInit);
     	}
     }
-    
-	private LoggerManager() {
-		applicationRootLogger = null;
-		formatterName = null;
-	}
   
-    private LoggerManager(String logName, AdvancedProperties props) {
+    private LoggerManager(String logName, AdvancedProperties props, boolean createBufferLogHandlerForInit) {
    		
     	if (props == null) {
-    		properties = new AdvancedProperties(rootLogger);
+    		properties = new AdvancedProperties(null);
     	} else {
     		properties = props;
     	}
-		
-    	loggingProperties = null;
     	
     	// Read java.util.logging.LogManager configuration
-    	initJavaUtilLogging(logName);
+    	loggingProperties = initJavaUtilLogging(logName);
     		
     	// get or create the logger
    		applicationRootLogger = Logger.getLogger(logName);
@@ -126,21 +133,23 @@ public class LoggerManager {
 		// Set the formatter name for specific handlers
 		formatterName = properties.getProperty("logging.formatter");
 		
-		try {	
-			initBufferedLogHandler();
-		} catch (SecurityException e) {
-			rootLogger.log(Level.SEVERE, "Security exception in LoggerManager init", e);
-		} catch (Exception e) {
-			rootLogger.log(Level.SEVERE, "Security exception in intialisation, LoggerManager", e);
+		bufferLogHandler = initBufferLogHandler(BUFFERLOGHANDLER_BASE_PROPERTY, 0, Level.OFF);
+		
+		if (createBufferLogHandlerForInit) {
+			bufferLogHandlerForInit = initBufferLogHandler(BUFFERLOGHANDLER_FOR_INIT_BASE_PROPERTY, 50, Level.INFO);
+		} else {
+			bufferLogHandlerForInit = null;
 		}
+
     }
     
     // Remapper for logging properties.
     // For all property key k, if the new property exists, take it, else keep the old one
     private Function<String, BiFunction<String,String,String>> loggingPrpertyRemapper = (k) -> ((o, n) -> n == null ? o : n);
     
-    private void initJavaUtilLogging(String applicationRootLoggerName) {
+    private AdvancedProperties initJavaUtilLogging(String applicationRootLoggerName) {
     	
+    	AdvancedProperties loggingProperties = null;
     	String loggingPropertiesFileName = properties.getProperty(LOGMANAGER_PROPERTY_FILE_PROPERTY);
     	if ((loggingPropertiesFileName != null) && !loggingPropertiesFileName.isEmpty()) {
     				
@@ -156,27 +165,28 @@ public class LoggerManager {
     				logManager.reset();
     				LogManager.getLogManager().updateConfiguration(is, loggingPrpertyRemapper);
     			} catch (IOException e) {
-    				rootLogger.log(Level.SEVERE, "IOException when LogManager loads logging properties file " + loggingPropertiesFileName, e);
+    				loggerManagertLogger.log(Level.SEVERE, "IOException when LogManager loads logging properties file " + loggingPropertiesFileName, e);
 				}
     			checkApplicationootLoggerConfig(loggingProperties, applicationRootLoggerName);
     		} else {
-    			rootLogger.severe("Logging properties file not found " + loggingPropertiesFileName);
+    			loggerManagertLogger.severe("Logging properties file not found " + loggingPropertiesFileName);
     		}
     	} else {
-    		rootLogger.warning(LOGMANAGER_PROPERTY_FILE_PROPERTY + " property is not found in the application property file");
+    		loggerManagertLogger.warning(LOGMANAGER_PROPERTY_FILE_PROPERTY + " property is not found in the application property file");
     	}
+    	return loggingProperties;
     }
     
     private void checkApplicationootLoggerConfig(AdvancedProperties loggingProperties, String applicationRootLoggerName) {
     	
     	String applicationLogLevel = loggingProperties.getProperty(applicationRootLoggerName + ".level");
     	if (applicationLogLevel == null) {
-    		rootLogger.warning("Application root logger level is not defined in the logging configuration properties");
+    		loggerManagertLogger.warning("Application root logger level is not defined in the logging configuration properties");
     	}
     	
     	String applicationLogHandlers = loggingProperties.getProperty(applicationRootLoggerName + ".handlers");
     	if (applicationLogHandlers == null) {
-    		rootLogger.warning("Application root logger handlers are not defined in the logging configuration properties");
+    		loggerManagertLogger.warning("Application root logger handlers are not defined in the logging configuration properties");
     	}
     }
     
@@ -186,35 +196,45 @@ public class LoggerManager {
 		if ((filePathPattern != null) && !filePathPattern.startsWith("%t") && !filePathPattern.startsWith("%h")) {
 			
 			try {
-				Path logFilePattern = Paths.get(filePathPattern);
-				if (logFilePattern.isAbsolute()) {
-					Path logFileFolderPath = logFilePattern.getParent();
-					if (Files.notExists(logFileFolderPath)) {
-						Files.createDirectories(logFileFolderPath);
-					}
+
+				Path logFileFolderPath = Path.of(filePathPattern).toAbsolutePath().getParent();
+				if (Files.notExists(logFileFolderPath)) {
+					Files.createDirectories(logFileFolderPath);
 				}
 			} catch (InvalidPathException e) {
-				rootLogger.log(Level.SEVERE, "InvalidPathException converting log file pattern " + filePathPattern, e);
+				loggerManagertLogger.log(Level.SEVERE, "InvalidPathException converting log file pattern " + filePathPattern, e);
 			} catch (Exception e) {
-				rootLogger.log(Level.SEVERE, "Exception creating unexistent parent folders in log file pattern " + filePathPattern, e);
+				loggerManagertLogger.log(Level.SEVERE, "Exception creating unexistent parent folders in log file pattern " + filePathPattern, e);
 			}
 		}
     }
     
-    private void initBufferedLogHandler() {
+    private BufferLogHandler initBufferLogHandler(String baseProperty, int defaultBufferSize, Level defaultLevel) {
 
 		// Memory handler
-		int bufferSize = properties.getInt("logging.BufferLogHandler.bufferLength", 0);
+    	BufferLogHandler bufferLogHandler = null;
+		int bufferSize = properties.getInt(baseProperty + ".bufferLength", defaultBufferSize);
 		if (bufferSize > 0) {
 
-			bufferLogHandler = new BufferLogHandler("standard bufferLogHandler", bufferSize);
-			bufferLogHandler.setLevel(properties.getLevel("logging.BufferLogHandler.level", Level.OFF));
+			bufferLogHandler = new BufferLogHandler(baseProperty, bufferSize);
+			bufferLogHandler.setLevel(properties.getLevel(baseProperty  + ".level", defaultLevel));
 			applicationRootLogger.addHandler(bufferLogHandler);
-		} else {
-			bufferLogHandler = null;
-		}
-      
+		} 
+		return bufferLogHandler;
     }
+    
+    public List<LogRecord> removeInitBufferLogHandlerAndDrainLogRecordsTo(Handler handler) {
+    	
+    	if (bufferLogHandlerForInit != null) {
+    		List<LogRecord> initLogRecords = bufferLogHandlerForInit.getAndDeleteLogRecords();
+    		initLogRecords.forEach(logRecord -> handler.publish(logRecord));
+    		applicationRootLogger.removeHandler(bufferLogHandlerForInit);
+    		bufferLogHandlerForInit = null;
+    		return initLogRecords;
+    	} else {
+    		return null;
+    	}
+     }
     
 	public Formatter getCommonFormatterInstance() {
 		
@@ -229,7 +249,7 @@ public class LoggerManager {
 		} else if (formatterName.equals(XMLFormatter.class.getName())) {
 			return new XMLFormatter();
 		} else {
-			rootLogger.warning("Unknown log formatter class (logging.formatter property): " + formatterName);
+			loggerManagertLogger.warning("Unknown log formatter class (logging.formatter property): " + formatterName);
 			return new SimpleFormatter();
 		}
 	}
@@ -238,6 +258,10 @@ public class LoggerManager {
 		return loggingProperties;
 	}
 
+	public BufferLogHandler getBufferLogHandlerForInit() {
+		return bufferLogHandlerForInit;
+	}
+	
 	// Add a custom handler to the logger
 	public void addCustomHandler(Handler customHandler) {
 
@@ -259,22 +283,12 @@ public class LoggerManager {
 				// Custom handler level
 				customHandler.setLevel(properties.getLevel("logging." + customHandlerName + ".level", Level.OFF));
 
-				if ((customHandler instanceof BufferLogHandler) && (bufferLogHandler != null)) {
-					// if the custom handler has an (inherited) in-memory logging, there is no need
-					// to have
-					// the standard in-memory logging of this class, so suppress it if it was
-					// enabled
-					applicationRootLogger.removeHandler(bufferLogHandler);
-					bufferLogHandler.close();
-					bufferLogHandler = null;
-				}
 			} catch (SecurityException | UnsupportedEncodingException e) {
-				rootLogger.log(Level.SEVERE, "Unable to set encoding for the custom log handler", e);
+				loggerManagertLogger.log(Level.SEVERE, "Unable to set encoding for the custom log handler", e);
 			}
 		}
 	}
 
-	
 	// Get the logger level and the levels, formatter of all handlers
 	public JsonNode getLoggerLevels() {
 		return LoggerUtils.getLoggerLevels(applicationRootLogger);

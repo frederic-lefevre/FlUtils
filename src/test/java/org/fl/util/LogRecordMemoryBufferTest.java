@@ -116,7 +116,7 @@ class LogRecordMemoryBufferTest {
 	}
 	
 	@Test
-	void testGetLogRecordst() {
+	void testGetLogRecords() {
 		
 		int bufferSize = 3;
 		LogRecordMemoryBuffer logMemoryBuffer = new LogRecordMemoryBuffer(bufferSize);
@@ -148,7 +148,37 @@ class LogRecordMemoryBufferTest {
 	}
 	
 	@Test
-	void zeroCapacityShouldThrowExceptio() {
+	void testGetLogRecordsOfEmptyBuffer() {
+		
+		assertThat((new LogRecordMemoryBuffer(5)).getLogRecords()).isNotNull().isEmpty();
+	}
+	
+	@Test
+	void testGetAndDeleteLogRecords() {
+		
+		int bufferSize = 3;
+		LogRecordMemoryBuffer logMemoryBuffer = new LogRecordMemoryBuffer(bufferSize);
+		
+		String recordMessage = "A record log message";
+		LogRecord logRecord = new LogRecord(Level.WARNING, recordMessage);
+
+		logMemoryBuffer.addLogRecord(logRecord);
+		
+		List<LogRecord> logRecords = logMemoryBuffer.getAndDeleteLogRecords();
+		
+		assertThat(logRecords).isNotNull().singleElement().isEqualTo(logRecord);
+		
+		assertThat(logMemoryBuffer.getLogRecords()).isNotNull().isEmpty();
+	}
+	
+	@Test
+	void testGetAndDeleteLogRecordsOfEmptyBuffer() {
+		
+		assertThat((new LogRecordMemoryBuffer(5)).getAndDeleteLogRecords()).isNotNull().isEmpty();
+	}
+	
+	@Test
+	void zeroCapacityShouldThrowException() {
 		assertThatIllegalArgumentException().isThrownBy(() -> new LogRecordMemoryBuffer(0));
 	}
 	

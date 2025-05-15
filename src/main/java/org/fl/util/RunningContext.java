@@ -35,16 +35,19 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.Vector;
 import java.util.logging.Formatter;
 import java.util.logging.Handler;
 import java.util.logging.Level;
+import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
 import org.fl.util.json.JsonUtils;
 import org.fl.util.os.OperatingInfo;
+import org.fl.util.swing.logPane.LogsDisplayPane;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -68,7 +71,7 @@ public class RunningContext {
 	private static final String DATE_PATTERN = "uuuu-MM-dd HH:mm:ss.SSS VV";
 
 	// Root logger
-	private static final Logger rootLogger = Logger.getLogger("");
+	private static final Logger runningContextLogger = Logger.getLogger(RunningContext.class.getName());
 	
 	private static final JavaPropsMapper propsMapper = new JavaPropsMapper();
 
@@ -95,7 +98,7 @@ public class RunningContext {
 		
 		if (name == null) {
 			this.name = DEFAULT_APP_NAME;
-			rootLogger.severe("Null application name passed in running context");
+			runningContextLogger.severe("Null application name passed in running context");
 		} else {
 			this.name = name;		
 		}	
@@ -105,13 +108,14 @@ public class RunningContext {
 				propsStorage = new PropertiesStorage(propertyUri);
 				applicationProperties = propsStorage.getAdvancedProperties(); 
 			} else {
-				applicationProperties = new AdvancedProperties(rootLogger);
+				applicationProperties = new AdvancedProperties(null);
 			}
 			
 			// Initialize logger
 			logMgr = LoggerManager.builder()
 					.applicationRootLoggerName(this.name)
 					.properties(applicationProperties)
+					.createBufferLogHandlerForInit(LogsDisplayPane.hasLogsDisplayPaneProperty(applicationProperties))
 					.build();
 
 			applicationRootLog = Logger.getLogger(this.name);
@@ -141,8 +145,8 @@ public class RunningContext {
 			}
 
 		} catch (Exception e) {
-			rootLogger.log(Level.SEVERE, "Exception processing property file.  ", e);
-			applicationProperties = new AdvancedProperties(rootLogger);			
+			runningContextLogger.log(Level.SEVERE, "Exception processing property file.  ", e);
+			applicationProperties = new AdvancedProperties(null);			
 		}
 	}
 	
@@ -356,5 +360,12 @@ public class RunningContext {
 
 		return applicationPropsNode;
 	}
+	
+	public BufferLogHandler getBufferLogHandlerForInit() {
+		return logMgr.getBufferLogHandlerForInit();
+	}
 
+    public List<LogRecord> removeInitBufferLogHandlerAndDrainLogRecordsTo(Handler handler) {
+    	return logMgr.removeInitBufferLogHandlerAndDrainLogRecordsTo(handler);
+    }
 }
