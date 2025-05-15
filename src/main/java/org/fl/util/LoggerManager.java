@@ -42,6 +42,7 @@ import java.util.logging.Formatter;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
+import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 import java.util.logging.XMLFormatter;
@@ -72,7 +73,7 @@ public class LoggerManager {
 	// in memory logging handler reserved for application initialization
 	// Used before the GUI setup
 	// Once the GUI is set up, the eventual log records will be displayed in the Log Display tab
-	private final BufferLogHandler bufferLogHandlerForInit;
+	private BufferLogHandler bufferLogHandlerForInit;
 	
 	private final AdvancedProperties properties;
 
@@ -132,10 +133,10 @@ public class LoggerManager {
 		// Set the formatter name for specific handlers
 		formatterName = properties.getProperty("logging.formatter");
 		
-		bufferLogHandler = initBufferedLogHandler(BUFFERLOGHANDLER_BASE_PROPERTY, 0, Level.OFF);
+		bufferLogHandler = initBufferLogHandler(BUFFERLOGHANDLER_BASE_PROPERTY, 0, Level.OFF);
 		
 		if (createBufferLogHandlerForInit) {
-			bufferLogHandlerForInit = initBufferedLogHandler(BUFFERLOGHANDLER_FOR_INIT_BASE_PROPERTY, 50, Level.INFO);
+			bufferLogHandlerForInit = initBufferLogHandler(BUFFERLOGHANDLER_FOR_INIT_BASE_PROPERTY, 50, Level.INFO);
 		} else {
 			bufferLogHandlerForInit = null;
 		}
@@ -208,7 +209,7 @@ public class LoggerManager {
 		}
     }
     
-    private BufferLogHandler initBufferedLogHandler(String baseProperty, int defaultBufferSize, Level defaultLevel) {
+    private BufferLogHandler initBufferLogHandler(String baseProperty, int defaultBufferSize, Level defaultLevel) {
 
 		// Memory handler
     	BufferLogHandler bufferLogHandler = null;
@@ -221,6 +222,19 @@ public class LoggerManager {
 		} 
 		return bufferLogHandler;
     }
+    
+    public List<LogRecord> removeInitBufferLogHandlerAndDrainLogRecordsTo(Handler handler) {
+    	
+    	if (bufferLogHandlerForInit != null) {
+    		List<LogRecord> initLogRecords = bufferLogHandlerForInit.getAndDeleteLogRecords();
+    		initLogRecords.forEach(logRecord -> handler.publish(logRecord));
+    		applicationRootLogger.removeHandler(bufferLogHandlerForInit);
+    		bufferLogHandlerForInit = null;
+    		return initLogRecords;
+    	} else {
+    		return null;
+    	}
+     }
     
 	public Formatter getCommonFormatterInstance() {
 		
@@ -247,7 +261,7 @@ public class LoggerManager {
 	public BufferLogHandler getBufferLogHandlerForInit() {
 		return bufferLogHandlerForInit;
 	}
-
+	
 	// Add a custom handler to the logger
 	public void addCustomHandler(Handler customHandler) {
 

@@ -30,11 +30,14 @@ import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collection;
+import java.util.List;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.FileHandler;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
+import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
@@ -603,11 +606,99 @@ class LoggerManagerTest {
 		
 		BufferLogHandler bufferLogHandlerForInit = logMgr.getBufferLogHandlerForInit();
 		assertThat(bufferLogHandlerForInit).isNotNull();
+		assertThat(bufferLogHandlerForInit.getLogRecords()).isNotNull().isEmpty();
+		
 		Logger logger = Logger.getLogger(loggerName);
 		String infoMessage = "un message à l'init";
 		logger.info(infoMessage);
 		
 		assertThat(bufferLogHandlerForInit.getLogRecords()).isNotNull().singleElement()
 			.satisfies(logRecord -> assertThat(logRecord.getMessage()).isEqualTo(infoMessage));
+	}
+	
+	@Test
+	@Order(13)
+	void testLoggerManagerWithoutBufferLogForInit() throws Exception {
+		
+		String loggerName = "org.fl.util.Test9";		
+		String pathString = "file:///FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test9.properties";
+
+		LoggerManager logMgr = LoggerManager.builder()
+				.applicationRootLoggerName(loggerName)
+				.properties(new PropertiesStorage(URI.create(pathString)).getAdvancedProperties())
+				.createBufferLogHandlerForInit(false)
+				.build();
+		
+		assertThat(logMgr.getBufferLogHandlerForInit()).isNull();
+	}
+	
+	@Test
+	@Order(14)
+	void testRemoveBufferLogForInit() throws Exception {
+		
+		String loggerName = "org.fl.util.Test9";		
+		String pathString = "file:///FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test9.properties";
+		
+		LoggerManager logMgr = LoggerManager.builder()
+				.applicationRootLoggerName(loggerName)
+				.properties(new PropertiesStorage(URI.create(pathString)).getAdvancedProperties())
+				.createBufferLogHandlerForInit(true)
+				.build();
+		
+		Logger logger = Logger.getLogger(loggerName);
+		String infoMessage = "un message à l'init";
+		logger.info(infoMessage);
+
+		Collection<LogRecord> initLogRecords = logMgr.getBufferLogHandlerForInit().getLogRecords();
+		assertThat(initLogRecords).singleElement()
+			.satisfies(logRecord -> assertThat(logRecord.getMessage()).isEqualTo(infoMessage));
+		
+		BufferLogHandler bufferLogHandler = new BufferLogHandler("test handler", 10);
+		List<LogRecord> removedInitLogRecords = logMgr.removeInitBufferLogHandlerAndDrainLogRecordsTo(bufferLogHandler);
+		Collection<LogRecord> drainedLogRecords = bufferLogHandler.getLogRecords();
+		
+		assertThat(initLogRecords).isEmpty();
+		
+		assertThat(removedInitLogRecords).isNotNull()
+			.hasSameElementsAs(drainedLogRecords)
+			.singleElement()
+			.satisfies(logRecord -> assertThat(logRecord.getMessage()).isEqualTo(infoMessage));
+		
+		assertThat(logMgr.removeInitBufferLogHandlerAndDrainLogRecordsTo( new BufferLogHandler("test handler", 10))).isNull();
+	}
+	
+	@Test
+	@Order(15)
+	void testRemoveWithoutBufferLogForInit() throws Exception {
+		
+		String loggerName = "org.fl.util.Test9";		
+		String pathString = "file:///FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test9.properties";
+
+		LoggerManager logMgr = LoggerManager.builder()
+				.applicationRootLoggerName(loggerName)
+				.properties(new PropertiesStorage(URI.create(pathString)).getAdvancedProperties())
+				.createBufferLogHandlerForInit(false)
+				.build();
+		
+		assertThat(logMgr.removeInitBufferLogHandlerAndDrainLogRecordsTo(new BufferLogHandler("test handler", 10))).isNull();
+	}
+	
+	
+	@Test
+	@Order(16)
+	void drainingToNullHandlerShouldThrowNPE() throws Exception {
+		
+		String loggerName = "org.fl.util.Test9";		
+		String pathString = "file:///FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test9.properties";
+		
+		LoggerManager logMgr = LoggerManager.builder()
+				.applicationRootLoggerName(loggerName)
+				.properties(new PropertiesStorage(URI.create(pathString)).getAdvancedProperties())
+				.createBufferLogHandlerForInit(true)
+				.build();
+		
+		 Logger.getLogger(loggerName).info("un message à l'init");
+		
+		assertThatNullPointerException().isThrownBy(() -> logMgr.removeInitBufferLogHandlerAndDrainLogRecordsTo(null));
 	}
 }
