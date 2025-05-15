@@ -122,6 +122,31 @@ class BufferLogHandlerTest {
 			.hasSameElementsAs(logRecords);
 	}
 	
+	
+	@Test
+	void testGetAndDeleteLogRecords() {
+		
+		
+		final String name = "Regular Buffer log handler";
+		final int capacity = 10;
+		BufferLogHandler bufferLogHandler = new BufferLogHandler(name, capacity);
+		
+		// Publish 5 logRecord
+		IntFunction<LogRecord> logRecordSupplier = recordNumber -> new LogRecord(Level.WARNING, "Record log " + recordNumber);
+		int nbLoggedRecords = 5;
+		List<LogRecord> logRecords = IntStream.rangeClosed(1, nbLoggedRecords)
+				.mapToObj(logRecordSupplier)
+				.collect(Collectors.toList());
+		
+		logRecords.forEach(lr -> bufferLogHandler.publish(lr));
+		
+		assertThat(bufferLogHandler.getAndDeleteLogRecords())
+			.hasSize(nbLoggedRecords)
+			.hasSameElementsAs(logRecords);
+		
+		assertThat(bufferLogHandler.getLogRecords()).isEmpty();
+	}
+	
 	@Test
 	void testBufferLogHandlerWithGetAndDelete() {
 		
