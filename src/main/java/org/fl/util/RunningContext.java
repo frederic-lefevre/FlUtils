@@ -35,12 +35,14 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.Vector;
 import java.util.logging.Formatter;
 import java.util.logging.Handler;
 import java.util.logging.Level;
+import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
 import org.fl.util.json.JsonUtils;
@@ -363,4 +365,7 @@ public class RunningContext {
 		return logMgr.getBufferLogHandlerForInit();
 	}
 
+    public List<LogRecord> removeInitBufferLogHandlerAndDrainLogRecordsTo(Handler handler) {
+    	return logMgr.removeInitBufferLogHandlerAndDrainLogRecordsTo(handler);
+    }
 }

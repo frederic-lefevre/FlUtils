@@ -31,9 +31,11 @@ import java.net.URISyntaxException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.function.Supplier;
 import java.util.logging.Level;
+import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
@@ -402,5 +404,32 @@ class RunningContextTest {
 		
 		assertThat(bufferLogHandlerForInit.getLogRecords()).isNotNull().singleElement()
 			.satisfies(logRecord -> assertThat(logRecord.getMessage()).isEqualTo(infoMessage));
+	}
+	
+	@Test
+	void testRemoveBufferLogForInit() throws Exception {
+		
+		String loggerName = "org.fl.util.Test9";
+		
+		RunningContext rc = new RunningContext(loggerName,
+				new URI("file:///FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test9.properties"));
+		
+		BufferLogHandler bufferLogHandlerForInit = rc.getBufferLogHandlerForInit();
+		assertThat(bufferLogHandlerForInit).isNotNull();
+		Logger logger = Logger.getLogger(loggerName);
+		String infoMessage = "un message à l'init";
+		logger.info(infoMessage);
+		
+		BufferLogHandler bufferLogHandler = new BufferLogHandler("test handler", 10);
+		List<LogRecord> removedInitLogRecords = rc.removeInitBufferLogHandlerAndDrainLogRecordsTo(bufferLogHandler);
+		Collection<LogRecord> drainedLogRecords = bufferLogHandler.getLogRecords();
+		
+		assertThat(removedInitLogRecords).isNotNull()
+			.hasSameElementsAs(drainedLogRecords)
+			.singleElement()
+			.satisfies(logRecord -> assertThat(logRecord.getMessage()).isEqualTo(infoMessage));
+		
+		assertThat(rc.getBufferLogHandlerForInit()).isNull();
+		
 	}
 }
