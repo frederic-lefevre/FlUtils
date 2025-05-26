@@ -50,6 +50,8 @@ import java.util.logging.Logger;
 
 public class FilesSecurityUtils {
 
+	private static final Logger logger = Logger.getLogger(FilesSecurityUtils.class.getName());
+	
 	// Set permission for a file.
 	// If it does not exists the file is created with the given permission
 	public static void setFilePermission(Path fPath, String permissions, Logger pLog) {
@@ -109,7 +111,7 @@ public class FilesSecurityUtils {
 				}
 			}
 		}
-		return userPrincipals ;
+		return userPrincipals;
 	}
 	
 	// Set a file writable : use all the possible attributes views
@@ -117,7 +119,22 @@ public class FilesSecurityUtils {
 	// and all the users defined in the ACL of sourcePath
 	public static void setWritable(Path path, Path sourcePath) throws IOException {
 
-		FileStore fileStore = Files.getFileStore(path) ;
+		setWritable(path, sourcePath, true);
+	}
+	
+	private static void setWritable(Path path, Path sourcePath, boolean setOnParent) throws IOException {
+
+		// setWritable on the parent first
+		if (setOnParent) {
+			Path parent = path.getParent();
+			try {
+				setWritable(parent, sourcePath, false);
+			} catch (Exception e) {
+				logger.log(Level.SEVERE, "Exception trying to set writable " + parent, e);
+			}
+		}
+		
+		FileStore fileStore = Files.getFileStore(path);
 		
 		// Get the UserPrincipal of the running process
 		UserPrincipalLookupService upls = path.getFileSystem().getUserPrincipalLookupService();
@@ -127,23 +144,23 @@ public class FilesSecurityUtils {
 			
 			AclFileAttributeView aclAttr = Files.getFileAttributeView(path, AclFileAttributeView.class);
 			
-			List<AclEntry> entries = new ArrayList<>() ;
+			List<AclEntry> entries = new ArrayList<>();
 			
 			// set the file writable for the user running this process
-			entries.add(buildAclEntry(path, user)) ;
+			entries.add(buildAclEntry(path, user));
 			
 			// set the file writable for all the users defined in the ACL of sourcePath
 			if (sourcePath != null) {
-				List<UserPrincipal> users = getAclPrincipals(sourcePath) ;
+				List<UserPrincipal> users = getAclPrincipals(sourcePath);
 				if (users != null) {
 					for (UserPrincipal userPrincipal : users) {
 						if (! userPrincipal.equals(user)) {
-							entries.add(buildAclEntry(path, userPrincipal)) ;
+							entries.add(buildAclEntry(path, userPrincipal));
 						}
 					}
 				}
 			}
-			aclAttr.setAcl(entries) ;
+			aclAttr.setAcl(entries);
 			
 		}
 		
