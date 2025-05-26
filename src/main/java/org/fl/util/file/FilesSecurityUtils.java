@@ -50,16 +50,18 @@ import java.util.logging.Logger;
 
 public class FilesSecurityUtils {
 
+	private static final Logger logger = Logger.getLogger(FilesSecurityUtils.class.getName());
+	
 	// Set permission for a file.
 	// If it does not exists the file is created with the given permission
 	public static void setFilePermission(Path fPath, String permissions, Logger pLog) {
-		setPermission(false, fPath, permissions, pLog) ;
+		setPermission(false, fPath, permissions, pLog);
 	}
 	
 	// Set permission for a directory.
 	// If it does not exists the directory is created with the given permission
 	public static void setDirectoryPermission(Path fPath, String permissions, Logger pLog) {
-		setPermission(true, fPath, permissions, pLog) ;
+		setPermission(true, fPath, permissions, pLog);
 	}
 	
 	private static void setPermission(boolean isDirectory, Path fPath, String permissions, Logger pLog) {
@@ -69,7 +71,7 @@ public class FilesSecurityUtils {
 			FileStore fileStore = Files.getFileStore(fPath) ;
 		
 			if (fileStore.supportsFileAttributeView(PosixFileAttributeView.class)) {
-				FileAttribute<Set<PosixFilePermission>> fileAttributes = null ;
+				FileAttribute<Set<PosixFilePermission>> fileAttributes = null;
 				Set<PosixFilePermission> perms = null;
 				if ((permissions != null) && (! permissions.isEmpty())) {
 					
@@ -77,39 +79,37 @@ public class FilesSecurityUtils {
 						fileAttributes = PosixFilePermissions.asFileAttribute(perms);
 						
 						if (Files.exists(fPath))  {
-							Files.setPosixFilePermissions(fPath, perms) ;
+							Files.setPosixFilePermissions(fPath, perms);
 						} else if (isDirectory) {
-							Files.createDirectory(fPath, fileAttributes) ;
+							Files.createDirectory(fPath, fileAttributes);
 						} else {
-							Files.createFile(fPath, fileAttributes) ;
-						}
-						
-					
+							Files.createFile(fPath, fileAttributes);
+						}							
 				}
 			}
-		}catch (IOException e) {
-			pLog.log(Level.SEVERE, "IOException when creating a policy file " + fPath + " with permission parameter " + permissions, e) ;
+		} catch (IOException e) {
+			pLog.log(Level.SEVERE, "IOException when creating a policy file " + fPath + " with permission parameter " + permissions, e);
 		} catch (Exception e) {
-			pLog.log(Level.SEVERE, "Exception when parsing posix file permission parameter: " + permissions, e) ;
+			pLog.log(Level.SEVERE, "Exception when parsing posix file permission parameter: " + permissions, e);
 		}
 	}
 
 	private static List<UserPrincipal> getAclPrincipals(Path path) throws IOException {
 		
-		List<UserPrincipal> userPrincipals = new ArrayList<>() ;
+		List<UserPrincipal> userPrincipals = new ArrayList<>();
 		FileStore fileStore = Files.getFileStore(path) ;
 		if (fileStore.supportsFileAttributeView(AclFileAttributeView.class)) {
 					
 			AclFileAttributeView aclView = Files.getFileAttributeView(path, AclFileAttributeView.class);
 			
-			List<AclEntry> aclEntries = aclView.getAcl() ;
+			List<AclEntry> aclEntries = aclView.getAcl();
 			if (aclEntries != null) {
 				for (AclEntry aclEntry : aclEntries) {
-					userPrincipals.add(aclEntry.principal()) ;
+					userPrincipals.add(aclEntry.principal());
 				}
 			}
 		}
-		return userPrincipals ;
+		return userPrincipals;
 	}
 	
 	// Set a file writable : use all the possible attributes views
@@ -117,7 +117,22 @@ public class FilesSecurityUtils {
 	// and all the users defined in the ACL of sourcePath
 	public static void setWritable(Path path, Path sourcePath) throws IOException {
 
-		FileStore fileStore = Files.getFileStore(path) ;
+		setWritable(path, sourcePath, true);
+	}
+	
+	private static void setWritable(Path path, Path sourcePath, boolean setOnParent) throws IOException {
+
+		// setWritable on the parent first
+		if (setOnParent) {
+			Path parent = path.getParent();
+			try {
+				setWritable(parent, sourcePath, false);
+			} catch (Exception e) {
+				logger.log(Level.SEVERE, "Exception trying to set parent writable " + parent, e);
+			}
+		}
+		
+		FileStore fileStore = Files.getFileStore(path);
 		
 		// Get the UserPrincipal of the running process
 		UserPrincipalLookupService upls = path.getFileSystem().getUserPrincipalLookupService();
@@ -125,65 +140,80 @@ public class FilesSecurityUtils {
 
 		if (fileStore.supportsFileAttributeView(AclFileAttributeView.class)) {
 			
-			AclFileAttributeView aclAttr = Files.getFileAttributeView(path, AclFileAttributeView.class);
-			
-			List<AclEntry> entries = new ArrayList<>() ;
-			
-			// set the file writable for the user running this process
-			entries.add(buildAclEntry(path, user)) ;
-			
-			// set the file writable for all the users defined in the ACL of sourcePath
-			if (sourcePath != null) {
-				List<UserPrincipal> users = getAclPrincipals(sourcePath) ;
-				if (users != null) {
-					for (UserPrincipal userPrincipal : users) {
-						if (! userPrincipal.equals(user)) {
-							entries.add(buildAclEntry(path, userPrincipal)) ;
+			try {
+				AclFileAttributeView aclAttr = Files.getFileAttributeView(path, AclFileAttributeView.class);
+				
+				List<AclEntry> entries = new ArrayList<>();
+				
+				// set the file writable for the user running this process
+				entries.add(buildAclEntry(path, user));
+				
+				// set the file writable for all the users defined in the ACL of sourcePath
+				if (sourcePath != null) {
+					List<UserPrincipal> users = getAclPrincipals(sourcePath);
+					if (users != null) {
+						for (UserPrincipal userPrincipal : users) {
+							if (! userPrincipal.equals(user)) {
+								entries.add(buildAclEntry(path, userPrincipal));
+							}
 						}
 					}
 				}
+				
+				aclAttr.setAcl(entries);
+			} catch (Exception e) {
+				logger.log(Level.SEVERE, "Exception trying to set acl permissions writable " + path, e);
 			}
-			aclAttr.setAcl(entries) ;
-			
 		}
 		
 		if (fileStore.supportsFileAttributeView(PosixFileAttributeView.class)) {
 			
-			Set<PosixFilePermission> perms = new HashSet<PosixFilePermission>();
-			// add owners permission
-			perms.add(PosixFilePermission.OWNER_READ);
-			perms.add(PosixFilePermission.OWNER_WRITE);
-			perms.add(PosixFilePermission.OWNER_EXECUTE);
-			// add group permissions
-			perms.add(PosixFilePermission.GROUP_READ);
-			perms.add(PosixFilePermission.GROUP_WRITE);
-			perms.add(PosixFilePermission.GROUP_EXECUTE);
-			// add others permissions
-			perms.add(PosixFilePermission.OTHERS_READ);
-			perms.add(PosixFilePermission.OTHERS_WRITE);
-			perms.add(PosixFilePermission.OTHERS_EXECUTE);
-			Files.setPosixFilePermissions(path, perms);
+			try {
+				Set<PosixFilePermission> perms = new HashSet<PosixFilePermission>();
+				// add owners permission
+				perms.add(PosixFilePermission.OWNER_READ);
+				perms.add(PosixFilePermission.OWNER_WRITE);
+				perms.add(PosixFilePermission.OWNER_EXECUTE);
+				// add group permissions
+				perms.add(PosixFilePermission.GROUP_READ);
+				perms.add(PosixFilePermission.GROUP_WRITE);
+				perms.add(PosixFilePermission.GROUP_EXECUTE);
+				// add others permissions
+				perms.add(PosixFilePermission.OTHERS_READ);
+				perms.add(PosixFilePermission.OTHERS_WRITE);
+				perms.add(PosixFilePermission.OTHERS_EXECUTE);
+				Files.setPosixFilePermissions(path, perms);
+			} catch (Exception e) {
+				logger.log(Level.SEVERE, "Exception trying to set posix permissions writable " + path, e);
+			}
 		} 
 		
 		if (fileStore.supportsFileAttributeView(FileOwnerAttributeView.class)) {
-			FileOwnerAttributeView ownerView = Files.getFileAttributeView(path, FileOwnerAttributeView.class);
-			ownerView.setOwner(user) ;
+			
+			try {
+				FileOwnerAttributeView ownerView = Files.getFileAttributeView(path, FileOwnerAttributeView.class);
+				ownerView.setOwner(user);
+			} catch (Exception e) {
+				logger.log(Level.SEVERE, "Exception trying to set File Owner permissions writable " + path, e);
+			}
 		}
+		
 		if (fileStore.supportsFileAttributeView(DosFileAttributeView.class)) {
-			Files.setAttribute(path, "dos:readonly", false);
+			try {
+				Files.setAttribute(path, "dos:readonly", false);
+			} catch (Exception e) {
+				logger.log(Level.SEVERE, "Exception trying to set DOS (readonly -> false) permissions writable " + path, e);
+			}
 		}
 	}
 	
 	private static AclEntry buildAclEntry(Path path, UserPrincipal user) throws IOException {
 		
 		AclEntry.Builder builder = AclEntry.newBuilder();
-		Set<AclEntryPermission> allPermissions = new HashSet<AclEntryPermission>(Arrays.asList( AclEntryPermission.values())) ;	
+		Set<AclEntryPermission> allPermissions = new HashSet<AclEntryPermission>(Arrays.asList( AclEntryPermission.values()));	
 		builder.setPermissions(allPermissions);
 		builder.setPrincipal(user);
 		builder.setType(AclEntryType.ALLOW);
-		return builder.build() ;
-		
-		
-	}
-	
+		return builder.build();
+	}	
 }
