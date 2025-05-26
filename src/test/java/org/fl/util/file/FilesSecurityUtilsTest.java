@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.nio.file.FileStore;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.attribute.AclEntry;
 import java.nio.file.attribute.AclEntryPermission;
@@ -39,11 +40,48 @@ import java.nio.file.attribute.PosixFileAttributeView;
 import java.nio.file.attribute.PosixFilePermission;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+import org.fl.util.FilterCounter;
+import org.fl.util.FilterCounter.LogRecordCounter;
 import org.junit.jupiter.api.Test;
 
 class FilesSecurityUtilsTest {
 
+	@Test
+	void shouldThrowsNullPointerException() throws IOException {
+		
+		assertThatNullPointerException().isThrownBy(() -> FilesSecurityUtils.setWritable(null, null));
+	}
+	
+	@Test
+	void shouldNoSuchFileException() throws IOException {
+		
+		Path unexistantPath = Path.of(URI.create("file:///ForTests/FlUtils/DoesNotExists"));
+		
+		assertThatExceptionOfType(NoSuchFileException.class).isThrownBy(() -> FilesSecurityUtils.setWritable(unexistantPath, null));
+	}
+	
+	@Test
+	void shouldNoSuchFileException2() throws IOException {
+		
+		Path existantPath = Path.of(URI.create("file:///ForTests/FlUtils/MyLogDir"));
+		Path unexistantPath = Path.of(URI.create("file:///ForTests/FlUtils/DoesNotExists"));
+		
+		LogRecordCounter logRecordCounter = 
+				FilterCounter.getLogRecordCounter(Logger.getLogger(FilesSecurityUtils.class.getName()));
+		
+		FilesSecurityUtils.setWritable(existantPath, unexistantPath);
+		
+		assertThat(logRecordCounter.getLogRecordCount()).isEqualTo(2);
+		assertThat(logRecordCounter.getLogRecordCount(Level.SEVERE)).isEqualTo(2);
+		assertThat(logRecordCounter.getLogRecords())
+			.allSatisfy(logRecord -> {
+				assertThat(logRecord.getMessage()).contains("Exception trying to set");
+				assertThat(logRecord.getThrown()).isExactlyInstanceOf(NoSuchFileException.class); });
+	}
+	
 	@Test
 	void shouldSetWritable() throws IOException {
 		
