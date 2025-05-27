@@ -32,7 +32,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.Charset;
-import java.nio.file.FileSystemNotFoundException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -47,8 +46,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.fl.util.AdvancedProperties;
+import org.fl.util.file.FilesUtils;
 import org.fl.util.swing.ColorHelpers;
-
 
 public class AdvancedProperties extends Properties {
 
@@ -275,63 +274,19 @@ public class AdvancedProperties extends Properties {
 			return null ;
 		}
 	}
-
-	public Path getPath(String key) {
-		
-		String pString =  getProperty(key) ;
-		Path path = null ;
-		if ((pString != null) && (pString.length() > 0)) {
-			
-			path = Paths.get(pString) ;
-			if (! Files.exists(path)) {
-				// if the path does not lead to a file, try to find it via the class loader
-				try {
-					URL url = AdvancedProperties.class.getClassLoader().getResource(pString) ;
-					if (url != null) {
-						path = Paths.get(url.toURI()) ;
-					}
-				} catch (URISyntaxException e) {
-					log.log(Level.SEVERE, "Exception when getting file path " + pString + " (value of property " + key, e);
-				}
-			}
-		} 
-		return path ;
-	}
-	
-	public Path getPathFromURI(String key) {
-		
-		String pString =  getProperty(key) ;
-	
-		if ((pString != null) && (pString.length() >0)) {
-			try {
-				return Paths.get(new URI(pString)) ;
-			} catch (URISyntaxException e) {
-				log.log(Level.SEVERE, "URISyntaxException when creating URI " + pString + " (value of property " + key, e);
-				return null ;
-			} catch (FileSystemNotFoundException e) {
-				log.log(Level.SEVERE, "FileSystemNotFoundException when creating Path from URI " + pString + " (value of property " + key, e);
-				return null ;
-			} catch (Exception e) {
-				log.log(Level.SEVERE, "Exception when creating Path from URI " + pString + " (value of property " + key, e);
-				return null ;
-			}
-		} else {
-			return null ;
-		}
-	}
 	
 	public String getFileContentFromURI(String key, Charset charset) {
 				
 		String pString =  getProperty(key) ;
 		try {
 			Path fPath ;
-			if ((pString != null) && (pString.length() >0)) {
-				 fPath = Paths.get(new URI(pString)) ;
+			if ((pString != null) && !pString.isEmpty()) {
+				 fPath = FilesUtils.uriStringToAbsolutePath(pString);
 			} else {
-				return "" ;
+				return "";
 			}
 		
-			return new String(Files.readAllBytes(fPath), charset) ;
+			return new String(Files.readAllBytes(fPath), charset);
 		} catch (IOException e) {
 			log.log(Level.SEVERE, "IO Exception when reading file " + pString + " (value of property " + key, e);
 			return "" ;
@@ -339,10 +294,6 @@ public class AdvancedProperties extends Properties {
 			log.log(Level.SEVERE, "Exception when reading file " + pString + " (value of property " + key, e);
 			return "" ;
 		}		
-	}
-	
-	public String getFileContent(String key) {		
-		return getFileContent(key, Charset.defaultCharset()) ;
 	}
 	
 	public String getFileContent(String key, Charset charset) {
