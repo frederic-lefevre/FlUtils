@@ -48,7 +48,7 @@ public class PropertiesStorage {
 
 	private static final Logger psLogger = Logger.getLogger(PropertiesStorage.class.getName());
 	
-	private static final String USER_DIR_PRPERTY = "user.dir";
+	private static final String USER_DIR_PROPERTY = "user.dir";
 	
     // URL of storage
     private URL propUrl;
@@ -78,7 +78,7 @@ public class PropertiesStorage {
 			} else {
 
 				String propPath = propertyUri.toString();
-				propUrl = getUrlFromSystemProperty(USER_DIR_PRPERTY, propPath);
+				propUrl = getUrlFromSystemProperty(USER_DIR_PROPERTY, propPath);
 
 				if (propUrl == null) {
 					// Still not found. Maybe inside the jar. Try class loader
@@ -138,7 +138,7 @@ public class PropertiesStorage {
 		StringBuilder errorMsg = new StringBuilder();
 		errorMsg.append(msg).append("\n");
 		errorMsg.append("property uri: ").append(Objects.toString(propertyUti)).append("\n");
-		errorMsg.append(USER_DIR_PRPERTY).append(": ").append(System.getProperty(USER_DIR_PRPERTY)).append("\n");
+		errorMsg.append(USER_DIR_PROPERTY).append(": ").append(System.getProperty(USER_DIR_PROPERTY)).append("\n");
 		return errorMsg.toString();
 	}
 	
