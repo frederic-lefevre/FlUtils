@@ -321,32 +321,6 @@ public class AdvancedProperties extends Properties {
 		return ret ;
 	}
 	
-	public byte[] getFileBinaryContent(String key) {
-		
-		String pString =  getProperty(key) ;
-		byte[] ret = {};
-		if (pString != null) {
-			try {
-				Path f = Paths.get(pString) ;
-				if (! Files.exists(f)) {
-					// if the path does not lead to a file, try to find it via the class loader
-					URL url = AdvancedProperties.class.getClassLoader().getResource(pString) ;
-					if (url != null) {
-						f = Paths.get(url.toURI()) ;
-					}
-				}
-				ret = Files.readAllBytes(f) ;
-			} catch (IOException e) {
-				log.log(Level.SEVERE, "IO Exception when reading file " + pString + " (value of property " + key, e);
-			} catch (Exception e) {
-				log.log(Level.SEVERE, "Exception when reading file " + pString + " (value of property " + key, e);
-			}
-		} else {
-			log.severe("getFileContent: Property " + pString + " does not exist");
-		}
-		return ret ;
-	}
-	
 	public AdvancedProperties getPropertiesFromFile(String key) {
 		
 		String filePathName = getProperty(key) ;
