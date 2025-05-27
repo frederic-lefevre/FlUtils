@@ -298,25 +298,6 @@ public class AdvancedProperties extends Properties {
 		return path ;
 	}
 	
-	public URI getURI(String key) {
-		
-		String pString =  getProperty(key) ;
-	
-		if ((pString != null) && (pString.length() >0)) {
-			try {
-				return new URI(pString) ;
-			} catch (URISyntaxException e) {
-				log.log(Level.SEVERE, "URISyntaxException when creating URI " + pString + " (value of property " + key, e);
-				return null ;
-			} catch (Exception e) {
-				log.log(Level.SEVERE, "Exception when creating Path from URI " + pString + " (value of property " + key, e);
-				return null ;
-			}
-		} else {
-			return null ;
-		}
-	}
-	
 	public Path getPathFromURI(String key) {
 		
 		String pString =  getProperty(key) ;
