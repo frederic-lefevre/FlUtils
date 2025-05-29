@@ -46,15 +46,17 @@ import java.util.logging.Logger;
  */
 public class PropertiesStorage {
 
-	private static final Logger psLogger = Logger.getLogger(PropertiesStorage.class.getName());
+	private static final Logger PS_LOGGER = Logger.getLogger(PropertiesStorage.class.getName());
 	
-	private static final String USER_DIR_PRPERTY = "user.dir";
+	private static final String USER_DIR_PROPERTY = "user.dir";
 	
     // URL of storage
     private URL propUrl;
     
     // Advanced Properties
     private AdvancedProperties advancedProperties;
+    
+    private Logger psLogger;
     
  /**
      * Create a properties storage
@@ -68,7 +70,17 @@ public class PropertiesStorage {
      * @throws Exception if the URI or file cannot be opened
      */
 	public PropertiesStorage(URI propertyUri) throws Exception {
-	   
+	   init(propertyUri, PS_LOGGER);
+	}
+  
+	public PropertiesStorage(URI propertyUri, Logger logger) throws Exception {
+		   init(propertyUri, logger);
+	}
+	
+	private void init(URI propertyUri, Logger logger) throws Exception {
+		
+		psLogger = logger;
+		
 		propUrl = null;
 		try {
 			// Get the URI of the properties			
@@ -78,7 +90,7 @@ public class PropertiesStorage {
 			} else {
 
 				String propPath = propertyUri.toString();
-				propUrl = getUrlFromSystemProperty(USER_DIR_PRPERTY, propPath);
+				propUrl = getUrlFromSystemProperty(USER_DIR_PROPERTY, propPath);
 
 				if (propUrl == null) {
 					// Still not found. Maybe inside the jar. Try class loader
@@ -105,10 +117,10 @@ public class PropertiesStorage {
 				propUrl = null;
 			}
 		} else {
-			psLogger.warning("GetAdvanced properties while properties url is null");
+			psLogger.severe("Property file has not been found. URI: " + Objects.toString(propertyUri));
 		}
-   }
-   
+		
+	}
    private URL getUrlFromSystemProperty(String systemProperty, String relativePath) {
 		String directory = System.getProperty(systemProperty);
 		if (directory != null) {
@@ -138,7 +150,7 @@ public class PropertiesStorage {
 		StringBuilder errorMsg = new StringBuilder();
 		errorMsg.append(msg).append("\n");
 		errorMsg.append("property uri: ").append(Objects.toString(propertyUti)).append("\n");
-		errorMsg.append(USER_DIR_PRPERTY).append(": ").append(System.getProperty(USER_DIR_PRPERTY)).append("\n");
+		errorMsg.append(USER_DIR_PROPERTY).append(": ").append(System.getProperty(USER_DIR_PROPERTY)).append("\n");
 		return errorMsg.toString();
 	}
 	
