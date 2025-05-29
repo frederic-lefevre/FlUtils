@@ -158,25 +158,37 @@ public class RunningContext {
 		}
 	}
 	
-	private void createAnInitialLoggerConfig(String name) throws SecurityException, IOException {
+	private void createAnInitialLoggerConfig(String name) {
 		
 		Level initialLoggerLevel = Level.INFO;
 		runningContextLogger.setLevel(initialLoggerLevel);
+		String logFolder = "/tmp/runningContextLog/";
 		
-		try {
-			String logFolder = "/tmp/runningContextLog/";
-			Path logFolderPath = Path.of(logFolder).toAbsolutePath();
-			if (Files.notExists(logFolderPath)) {
-				Files.createDirectories(logFolderPath);
-			}
-			FileHandler runningContextFLogFileHandler = new FileHandler(logFolder + Objects.toString(name) + "%u.log", 80000000, 1, false);
-			runningContextFLogFileHandler.setLevel(initialLoggerLevel);
-			runningContextFLogFileHandler.setFormatter(new SimpleFormatter());
-			runningContextLogger.addHandler(runningContextFLogFileHandler);
-			
+		try {			
+			createAnInitialLoggerConfig(name, logFolder, initialLoggerLevel);		
 		} catch (Exception e) {
-			runningContextLogger.log(Level.SEVERE, "Exception creating minimal file handler", e);	
+			runningContextLogger.log(Level.SEVERE, "Exception creating minimal file handler in " + logFolder, e);
+			// Try with user.dir
+			String logFolderFallback = System.getProperty("user.dir");
+			try {
+				createAnInitialLoggerConfig(name, logFolderFallback, initialLoggerLevel);
+			} catch (SecurityException | IOException e1) {
+				runningContextLogger.log(Level.SEVERE, "Exception creating minimal file handler in folder fallback " + logFolderFallback, e1);
+			}			
 		}
+	}
+	
+	private void createAnInitialLoggerConfig(String name, String logFolder, Level initialLoggerLevel ) throws SecurityException, IOException {
+		
+		Path logFolderPath = Path.of(logFolder).toAbsolutePath();
+		if (Files.notExists(logFolderPath)) {
+			Files.createDirectories(logFolderPath);
+		}
+		FileHandler runningContextFLogFileHandler = new FileHandler(logFolder + Objects.toString(name) + "%u.log", 80000000, 1, false);
+		runningContextFLogFileHandler.setLevel(initialLoggerLevel);
+		runningContextFLogFileHandler.setFormatter(new SimpleFormatter());
+		runningContextLogger.addHandler(runningContextFLogFileHandler);
+		
 	}
 	
 	public String getName() {
