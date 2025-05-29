@@ -393,35 +393,6 @@ public class AdvancedProperties extends Properties {
     		return colors ;
     	}    	
     }
-    
-	public List<String> getArrayOfFileContent(String key, String separator) {
-		return getArrayOfFileContent(key, separator,  Charset.defaultCharset()) ;
-	}
-	
-	public List<String> getArrayOfFileContent(String key, String separator, Charset charset) {
-		
-		String prop =  getProperty(key) ;
-		String[] fPaths ;
-		ArrayList<String> result = new ArrayList<>() ;
-		if ((prop != null) && (! prop.isEmpty())) {	
-			try {
-				fPaths = prop.split(separator) ;
-				for (String fPath : fPaths) {
-					 result.add(new String(Files.readAllBytes(Paths.get(fPath)))) ;
-				}
-			} catch (IOException e) {
-				log.log(Level.SEVERE, "IO Exception when reading a file in value of property " + key, e);
-				return null ;
-			} catch (Exception e) {
-				log.log(Level.SEVERE, "Exception when reading a file in value of property " + key, e);
-				return null ;
-			}
-		} else {
-			result = null ;
-		}
-		
-		return result ;
-	}
 	
 	// Get all the properties as a string
 	public String getPropertiesAsString() {
