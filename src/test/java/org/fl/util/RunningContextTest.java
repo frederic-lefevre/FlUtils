@@ -107,7 +107,7 @@ class RunningContextTest {
 		assertThat(runningContextLogRecordCounter.getLogRecordCount()).isEqualTo(1);
 		assertThat(runningContextLogRecordCounter.getLogRecordCount(Level.SEVERE)).isEqualTo(1);
 		assertThat(runningContextLogRecordCounter.getLogRecords()).singleElement()
-			.satisfies(logRecord -> assertThat(logRecord.getMessage()).isEqualTo("Null application name passed in running context"));
+			.satisfies(logRecord -> assertThat(logRecord.getMessage()).isEqualTo("Null application name passed in running context. PropertyUri=null"));
 		
 		assertThat(loggerManagerLogRecordCounter.getLogRecordCount()).isEqualTo(1);
 		assertThat(loggerManagerLogRecordCounter.getLogRecordCount(Level.WARNING)).isEqualTo(1);

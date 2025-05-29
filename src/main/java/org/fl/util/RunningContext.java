@@ -29,6 +29,8 @@ import java.io.StringReader;
 import java.net.URI;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -36,14 +38,17 @@ import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.Vector;
+import java.util.logging.FileHandler;
 import java.util.logging.Formatter;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 
 import org.fl.util.json.JsonUtils;
 import org.fl.util.os.OperatingInfo;
@@ -75,12 +80,12 @@ public class RunningContext {
 	
 	private static final JavaPropsMapper propsMapper = new JavaPropsMapper();
 
-	private final String name;
+	private String name;
 	private Logger applicationRootLog;
 	private AdvancedProperties applicationProperties;
 	private PropertiesStorage propsStorage;
 	private LoggerManager logMgr;
-	private final Instant initializationDate;
+	private  Instant initializationDate;
 
 	private ArrayNode buildInformation;
 	private JsonNode loggingPropertiesAsJson;
@@ -94,18 +99,21 @@ public class RunningContext {
 	 */
 	public RunningContext(String name, URI propertyUri) {
 		
-		initializationDate = Instant.now();
-		
-		if (name == null) {
-			this.name = DEFAULT_APP_NAME;
-			runningContextLogger.severe("Null application name passed in running context");
-		} else {
-			this.name = name;		
-		}	
-		
 		try {
+			initializationDate = Instant.now();
+			
+			// Create an initial logging configuration
+			createAnInitialLoggerConfig(name);
+			
+			if (name == null) {
+				this.name = DEFAULT_APP_NAME;
+				runningContextLogger.severe("Null application name passed in running context. PropertyUri=" + Objects.toString(propertyUri));
+			} else {
+				this.name = name;		
+			}	
+		
 			if (propertyUri != null) {
-				propsStorage = new PropertiesStorage(propertyUri);
+				propsStorage = new PropertiesStorage(propertyUri, runningContextLogger);
 				applicationProperties = propsStorage.getAdvancedProperties(); 
 			} else {
 				applicationProperties = new AdvancedProperties(null);
@@ -147,6 +155,27 @@ public class RunningContext {
 		} catch (Exception e) {
 			runningContextLogger.log(Level.SEVERE, "Exception processing property file.  ", e);
 			applicationProperties = new AdvancedProperties(null);			
+		}
+	}
+	
+	private void createAnInitialLoggerConfig(String name) throws SecurityException, IOException {
+		
+		Level initialLoggerLevel = Level.INFO;
+		runningContextLogger.setLevel(initialLoggerLevel);
+		
+		try {
+			String logFolder = "/tmp/runningContextLog/";
+			Path logFolderPath = Path.of(logFolder).toAbsolutePath();
+			if (Files.notExists(logFolderPath)) {
+				Files.createDirectories(logFolderPath);
+			}
+			FileHandler runningContextFLogFileHandler = new FileHandler(logFolder + Objects.toString(name) + "%u.log", 80000000, 1, false);
+			runningContextFLogFileHandler.setLevel(initialLoggerLevel);
+			runningContextFLogFileHandler.setFormatter(new SimpleFormatter());
+			runningContextLogger.addHandler(runningContextFLogFileHandler);
+			
+		} catch (Exception e) {
+			runningContextLogger.log(Level.SEVERE, "Exception creating minimal file handler", e);	
 		}
 	}
 	
