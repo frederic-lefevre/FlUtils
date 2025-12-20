@@ -6,41 +6,41 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.fl</groupId>
 	<artifactId>FlUtils</artifactId>
-	<version>9.0.0</version>
+	<version>9.0.1</version>
 	<packaging>jar</packaging>
 
 	<dependencies>
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-core</artifactId>
-			<version>2.19.0</version>
+			<version>2.20.1</version>
 		</dependency>
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
-			<version>2.19.0</version>
+			<version>2.20.1</version>
 		</dependency>
 		<dependency>
 			<groupId>com.fasterxml.jackson.dataformat</groupId>
 			<artifactId>jackson-dataformat-properties</artifactId>
-			<version>2.19.0</version>
+			<version>2.20.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter-api</artifactId>
-			<version>5.12.2</version>
+			<version>6.0.1</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter-params</artifactId>
-			<version>5.12.2</version>
+			<version>6.0.1</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.assertj</groupId>
 			<artifactId>assertj-core</artifactId>
-			<version>3.27.3</version>
+			<version>3.27.6</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
@@ -69,12 +69,12 @@
 		<plugins>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.14.0</version>
+				<version>3.14.1</version>
 			</plugin>
 			<plugin>
                 <groupId>io.github.git-commit-id</groupId>
 				<artifactId>git-commit-id-maven-plugin</artifactId>
-                <version>9.0.1</version>
+                <version>9.0.2</version>
                     <executions>
                         <execution>
                             <goals>
