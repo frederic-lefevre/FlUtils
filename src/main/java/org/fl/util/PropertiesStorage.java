@@ -70,11 +70,11 @@ public class PropertiesStorage {
      * @throws Exception if the URI or file cannot be opened
      */
 	public PropertiesStorage(URI propertyUri) throws Exception {
-	   init(propertyUri, PS_LOGGER);
+		init(propertyUri, PS_LOGGER);
 	}
-  
+
 	public PropertiesStorage(URI propertyUri, Logger logger) throws Exception {
-		   init(propertyUri, logger);
+		init(propertyUri, logger);
 	}
 	
 	private void init(URI propertyUri, Logger logger) throws Exception {
