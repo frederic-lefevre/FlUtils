@@ -71,9 +71,9 @@ class LoggerManagerTest {
 		LoggerManager logMgr = LoggerManager.builder().build();
 		assertThat(logMgr).isNotNull();
 		
-		// 1 warning is logged
+		// 1 SEVERE error is logged
 		assertThat(logRecordCounter.getLogRecordCount()).isEqualTo(1);
-		assertThat(logRecordCounter.getLogRecordCount(Level.WARNING)).isEqualTo(1);
+		assertThat(logRecordCounter.getLogRecordCount(Level.SEVERE)).isEqualTo(1);
 		
 		logRecordCounter.stopLogCountAndFilter();
 		
@@ -85,7 +85,7 @@ class LoggerManagerTest {
 		
 		assertThat(handlers).isEmpty();
 		
-		assertThat(logMgr.getLoggingProperties()).isNull();
+		assertThat(logMgr.getLoggingProperties()).isNotNull().isEmpty();
 		assertThat(logMgr.getCommonFormatterInstance()).isInstanceOf(SimpleFormatter.class);
 	}
 
@@ -104,9 +104,9 @@ class LoggerManagerTest {
 		
 		assertThat(logMgr).isNotNull();
 		
-		// 1 warning is logged
+		// 1 SEVERE error is logged
 		assertThat(logRecordCounter.getLogRecordCount()).isEqualTo(1);
-		assertThat(logRecordCounter.getLogRecordCount(Level.WARNING)).isEqualTo(1);
+		assertThat(logRecordCounter.getLogRecordCount(Level.SEVERE)).isEqualTo(1);
 		
 		logRecordCounter.stopLogCountAndFilter();
 		
@@ -117,7 +117,7 @@ class LoggerManagerTest {
 		Handler[] handlers = logger.getHandlers();
 		
 		assertThat(handlers).isEmpty();
-		assertThat(logMgr.getLoggingProperties()).isNull();
+		assertThat(logMgr.getLoggingProperties()).isNotNull().isEmpty();
 		assertThat(logMgr.getCommonFormatterInstance()).isInstanceOf(SimpleFormatter.class);
 	}
 	
@@ -496,7 +496,7 @@ class LoggerManagerTest {
 	
 	@Test
 	@Order(9)
-	void warningWhenLoggingFileNamePropertyNotFound() throws Exception {
+	void severeWhenLoggingFileNamePropertyNotFound() throws Exception {
 		
 		String loggerName = "org.fl.util.SampleApp";
 		
@@ -517,9 +517,9 @@ class LoggerManagerTest {
 		
 		assertThat(logMgr).isNotNull();
 		
-		// 1 warning is logged
+		// 1 severe error is logged
 		assertThat(logRecordCounter.getLogRecordCount()).isEqualTo(1);
-		assertThat(logRecordCounter.getLogRecordCount(Level.WARNING)).isEqualTo(1);
+		assertThat(logRecordCounter.getLogRecordCount(Level.SEVERE)).isEqualTo(1);
 		
 		logRecordCounter.stopLogCountAndFilter();
 	}

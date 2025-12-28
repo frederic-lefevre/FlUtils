@@ -111,7 +111,7 @@ class LogsDisplayPaneTest {
 		
 		// 1 warning is logged
 		assertThat(rootLogRecordCounter.getLogRecordCount()).isEqualTo(1);
-		assertThat(rootLogRecordCounter.getLogRecordCount(Level.WARNING)).isEqualTo(1);
+		assertThat(rootLogRecordCounter.getLogRecordCount(Level.SEVERE)).isEqualTo(1);
 		
 		assertThat(rc).isNotNull();
 		
@@ -127,7 +127,7 @@ class LogsDisplayPaneTest {
 		
 		assertThat(logsDisplayPane).isNotNull();
 		
-		// 1 warning is logged
+		// 1severe error is logged
 		assertThat(logRecordCounter.getLogRecordCount()).isEqualTo(1);
 		assertThat(logRecordCounter.getLogRecordCount(Level.WARNING)).isEqualTo(1);
 		

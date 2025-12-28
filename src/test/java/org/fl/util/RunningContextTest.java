@@ -110,9 +110,9 @@ class RunningContextTest {
 			.satisfies(logRecord -> assertThat(logRecord.getMessage()).isEqualTo("Null application name passed in running context. PropertyUri=null"));
 		
 		assertThat(loggerManagerLogRecordCounter.getLogRecordCount()).isEqualTo(1);
-		assertThat(loggerManagerLogRecordCounter.getLogRecordCount(Level.WARNING)).isEqualTo(1);
+		assertThat(loggerManagerLogRecordCounter.getLogRecordCount(Level.SEVERE)).isEqualTo(1);
 		assertThat(loggerManagerLogRecordCounter.getLogRecords()).singleElement()
-			.satisfies(logRecord -> assertThat(logRecord.getMessage()).isEqualTo("logManager.properties.file property is not found in the application property file"));
+			.satisfies(logRecord -> assertThat(logRecord.getMessage()).isEqualTo("Logging properties file not found loggingProperties.properties"));
 		
 		orgFlLogRecordCounter.stopLogCountAndFilter();
 		runningContextLogRecordCounter.stopLogCountAndFilter();

@@ -70,11 +70,11 @@ public class PropertiesStorage {
      * @throws Exception if the URI or file cannot be opened
      */
 	public PropertiesStorage(URI propertyUri) throws Exception {
-	   init(propertyUri, PS_LOGGER);
+		init(propertyUri, PS_LOGGER);
 	}
-  
+
 	public PropertiesStorage(URI propertyUri, Logger logger) throws Exception {
-		   init(propertyUri, logger);
+		init(propertyUri, logger);
 	}
 	
 	private void init(URI propertyUri, Logger logger) throws Exception {
@@ -115,17 +115,19 @@ public class PropertiesStorage {
 				psLogger.log(Level.SEVERE, "Property file loading error for " + propUrl, e);
 				// Invalid url
 				propUrl = null;
+				advancedProperties = new AdvancedProperties(null);
 			}
 		} else {
 			psLogger.severe("Property file has not been found. URI: " + Objects.toString(propertyUri));
-		}
-		
+		}	
+	
 	}
-   private URL getUrlFromSystemProperty(String systemProperty, String relativePath) {
+	
+	private URL getUrlFromSystemProperty(String systemProperty, String relativePath) {
 		String directory = System.getProperty(systemProperty);
 		if (directory != null) {
 			Path propPath = Paths.get(directory);
-			
+
 			if (Files.exists(propPath)) {
 				Path fullPath;
 				if (Files.isDirectory(propPath)) {
@@ -143,7 +145,7 @@ public class PropertiesStorage {
 			}
 		}
 		return null;
-   }
+	}
    
 	private String buildPropErrorMsg(String msg, URI propertyUti) {
 
