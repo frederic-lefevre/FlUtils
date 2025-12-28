@@ -26,9 +26,11 @@ package org.fl.util;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
@@ -148,32 +150,38 @@ public class LoggerManager {
     private Function<String, BiFunction<String,String,String>> loggingPrpertyRemapper = (k) -> ((o, n) -> n == null ? o : n);
     
     private AdvancedProperties initJavaUtilLogging(String applicationRootLoggerName) {
-    	
-    	AdvancedProperties loggingProperties = null;
-    	String loggingPropertiesFileName = properties.getProperty(LOGMANAGER_PROPERTY_FILE_PROPERTY);
-    	if ((loggingPropertiesFileName != null) && !loggingPropertiesFileName.isEmpty()) {
-    				
-    		URL loggingPropertiesUrl = RunningContext.class.getClassLoader().getResource(loggingPropertiesFileName);
+
+    	AdvancedProperties loggingProperties = new AdvancedProperties(null);
+    	String loggingPropertiesFileName = properties.getProperty(LOGMANAGER_PROPERTY_FILE_PROPERTY, "loggingProperties.properties");
+
+    	URL loggingPropertiesUrl = RunningContext.class.getClassLoader().getResource(loggingPropertiesFileName);
+
+    	if (loggingPropertiesUrl != null) {
     		
-    		if (loggingPropertiesUrl != null) {
-    			
-    			loggingProperties = properties.getPropertiesFromFile(LOGMANAGER_PROPERTY_FILE_PROPERTY);
-    			createFileHandlerPatternNonExistantFolders(loggingProperties);
-   			
-    			LogManager logManager = LogManager.getLogManager();
-    			try (InputStream is = loggingPropertiesUrl.openStream()) {
-    				logManager.reset();
-    				LogManager.getLogManager().updateConfiguration(is, loggingPrpertyRemapper);
-    			} catch (IOException e) {
-    				loggerManagertLogger.log(Level.SEVERE, "IOException when LogManager loads logging properties file " + loggingPropertiesFileName, e);
-				}
-    			checkApplicationootLoggerConfig(loggingProperties, applicationRootLoggerName);
-    		} else {
-    			loggerManagertLogger.severe("Logging properties file not found " + loggingPropertiesFileName);
-    		}
+			try (InputStreamReader reader = new InputStreamReader(loggingPropertiesUrl.openStream(), StandardCharsets.UTF_8)) {
+				
+				loggingProperties.load(reader);
+				createFileHandlerPatternNonExistantFolders(loggingProperties);
+				
+	    		LogManager logManager = LogManager.getLogManager();
+	    		try (InputStream is = loggingPropertiesUrl.openStream()) {
+	    			logManager.reset();
+	    			LogManager.getLogManager().updateConfiguration(is, loggingPrpertyRemapper);
+	    		} catch (IOException e) {
+	    			loggerManagertLogger.log(Level.SEVERE, "IOException when LogManager loads logging properties file " + loggingPropertiesFileName, e);
+	    		}
+	    		checkApplicationootLoggerConfig(loggingProperties, applicationRootLoggerName);
+	    		
+			} catch (Exception e) {
+				loggerManagertLogger.log(Level.SEVERE, "Java logging property file loading error for " + loggingPropertiesUrl, e);
+				// Invalid url
+				loggingPropertiesUrl = null;
+			}
+
     	} else {
-    		loggerManagertLogger.warning(LOGMANAGER_PROPERTY_FILE_PROPERTY + " property is not found in the application property file");
+    		loggerManagertLogger.severe("Logging properties file not found " + loggingPropertiesFileName);
     	}
+
     	return loggingProperties;
     }
     
