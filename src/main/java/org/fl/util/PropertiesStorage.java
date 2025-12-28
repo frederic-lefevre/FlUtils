@@ -118,14 +118,15 @@ public class PropertiesStorage {
 			}
 		} else {
 			psLogger.severe("Property file has not been found. URI: " + Objects.toString(propertyUri));
-		}
-		
+		}	
+	
 	}
-   private URL getUrlFromSystemProperty(String systemProperty, String relativePath) {
+	
+	private URL getUrlFromSystemProperty(String systemProperty, String relativePath) {
 		String directory = System.getProperty(systemProperty);
 		if (directory != null) {
 			Path propPath = Paths.get(directory);
-			
+
 			if (Files.exists(propPath)) {
 				Path fullPath;
 				if (Files.isDirectory(propPath)) {
@@ -143,7 +144,7 @@ public class PropertiesStorage {
 			}
 		}
 		return null;
-   }
+	}
    
 	private String buildPropErrorMsg(String msg, URI propertyUti) {
 
