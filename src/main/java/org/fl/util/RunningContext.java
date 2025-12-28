@@ -123,7 +123,7 @@ public class RunningContext {
 			logMgr = LoggerManager.builder()
 					.applicationRootLoggerName(this.name)
 					.properties(applicationProperties)
-					.createBufferLogHandlerForInit(LogsDisplayPane.hasLogsDisplayPaneProperty(applicationProperties))
+					.createBufferLogHandlerForInit(applicationProperties.isEmpty() || LogsDisplayPane.hasLogsDisplayPaneProperty(applicationProperties))
 					.build();
 
 			applicationRootLog = Logger.getLogger(this.name);
