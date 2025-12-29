@@ -68,6 +68,25 @@ class PropertiesStorageTest {
 		assertThat(logRecordCounter.getLogRecordCount(Level.SEVERE)).isEqualTo(1);
 	}
 	
+	
+	@Test
+	void testPropertiesStorageWithUnloadablePropertyFile() throws Exception {
+		
+		LogRecordCounter logRecordCounter = 
+				FilterCounter.getLogRecordCounter(Logger.getLogger(PropertiesStorage.class.getName()));
+		
+		PropertiesStorage ps = new PropertiesStorage(new URI("file:///ForTests/FlUtils/InvalidProperties/CDExPortable.exe"));
+		
+		assertThat(ps).isNotNull();	
+		assertThat(ps.getPropertyLocation()).isNotNull().asString().endsWith("/ForTests/FlUtils/InvalidProperties/CDExPortable.exe");
+		
+		AdvancedProperties props = ps.getAdvancedProperties();
+		assertThat(props).isNotNull().isEmpty();
+		
+		assertThat(logRecordCounter.getLogRecordCount()).isEqualTo(1);
+		assertThat(logRecordCounter.getLogRecordCount(Level.SEVERE)).isEqualTo(1);
+	}
+	
 	@Test
 	void testPropertiesStorageWithUri() throws URISyntaxException, Exception {
 		
