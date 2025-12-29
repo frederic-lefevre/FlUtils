@@ -114,7 +114,6 @@ public class PropertiesStorage {
 			} catch (Exception e) {
 				psLogger.log(Level.SEVERE, "Property file loading error for " + propUrl, e);
 				// Invalid url
-				propUrl = null;
 				advancedProperties = new AdvancedProperties(null);
 			}
 		} else {
