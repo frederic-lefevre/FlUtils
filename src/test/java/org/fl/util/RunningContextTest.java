@@ -432,4 +432,75 @@ class RunningContextTest {
 		assertThat(rc.getBufferLogHandlerForInit()).isNull();
 		
 	}
+	
+	@Test
+	void nullPrefixAndProgramArgTest() {
+		assertThat(RunningContext.getProgramArgWithPrefix(null, null)).isNull();
+	}
+	
+	@Test
+	void nullPrefixTest() {
+		assertThat(RunningContext.getProgramArgWithPrefix(null, new String[] {"-props=P1"})).isNull();
+	}
+	
+	@Test
+	void nullProgramArgTest() {
+		assertThat(RunningContext.getProgramArgWithPrefix("-prefix", null)).isNull();
+	}
+	
+	@Test
+	void notFoundPrefixTest() {
+		assertThat(RunningContext.getProgramArgWithPrefix("-prefs", new String[] {"-propsP1", "prefix2 toto"})).isNull();
+	}
+	
+	@Test
+	void notFoundPrefixTest2() {
+		assertThat(RunningContext.getProgramArgWithPrefix("-prefs", new String[] {"", "prefix2 toto", ""})).isNull();
+	}
+	
+	@Test
+	void notFoundPrefixTest3() {
+		assertThat(RunningContext.getProgramArgWithPrefix("-prefs", new String[] {})).isNull();
+	}
+	
+	@Test
+	void foundPrefixTest() {
+		assertThat(RunningContext.getProgramArgWithPrefix("-props=", new String[] {"-props=propertyFile.properties", "prefix2 toto"}))
+			.isNotNull()
+			.isEqualTo("propertyFile.properties");
+	}
+	
+	@Test
+	void emptyPrefixTest() {
+		assertThat(RunningContext.getProgramArgWithPrefix("", new String[] {"param1", "param2"}))
+			.isNotNull()
+			.isEqualTo("param1");
+	}
+	
+	@Test
+	void emptyPrefixTest2() {
+		assertThat(RunningContext.getProgramArgWithPrefix("", new String[] {}))
+			.isNull();
+	}
+	
+	@Test
+	void foundPrefixTest2() {
+		assertThat(RunningContext.getProgramArgWithPrefix("-props=", new String[] {"-props=", "prefix2 toto"}))
+			.isNotNull()
+			.isEqualTo("");
+	}
+	
+	@Test
+	void foundPrefixTest3() {
+		assertThat(RunningContext.getProgramArgWithPrefix("-props=", new String[] {"-props=propertyFile.properties", "-props=propertyFile2.properties", "prefix2 toto"}))
+			.isNotNull()
+			.isEqualTo("propertyFile.properties");
+	}
+	
+	@Test
+	void foundPrefixTest4() {
+		assertThat(RunningContext.getProgramArgWithPrefix("-props ", new String[] {"-props propertyFile.properties", "prefix2 toto"}))
+			.isNotNull()
+			.isEqualTo("propertyFile.properties");
+	}
 }
