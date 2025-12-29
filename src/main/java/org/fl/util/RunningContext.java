@@ -413,4 +413,16 @@ public class RunningContext {
     public List<LogRecord> removeInitBufferLogHandlerAndDrainLogRecordsTo(Handler handler) {
     	return logMgr.removeInitBufferLogHandlerAndDrainLogRecordsTo(handler);
     }
+    
+    public static String getProgramArgWithPrefix(String argPrefix, String[] args) {
+    	
+    	if ((argPrefix != null) && (args != null) && (args.length > 0)) {
+    		for (String arg : args) {
+    			if (arg.startsWith(argPrefix)) {
+    				return arg.substring(argPrefix.length());
+    			}
+    		}
+    	}
+    	return null;
+    }
 }
