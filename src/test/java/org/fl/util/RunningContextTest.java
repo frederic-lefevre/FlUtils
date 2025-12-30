@@ -26,7 +26,6 @@ package org.fl.util;
 
 import static org.assertj.core.api.Assertions.*;
 
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -99,9 +98,10 @@ class RunningContextTest {
 		
 		assertThat(rc.getCommonLogFormatter()).isInstanceOf(SimpleFormatter.class);
 		
-		assertThat(orgFlLogRecordCounter.getLogRecordCount()).isEqualTo(3);
+		assertThat(orgFlLogRecordCounter.getLogRecordCount()).isEqualTo(4);
 		assertThat(orgFlLogRecordCounter.getLogRecordCount(Level.WARNING)).isEqualTo(3);
-		assertThat(orgFlLogRecordCounter.getLogRecords()).hasSize(3)
+		assertThat(orgFlLogRecordCounter.getLogRecordCount(Level.SEVERE)).isEqualTo(1);
+		assertThat(orgFlLogRecordCounter.getLogRecords()).hasSize(4)
 			.anySatisfy(logRecord -> assertThat(logRecord.getMessage()).isEqualTo("No project properties (build information) found"));
 		
 		assertThat(runningContextLogRecordCounter.getLogRecordCount()).isEqualTo(1);
@@ -121,9 +121,84 @@ class RunningContextTest {
 	}
 	
 	@Test
+	void testRunningContextWithEmpyUri() throws JsonProcessingException, URISyntaxException {
+		
+		LogRecordCounter runningContextLogRecordCounter = 
+				FilterCounter.getLogRecordCounter(Logger.getLogger(RunningContext.class.getName()));
+		
+		LogRecordCounter propertiesStorageLogRecordCounter = 
+				FilterCounter.getLogRecordCounter(Logger.getLogger(LOGGER_NAME));
+		
+		LogRecordCounter loggerManagerLogRecordCounter = 
+				FilterCounter.getLogRecordCounter(Logger.getLogger(LoggerManager.class.getName()));
+		
+		RunningContext rc = new RunningContext(LOGGER_NAME, "");
+		
+		assertThat(rc).isNotNull();
+
+		assertThat(rc.getPropertiesLocation()).isNull();
+		
+		AdvancedProperties advancedProperties = rc.getProps();
+		assertThat(advancedProperties).isNotNull().isNotEmpty();
+		
+		assertThat(advancedProperties.get("buildOs"))
+			.isInstanceOfSatisfying(String.class, buildOs -> buildOs.contains("windows"));
+		
+		assertThat(rc.getName()).isEqualTo(LOGGER_NAME);
+		
+		assertThat(propertiesStorageLogRecordCounter.getLogRecordCount()).isEqualTo(1);
+		assertThat(propertiesStorageLogRecordCounter.getLogRecords()).hasSize(1)
+			.anySatisfy(logRecord -> assertThat(logRecord.getMessage())
+					.isEqualTo("Application properties is empty but the property file uri is not null: \"\"" +
+							" Absolute URI found: \"null\""));
+		
+		assertThat(runningContextLogRecordCounter.getLogRecordCount()).isEqualTo(1);
+		assertThat(runningContextLogRecordCounter.getLogRecordCount(Level.SEVERE)).isEqualTo(1);
+		assertThat(runningContextLogRecordCounter.getLogRecords()).singleElement()
+			.satisfies(logRecord -> assertThat(logRecord.getMessage()).isEqualTo("Property file has not been found. URI: \"\""));
+		
+		assertThat(loggerManagerLogRecordCounter.getLogRecordCount()).isEqualTo(1);
+		assertThat(loggerManagerLogRecordCounter.getLogRecordCount(Level.SEVERE)).isEqualTo(1);
+		assertThat(loggerManagerLogRecordCounter.getLogRecords()).singleElement()
+			.satisfies(logRecord -> assertThat(logRecord.getMessage()).isEqualTo("Logging properties file not found loggingProperties.properties"));
+		
+		propertiesStorageLogRecordCounter.stopLogCountAndFilter();
+		runningContextLogRecordCounter.stopLogCountAndFilter();
+		loggerManagerLogRecordCounter.stopLogCountAndFilter();
+	}
+	
+	@Test
+	void testRunningContextWithFolderUri() throws JsonProcessingException, URISyntaxException {
+			
+		LogRecordCounter loggerManagerLogRecordCounter = 
+				FilterCounter.getLogRecordCounter(Logger.getLogger(LoggerManager.class.getName()));
+		
+		RunningContext rc = new RunningContext(LOGGER_NAME, "file:///ForTests/FlUtils/InvalidProperties/");
+		
+		assertThat(rc).isNotNull();
+
+		assertThat(rc.getPropertiesLocation()).isNotNull();
+		
+		AdvancedProperties advancedProperties = rc.getProps();
+		assertThat(advancedProperties).isNotNull().isNotEmpty();
+		
+		assertThat(advancedProperties.get("buildOs"))
+			.isInstanceOfSatisfying(String.class, buildOs -> buildOs.contains("windows"));
+		
+		assertThat(rc.getName()).isEqualTo(LOGGER_NAME);
+		
+		assertThat(loggerManagerLogRecordCounter.getLogRecordCount()).isEqualTo(1);
+		assertThat(loggerManagerLogRecordCounter.getLogRecordCount(Level.SEVERE)).isEqualTo(1);
+		assertThat(loggerManagerLogRecordCounter.getLogRecords()).singleElement()
+			.satisfies(logRecord -> assertThat(logRecord.getMessage()).isEqualTo("Logging properties file not found loggingProperties.properties"));
+		
+		loggerManagerLogRecordCounter.stopLogCountAndFilter();
+	}
+	
+	@Test
 	void testRunningContextWithRelativePath() throws JsonProcessingException {
 		
-		RunningContext rc = new RunningContext(LOGGER_NAME, URI.create("test1.properties"));
+		RunningContext rc = new RunningContext(LOGGER_NAME, "test1.properties");
 		
 		assertThat(rc).isNotNull();
 		
@@ -156,7 +231,7 @@ class RunningContextTest {
 	void testRunningContextWithAbsolutePath() {
 		
 		RunningContext rc = new RunningContext(LOGGER_NAME, 
-				URI.create("file:///FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test1.properties"));
+				"file:///FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test1.properties");
 		
 		assertThat(rc).isNotNull();
 		
@@ -184,7 +259,7 @@ class RunningContextTest {
 	void testBasicRunningContextWithURI() throws URISyntaxException {
 		
 		RunningContext rc = new RunningContext(LOGGER_NAME,
-				new URI("file:///FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test1.properties"));
+				"file:///FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test1.properties");
 		
 		assertThat(rc).isNotNull();
 		
@@ -209,7 +284,7 @@ class RunningContextTest {
 	void testRunningContextBuildInfo() throws URISyntaxException, JsonProcessingException {
 		
 		RunningContext rc = new RunningContext(LOGGER_NAME,
-				new URI("file:///FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test1.properties"));
+				"file:///FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test1.properties");
 		
 		assertThat(rc).isNotNull();
 		
@@ -246,7 +321,7 @@ class RunningContextTest {
 	void testRunningContextBuildInfo2() throws URISyntaxException, JsonProcessingException {
 							
 		RunningContext rc = new RunningContext(LOGGER_NAME,
-				new URI("file:///FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test1.properties"));
+				"file:///FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test1.properties");
 		
 		LogRecordCounter logRecordCounter = 
 				FilterCounter.getLogRecordCounter(Logger.getLogger(LOGGER_NAME));
@@ -288,7 +363,7 @@ class RunningContextTest {
 	void testRunningContextBuildInfo3() throws URISyntaxException, JsonProcessingException {
 							
 		RunningContext rc = new RunningContext(LOGGER_NAME,
-				new URI("file:///FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test1.properties"));
+				"file:///FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test1.properties");
 		
 		String addedModule = "org.fl.util.test2";
 		rc.addBuildInformation(addedModule);
@@ -323,7 +398,7 @@ class RunningContextTest {
 	void testRunningContextBuildInfoWithSpecificClassLoader() throws URISyntaxException, JsonProcessingException {
 							
 		RunningContext rc = new RunningContext(LOGGER_NAME,
-				new URI("file:///FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test1.properties"));
+				"file:///FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test1.properties");
 		
 		String addedModule = "org.fl.util.test2";
 		rc.addBuildInformation(addedModule, JsonLogFormatter.class.getClassLoader());
@@ -358,7 +433,7 @@ class RunningContextTest {
 	void testRunningContextLoggingInfo() throws URISyntaxException, JsonProcessingException {
 		
 		RunningContext rc = new RunningContext(LOGGER_NAME,
-				new URI("file:///FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test1.properties"));
+				"file:///FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test1.properties");
 		
 		JsonNode applicationInfos = rc.getApplicationInfo(false);
 		
@@ -379,7 +454,7 @@ class RunningContextTest {
 				FilterCounter.getLogRecordCounter(Logger.getLogger(LOGGER_NAME2));
 		
 		RunningContext rc = new RunningContext(LOGGER_NAME2,
-				new URI("file:///FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test7.properties"));
+				"file:///FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test7.properties");
 		
 		JsonNode applicationInfos = rc.getApplicationInfo(false);	
 		assertThat(applicationInfos).isNotNull();
@@ -394,7 +469,7 @@ class RunningContextTest {
 		String loggerName = "org.fl.util.Test9";
 		
 		RunningContext rc = new RunningContext(loggerName,
-				new URI("file:///FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test9.properties"));
+				"file:///FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test9.properties");
 		
 		BufferLogHandler bufferLogHandlerForInit = rc.getBufferLogHandlerForInit();
 		assertThat(bufferLogHandlerForInit).isNotNull();
@@ -412,7 +487,7 @@ class RunningContextTest {
 		String loggerName = "org.fl.util.Test9";
 		
 		RunningContext rc = new RunningContext(loggerName,
-				new URI("file:///FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test9.properties"));
+				"file:///FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test9.properties");
 		
 		BufferLogHandler bufferLogHandlerForInit = rc.getBufferLogHandlerForInit();
 		assertThat(bufferLogHandlerForInit).isNotNull();

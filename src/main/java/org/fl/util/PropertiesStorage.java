@@ -86,6 +86,7 @@ public class PropertiesStorage {
 			// Get the URI of the properties			
 
 			if (propertyUri.isAbsolute()) {
+				
 				propUrl = propertyUri.toURL();
 			} else {
 
@@ -95,6 +96,12 @@ public class PropertiesStorage {
 				if (propUrl == null) {
 					// Still not found. Maybe inside the jar. Try class loader
 					propUrl = PropertiesStorage.class.getClassLoader().getResource(propPath);
+					
+					// Check it is a regular file
+					if ((propUrl != null) 		
+						&& (! Files.isRegularFile(Paths.get(propUrl.toURI())))) {
+						propUrl = null;		
+					}
 				}
 			}
 			
@@ -109,6 +116,7 @@ public class PropertiesStorage {
 		advancedProperties = new AdvancedProperties(null);
 
 		if (propUrl != null) {
+			
 			try (InputStreamReader reader = new InputStreamReader(propUrl.openStream(), StandardCharsets.UTF_8)) {
 				advancedProperties.load(reader);
 			} catch (Exception e) {
@@ -117,7 +125,7 @@ public class PropertiesStorage {
 				advancedProperties = new AdvancedProperties(null);
 			}
 		} else {
-			psLogger.severe("Property file has not been found. URI: " + Objects.toString(propertyUri));
+			psLogger.severe("Property file has not been found. URI: \"" + Objects.toString(propertyUri) + "\"");
 		}	
 	
 	}
@@ -134,7 +142,7 @@ public class PropertiesStorage {
 				} else {
 					fullPath = propPath.getParent().resolve(relativePath);
 				}
-				if (Files.exists(fullPath)) {
+				if (Files.exists(fullPath) && Files.isRegularFile(fullPath)) {
 					try {
 						return fullPath.toUri().toURL();
 					} catch (MalformedURLException e) {

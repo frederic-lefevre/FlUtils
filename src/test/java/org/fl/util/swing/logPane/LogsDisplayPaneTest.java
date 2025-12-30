@@ -52,7 +52,7 @@ class LogsDisplayPaneTest {
 	@Test
 	void testCreatLogsDisplayPane() throws JsonProcessingException {
 		
-		RunningContext rc = new RunningContext(LOGGER_NAME, URI.create("test1.properties"));
+		RunningContext rc = new RunningContext(LOGGER_NAME, "test1.properties");
 		
 		assertThat(rc).isNotNull();
 		
@@ -91,7 +91,7 @@ class LogsDisplayPaneTest {
 		String loggerName = "org.fl.util.Test9";
 		
 		RunningContext rc = new RunningContext(loggerName,
-				new URI("file:///FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test9.properties"));
+				"file:///FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test9.properties");
 		
 		Logger logger = Logger.getLogger(loggerName);
 		String infoMessage = "un message à l'init";
@@ -107,7 +107,7 @@ class LogsDisplayPaneTest {
 		LogRecordCounter rootLogRecordCounter = 
 				FilterCounter.getLogRecordCounter(Logger.getLogger(LoggerManager.class.getName()));
 		
-		RunningContext rc = new RunningContext(LOGGER_NAME2, URI.create("test6.properties"));
+		RunningContext rc = new RunningContext(LOGGER_NAME2, "test6.properties");
 		
 		// 1 warning is logged
 		assertThat(rootLogRecordCounter.getLogRecordCount()).isEqualTo(1);
@@ -127,7 +127,7 @@ class LogsDisplayPaneTest {
 		
 		assertThat(logsDisplayPane).isNotNull();
 		
-		// 1severe error is logged
+		// 1 severe error is logged
 		assertThat(logRecordCounter.getLogRecordCount()).isEqualTo(1);
 		assertThat(logRecordCounter.getLogRecordCount(Level.WARNING)).isEqualTo(1);
 		
@@ -148,7 +148,7 @@ class LogsDisplayPaneTest {
 	@Test
 	void testHasNoLogsDisplayPaneProperty() throws JsonProcessingException {
 		
-		RunningContext rc = new RunningContext(LOGGER_NAME, URI.create("test1.properties"));		
+		RunningContext rc = new RunningContext(LOGGER_NAME, "test1.properties");		
 		assertThat(LogsDisplayPane.hasLogsDisplayPaneProperty(rc.getProps())).isFalse();		
 	}
 	
