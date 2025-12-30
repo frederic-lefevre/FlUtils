@@ -97,10 +97,21 @@ public class RunningContext {
 	 *         The property file may denominated by :
      *  		- a well formed URI (for instance "http://my.server.org/myProps.properties" or "file:///my/dir/myProps.properties")
 	 */
-	public RunningContext(String name, URI propertyUri) {
+	public RunningContext(String name, String propertyFile) {
 		
 		try {
 			initializationDate = Instant.now();
+			
+			URI propertyUri;
+			Exception uriExp = null;
+			
+			try {
+				propertyUri = new URI(propertyFile);
+			} catch (Exception e) {
+				uriExp = e;
+				propertyUri = null;
+				// Wait application logger init to log that
+			}
 			
 			// Create an initial logging configuration
 			createAnInitialLoggerConfig(name);
@@ -127,6 +138,10 @@ public class RunningContext {
 					.build();
 
 			applicationRootLog = Logger.getLogger(this.name);
+			
+			if (uriExp != null) {
+				applicationRootLog.log(Level.SEVERE, "Invalid property file URI " + propertyFile, uriExp);
+			}
 			
 			if ((propertyUri != null) && applicationProperties.isEmpty()) {
 				applicationRootLog.severe("Application properties is empty but the property file uri is not null: " + Objects.toString(propsStorage.getPropertyLocation()));

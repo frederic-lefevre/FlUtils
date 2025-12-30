@@ -26,7 +26,6 @@ package org.fl.util;
 
 import static org.assertj.core.api.Assertions.*;
 
-import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.IntFunction;
@@ -129,7 +128,7 @@ class LoggerUtilsTest {
 	void getLoggerLevels() throws JsonProcessingException {
 		
 		RunningContext rc = new RunningContext(APPLICATION_NAME,
-				URI.create("file:///FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test1.properties"));
+				"file:///FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test1.properties");
 		assertThat(rc.getName()).isNotNull().isEqualTo(APPLICATION_NAME);
 		
 		Logger logger = Logger.getLogger(APPLICATION_NAME);
@@ -214,7 +213,7 @@ class LoggerUtilsTest {
 	void setLoggerAndHandlerLevels() throws JsonProcessingException {
 		
 		RunningContext rc = new RunningContext(APPLICATION_NAME,
-				URI.create("file:///FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test1.properties"));
+				"file:///FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test1.properties");
 		assertThat(rc.getName()).isNotNull().isEqualTo(APPLICATION_NAME);
 		
 		Logger logger = Logger.getLogger(APPLICATION_NAME);
