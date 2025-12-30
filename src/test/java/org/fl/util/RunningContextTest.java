@@ -121,13 +121,22 @@ class RunningContextTest {
 	}
 	
 	@Test
-	void testRunningContextWithEmpyUri() throws JsonProcessingException {
+	void testRunningContextWithEmpyUri() throws JsonProcessingException, URISyntaxException {
+		
+		LogRecordCounter runningContextLogRecordCounter = 
+				FilterCounter.getLogRecordCounter(Logger.getLogger(RunningContext.class.getName()));
+		
+		LogRecordCounter propertiesStorageLogRecordCounter = 
+				FilterCounter.getLogRecordCounter(Logger.getLogger(LOGGER_NAME));
+		
+		LogRecordCounter loggerManagerLogRecordCounter = 
+				FilterCounter.getLogRecordCounter(Logger.getLogger(LoggerManager.class.getName()));
 		
 		RunningContext rc = new RunningContext(LOGGER_NAME, "");
 		
 		assertThat(rc).isNotNull();
-		
-//		assertThat(rc.getPropertiesLocation()).isNull();
+
+		assertThat(rc.getPropertiesLocation()).isNull();
 		
 		AdvancedProperties advancedProperties = rc.getProps();
 		assertThat(advancedProperties).isNotNull().isNotEmpty();
@@ -136,6 +145,54 @@ class RunningContextTest {
 			.isInstanceOfSatisfying(String.class, buildOs -> buildOs.contains("windows"));
 		
 		assertThat(rc.getName()).isEqualTo(LOGGER_NAME);
+		
+		assertThat(propertiesStorageLogRecordCounter.getLogRecordCount()).isEqualTo(1);
+		assertThat(propertiesStorageLogRecordCounter.getLogRecords()).hasSize(1)
+			.anySatisfy(logRecord -> assertThat(logRecord.getMessage())
+					.isEqualTo("Application properties is empty but the property file uri is not null: \"\"" +
+							" Absolute URI found: \"null\""));
+		
+		assertThat(runningContextLogRecordCounter.getLogRecordCount()).isEqualTo(1);
+		assertThat(runningContextLogRecordCounter.getLogRecordCount(Level.SEVERE)).isEqualTo(1);
+		assertThat(runningContextLogRecordCounter.getLogRecords()).singleElement()
+			.satisfies(logRecord -> assertThat(logRecord.getMessage()).isEqualTo("Property file has not been found. URI: \"\""));
+		
+		assertThat(loggerManagerLogRecordCounter.getLogRecordCount()).isEqualTo(1);
+		assertThat(loggerManagerLogRecordCounter.getLogRecordCount(Level.SEVERE)).isEqualTo(1);
+		assertThat(loggerManagerLogRecordCounter.getLogRecords()).singleElement()
+			.satisfies(logRecord -> assertThat(logRecord.getMessage()).isEqualTo("Logging properties file not found loggingProperties.properties"));
+		
+		propertiesStorageLogRecordCounter.stopLogCountAndFilter();
+		runningContextLogRecordCounter.stopLogCountAndFilter();
+		loggerManagerLogRecordCounter.stopLogCountAndFilter();
+	}
+	
+	@Test
+	void testRunningContextWithFolderUri() throws JsonProcessingException, URISyntaxException {
+			
+		LogRecordCounter loggerManagerLogRecordCounter = 
+				FilterCounter.getLogRecordCounter(Logger.getLogger(LoggerManager.class.getName()));
+		
+		RunningContext rc = new RunningContext(LOGGER_NAME, "file:///ForTests/FlUtils/InvalidProperties/");
+		
+		assertThat(rc).isNotNull();
+
+		assertThat(rc.getPropertiesLocation()).isNotNull();
+		
+		AdvancedProperties advancedProperties = rc.getProps();
+		assertThat(advancedProperties).isNotNull().isNotEmpty();
+		
+		assertThat(advancedProperties.get("buildOs"))
+			.isInstanceOfSatisfying(String.class, buildOs -> buildOs.contains("windows"));
+		
+		assertThat(rc.getName()).isEqualTo(LOGGER_NAME);
+		
+		assertThat(loggerManagerLogRecordCounter.getLogRecordCount()).isEqualTo(1);
+		assertThat(loggerManagerLogRecordCounter.getLogRecordCount(Level.SEVERE)).isEqualTo(1);
+		assertThat(loggerManagerLogRecordCounter.getLogRecords()).singleElement()
+			.satisfies(logRecord -> assertThat(logRecord.getMessage()).isEqualTo("Logging properties file not found loggingProperties.properties"));
+		
+		loggerManagerLogRecordCounter.stopLogCountAndFilter();
 	}
 	
 	@Test
