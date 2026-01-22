@@ -1,7 +1,7 @@
 /*
  * MIT License
 
-Copyright (c) 2017, 2025 Frederic Lefevre
+Copyright (c) 2017, 2026 Frederic Lefevre
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -572,17 +572,16 @@ public class FilesUtils {
 		}
 	}
 	
-	public static FileStore findFileStore(Path path, Logger logger) throws IOException {
+	public static FileStore findFileStore(Path path) throws IOException {
 		
 		if (Files.exists(path)) {
 			return Files.getFileStore(path);
 		} else {
 			Path parentPath = path.getParent();
 			if (parentPath == null) {
-				logger.warning("No FileStore found for the path " + path);
 				return null;
 			} else {
-				return findFileStore(parentPath, logger);
+				return findFileStore(parentPath);
 			}
 		}
 	}

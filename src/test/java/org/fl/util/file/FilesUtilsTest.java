@@ -1,7 +1,7 @@
 /*
  * MIT License
 
-Copyright (c) 2017, 2025 Frederic Lefevre
+Copyright (c) 2017, 2026 Frederic Lefevre
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -49,12 +49,24 @@ class FilesUtilsTest {
 		assertThat(unexistantPath).doesNotExist();
 		assertThat(existantPath).exists();
 		
-		FileStore fileStoreOfUnexistantPath = FilesUtils.findFileStore(unexistantPath, logger);
-		FileStore fileStoreOfExistantPath = FilesUtils.findFileStore(unexistantPath, logger);
+		FileStore fileStoreOfUnexistantPath = FilesUtils.findFileStore(unexistantPath);
+		FileStore fileStoreOfExistantPath = FilesUtils.findFileStore(existantPath);
 		
 		assertThat(fileStoreOfUnexistantPath).isNotNull()
 			.isEqualTo(fileStoreOfExistantPath)
 			.isEqualTo(Files.getFileStore(existantPath));
+	}
+	
+	@Test
+	void testshoulNotdFindFileStore() throws IOException {
+		
+		Path unexistantPath = Path.of(URI.create("file:///X:/ForTests/FlUtils/does/not/exists"));
+		
+		assertThat(unexistantPath).doesNotExist();
+		
+		FileStore fileStoreOfUnexistantPath = FilesUtils.findFileStore(unexistantPath);
+		
+		assertThat(fileStoreOfUnexistantPath).isNull();
 	}
 	
 	@Test
