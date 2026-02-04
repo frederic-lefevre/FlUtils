@@ -1,7 +1,7 @@
 /*
  * MIT License
 
-Copyright (c) 2017, 2025 Frederic Lefevre
+Copyright (c) 2017, 2026 Frederic Lefevre
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -36,6 +36,9 @@ public abstract class CustomTableCellRenderer extends DefaultTableCellRenderer {
 
 	private static final long serialVersionUID = 1L;
 	
+    private Color unselectedForeground;
+    private Color unselectedBackground;
+    
 	public CustomTableCellRenderer(Font font, int horizontalAlignment) {
 		
 		super();
@@ -44,11 +47,47 @@ public abstract class CustomTableCellRenderer extends DefaultTableCellRenderer {
 	}
 	
 	public abstract void valueProcessor(Object value);
-	
+    
+    @Override
+    public void setForeground(Color c) {
+        super.setForeground(c);
+        unselectedForeground = c;
+    }
+    
+    @Override
+    public void setBackground(Color c) {
+        super.setBackground(c);
+        unselectedBackground = c;
+    }
+    
 	@Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
 		
-		// same code as in DefaultTableCellRenderer
+		// (almost) same code as in DefaultTableCellRenderer except for setFont (omitted) and a simplified management of selected cell color
+        if (table == null) {
+            return this;
+        }
+
+        JTable.DropLocation dropLocation = table.getDropLocation();
+
+        isSelected = isSelected || (dropLocation != null
+                && !dropLocation.isInsertRow()
+                && !dropLocation.isInsertColumn()
+                && dropLocation.getRow() == row
+                && dropLocation.getColumn() == column);
+
+        if (isSelected) {
+            super.setForeground(table.getSelectionForeground());
+            super.setBackground(table.getSelectionBackground());
+        } else {
+            super.setForeground(unselectedForeground != null
+                                    ? unselectedForeground
+                                    : table.getForeground());
+            super.setBackground(unselectedBackground != null
+                    ? unselectedBackground
+                    : table.getBackground());
+        }
+        
 		if (hasFocus) {
 		    setBorder( UIManager.getBorder("Table.focusCellHighlightBorder") );
 		    if (!isSelected && table.isCellEditable(row, column)) {
@@ -66,7 +105,7 @@ public abstract class CustomTableCellRenderer extends DefaultTableCellRenderer {
 		    setBorder(noFocusBorder);
 		}
 		
-		// Responsible of setting text of JLabel, optionally setting background, foreground
+		// Responsible of setting text of JLabel, optionally setting background, foreground but that will override the selection colors
 		valueProcessor(value);
 		
 		return this;
