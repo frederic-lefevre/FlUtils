@@ -31,7 +31,7 @@ import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 
 class NetworkUtilsTest {
 	
@@ -62,8 +62,8 @@ class NetworkUtilsTest {
 		
 		assertThat(iPv4List.size()).isEqualTo(iPv4Json.size());
 		
-		assertThat(iPv4Json.elements()).toIterable()
-			.map(element -> element.get("IPaddress").asText())
+		assertThat(iPv4Json.values())
+			.map(element -> element.get("IPaddress").asString())
 			.allMatch(ip -> iPv4List.contains(ip));
 	}
 	

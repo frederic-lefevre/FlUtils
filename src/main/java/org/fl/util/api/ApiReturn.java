@@ -32,10 +32,10 @@ import org.fl.util.CompressionUtils;
 import org.fl.util.ExecutionDurations;
 import org.fl.util.json.JsonUtils;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.node.ObjectNode;
 
 public class ApiReturn {
 
@@ -101,7 +101,7 @@ public class ApiReturn {
 		if (aLog.isLoggable(Level.FINE)) {
 			try {
 				retStr = JsonUtils.jsonPrettyPrint(ret) ;
-			} catch (JsonProcessingException e) {
+			} catch (JacksonException e) {
 				aLog.log(Level.SEVERE, "Exception pretty printing API return", e);
 				retStr = ret.toString();
 			}

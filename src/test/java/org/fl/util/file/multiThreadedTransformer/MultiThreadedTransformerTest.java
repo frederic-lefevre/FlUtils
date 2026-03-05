@@ -39,7 +39,7 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class MultiThreadedTransformerTest {
@@ -71,7 +71,7 @@ class MultiThreadedTransformerTest {
 		JsonNode result = sampleExtractor.extract(sampleItemProcessor);
 		
 		assertThat(result.get("error")).isNotNull();
-		assertThat(result.get("error").asText()).startsWith("Exception reading file");
+		assertThat(result.get("error").asString()).startsWith("Exception reading file");
 
 		assertThat(logRecordCounter.getLogRecordCount()).isEqualTo(1);
 		assertThat(logRecordCounter.getLogRecordCount(Level.SEVERE)).isEqualTo(1);

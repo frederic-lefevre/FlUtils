@@ -36,16 +36,16 @@ import org.fl.util.LoggerCounter;
 import org.fl.util.json.JsonUtils;
 import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.DatabindException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.node.ObjectNode;
 
 class ApiReturnTest {
 	
 	@Test
-	void errorReturn() throws JsonMappingException, JsonProcessingException {
+	void errorReturn() throws DatabindException, JacksonException {
 		
 		LoggerCounter noLog = LoggerCounter.getLogger();
 		
@@ -62,18 +62,18 @@ class ApiReturnTest {
 		String ret = apiReturn.getApiReturnJson("Info retour ");
 		JsonNode jsonRet = JsonUtils.getObjectMapper().readTree(ret);
 
-		assertThat(jsonRet.get(ApiJsonPropertyName.OPERATION).asText()).isEqualTo(ApiReturn.KO);
+		assertThat(jsonRet.get(ApiJsonPropertyName.OPERATION).asString()).isEqualTo(ApiReturn.KO);
 		
 		JsonNode errorJson = jsonRet.get(ApiJsonPropertyName.ERROR);
 		assertThat(errorJson.get(ApiJsonPropertyName.ERR_CODE).asInt()).isEqualTo(1234);
-		assertThat(errorJson.get(ApiJsonPropertyName.REASON).asText()).isEqualTo("Mon code de test");
+		assertThat(errorJson.get(ApiJsonPropertyName.REASON).asString()).isEqualTo("Mon code de test");
 		
 		assertThat(noLog.getLogRecordCount()).isEqualTo(1);
 		assertThat(noLog.getLogRecordCount(Level.INFO)).isEqualTo(1);
 	}
 
 	@Test
-	void normalReturn() throws JsonMappingException, JsonProcessingException {
+	void normalReturn() throws DatabindException, JacksonException {
 		
 		LoggerCounter noLog = LoggerCounter.getLogger();
 		
@@ -91,18 +91,18 @@ class ApiReturnTest {
 		assertThat(jsonRet.has(ApiJsonPropertyName.OPERATION)).isTrue();
 		assertThat(jsonRet.has(ApiJsonPropertyName.DATA)).isTrue();
 		
-		assertThat(jsonRet.get(ApiJsonPropertyName.OPERATION).asText()).isEqualTo(ApiReturn.OK);
+		assertThat(jsonRet.get(ApiJsonPropertyName.OPERATION).asString()).isEqualTo(ApiReturn.OK);
 		
 		JsonNode dataJson = jsonRet.get(ApiJsonPropertyName.DATA);
-		assertThat(dataJson.get("prop1").asText()).isEqualTo("contenu de la prop1");
-		assertThat(dataJson.get("prop2").asText()).isEqualTo("contenu de la prop2");
+		assertThat(dataJson.get("prop1").asString()).isEqualTo("contenu de la prop1");
+		assertThat(dataJson.get("prop2").asString()).isEqualTo("contenu de la prop2");
 		
 		assertThat(noLog.getLogRecordCount()).isEqualTo(1);
 		assertThat(noLog.getLogRecordCount(Level.INFO)).isEqualTo(1);
 	}
 	
 	@Test
-	void testDuration() throws JsonMappingException, JsonProcessingException {
+	void testDuration() throws DatabindException, JacksonException {
 		
 		LoggerCounter noLog = LoggerCounter.getLogger();
 		
@@ -135,7 +135,7 @@ class ApiReturnTest {
 	}
 	
 	@Test
-	void compressedDeflateReturn() throws JsonMappingException, JsonProcessingException {
+	void compressedDeflateReturn() throws DatabindException, JacksonException {
 		
 		LoggerCounter noLog = LoggerCounter.getLogger();
 		
@@ -157,18 +157,18 @@ class ApiReturnTest {
 		assertThat(jsonRet.has(ApiJsonPropertyName.OPERATION)).isTrue();
 		assertThat(jsonRet.has(ApiJsonPropertyName.DATA)).isTrue();
 		
-		assertThat(jsonRet.get(ApiJsonPropertyName.OPERATION).asText()).isEqualTo(ApiReturn.OK);
+		assertThat(jsonRet.get(ApiJsonPropertyName.OPERATION).asString()).isEqualTo(ApiReturn.OK);
 		
 		JsonNode dataJson = jsonRet.get(ApiJsonPropertyName.DATA);
-		assertThat(dataJson.get("prop1").asText()).isEqualTo("contenu de la prop1");
-		assertThat(dataJson.get("prop2").asText()).isEqualTo("contenu de la prop2");
+		assertThat(dataJson.get("prop1").asString()).isEqualTo("contenu de la prop1");
+		assertThat(dataJson.get("prop2").asString()).isEqualTo("contenu de la prop2");
 		
 		assertThat(noLog.getLogRecordCount()).isEqualTo(1);
 		assertThat(noLog.getLogRecordCount(Level.INFO)).isEqualTo(1);
 	}
 	
 	@Test
-	void compresseGzipReturn() throws JsonMappingException, JsonProcessingException {
+	void compresseGzipReturn() throws DatabindException, JacksonException {
 		
 		LoggerCounter noLog = LoggerCounter.getLogger();
 		
@@ -190,11 +190,11 @@ class ApiReturnTest {
 		assertThat(jsonRet.has(ApiJsonPropertyName.OPERATION)).isTrue();
 		assertThat(jsonRet.has(ApiJsonPropertyName.DATA)).isTrue();
 		
-		assertThat(jsonRet.get(ApiJsonPropertyName.OPERATION).asText()).isEqualTo(ApiReturn.OK);
+		assertThat(jsonRet.get(ApiJsonPropertyName.OPERATION).asString()).isEqualTo(ApiReturn.OK);
 		
 		JsonNode dataJson = jsonRet.get(ApiJsonPropertyName.DATA);
-		assertThat(dataJson.get("prop1").asText()).isEqualTo("contenu de la prop1");
-		assertThat(dataJson.get("prop2").asText()).isEqualTo("contenu de la prop2");
+		assertThat(dataJson.get("prop1").asString()).isEqualTo("contenu de la prop1");
+		assertThat(dataJson.get("prop2").asString()).isEqualTo("contenu de la prop2");
 		
 		assertThat(noLog.getLogRecordCount()).isEqualTo(1);
 		assertThat(noLog.getLogRecordCount(Level.INFO)).isEqualTo(1);

@@ -1,7 +1,7 @@
 /*
  * MIT License
 
-Copyright (c) 2017, 2025 Frederic Lefevre
+Copyright (c) 2017, 2026 Frederic Lefevre
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -37,17 +37,17 @@ import java.util.logging.LogRecord;
 
 import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.json.JsonMapper;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.DatabindException;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 
 class JsonLogFormatterTest {
 
 	private static final ObjectMapper mapper = JsonMapper.builder().build();
 	
 	@Test
-	void testMinimalLogErrorFormat() throws JsonMappingException, JsonProcessingException {
+	void testMinimalLogErrorFormat() throws DatabindException, JacksonException {
 		
 		JsonLogFormatter jsonLogFormatter = new JsonLogFormatter();
 		
@@ -79,7 +79,7 @@ class JsonLogFormatterTest {
 	}
 	
 	@Test
-	void testLogErrorFormat() throws JsonMappingException, JsonProcessingException {
+	void testLogErrorFormat() throws DatabindException, JacksonException {
 		
 		JsonLogFormatter jsonLogFormatter = new JsonLogFormatter();
 		

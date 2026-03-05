@@ -33,12 +33,12 @@ import java.nio.file.Path;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.json.JsonMapper;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.SerializationFeature;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.JsonNodeFactory;
 
 public class JsonUtils {
 
@@ -65,7 +65,7 @@ public class JsonUtils {
 	}
 	
 	// pretty print Json object
-	public static String jsonPrettyPrint(JsonNode jsonNode) throws JsonProcessingException {
+	public static String jsonPrettyPrint(JsonNode jsonNode) throws JacksonException {
 	
 		return mapper.writeValueAsString(jsonNode);
 	}
@@ -154,7 +154,7 @@ public class JsonUtils {
 	
 	public static String getAsStringOrNull(JsonNode jElem) {
 		if (jElem != null) {
-			return jElem.asText() ;
+			return jElem.asString() ;
 		} else {
 			return null ;
 		}
@@ -162,7 +162,7 @@ public class JsonUtils {
 	
 	public static String getAsStringOrBlank(JsonNode jElem) {
 		if (jElem != null) {
-			return jElem.asText() ;
+			return jElem.asString() ;
 		} else {
 			return "" ;
 		}

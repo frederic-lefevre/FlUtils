@@ -42,7 +42,7 @@ import org.fl.util.PlainLogFormatter;
 import org.fl.util.PropertiesStorage;
 import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import tools.jackson.core.JacksonException;
 
 class LogsDisplayPaneTest {
 
@@ -50,7 +50,7 @@ class LogsDisplayPaneTest {
 	private static final String LOGGER_NAME2 = "org.fl.util.test2";
 	
 	@Test
-	void testCreatLogsDisplayPane() throws JsonProcessingException {
+	void testCreatLogsDisplayPane() throws JacksonException {
 		
 		RunningContext rc = new RunningContext(LOGGER_NAME, "test1.properties");
 		
@@ -102,7 +102,7 @@ class LogsDisplayPaneTest {
 	}
 	
 	@Test
-	void nullLevelForApplicationLoggerShouldRaiseError() throws JsonProcessingException {
+	void nullLevelForApplicationLoggerShouldRaiseError() throws JacksonException {
 		
 		LogRecordCounter rootLogRecordCounter = 
 				FilterCounter.getLogRecordCounter(Logger.getLogger(LoggerManager.class.getName()));
@@ -146,7 +146,7 @@ class LogsDisplayPaneTest {
 	}
 	
 	@Test
-	void testHasNoLogsDisplayPaneProperty() throws JsonProcessingException {
+	void testHasNoLogsDisplayPaneProperty() throws JacksonException {
 		
 		RunningContext rc = new RunningContext(LOGGER_NAME, "test1.properties");		
 		assertThat(LogsDisplayPane.hasLogsDisplayPaneProperty(rc.getProps())).isFalse();		

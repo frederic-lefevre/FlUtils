@@ -34,9 +34,9 @@ import java.util.logging.Logger;
 
 import org.fl.util.json.JsonUtils;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.core.JacksonException ;
+import tools.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.node.ObjectNode;
 
 public class JsonLogFormatter extends Formatter {
 
@@ -89,7 +89,7 @@ public class JsonLogFormatter extends Formatter {
 		
 		try {
 			return JsonUtils.jsonPrettyPrint(jsonLogRecord);
-		} catch (JsonProcessingException e) {
+		} catch (JacksonException  e) {
 			
 			// Log with the root logger in order to avoid infinite recursion, re-entering the same formatter
 			safeLogger.log(Level.SEVERE, "JsonProcessingException when formatting the error", e);

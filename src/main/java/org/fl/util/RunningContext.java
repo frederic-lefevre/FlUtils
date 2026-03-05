@@ -54,12 +54,12 @@ import org.fl.util.json.JsonUtils;
 import org.fl.util.os.OperatingInfo;
 import org.fl.util.swing.logPane.LogsDisplayPane;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.dataformat.javaprop.JavaPropsMapper;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.node.ObjectNode;
+import tools.jackson.dataformat.javaprop.JavaPropsMapper;
 
 /*
 # Properties for RunningContext 
@@ -164,7 +164,7 @@ public class RunningContext {
 				applicationRootLog.log(logLevel, () -> {
 					try {
 						return JsonUtils.jsonPrettyPrint(getApplicationInfo(true));
-					} catch (JsonProcessingException e) {
+					} catch (JacksonException e) {
 						applicationRootLog.log(Level.SEVERE, "Exception logging application info", e);
 						return "Exception logging application info" + e.getMessage();
 					}
@@ -216,11 +216,11 @@ public class RunningContext {
 		return name;
 	}
 	
-	public String getBuildInformation() throws JsonProcessingException {
+	public String getBuildInformation() throws JacksonException {
 		return JsonUtils.jsonPrettyPrint(buildInformation);
 	}
 	
-	public JsonNode getBuildInformationAsJson() throws JsonProcessingException {
+	public JsonNode getBuildInformationAsJson() throws JacksonException {
 		return buildInformation;
 	}
 

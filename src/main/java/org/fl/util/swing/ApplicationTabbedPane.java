@@ -38,7 +38,7 @@ import org.fl.util.swing.logConfiguration.LogConfigurationPane;
 import org.fl.util.swing.logPane.LogHighLightListener;
 import org.fl.util.swing.logPane.LogsDisplayPane;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import tools.jackson.core.JacksonException;
 
 public class ApplicationTabbedPane extends JTabbedPane {
 			
@@ -98,7 +98,7 @@ public class ApplicationTabbedPane extends JTabbedPane {
 			if (getSelectedComponent().equals(appInfoPane)) {
 				try {
 					appInfoPane.setInfos();
-				} catch (JsonProcessingException e) {
+				} catch (JacksonException e) {
 					logger.log(Level.SEVERE, "Exception setting Application info pane", e);
 				}
 			} else if (getSelectedComponent().equals(logsDisplayPane)) {

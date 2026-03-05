@@ -1,7 +1,7 @@
 /*
  * MIT License
 
-Copyright (c) 2017, 2025 Frederic Lefevre
+Copyright (c) 2017, 2026 Frederic Lefevre
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -45,8 +45,8 @@ import org.fl.util.RunningContext;
 import org.fl.util.json.JsonUtils;
 import org.fl.util.swing.text.SearchableTextPane;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
 
 public class ApplicationInfoPane extends JPanel {
 
@@ -87,11 +87,11 @@ public class ApplicationInfoPane extends JPanel {
 		add(searchableTextArea);
 	}
 
-	public void setInfos() throws JsonProcessingException {
+	public void setInfos() throws JacksonException {
 		setInfos(doIpLookUp.isSelected());
 	}
 
-	private void setInfos(boolean withLookUp) throws JsonProcessingException {
+	private void setInfos(boolean withLookUp) throws JacksonException {
 		
 		JsonNode infosJson = runningContext.getApplicationInfo(withLookUp);
 		infosText.setText(JsonUtils.jsonPrettyPrint(infosJson));
@@ -110,7 +110,7 @@ public class ApplicationInfoPane extends JPanel {
 				infosText.setText(GuiTexts.getText("appTabbedPane.information.updating"));
 				try {
 					setInfos(true);
-				} catch (JsonProcessingException e1) {
+				} catch (JacksonException e1) {
 					logger.log(Level.SEVERE, "Exception setting Application pane infos", e);
 				}
 			}
