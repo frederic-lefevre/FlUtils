@@ -6,7 +6,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.fl</groupId>
 	<artifactId>FlUtils</artifactId>
-	<version>11.1.0</version>
+	<version>11.1.1</version>
 	<packaging>jar</packaging>
 
 	<dependencyManagement>
@@ -51,7 +51,7 @@
 	</dependencies>
 
 	<properties>
-		<maven.compiler.release>21</maven.compiler.release>
+		<maven.compiler.release>25</maven.compiler.release>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<timestamp>${maven.build.timestamp}</timestamp>
 		<maven.build.timestamp.format>yyyy-MM-dd HH:mm:ss z</maven.build.timestamp.format>
