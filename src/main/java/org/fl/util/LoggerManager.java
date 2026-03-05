@@ -147,7 +147,7 @@ public class LoggerManager {
     
     // Remapper for logging properties.
     // For all property key k, if the new property exists, take it, else keep the old one
-    private Function<String, BiFunction<String,String,String>> loggingPrpertyRemapper = (k) -> ((o, n) -> n == null ? o : n);
+    private Function<String, BiFunction<String,String,String>> loggingPrpertyRemapper = _ -> ((o, n) -> n == null ? o : n);
     
     private AdvancedProperties initJavaUtilLogging(String applicationRootLoggerName) {
 

@@ -90,6 +90,7 @@ public class CompressionUtils {
 			logger.log(Level.SEVERE, "Exception when compressing Api with defate", ioe);
 			compressedArray = null;
 		}
+		compresser.close();
 		return compressedArray ;
 	}
 	

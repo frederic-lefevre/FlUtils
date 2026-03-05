@@ -88,7 +88,7 @@ public class RawResponse {
     public List<StatusMessage> getStatusMessages() {
 
         List<StatusMessage> orderedMessages = new ArrayList<>();
-        statusMessages.forEach((k,v) -> orderedMessages.addAll(v));
+        statusMessages.forEach((_,v) -> orderedMessages.addAll(v));
         return Collections.unmodifiableList(orderedMessages);
     }
 
@@ -107,7 +107,7 @@ public class RawResponse {
     public RawResponse addStatusMessage(StatusMessage statusMessage) {
         if (statusMessage != null) {
             StatusMessage.TargetClient targetClient = statusMessage.getTargetClient();
-            statusMessages.computeIfAbsent(targetClient, k -> new ArrayList<>());
+            statusMessages.computeIfAbsent(targetClient, _ -> new ArrayList<>());
             String previousLoggedResponseId = statusMessage.logIfNotAlreadyLogged(responseId, correlatedIds, logger);
             if (previousLoggedResponseId != null) {
                 // the StatusMessage has already been logged under previousLoggedResponseId
