@@ -1,7 +1,7 @@
 /*
  * MIT License
 
-Copyright (c) 2017, 2025 Frederic Lefevre
+Copyright (c) 2017, 2026 Frederic Lefevre
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -34,10 +34,10 @@ import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.node.ObjectNode;
 
 public class LoggerUtils {
 
@@ -132,7 +132,7 @@ public class LoggerUtils {
 			// Log level
 			JsonNode logLevelElem = levelsJson.get(LOG_LEVEL);
 			if (logLevelElem != null) {
-				String levelString = logLevelElem.asText();
+				String levelString = logLevelElem.asString();
 				try {
 					Level newLevel = Level.parse(levelString);
 					log.setLevel(newLevel);
@@ -150,8 +150,8 @@ public class LoggerUtils {
 				HashMap<String, Level> handlers = new HashMap<String, Level>();
 				for (JsonNode handlerElem : handlersLevelsElem) {
 
-					String handlerName = handlerElem.get(HANDLER_NAME).asText();
-					String handlerLevel = handlerElem.get(HANDLER_LEVEL).asText();
+					String handlerName = handlerElem.get(HANDLER_NAME).asString();
+					String handlerLevel = handlerElem.get(HANDLER_LEVEL).asString();
 					try {
 						Level newLevel = Level.parse(handlerLevel);
 						handlers.put(handlerName, newLevel);

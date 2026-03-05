@@ -1,7 +1,7 @@
 /*
  * MIT License
 
-Copyright (c) 2017, 2025 Frederic Lefevre
+Copyright (c) 2017, 2026 Frederic Lefevre
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -49,7 +49,7 @@ import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 import java.util.logging.XMLFormatter;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 
 public class LoggerManager {
 
@@ -147,7 +147,7 @@ public class LoggerManager {
     
     // Remapper for logging properties.
     // For all property key k, if the new property exists, take it, else keep the old one
-    private Function<String, BiFunction<String,String,String>> loggingPrpertyRemapper = (k) -> ((o, n) -> n == null ? o : n);
+    private Function<String, BiFunction<String,String,String>> loggingPrpertyRemapper = _ -> ((o, n) -> n == null ? o : n);
     
     private AdvancedProperties initJavaUtilLogging(String applicationRootLoggerName) {
 

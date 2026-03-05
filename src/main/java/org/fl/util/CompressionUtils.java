@@ -1,7 +1,7 @@
 /*
  * MIT License
 
-Copyright (c) 2017, 2025 Frederic Lefevre
+Copyright (c) 2017, 2026 Frederic Lefevre
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -90,6 +90,7 @@ public class CompressionUtils {
 			logger.log(Level.SEVERE, "Exception when compressing Api with defate", ioe);
 			compressedArray = null;
 		}
+		compresser.close();
 		return compressedArray ;
 	}
 	

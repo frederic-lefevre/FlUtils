@@ -1,7 +1,7 @@
 /*
  * MIT License
 
-Copyright (c) 2017, 2025 Frederic Lefevre
+Copyright (c) 2017, 2026 Frederic Lefevre
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -41,8 +41,8 @@ import java.util.logging.SimpleFormatter;
 import org.fl.util.FilterCounter.LogRecordCounter;
 import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
 
 class RunningContextTest {
 	
@@ -50,11 +50,11 @@ class RunningContextTest {
 	private static final String LOGGER_NAME2 = "org.fl.util.Test7";
 
 	@Test
-	void testRunningContextWithNullUriParam() throws JsonProcessingException {
+	void testRunningContextWithNullUriParam() throws JacksonException {
 		testRunningContextWithNullParam(() -> new RunningContext(null, null));
 	}
 	
-	private void testRunningContextWithNullParam(Supplier<RunningContext> rcSupplier) throws JsonProcessingException {
+	private void testRunningContextWithNullParam(Supplier<RunningContext> rcSupplier) throws JacksonException {
 		
 		LogRecordCounter runningContextLogRecordCounter = 
 				FilterCounter.getLogRecordCounter(Logger.getLogger(RunningContext.class.getName()));
@@ -83,15 +83,15 @@ class RunningContextTest {
 		.satisfiesExactlyInAnyOrder(
 				buildInfo -> { 
 					assertThat(buildInfo.get("moduleName")).isNotNull();
-					assertThat(buildInfo.get("moduleName").asText()).isEqualTo("org.fl");
+					assertThat(buildInfo.get("moduleName").asString()).isEqualTo("org.fl");
 					assertThat(buildInfo.get("buildInformation")).isNotNull();
-					assertThat(buildInfo.get("buildInformation").asText()).isEqualTo("No build information");
+					assertThat(buildInfo.get("buildInformation").asString()).isEqualTo("No build information");
 				},
 				buildInfo -> { 
 					assertThat(buildInfo.get("moduleName")).isNotNull();
-					assertThat(buildInfo.get("moduleName").asText()).isEqualTo("org.fl.util");
+					assertThat(buildInfo.get("moduleName").asString()).isEqualTo("org.fl.util");
 					assertThat(buildInfo.get("version")).isNotNull();
-					assertThat(buildInfo.get("version").asText()).isNotEmpty();
+					assertThat(buildInfo.get("version").asString()).isNotEmpty();
 				});
 		
 		assertThat(rc.getInitializationDate()).isCloseTo(Instant.now(), within(2, ChronoUnit.SECONDS));
@@ -121,7 +121,7 @@ class RunningContextTest {
 	}
 	
 	@Test
-	void testRunningContextWithEmpyUri() throws JsonProcessingException, URISyntaxException {
+	void testRunningContextWithEmpyUri() throws JacksonException, URISyntaxException {
 		
 		LogRecordCounter runningContextLogRecordCounter = 
 				FilterCounter.getLogRecordCounter(Logger.getLogger(RunningContext.class.getName()));
@@ -168,7 +168,7 @@ class RunningContextTest {
 	}
 	
 	@Test
-	void testRunningContextWithFolderUri() throws JsonProcessingException, URISyntaxException {
+	void testRunningContextWithFolderUri() throws JacksonException, URISyntaxException {
 			
 		LogRecordCounter loggerManagerLogRecordCounter = 
 				FilterCounter.getLogRecordCounter(Logger.getLogger(LoggerManager.class.getName()));
@@ -196,7 +196,7 @@ class RunningContextTest {
 	}
 	
 	@Test
-	void testRunningContextWithRelativePath() throws JsonProcessingException {
+	void testRunningContextWithRelativePath() throws JacksonException {
 		
 		RunningContext rc = new RunningContext(LOGGER_NAME, "test1.properties");
 		
@@ -281,7 +281,7 @@ class RunningContextTest {
 	}
 	
 	@Test
-	void testRunningContextBuildInfo() throws URISyntaxException, JsonProcessingException {
+	void testRunningContextBuildInfo() throws URISyntaxException, JacksonException {
 		
 		RunningContext rc = new RunningContext(LOGGER_NAME,
 				"file:///FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test1.properties");
@@ -304,7 +304,7 @@ class RunningContextTest {
 	private void assertModuleBuildInfo(JsonNode buildInfo, String moduleName) {
 		assertThat(buildInfo).hasSize(11);
 		assertThat(buildInfo.get("moduleName")).isNotNull();
-		assertThat(buildInfo.get("moduleName").asText()).isEqualTo(moduleName);
+		assertThat(buildInfo.get("moduleName").asString()).isEqualTo(moduleName);
 		assertThat(buildInfo.has("version")).isTrue();
 		assertThat(buildInfo.has("buildtime")).isTrue();
 		assertThat(buildInfo.has("builder")).isTrue();
@@ -318,7 +318,7 @@ class RunningContextTest {
 	}
 	
 	@Test
-	void testRunningContextBuildInfo2() throws URISyntaxException, JsonProcessingException {
+	void testRunningContextBuildInfo2() throws URISyntaxException, JacksonException {
 							
 		RunningContext rc = new RunningContext(LOGGER_NAME,
 				"file:///FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test1.properties");
@@ -335,21 +335,21 @@ class RunningContextTest {
 			.satisfiesExactlyInAnyOrder(
 					buildInfo -> { 
 						assertThat(buildInfo.get("moduleName")).isNotNull();
-						assertThat(buildInfo.get("moduleName").asText()).isEqualTo(LOGGER_NAME);
+						assertThat(buildInfo.get("moduleName").asString()).isEqualTo(LOGGER_NAME);
 						assertThat(buildInfo.get("version")).isNotNull();
-						assertThat(buildInfo.get("version").asText()).isNotEmpty();
+						assertThat(buildInfo.get("version").asString()).isNotEmpty();
 					},
 					buildInfo -> { 
 						assertThat(buildInfo.get("moduleName")).isNotNull();
-						assertThat(buildInfo.get("moduleName").asText()).isEqualTo("org.fl.util");
+						assertThat(buildInfo.get("moduleName").asString()).isEqualTo("org.fl.util");
 						assertThat(buildInfo.get("version")).isNotNull();
-						assertThat(buildInfo.get("version").asText()).isNotEmpty();
+						assertThat(buildInfo.get("version").asString()).isNotEmpty();
 					},
 					buildInfo -> { 
 						assertThat(buildInfo.get("moduleName")).isNotNull();
-						assertThat(buildInfo.get("moduleName").asText()).isEqualTo("does.not.exists");
+						assertThat(buildInfo.get("moduleName").asString()).isEqualTo("does.not.exists");
 						assertThat(buildInfo.get("buildInformation")).isNotNull();
-						assertThat(buildInfo.get("buildInformation").asText()).isEqualTo("No build information");
+						assertThat(buildInfo.get("buildInformation").asString()).isEqualTo("No build information");
 					}
 					);
 		
@@ -360,7 +360,7 @@ class RunningContextTest {
 	}
 	
 	@Test
-	void testRunningContextBuildInfo3() throws URISyntaxException, JsonProcessingException {
+	void testRunningContextBuildInfo3() throws URISyntaxException, JacksonException {
 							
 		RunningContext rc = new RunningContext(LOGGER_NAME,
 				"file:///FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test1.properties");
@@ -375,27 +375,27 @@ class RunningContextTest {
 			.satisfiesExactlyInAnyOrder(
 					buildInfo -> { 
 						assertThat(buildInfo.get("moduleName")).isNotNull();
-						assertThat(buildInfo.get("moduleName").asText()).isEqualTo(LOGGER_NAME);
+						assertThat(buildInfo.get("moduleName").asString()).isEqualTo(LOGGER_NAME);
 						assertThat(buildInfo.get("version")).isNotNull();
-						assertThat(buildInfo.get("version").asText()).isNotEmpty();
+						assertThat(buildInfo.get("version").asString()).isNotEmpty();
 					},
 					buildInfo -> { 
 						assertThat(buildInfo.get("moduleName")).isNotNull();
-						assertThat(buildInfo.get("moduleName").asText()).isEqualTo("org.fl.util");
+						assertThat(buildInfo.get("moduleName").asString()).isEqualTo("org.fl.util");
 						assertThat(buildInfo.get("version")).isNotNull();
-						assertThat(buildInfo.get("version").asText()).isNotEmpty();
+						assertThat(buildInfo.get("version").asString()).isNotEmpty();
 					},
 					buildInfo -> { 
 						assertThat(buildInfo.get("moduleName")).isNotNull();
-						assertThat(buildInfo.get("moduleName").asText()).isEqualTo(addedModule);
+						assertThat(buildInfo.get("moduleName").asString()).isEqualTo(addedModule);
 						assertThat(buildInfo.get("version")).isNotNull();
-						assertThat(buildInfo.get("version").asText()).isNotEmpty();
+						assertThat(buildInfo.get("version").asString()).isNotEmpty();
 					}
 					);
 	}
 	
 	@Test
-	void testRunningContextBuildInfoWithSpecificClassLoader() throws URISyntaxException, JsonProcessingException {
+	void testRunningContextBuildInfoWithSpecificClassLoader() throws URISyntaxException, JacksonException {
 							
 		RunningContext rc = new RunningContext(LOGGER_NAME,
 				"file:///FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test1.properties");
@@ -410,27 +410,27 @@ class RunningContextTest {
 			.satisfiesExactlyInAnyOrder(
 					buildInfo -> { 
 						assertThat(buildInfo.get("moduleName")).isNotNull();
-						assertThat(buildInfo.get("moduleName").asText()).isEqualTo(LOGGER_NAME);
+						assertThat(buildInfo.get("moduleName").asString()).isEqualTo(LOGGER_NAME);
 						assertThat(buildInfo.get("version")).isNotNull();
-						assertThat(buildInfo.get("version").asText()).isNotEmpty();
+						assertThat(buildInfo.get("version").asString()).isNotEmpty();
 					},
 					buildInfo -> { 
 						assertThat(buildInfo.get("moduleName")).isNotNull();
-						assertThat(buildInfo.get("moduleName").asText()).isEqualTo("org.fl.util");
+						assertThat(buildInfo.get("moduleName").asString()).isEqualTo("org.fl.util");
 						assertThat(buildInfo.get("version")).isNotNull();
-						assertThat(buildInfo.get("version").asText()).isNotEmpty();
+						assertThat(buildInfo.get("version").asString()).isNotEmpty();
 					},
 					buildInfo -> { 
 						assertThat(buildInfo.get("moduleName")).isNotNull();
-						assertThat(buildInfo.get("moduleName").asText()).isEqualTo(addedModule);
+						assertThat(buildInfo.get("moduleName").asString()).isEqualTo(addedModule);
 						assertThat(buildInfo.get("version")).isNotNull();
-						assertThat(buildInfo.get("version").asText()).isNotEmpty();
+						assertThat(buildInfo.get("version").asString()).isNotEmpty();
 					}
 					);
 	}
 	
 	@Test
-	void testRunningContextLoggingInfo() throws URISyntaxException, JsonProcessingException {
+	void testRunningContextLoggingInfo() throws URISyntaxException, JacksonException {
 		
 		RunningContext rc = new RunningContext(LOGGER_NAME,
 				"file:///FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test1.properties");
@@ -443,12 +443,12 @@ class RunningContextTest {
 		assertThat(loggingInfos).isNotNull();
 		
 		assertThat(loggingInfos.get("handlers")).isNotNull();
-		assertThat(loggingInfos.get("handlers").asText())
+		assertThat(loggingInfos.get("handlers").asString())
 			.isEqualTo("java.util.logging.FileHandler,java.util.logging.ConsoleHandler");
 	}
 	
 	@Test
-	void testRunningContextApplicationInfoLog() throws URISyntaxException, JsonProcessingException {
+	void testRunningContextApplicationInfoLog() throws URISyntaxException, JacksonException {
 		
 		LogRecordCounter logRecordCounter = 
 				FilterCounter.getLogRecordCounter(Logger.getLogger(LOGGER_NAME2));

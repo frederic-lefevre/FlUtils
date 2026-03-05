@@ -1,7 +1,7 @@
 /*
  * MIT License
 
-Copyright (c) 2017, 2025 Frederic Lefevre
+Copyright (c) 2017, 2026 Frederic Lefevre
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -212,7 +212,7 @@ public class ResponseTest {
         Response<List<String>> badListOfStringResponse = new Response<>(false, statusMessageForBadListResponse, noLog, null);
         Response<List<String>> mlResponse = goodStringResponse(firstString, logger)
                 .addStatusMessagesWhenInError(() -> Collections.singletonList(shouldNotBeAddedStatusMessage))
-                .composeWithResponseIfSuccess(response -> badListOfStringResponse)
+                .composeWithResponseIfSuccess(_ -> badListOfStringResponse)
                 .addStatusMessagesWhenInError(() -> Collections.singletonList(addedStatusMessageListElement));
 
         assertThat(mlResponse).isNotNull();
@@ -240,7 +240,7 @@ public class ResponseTest {
         Response<List<String>> badListOfStringResponse = new Response<>(false, statusMessageForBadListResponse, noLog, null);
         Response<String> mlResponse = badListOfStringResponse
                 .addStatusMessagesWhenInError(() -> Collections.singletonList(shouldBeAddedStatusMessage))
-                .composeWithResponseIfSuccess(response -> {
+                .composeWithResponseIfSuccess(_ -> {
                     neverProcessedString.set("we should not pass here !");
                     return goodStringResponse(neverProcessedString.get(), logger);
                 })
@@ -278,7 +278,7 @@ public class ResponseTest {
                 })
                 .addStatusMessagesWhenInError(() -> Collections.singletonList(shouldNotBeAddedStatusMessage))
                 .putInErrorWithStatusMessage(() -> shouldBeAddedStatusMessage)
-                .applyIfSuccess(mlListOfStringResponse -> fail("No, I should not have succeeded !"));
+                .applyIfSuccess(_ -> fail("No, I should not have succeeded !"));
 
         assertThat(mlResponse).isNotNull();
         assertThat(mlResponse.isSuccess()).isFalse();
@@ -327,7 +327,7 @@ public class ResponseTest {
                 })
                 .addStatusMessagesWhenInError(() -> Collections.singletonList(shouldNotBeAddedStatusMessage))
                 .putInErrorWithStatusMessages(() -> shouldBeAddedStatusMessages)
-                .applyIfSuccess(mlListOfStringResponse -> fail("No, I should not have succeeded !"));
+                .applyIfSuccess(_ -> fail("No, I should not have succeeded !"));
 
         assertThat(mlResponse).isNotNull();
         assertThat(mlResponse.isSuccess()).isFalse();

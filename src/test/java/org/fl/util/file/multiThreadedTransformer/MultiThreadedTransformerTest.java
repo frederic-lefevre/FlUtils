@@ -1,7 +1,7 @@
 /*
  * MIT License
 
-Copyright (c) 2017, 2025 Frederic Lefevre
+Copyright (c) 2017, 2026 Frederic Lefevre
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -39,7 +39,7 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class MultiThreadedTransformerTest {
@@ -71,7 +71,7 @@ class MultiThreadedTransformerTest {
 		JsonNode result = sampleExtractor.extract(sampleItemProcessor);
 		
 		assertThat(result.get("error")).isNotNull();
-		assertThat(result.get("error").asText()).startsWith("Exception reading file");
+		assertThat(result.get("error").asString()).startsWith("Exception reading file");
 
 		assertThat(logRecordCounter.getLogRecordCount()).isEqualTo(1);
 		assertThat(logRecordCounter.getLogRecordCount(Level.SEVERE)).isEqualTo(1);

@@ -1,7 +1,7 @@
 /*
  * MIT License
 
-Copyright (c) 2017, 2025 Frederic Lefevre
+Copyright (c) 2017, 2026 Frederic Lefevre
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -33,7 +33,7 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 
 class OperatingInfoTest {
 
@@ -71,22 +71,22 @@ class OperatingInfoTest {
 		assertThat(operatingInfo.has("fileSystemsInformation")).isTrue();
 		assertThat(operatingInfo.size()).isEqualTo(8);
 		
-		assertThat(operatingInfo.get("defaultCharset").asText()).isEqualTo(Charset.defaultCharset().name());
+		assertThat(operatingInfo.get("defaultCharset").asString()).isEqualTo(Charset.defaultCharset().name());
 		
 		JsonNode fileSystemsInformation = operatingInfo.get("fileSystemsInformation");
 		assertThat(fileSystemsInformation.isArray()).isTrue();
-		assertThat(fileSystemsInformation.elements()).toIterable()
+		assertThat(fileSystemsInformation.values())
 			.allMatch(element -> element.has("fileSystemProviderScheme") && element.has("fileSystemProviderClass"))
 			.anySatisfy(element -> {
 				assertThat(element.has("fileSystemProviderScheme")).isTrue();
-				assertThat(element.get("fileSystemProviderScheme").asText()).isEqualTo("file");
+				assertThat(element.get("fileSystemProviderScheme").asString()).isEqualTo("file");
 				assertThat(element.has("isDefaultFileSystem")).isTrue();
 				assertThat(element.get("isDefaultFileSystem").asBoolean()).isTrue();
 			});
 		
 		JsonNode runtimeInformation = operatingInfo.get("runtimeInformation");
 		assertThat(runtimeInformation.isArray()).isTrue();
-		assertThat(runtimeInformation.elements()).toIterable().hasSize(5).map(element -> element.asText())
+		assertThat(runtimeInformation.values()).hasSize(5).map(element -> element.asString())
 			.satisfiesExactlyInAnyOrder(
 					stringElement -> assertThat(stringElement).startsWith("Free Memory usable for objects="),
 					stringElement -> assertThat(stringElement).startsWith("Maximum Memory available for the JVM="),
@@ -96,7 +96,7 @@ class OperatingInfoTest {
 		
 		JsonNode newLine = operatingInfo.get("newLine");
 		assertThat(newLine.isArray()).isTrue();
-		assertThat(newLine.elements()).toIterable().hasSize(2).map(element -> element.asText())
+		assertThat(newLine.values()).hasSize(2).map(element -> element.asString())
 			.satisfiesExactlyInAnyOrder(
 					stringElement -> assertThat(stringElement).startsWith("Newline unicode code point sequence:"),
 					stringElement -> assertThat(stringElement).startsWith("Newline as default charset byte sequence:"));
@@ -111,7 +111,7 @@ class OperatingInfoTest {
 			.forEach(field -> {
 				try {
 					if (field.get(null) instanceof Charset charset) {
-						assertThat(availableCharset.elements()).toIterable().map(element -> element.asText()).contains(charset.name());
+						assertThat(availableCharset.values()).map(element -> element.asString()).contains(charset.name());
 					} else {
 						fail("A field of StandardCharsets is not a Charset ...");
 					}
@@ -126,7 +126,7 @@ class OperatingInfoTest {
 		assertThat(systemProperties.has("user.dir")).isTrue();
 		assertThat(systemProperties.has("file.separator")).isTrue();
 		assertThat(systemProperties.has(PROPERTY_KEY)).isTrue();
-		assertThat(systemProperties.get(PROPERTY_KEY).asText()).isEqualTo(PROPERTY_VALUE);
+		assertThat(systemProperties.get(PROPERTY_KEY).asString()).isEqualTo(PROPERTY_VALUE);
 		
 		JsonNode networkInformation = operatingInfo.get("networkInformation");
 		assertThat(networkInformation.has("machineName")).isTrue();

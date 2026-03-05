@@ -1,7 +1,7 @@
 /*
  * MIT License
 
-Copyright (c) 2017, 2025 Frederic Lefevre
+Copyright (c) 2017, 2026 Frederic Lefevre
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -36,11 +36,11 @@ import java.util.stream.IntStream;
 
 import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.node.ObjectNode;
 
 class LoggerUtilsTest {
 
@@ -110,7 +110,7 @@ class LoggerUtilsTest {
 	}
 	
 	@Test	
-	void getMinimalLoggerLevels() throws JsonProcessingException {
+	void getMinimalLoggerLevels() throws JacksonException {
 		
 		Logger logger = Logger.getLogger(LoggerUtilsTest.class.getName() + ".test1");
 		assertThat(logger.getLevel()).isNull();
@@ -125,7 +125,7 @@ class LoggerUtilsTest {
 	private static final String CONSOLE_HANDLER_NAME = "java.util.logging.ConsoleHandler";
 	
 	@Test	
-	void getLoggerLevels() throws JsonProcessingException {
+	void getLoggerLevels() throws JacksonException {
 		
 		RunningContext rc = new RunningContext(APPLICATION_NAME,
 				"file:///FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test1.properties");
@@ -140,22 +140,22 @@ class LoggerUtilsTest {
 		String bufferHandlerName = "org.fl.util.BufferLogHandler";
 		String plainLogFormatterName = "org.fl.util.PlainLogFormatter";
 		String simpleFormatterName = "java.util.logging.SimpleFormatter";
-		assertThat(loggerLevelsJson.get(LoggerUtils.LOG_LEVEL).asText()).isEqualTo(Level.INFO.getName());
+		assertThat(loggerLevelsJson.get(LoggerUtils.LOG_LEVEL).asString()).isEqualTo(Level.INFO.getName());
 		assertThat(loggerLevelsJson.get(LoggerUtils.HANDLERS)).isNotNull().hasSize(3)
 			.satisfiesExactlyInAnyOrder(
 					jsonHandler -> { 
-						assertThat(jsonHandler.get(LoggerUtils.HANDLER_NAME).asText()).isEqualTo(CONSOLE_HANDLER_NAME);
-						assertThat(jsonHandler.get(LoggerUtils.HANDLER_LEVEL).asText()).isEqualTo(Level.INFO.getName());
-						assertThat(jsonHandler.get(LoggerUtils.FORMATTER).asText()).isEqualTo(simpleFormatterName);
+						assertThat(jsonHandler.get(LoggerUtils.HANDLER_NAME).asString()).isEqualTo(CONSOLE_HANDLER_NAME);
+						assertThat(jsonHandler.get(LoggerUtils.HANDLER_LEVEL).asString()).isEqualTo(Level.INFO.getName());
+						assertThat(jsonHandler.get(LoggerUtils.FORMATTER).asString()).isEqualTo(simpleFormatterName);
 					},
 					jsonHandler -> { 
-						assertThat(jsonHandler.get(LoggerUtils.HANDLER_NAME).asText()).isEqualTo(fileHandlerName);
-						assertThat(jsonHandler.get(LoggerUtils.HANDLER_LEVEL).asText()).isEqualTo(Level.INFO.getName());
-						assertThat(jsonHandler.get(LoggerUtils.FORMATTER).asText()).isEqualTo(plainLogFormatterName);
+						assertThat(jsonHandler.get(LoggerUtils.HANDLER_NAME).asString()).isEqualTo(fileHandlerName);
+						assertThat(jsonHandler.get(LoggerUtils.HANDLER_LEVEL).asString()).isEqualTo(Level.INFO.getName());
+						assertThat(jsonHandler.get(LoggerUtils.FORMATTER).asString()).isEqualTo(plainLogFormatterName);
 					},
 					jsonHandler -> { 
-						assertThat(jsonHandler.get(LoggerUtils.HANDLER_NAME).asText()).isEqualTo(bufferHandlerName);
-						assertThat(jsonHandler.get(LoggerUtils.HANDLER_LEVEL).asText()).isEqualTo(Level.INFO.getName());
+						assertThat(jsonHandler.get(LoggerUtils.HANDLER_NAME).asString()).isEqualTo(bufferHandlerName);
+						assertThat(jsonHandler.get(LoggerUtils.HANDLER_LEVEL).asString()).isEqualTo(Level.INFO.getName());
 						assertThat(jsonHandler.get(LoggerUtils.FORMATTER)).isNull();
 						assertThat(jsonHandler.get(LoggerUtils.MEMORY_BUF_SZ).asInt()).isEqualTo(100);
 					}
@@ -177,7 +177,7 @@ class LoggerUtilsTest {
 	}
 	
 	@Test	
-	void setLoggerLevelsWhenNoHanlder() throws JsonProcessingException {
+	void setLoggerLevelsWhenNoHanlder() throws JacksonException {
 		
 		Logger logger = Logger.getLogger(LoggerUtilsTest.class.getName() + ".test1");
 		assertThat(logger.getLevel()).isNull();
@@ -210,7 +210,7 @@ class LoggerUtilsTest {
 	}
 	
 	@Test	
-	void setLoggerAndHandlerLevels() throws JsonProcessingException {
+	void setLoggerAndHandlerLevels() throws JacksonException {
 		
 		RunningContext rc = new RunningContext(APPLICATION_NAME,
 				"file:///FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test1.properties");
