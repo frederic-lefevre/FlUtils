@@ -226,6 +226,26 @@ public class RunningContext {
 		return buildInformationJson;
 	}
 
+	public String getVersion() {
+		if (buildInformation != null) {
+			if (buildInformation.isGitDirty(this.name)) {
+				return "version beta " + buildInformation.getBuildProperty(this.name, BuildInformation.VERSION);
+			} else {
+				return "version " + buildInformation.getBuildProperty(this.name, BuildInformation.VERSION);
+			}
+		} else {
+			return "Aucune information de build";
+		}
+	}
+	
+	public String getRawVersion() {
+		if (buildInformation != null) {
+			return buildInformation.getBuildProperty(this.name, BuildInformation.VERSION);
+		} else {
+			return "Aucune information de build";
+		}
+	}
+	
 	public void addBuildInformation(String moduleName) {
 		addBuildInformation(moduleName, false, RunningContext.class.getClassLoader());
 	}

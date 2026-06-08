@@ -92,7 +92,6 @@
                         </execution>
                     </executions>
                     <configuration>
-                     	<generateGitPropertiesFile>true</generateGitPropertiesFile>
                     	<dateFormat>yyyy-MM-dd HH:mm:ss Z</dateFormat>
                         <skipPoms>false</skipPoms>
                         <commitIdGenerationMode>full</commitIdGenerationMode>

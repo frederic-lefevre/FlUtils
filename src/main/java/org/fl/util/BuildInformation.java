@@ -69,4 +69,13 @@ public class BuildInformation {
 		}
 	}
 	
+	boolean isGitDirty(String moduleName) {
+		Properties buildInformationProperties = buildInformationPropertiesMap.get(moduleName);
+		if (buildInformationProperties != null) {
+			return Boolean.parseBoolean(buildInformationProperties.getProperty(GIT_DIRTY));
+		} else {
+			return false;
+		}
+	}
+	
 }

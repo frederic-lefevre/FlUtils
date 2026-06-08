@@ -281,6 +281,17 @@ class RunningContextTest {
 	}
 	
 	@Test
+	void testGetVersion() {
+		
+		RunningContext rc = new RunningContext(LOGGER_NAME,
+				"file:///FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test1.properties");
+		
+		assertThat(rc).isNotNull();
+		
+		assertThat(rc.getVersion()).isNotBlank();
+	}
+	
+	@Test
 	void testRunningContextBuildInfo() throws URISyntaxException, JacksonException {
 		
 		RunningContext rc = new RunningContext(LOGGER_NAME,
@@ -299,6 +310,7 @@ class RunningContextTest {
 					buildInfo -> assertModuleBuildInfo(buildInfo, LOGGER_NAME),
 					buildInfo -> assertModuleBuildInfo(buildInfo, "org.fl.util")
 				);
+		
 	}
 	
 	private void assertModuleBuildInfo(JsonNode buildInfo, String moduleName) {
