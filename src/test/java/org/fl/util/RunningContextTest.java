@@ -302,16 +302,19 @@ class RunningContextTest {
 	}
 	
 	private void assertModuleBuildInfo(JsonNode buildInfo, String moduleName) {
-		assertThat(buildInfo).hasSize(11);
+		assertThat(buildInfo).hasSize(14);
 		assertThat(buildInfo.get("moduleName")).isNotNull();
 		assertThat(buildInfo.get("moduleName").asString()).isEqualTo(moduleName);
 		assertThat(buildInfo.has("version")).isTrue();
 		assertThat(buildInfo.has("buildtime")).isTrue();
 		assertThat(buildInfo.has("builder")).isTrue();
+		assertThat(buildInfo.has("builderName")).isTrue();
+		assertThat(buildInfo.has("builderEmail")).isTrue();
 		assertThat(buildInfo.has("buildhost")).isTrue();
 		assertThat(buildInfo.has("buildOs")).isTrue();
 		assertThat(buildInfo.has("gitBranch")).isTrue();
 		assertThat(buildInfo.has("gitCommitId")).isTrue();
+		assertThat(buildInfo.has("gitCommitIdDescribe")).isTrue();
 		assertThat(buildInfo.has("gitCommitUrl")).isTrue();
 		assertThat(buildInfo.has("gitCommitTime")).isTrue();
 		assertThat(buildInfo.has("gitDirty")).isTrue();

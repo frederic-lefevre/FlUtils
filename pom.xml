@@ -92,9 +92,10 @@
                         </execution>
                     </executions>
                     <configuration>
+                     	<generateGitPropertiesFile>true</generateGitPropertiesFile>
                     	<dateFormat>yyyy-MM-dd HH:mm:ss Z</dateFormat>
                         <skipPoms>false</skipPoms>
-                        <commitIdGenerationMode>flat</commitIdGenerationMode>
+                        <commitIdGenerationMode>full</commitIdGenerationMode>
                         <injectAllReactorProjects>true</injectAllReactorProjects>
                     </configuration>
             </plugin>
