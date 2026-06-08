@@ -82,16 +82,16 @@ class RunningContextTest {
 		assertThat(buildInformation).isNotEmpty().hasSize(2)
 		.satisfiesExactlyInAnyOrder(
 				buildInfo -> { 
-					assertThat(buildInfo.get("moduleName")).isNotNull();
-					assertThat(buildInfo.get("moduleName").asString()).isEqualTo("org.fl");
+					assertThat(buildInfo.get(BuildInformation.MODULE_NAME)).isNotNull();
+					assertThat(buildInfo.get(BuildInformation.MODULE_NAME).asString()).isEqualTo("org.fl");
 					assertThat(buildInfo.get("buildInformation")).isNotNull();
 					assertThat(buildInfo.get("buildInformation").asString()).isEqualTo("No build information");
 				},
 				buildInfo -> { 
-					assertThat(buildInfo.get("moduleName")).isNotNull();
-					assertThat(buildInfo.get("moduleName").asString()).isEqualTo("org.fl.util");
-					assertThat(buildInfo.get("version")).isNotNull();
-					assertThat(buildInfo.get("version").asString()).isNotEmpty();
+					assertThat(buildInfo.get(BuildInformation.MODULE_NAME)).isNotNull();
+					assertThat(buildInfo.get(BuildInformation.MODULE_NAME).asString()).isEqualTo("org.fl.util");
+					assertThat(buildInfo.get(BuildInformation.VERSION)).isNotNull();
+					assertThat(buildInfo.get(BuildInformation.VERSION).asString()).isNotEmpty();
 				});
 		
 		assertThat(rc.getInitializationDate()).isCloseTo(Instant.now(), within(2, ChronoUnit.SECONDS));
@@ -222,7 +222,7 @@ class RunningContextTest {
 		
 		assertThat(rc.getInitializationDate()).isCloseTo(Instant.now(), within(2, ChronoUnit.SECONDS));
 
-		assertThat(rc.getBuildInformation()).isNotNull().isNotEmpty().contains("version");
+		assertThat(rc.getBuildInformation()).isNotNull().isNotEmpty().contains(BuildInformation.VERSION);
 		
 		assertThat(rc.getCommonLogFormatter()).isInstanceOf(PlainLogFormatter.class);
 	}
@@ -281,6 +281,17 @@ class RunningContextTest {
 	}
 	
 	@Test
+	void testGetVersion() {
+		
+		RunningContext rc = new RunningContext(LOGGER_NAME,
+				"file:///FredericPersonnel/EclipseOxygenWorkspace/FlUtils/src/test/resources/test1.properties");
+		
+		assertThat(rc).isNotNull();
+		
+		assertThat(rc.getVersion()).isNotBlank();
+	}
+	
+	@Test
 	void testRunningContextBuildInfo() throws URISyntaxException, JacksonException {
 		
 		RunningContext rc = new RunningContext(LOGGER_NAME,
@@ -299,22 +310,26 @@ class RunningContextTest {
 					buildInfo -> assertModuleBuildInfo(buildInfo, LOGGER_NAME),
 					buildInfo -> assertModuleBuildInfo(buildInfo, "org.fl.util")
 				);
+		
 	}
 	
 	private void assertModuleBuildInfo(JsonNode buildInfo, String moduleName) {
-		assertThat(buildInfo).hasSize(11);
-		assertThat(buildInfo.get("moduleName")).isNotNull();
-		assertThat(buildInfo.get("moduleName").asString()).isEqualTo(moduleName);
-		assertThat(buildInfo.has("version")).isTrue();
-		assertThat(buildInfo.has("buildtime")).isTrue();
-		assertThat(buildInfo.has("builder")).isTrue();
-		assertThat(buildInfo.has("buildhost")).isTrue();
-		assertThat(buildInfo.has("buildOs")).isTrue();
-		assertThat(buildInfo.has("gitBranch")).isTrue();
-		assertThat(buildInfo.has("gitCommitId")).isTrue();
-		assertThat(buildInfo.has("gitCommitUrl")).isTrue();
-		assertThat(buildInfo.has("gitCommitTime")).isTrue();
-		assertThat(buildInfo.has("gitDirty")).isTrue();
+		assertThat(buildInfo).hasSize(14);
+		assertThat(buildInfo.get(BuildInformation.VERSION)).isNotNull();
+		assertThat(buildInfo.get(BuildInformation.MODULE_NAME).asString()).isEqualTo(moduleName);
+		assertThat(buildInfo.has(BuildInformation.VERSION)).isTrue();
+		assertThat(buildInfo.has(BuildInformation.BUILD_TIME)).isTrue();
+		assertThat(buildInfo.has(BuildInformation.BUILDER)).isTrue();
+		assertThat(buildInfo.has(BuildInformation.BUILDER_NAME)).isTrue();
+		assertThat(buildInfo.has(BuildInformation.BUILDER_EMAIL)).isTrue();
+		assertThat(buildInfo.has(BuildInformation.BUILD_HOST)).isTrue();
+		assertThat(buildInfo.has(BuildInformation.BUILD_OS)).isTrue();
+		assertThat(buildInfo.has(BuildInformation.GIT_BRANCH)).isTrue();
+		assertThat(buildInfo.has(BuildInformation.GIT_COMMIT_ID)).isTrue();
+		assertThat(buildInfo.has(BuildInformation.GIT_COMMIT_ID_DESCRIBE)).isTrue();
+		assertThat(buildInfo.has(BuildInformation.GIT_COMMIT_URL)).isTrue();
+		assertThat(buildInfo.has(BuildInformation.GIT_COMMIT_TIME)).isTrue();
+		assertThat(buildInfo.has(BuildInformation.GIT_DIRTY)).isTrue();
 	}
 	
 	@Test
@@ -334,20 +349,20 @@ class RunningContextTest {
 		assertThat(buildInformation).isNotEmpty().hasSize(3)
 			.satisfiesExactlyInAnyOrder(
 					buildInfo -> { 
-						assertThat(buildInfo.get("moduleName")).isNotNull();
-						assertThat(buildInfo.get("moduleName").asString()).isEqualTo(LOGGER_NAME);
-						assertThat(buildInfo.get("version")).isNotNull();
-						assertThat(buildInfo.get("version").asString()).isNotEmpty();
+						assertThat(buildInfo.get(BuildInformation.MODULE_NAME)).isNotNull();
+						assertThat(buildInfo.get(BuildInformation.MODULE_NAME).asString()).isEqualTo(LOGGER_NAME);
+						assertThat(buildInfo.get(BuildInformation.VERSION)).isNotNull();
+						assertThat(buildInfo.get(BuildInformation.VERSION).asString()).isNotEmpty();
 					},
 					buildInfo -> { 
-						assertThat(buildInfo.get("moduleName")).isNotNull();
-						assertThat(buildInfo.get("moduleName").asString()).isEqualTo("org.fl.util");
-						assertThat(buildInfo.get("version")).isNotNull();
-						assertThat(buildInfo.get("version").asString()).isNotEmpty();
+						assertThat(buildInfo.get(BuildInformation.MODULE_NAME)).isNotNull();
+						assertThat(buildInfo.get(BuildInformation.MODULE_NAME).asString()).isEqualTo("org.fl.util");
+						assertThat(buildInfo.get(BuildInformation.VERSION)).isNotNull();
+						assertThat(buildInfo.get(BuildInformation.VERSION).asString()).isNotEmpty();
 					},
 					buildInfo -> { 
-						assertThat(buildInfo.get("moduleName")).isNotNull();
-						assertThat(buildInfo.get("moduleName").asString()).isEqualTo("does.not.exists");
+						assertThat(buildInfo.get(BuildInformation.MODULE_NAME)).isNotNull();
+						assertThat(buildInfo.get(BuildInformation.MODULE_NAME).asString()).isEqualTo("does.not.exists");
 						assertThat(buildInfo.get("buildInformation")).isNotNull();
 						assertThat(buildInfo.get("buildInformation").asString()).isEqualTo("No build information");
 					}
@@ -374,22 +389,22 @@ class RunningContextTest {
 		assertThat(buildInformation).isNotEmpty().hasSize(3)
 			.satisfiesExactlyInAnyOrder(
 					buildInfo -> { 
-						assertThat(buildInfo.get("moduleName")).isNotNull();
-						assertThat(buildInfo.get("moduleName").asString()).isEqualTo(LOGGER_NAME);
-						assertThat(buildInfo.get("version")).isNotNull();
-						assertThat(buildInfo.get("version").asString()).isNotEmpty();
+						assertThat(buildInfo.get(BuildInformation.MODULE_NAME)).isNotNull();
+						assertThat(buildInfo.get(BuildInformation.MODULE_NAME).asString()).isEqualTo(LOGGER_NAME);
+						assertThat(buildInfo.get(BuildInformation.VERSION)).isNotNull();
+						assertThat(buildInfo.get(BuildInformation.VERSION).asString()).isNotEmpty();
 					},
 					buildInfo -> { 
-						assertThat(buildInfo.get("moduleName")).isNotNull();
-						assertThat(buildInfo.get("moduleName").asString()).isEqualTo("org.fl.util");
-						assertThat(buildInfo.get("version")).isNotNull();
-						assertThat(buildInfo.get("version").asString()).isNotEmpty();
+						assertThat(buildInfo.get(BuildInformation.MODULE_NAME)).isNotNull();
+						assertThat(buildInfo.get(BuildInformation.MODULE_NAME).asString()).isEqualTo("org.fl.util");
+						assertThat(buildInfo.get(BuildInformation.VERSION)).isNotNull();
+						assertThat(buildInfo.get(BuildInformation.VERSION).asString()).isNotEmpty();
 					},
 					buildInfo -> { 
-						assertThat(buildInfo.get("moduleName")).isNotNull();
-						assertThat(buildInfo.get("moduleName").asString()).isEqualTo(addedModule);
-						assertThat(buildInfo.get("version")).isNotNull();
-						assertThat(buildInfo.get("version").asString()).isNotEmpty();
+						assertThat(buildInfo.get(BuildInformation.MODULE_NAME)).isNotNull();
+						assertThat(buildInfo.get(BuildInformation.MODULE_NAME).asString()).isEqualTo(addedModule);
+						assertThat(buildInfo.get(BuildInformation.VERSION)).isNotNull();
+						assertThat(buildInfo.get(BuildInformation.VERSION).asString()).isNotEmpty();
 					}
 					);
 	}
@@ -409,22 +424,22 @@ class RunningContextTest {
 		assertThat(buildInformation).isNotEmpty().hasSize(3)
 			.satisfiesExactlyInAnyOrder(
 					buildInfo -> { 
-						assertThat(buildInfo.get("moduleName")).isNotNull();
-						assertThat(buildInfo.get("moduleName").asString()).isEqualTo(LOGGER_NAME);
-						assertThat(buildInfo.get("version")).isNotNull();
-						assertThat(buildInfo.get("version").asString()).isNotEmpty();
+						assertThat(buildInfo.get(BuildInformation.MODULE_NAME)).isNotNull();
+						assertThat(buildInfo.get(BuildInformation.MODULE_NAME).asString()).isEqualTo(LOGGER_NAME);
+						assertThat(buildInfo.get(BuildInformation.VERSION)).isNotNull();
+						assertThat(buildInfo.get(BuildInformation.VERSION).asString()).isNotEmpty();
 					},
 					buildInfo -> { 
-						assertThat(buildInfo.get("moduleName")).isNotNull();
-						assertThat(buildInfo.get("moduleName").asString()).isEqualTo("org.fl.util");
-						assertThat(buildInfo.get("version")).isNotNull();
-						assertThat(buildInfo.get("version").asString()).isNotEmpty();
+						assertThat(buildInfo.get(BuildInformation.MODULE_NAME)).isNotNull();
+						assertThat(buildInfo.get(BuildInformation.MODULE_NAME).asString()).isEqualTo("org.fl.util");
+						assertThat(buildInfo.get(BuildInformation.VERSION)).isNotNull();
+						assertThat(buildInfo.get(BuildInformation.VERSION).asString()).isNotEmpty();
 					},
 					buildInfo -> { 
-						assertThat(buildInfo.get("moduleName")).isNotNull();
-						assertThat(buildInfo.get("moduleName").asString()).isEqualTo(addedModule);
-						assertThat(buildInfo.get("version")).isNotNull();
-						assertThat(buildInfo.get("version").asString()).isNotEmpty();
+						assertThat(buildInfo.get(BuildInformation.MODULE_NAME)).isNotNull();
+						assertThat(buildInfo.get(BuildInformation.MODULE_NAME).asString()).isEqualTo(addedModule);
+						assertThat(buildInfo.get(BuildInformation.VERSION)).isNotNull();
+						assertThat(buildInfo.get(BuildInformation.VERSION).asString()).isNotEmpty();
 					}
 					);
 	}
