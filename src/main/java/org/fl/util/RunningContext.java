@@ -254,14 +254,15 @@ public class RunningContext {
 
 			if (propsProjectString != null) {
 				
+				Properties propsProject = new Properties();
+				propsProject.load(new StringReader(propsProjectString));
+				propsProject.put("moduleName", moduleName);
+				
 				if (addToApplicationProps) {
-					Properties propsProject = new Properties();
-					propsProject.load(new StringReader(propsProjectString));
 					applicationProperties.putAll(propsProject);
 				}
 
-				ObjectNode moduleBuildInformation = (ObjectNode)propsMapper.readTree(propsProjectString);
-				moduleBuildInformation.put("moduleName", moduleName);
+				ObjectNode moduleBuildInformation = propsMapper.readPropertiesAs(propsProject, ObjectNode.class);
 				return moduleBuildInformation;
 
 			} else {
