@@ -105,7 +105,7 @@ public abstract class CustomTableCellRenderer extends DefaultTableCellRenderer {
 		    setBorder(noFocusBorder);
 		}
 		
-		// Responsible of setting text of JLabel, optionally setting background, foreground but that will override the selection colors
+		// Responsible of setting text or ImageIcon of JLabel, optionally setting background, foreground but that will override the selection colors
 		valueProcessor(value);
 		
 		return this;
