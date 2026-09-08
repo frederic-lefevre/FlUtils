@@ -228,7 +228,7 @@ public class RunningContext {
 
 	public String getVersion() {
 		if (buildInformation != null) {
-			if (buildInformation.isGitDirty(this.name)) {
+			if (buildInformation.isBetaVersion(this.name)) {
 				return "version beta " + buildInformation.getBuildProperty(this.name, BuildInformation.VERSION);
 			} else {
 				return "version " + buildInformation.getBuildProperty(this.name, BuildInformation.VERSION);

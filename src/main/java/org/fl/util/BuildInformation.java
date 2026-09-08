@@ -49,6 +49,9 @@ public class BuildInformation {
 	private static final String INCONNUE = "Propriété inconnue";
 	private static final String MODULE_INCONNU = "Module inconnu";
 	
+	private static final String MASTER_BRANCH = "master";
+	private static final String DEVELOP_BRANCH = "develop";
+	
 	private final Map<String,Properties> buildInformationPropertiesMap;
 	
 	BuildInformation() {
@@ -69,13 +72,14 @@ public class BuildInformation {
 		}
 	}
 	
-	boolean isGitDirty(String moduleName) {
+	boolean isBetaVersion(String moduleName) {
 		Properties buildInformationProperties = buildInformationPropertiesMap.get(moduleName);
 		if (buildInformationProperties != null) {
-			return Boolean.parseBoolean(buildInformationProperties.getProperty(GIT_DIRTY));
+			String branch = buildInformationProperties.getProperty(GIT_BRANCH);
+			return Boolean.parseBoolean(buildInformationProperties.getProperty(GIT_DIRTY)) ||
+					((!DEVELOP_BRANCH.equals(branch) && !MASTER_BRANCH.equals(branch)));
 		} else {
 			return false;
 		}
 	}
-	
 }
